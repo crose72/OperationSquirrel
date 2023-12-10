@@ -6,16 +6,20 @@ const float dt = 0.025;
 
 float timerVal = 0;
 int stage = 0;
-int32_t A_lat = -353630743;
-int32_t A_lon = 1491646454;
+int32_t A_lat = -353632362; 
+int32_t A_lon = 1491648312;
 float A_alt = 5;
-int32_t B_lat = -353638947;
-int32_t B_lon = 1491648283;
+int32_t B_lat = -353637101;  
+int32_t B_lon = 1491653676;
 float B_alt = 6;
 int32_t C_lat = -353637206;
 int32_t C_lon = 1491660477;
 float C_alt = 5;
+int32_t D_lat = -353633059;
+int32_t D_lon = 1491656980;
+float D_alt = 12;
 
+ 
 void countupTimer(void)
 {
     timerVal = timerVal + dt; // printf("Timer: %.3f\n", timerVal);
@@ -28,12 +32,12 @@ void resetTimer(void)
 
 void test_flight(void)
 {
-    if (stage <= 3)
+    if (stage <= 4)
     {
         countupTimer();
     }
 
-    if (timerVal > 10.0 && stage == 0)
+    if (timerVal > 7.0 && stage == 0)
     {
         printf("Moving to A\n");
         stage = stage + 1;
@@ -42,7 +46,7 @@ void test_flight(void)
 
     }
 
-    if (timerVal > 10.0 && stage == 1)
+    if (timerVal > 6.0 && stage == 1)
     {
         printf("Moving to B\n");
         stage = stage + 1;
@@ -50,7 +54,7 @@ void test_flight(void)
         go_to_waypoint(B_lat, B_lon, B_alt);
     }
 
-    if (timerVal > 10.0 && stage == 2)
+    if (timerVal > 6.0 && stage == 2)
     {
         printf("Moving to C\n");
         stage = stage + 1;
@@ -58,7 +62,15 @@ void test_flight(void)
         go_to_waypoint(C_lat, C_lon, C_alt);
     }
 
-    if (timerVal > 10.0 && stage == 3)
+    if (timerVal > 5.0 && stage == 3)
+    {
+        printf("Moving to D\n");
+        stage = stage + 1;
+        resetTimer();
+        go_to_waypoint(D_lat, D_lon, D_alt);
+    }
+
+    if (timerVal > 7.0 && stage == 4)
     {
         printf("Returning to base\n");
         stage = stage + 1;
