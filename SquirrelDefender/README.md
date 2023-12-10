@@ -16,8 +16,9 @@ This folder contains the code for the Squirrel Defender and most of its dependen
 #### Other preprocessing directives will be added to configure the code to enable or disable other features
 
 ## Code explanation
-- `appsrc` contains all source code files
-- `apphdr` contains all header files
-- `lib` contains all libraries used 
+- `appsrc` - source code files
+- `apphdr` - header files
+- `lib` - libraries used
+- `tests` - header files used to run flight tests
 
 #### Further descriptions to come

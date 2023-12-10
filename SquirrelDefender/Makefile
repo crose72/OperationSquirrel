@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -I. -I./apphdr/mavlink/v2.0/common -I./apphdr -I./lib
+CFLAGS = -I. -I./lib/mavlink/v2.0/common -I./apphdr -I./lib -I./tests
 
 # get list of all .cpp files in the appsrc directory
 SRCS := $(wildcard appsrc/*.cpp)
