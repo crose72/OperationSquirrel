@@ -20,9 +20,8 @@ Colosseum repo: https://github.com/CodexLabsLLC/Colosseum
     ###### Note: Again these steps are taking place in the `Colosseum` directory instead of AirSim because we cloned Colosseum
 
 ## Connecting SITL to AirSim
-#### You should already have SITL working independently before proceeding with these instructions
-#### AirSim is supposed to work with WSL2 according to these instructions: https://discuss.ardupilot.org/t/gsoc-2019-airsim-simulator-support-for-ardupilot-sitl-part-ii/46395/5, but I could not make it work with WSL2, I can get it working with WSL version 1, however
-#### These steps were done on Windows 11
+#### You should already have SITL working independently before proceeding with these instructions.  AirSim is supposed to work with WSL2 according to these instructions: https://discuss.ardupilot.org/t/gsoc-2019-airsim-simulator-support-for-ardupilot-sitl-part-ii/46395/5, but I could not make it work with WSL2, I can get it working with WSL version 1, however.  These steps were done on Windows 11.  Steps 1-4, and 9 should only need to be done the first time.
+
 1. Set up the ArduPilot development environment according to `[Start-Here] 
 2.Setting-up-the-workflow.md`
 2. Make sure you are using WSL version 1
@@ -66,13 +65,15 @@ export DISPLAY=0:0
     - Select how to start clients: Must select “Start no Client”
     - Extra settings: Must check “Disable access control”
     ###### Even if you're on Windows 11 - which natively supports x server displays in WSL2 because we are in WSL version 1 we need this 3rd party x server client
-7. Start SITL
+7. Start AirSim by pressing the play button in VS
+8. Start SITL
     - `sim_vehicle.py -v ArduCopter -f airsim-copter -A --sim-address=$WSL_HOST_IP --console --map`
-8. Disable arming checks in the SITL command line (for simulation testing purposes only)
-    - param set ARMING_CHECK 0 (if "Main Loop" is slow then disable arming checks)
+9. Disable arming checks in the SITL command line (for simulation testing purposes only and only if "Main Loop" is slow)
+    - `param set ARMING_CHECK 0`
 
-Somebody else had to use a slightly modified version of this command when starting SITL
-    - sim_vehicle.py -v ArduCopter -f airsim-copter -A --sim-address=169.254.255.255 --console --map
+## Additional notes
+Somebody else had to use a slightly modified version of the command in step 8 when starting SITL
+    - `sim_vehicle.py -v ArduCopter -f airsim-copter -A --sim-address=169.254.255.255 --console --map`
     - Where `169.254.255.255` sim address was found using the command `ip addr show eth0`.  Below is an example of what that output might look like and the value to choose is the one with enclosed with **.  (it may change sometimes, may need to check it occasionally)
 ```
 12: eth0: <> mtu 1500 group default qlen 1
