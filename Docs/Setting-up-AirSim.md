@@ -8,7 +8,7 @@ This document will guide you through setting up AirSim to work with SITL.  The o
 
 ## Setting up AirSim on Windows
 1. Clone Colosseum to a location of your choosing
-    - git clone `https://github.com/CodexLabsLLC/Colosseum.git`
+    - `git clone https://github.com/CodexLabsLLC/Colosseum.git`
 2. Follow these instructions for installing Unreal Engine and Building Colosseum
     - https://github.com/microsoft/AirSim/blob/main/docs/build_windows.md#build-airsim
     ###### Note: Use the `Developer Command Prompt for VS 2022` when running `build.cmd`
