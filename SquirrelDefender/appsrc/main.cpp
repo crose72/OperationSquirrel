@@ -11,7 +11,7 @@
 
 // Test flights
 //#include "sim_flight_test_1_goToWaypoint.h"
-#include "sim_flight_test_1_GPSWaypoint.h"
+#include "sim_flight_test_2_AttitudeControl.h"
 
 int main() 
 {
@@ -42,7 +42,7 @@ void initialize(void)
     request_messages();
 
     // Startup commands for drone
-    startup_sequence();
+    takeoff_sequence((float)5);
 }
 
 // Function to handle timer interrupt at 40Hz

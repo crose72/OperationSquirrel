@@ -43,10 +43,10 @@ void test_flight(void)
     mavlink_set_attitude_target_t desired_attitude_target;
     // parameters for set_attitude_target command
     desired_attitude_target.time_boot_ms = 0;
-    desired_attitude_target.body_roll_rate = 0.1;
-    desired_attitude_target.body_pitch_rate = 0.1;
-    desired_attitude_target.body_yaw_rate = 0.1; 
-    desired_attitude_target.thrust = (float)1.0;  // Define the desired thrust magnitude (adjust as needed), Range: 0.0 (no thrust) to 1.0 (full thrust)
+    desired_attitude_target.body_roll_rate = 0.0;
+    desired_attitude_target.body_pitch_rate = -2.0;
+    desired_attitude_target.body_yaw_rate = 0.0; 
+    desired_attitude_target.thrust = (float)0.5;  // Define the desired thrust magnitude (adjust as needed), Range: 0.0 (no thrust) to 1.0 (full thrust)
     desired_attitude_target.q[0] = (float)1.0; // real part, i, j, k
     desired_attitude_target.q[1] = (float)0.0;
     desired_attitude_target.q[2] = (float)0.0;
@@ -60,7 +60,7 @@ void test_flight(void)
 
 
 
-    if (alt > 12.0)
+    if (timerVal > 5.0)
     {
         if (std::fabs(q1_actual - q1_target) > error_cal || std::fabs(q2_actual - q2_target) > error_cal || std::fabs(q3_actual - q3_target) > error_cal || std::fabs(q4_actual - q4_target) > error_cal 
         || std::fabs(roll_rate_actual - roll_rate_target) > error_cal || std::fabs(pitch_rate_actual - pitch_rate_target) > error_cal || std::fabs(yaw_rate_actual - yaw_rate_target) > error_cal)

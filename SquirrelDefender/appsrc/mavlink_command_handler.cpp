@@ -21,7 +21,7 @@ void msg_handler(uint16_t mavlink_command, uint16_t msg_id, float msg_interval)
     write_serial_port(buffer, len);
 }
 
-void startup_sequence(void)
+void takeoff_sequence(float takeoff_alt)
 {
     // Set flight mode to guided
     // enable or disable custom mode (including guided), mode # (found in mode.h), custom submode, empty, etc
@@ -34,7 +34,7 @@ void startup_sequence(void)
     send_command_long(MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 1, 0, 0, 0, 0, 0);
 
     // Takeoff
-    send_command_long(MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, 15.0);
+    send_command_long(MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, takeoff_alt);
 }
 
 void landing_sequence(void)
