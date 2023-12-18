@@ -10,7 +10,8 @@ extern const uint8_t SENDER_SYS_ID;
 extern const uint8_t SENDER_COMP_ID;
 extern const uint8_t TARGET_SYS_ID;
 extern const uint8_t TARGET_COMP_ID;
-extern const int32_t MESSAGE_INTERVAL;
+extern const int32_t MESSAGE_RATE_DEFAULT;
+extern const int32_t MESSAGE_RATE_1000us;
 
 extern int32_t lat;
 extern int32_t lon;

@@ -1,10 +1,13 @@
 # Setting up the OperationSquirrel workflow
 
 ## Summary
-This document will guide you through setting up AirSim to work with SITL.  The original instructions can be found here https://ardupilot.org/dev/docs/sitl-with-airsim.html, but I will try to simplify it after having done the process.  Note that the AirSim repository is no longer supported.  It should still work, but Codex Labs forked AirSim to a new repo called Colosseum to keep AirSim alive, and it works with Unreal Engine 5.  AirSim and Colosseum are synonymous in this document, they mean the same simulation environment, one repo is just no longer supported.
+This document will guide you through setting up AirSim to work with SITL.  The original instructions can be found here https://ardupilot.org/dev/docs/sitl-with-airsim.html, but I will try to simplify it after having done the process.  Note that the AirSim repository is no longer supported.  It should still work, but Codex Labs forked AirSim to a new repo called Colosseum to keep AirSim alive, and it works with Unreal Engine 5.  AirSim and Colosseum are synonymous in this document, they mean the same simulation environment, one repo is just no longer supported.  Instructions for using pre compiled binaries is also included so you can use AirSim without installing Unreal Engine or building AirSim.
 
 - AirSim repo: https://github.com/microsoft/AirSim
 - Colosseum repo: https://github.com/CodexLabsLLC/Colosseum
+
+## Using AirSim binaries
+#### If you don't want to install unreal engine and build AirSim/Colosseum, then you can use precompiled binaries found here https://github.com/microsoft/AirSim/releases.  Just download the zip file for the environment you want to use, unzip it, and execute the application (e.g. double click `AbandonedPark.exe`)
 
 ## Setting up AirSim on Windows
 1. Clone Colosseum to a location of your choosing

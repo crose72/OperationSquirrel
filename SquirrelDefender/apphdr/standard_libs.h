@@ -31,5 +31,6 @@
 // Customer headers for global objects
 #include "global_objects.h"
 #include "global_calibrations.h"
+#include "global_types.h"
 
 #endif // STANDARD_LIBS

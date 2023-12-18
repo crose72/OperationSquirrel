@@ -28,7 +28,7 @@ void takeoff_sequence(float takeoff_alt)
     send_command_long(MAV_CMD_DO_SET_MODE, 0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, 4, 0, 0, 0, 0, 0); // guided = 4
 
     // Hand control over to the companion computer
-    send_command_long(MAV_CMD_NAV_GUIDED_ENABLE, 0, 1, 0, 0, 0, 0, 0, 0);
+    // send_command_long(MAV_CMD_NAV_GUIDED_ENABLE, 0, 1, 0, 0, 0, 0, 0, 0);
     
     // ARM the drone
     send_command_long(MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 1, 0, 0, 0, 0, 0);
@@ -104,6 +104,18 @@ void send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired_attitud
     mavlink_message_t msg; // initialize the Madvlink message buffer
 
     mavlink_msg_set_attitude_target_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, desired_attitude_target);
+    offset_buffer(buffer, len, msg);
+    write_serial_port(buffer, len);
+}
+
+// Position control of drone using external controller
+void send_cmd_set_position_target_local_ned(mavlink_set_position_target_local_ned_t *desired_position_target)
+{
+    uint16_t len = 0; // length of buffer
+    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
+    mavlink_message_t msg; // initialize the Madvlink message buffer
+
+    mavlink_msg_set_position_target_local_ned_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, desired_position_target);
     offset_buffer(buffer, len, msg);
     write_serial_port(buffer, len);
 }

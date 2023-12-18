@@ -10,8 +10,9 @@
 #include "time_calc.h"
 
 // Test flights
-//#include "sim_flight_test_1_goToWaypoint.h"
-#include "sim_flight_test_2_AttitudeControl.h"
+// #include "sim_flight_test_1_GPSWaypoint.h"
+// #include "sim_flight_test_2_AttitudeControl.h"
+#include "sim_flight_test_3_VehiclePositionControl.h"
 
 int main() 
 {
@@ -42,7 +43,7 @@ void initialize(void)
     request_messages();
 
     // Startup commands for drone
-    takeoff_sequence((float)5);
+    takeoff_sequence((float)6);
 }
 
 // Function to handle timer interrupt at 40Hz
@@ -52,7 +53,7 @@ void task_25ms(int sig, siginfo_t* si, void* uc)
     calcExecutionTime();
     parse_serial_data();
     test_flight();
-    logData();
+    // logData();
 
     if (firstLoopAfterStartup == true)
     {
