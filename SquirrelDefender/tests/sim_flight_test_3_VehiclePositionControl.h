@@ -25,20 +25,26 @@ void test_flight(void)
 {
     countupTimer();
 
-    if (timerVal > 5.0 && stage == 0)
+    if (timerVal > 6.0 && stage == 0)
     {
-        move_to_position((float)2, (float)-10, (float)-4);
+        cmd_position((float)10, (float)-4, (float)-4);
         stage = 1;
     }
 
-    if (timerVal > 10 && stage == 1)
+    if (timerVal > 12 && stage == 1)
     {
-        move_to_position((float)20, (float)-4, (float)-11);
+        cmd_position((float)5, (float)7, (float)1);
         stage = 2;
     }
 
-    /*if (timerVal > 14.0)
+    // if (timerVal > 16.0 && stage == 2)
+    // {
+    //     cmd_position((float)-6, (float)4, (float)-2);
+    //     stage = 3;
+    // }
+
+    if (timerVal > 23 && stage == 3)
     {
         landing_sequence();
-    }*/
+    }
 }
