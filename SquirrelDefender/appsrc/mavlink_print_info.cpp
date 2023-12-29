@@ -1,6 +1,39 @@
+/********************************************************************************
+ * @file    mavlink_print_info.cpp
+ * @author  Cameron Rose
+ * @date    12/27/2023
+ * @brief   Formatted print statements for mavlink messages.
+ ********************************************************************************/
+
+/********************************************************************************
+ * Includes
+ ********************************************************************************/
 #include "mavlink_print_info.h"
 
-// Function definitions
+/********************************************************************************
+ * Typedefs
+ ********************************************************************************/
+
+/********************************************************************************
+ * Private macros and defines
+ ********************************************************************************/
+
+/********************************************************************************
+ * Object definitions
+ ********************************************************************************/
+
+/********************************************************************************
+ * Calibration definitions
+ ********************************************************************************/
+
+/********************************************************************************
+ * Function definitions
+ ********************************************************************************/
+
+/********************************************************************************
+ * Function: print_heartbeat
+ * Description: Print the heartbeat mavlink message.
+ ********************************************************************************/
 void print_heartbeat(mavlink_heartbeat_t &heartbeat) 
 {
     printf("Heartbeat:\n");
@@ -12,6 +45,10 @@ void print_heartbeat(mavlink_heartbeat_t &heartbeat)
     printf("\tMavlink version: %d\n", heartbeat.mavlink_version);
 }
 
+/********************************************************************************
+ * Function: print_system_time
+ * Description: Print the system time mavlink message.
+ ********************************************************************************/
 void print_system_time(mavlink_system_time_t &system_time)
 {
     printf("System Time:\n");
@@ -19,6 +56,10 @@ void print_system_time(mavlink_system_time_t &system_time)
     printf("\tTime since boot (ms): %u\n", system_time.time_boot_ms);
 }
 
+/********************************************************************************
+ * Function: print_sys_status
+ * Description: Print the system status mavlink message.
+ ********************************************************************************/
 void print_sys_status(mavlink_sys_status_t &sys_status) 
 {
     printf("System status:\n");
@@ -37,36 +78,10 @@ void print_sys_status(mavlink_sys_status_t &sys_status)
     printf("\tErrors count 4: %u\n", sys_status.errors_count4);
 }
 
-
-
-/*
-void print_gps_raw_int(mavlink_gps_raw_int_t &gps_raw_int) 
-{
-    printf("GPS raw data:\n");
-    printf("\tTimestamp: %lu ms\n", gps_raw_int.time_usec);
-    printf("\tFix type: %d\n", gps_raw_int.fix_type);
-    printf("\tLatitude: %d degrees (1e-7)\n", gps_raw_int.lat);
-    printf("\tLongitude: %d degrees (1e-7)\n", gps_raw_int.lon);
-    printf("\tAltitude: %d meters\n", gps_raw_int.alt);
-    printf("\tGround speed: %d m/s\n", gps_raw_int.vel);
-    printf("\tCourse over ground: %d degrees\n", gps_raw_int.cog);
-}
-*/
-
-/*
-void print_attitude(mavlink_attitude_t& attitude) 
-{
-    printf("Attitude:\n");
-    printf("\tTimestamp: %u\n", attitude.time_boot_ms);
-    printf("\tRoll: %f (radians)\n", attitude.roll);
-    printf("\tPitch: %f (radians)\n", attitude.pitch);
-    printf("\tYaw: %f (radians)\n", attitude.yaw);
-    printf("\tRoll rate: %f (radians/second)\n", attitude.rollspeed);
-    printf("\tPitch rate: %f (radians/second)\n", attitude.pitchspeed);
-    printf("\tYaw rate: %f (radians/second)\n", attitude.yawspeed);
-}
-*/
-
+/********************************************************************************
+ * Function: print_attitude
+ * Description: Print the attitude mavlink message.
+ ********************************************************************************/
 void print_attitude(mavlink_attitude_t &attitude) 
 {
     printf("Attitude:\n");
@@ -78,6 +93,10 @@ void print_attitude(mavlink_attitude_t &attitude)
     printf("\tYaw speed: %.4f rad/s\n", attitude.yawspeed);
 }
 
+/********************************************************************************
+ * Function: print_global_position_int
+ * Description: Print the global position integer mavlink message.
+ ********************************************************************************/
 void print_global_position_int(mavlink_global_position_int_t &global_pos_int) 
 {
     printf("Global position:\n");
@@ -86,6 +105,10 @@ void print_global_position_int(mavlink_global_position_int_t &global_pos_int)
     printf("\tAltitude: %d\n", global_pos_int.alt);
 }
 
+/********************************************************************************
+ * Function: print_scale_imu
+ * Description: Print the scaled imu mavlink message.
+ ********************************************************************************/
 void print_scaled_imu(mavlink_raw_imu_t &scaled_imu) 
 {
     printf("Scaled IMU data:\n");
@@ -101,6 +124,10 @@ void print_scaled_imu(mavlink_raw_imu_t &scaled_imu)
     printf("\tZ magnetometer: %d\n", scaled_imu.zmag);
 }
 
+/********************************************************************************
+ * Function: print_raw_imu
+ * Description: Print the raw imu mavlink message.
+ ********************************************************************************/
 void print_raw_imu(mavlink_raw_imu_t &raw_imu) 
 {
     printf("Raw IMU data:\n");
@@ -116,25 +143,10 @@ void print_raw_imu(mavlink_raw_imu_t &raw_imu)
     printf("\tZ magnetometer: %d\n", raw_imu.zmag);
 }
 
-void print_scaled_imu(mavlink_scaled_imu_t& scaled_imu) 
-{
-    printf("Scaled IMU:\n");
-    printf("\tTimestamp: %u\n", scaled_imu.time_boot_ms);
-    printf("\tAcceleration (m/s^2):\n");
-    printf("\t\tX: %d\n", scaled_imu.xacc);
-    printf("\t\tY: %d\n", scaled_imu.yacc);
-    printf("\t\tZ: %d\n", scaled_imu.zacc);
-    printf("\tAngular velocity (rad/s):\n");
-    printf("\t\tX: %d\n", scaled_imu.xgyro);
-    printf("\t\tY: %d\n", scaled_imu.ygyro);
-    printf("\t\tZ: %d\n", scaled_imu.zgyro);
-    printf("\tMagnetic field (Gauss):\n");
-    printf("\t\tX: %d\n", scaled_imu.xmag);
-    printf("\t\tY: %d\n", scaled_imu.ymag);
-    printf("\t\tZ: %d\n", scaled_imu.zmag);
-    printf("\tTemperature (°C): %d\n", scaled_imu.temperature);
-}
-
+/********************************************************************************
+ * Function: print_servo_output_raw
+ * Description: Print the raw servo output mavlink message.
+ ********************************************************************************/
 void print_servo_output_raw(mavlink_servo_output_raw_t& servo_output_raw) 
 {
     printf("Servo Output Raw:\n");
@@ -146,18 +158,10 @@ void print_servo_output_raw(mavlink_servo_output_raw_t& servo_output_raw)
     printf("\t\tChannel 4: %d\n", servo_output_raw.servo4_raw);
 }
 
-void print_rc_channels_scaled(mavlink_rc_channels_scaled_t& rc_channels_scaled) 
-{
-    printf("RC Channels Scaled:\n");
-    printf("\tTimestamp: %u\n", rc_channels_scaled.time_boot_ms);
-    printf("\tScaled Channels:\n");
-    printf("\t\tChannel 1: %d\n", rc_channels_scaled.chan1_scaled);
-    printf("\t\tChannel 2: %d\n", rc_channels_scaled.chan2_scaled);
-    printf("\t\tChannel 3: %d\n", rc_channels_scaled.chan3_scaled);
-    printf("\t\tChannel 4: %d\n", rc_channels_scaled.chan4_scaled);
-    // Add more channels as needed
-}
-
+/********************************************************************************
+ * Function: print_local_position
+ * Description: Print the local position mavlink message.
+ ********************************************************************************/
 void print_local_position(mavlink_local_position_ned_t& local_position) 
 {
     printf("Local Position:\n");
@@ -172,18 +176,10 @@ void print_local_position(mavlink_local_position_ned_t& local_position)
     printf("\t\tVZ: %f\n", local_position.vz);
 }
 
-void print_rc_channels_raw(mavlink_rc_channels_raw_t& rc_channels_raw) 
-{
-    printf("RC Channels Raw:\n");
-    printf("\tTimestamp: %u\n", rc_channels_raw.time_boot_ms);
-    printf("\tRaw Channels:\n");
-    printf("\t\tChannel 1: %d\n", rc_channels_raw.chan1_raw);
-    printf("\t\tChannel 2: %d\n", rc_channels_raw.chan2_raw);
-    printf("\t\tChannel 3: %d\n", rc_channels_raw.chan3_raw);
-    printf("\t\tChannel 4: %d\n", rc_channels_raw.chan4_raw);
-    // Add more channels as needed
-}
-
+/********************************************************************************
+ * Function: print_gps_raw_int
+ * Description: Print the raw gps integer mavlink message.
+ ********************************************************************************/
 void print_gps_raw_int(mavlink_gps_raw_int_t &gps_raw_int) 
 {
     printf("GPS Raw Int:\n");
@@ -197,6 +193,10 @@ void print_gps_raw_int(mavlink_gps_raw_int_t &gps_raw_int)
     printf("\tSatellites visible: %d\n", gps_raw_int.satellites_visible);
 } 
 
+/********************************************************************************
+ * Function: print_param_request_read
+ * Description: Print the parameter request read mavlink message.
+ ********************************************************************************/
 void print_param_request_read(mavlink_param_request_read_t &param_request_read) 
 {
     printf("Param Request Read:\n");
@@ -205,6 +205,10 @@ void print_param_request_read(mavlink_param_request_read_t &param_request_read)
     printf("\tParameter ID: %s\n", param_request_read.param_id);
 }
 
+/********************************************************************************
+ * Function: print_request_data_stream
+ * Description: Print the request data stream mavlink message.
+ ********************************************************************************/
 void print_request_data_stream(mavlink_request_data_stream_t &request_data_stream) 
 {
     printf("REQUEST_DATA_STREAM message:\n");
@@ -215,6 +219,10 @@ void print_request_data_stream(mavlink_request_data_stream_t &request_data_strea
     printf("\tStart/Stop: %u\n", request_data_stream.start_stop);
 }
 
+/********************************************************************************
+ * Function: print_gps_global_origin
+ * Description: Print the gps global origin mavlink message.
+ ********************************************************************************/
 void print_gps_global_origin(mavlink_gps_global_origin_t &gps_global_origin) 
 {
     printf("GPS_GLOBAL_ORIGIN message:\n");
@@ -223,6 +231,10 @@ void print_gps_global_origin(mavlink_gps_global_origin_t &gps_global_origin)
     printf("\tAltitude: %f\n", (double)gps_global_origin.altitude);
 }
 
+/********************************************************************************
+ * Function: print_home_position
+ * Description: Print the home position mavlink message.
+ ********************************************************************************/
 void print_home_position(mavlink_home_position_t &home_position) 
 {
     printf("HOME_POSITION message:\n");
@@ -231,6 +243,10 @@ void print_home_position(mavlink_home_position_t &home_position)
     printf("\tAltitude: %f\n", (double)home_position.altitude);
 }
 
+/********************************************************************************
+ * Function: print_statustext
+ * Description: Print the status text mavlink message.
+ ********************************************************************************/
 void print_statustext(mavlink_statustext_t &statustext) 
 {
     printf("STATUSTEXT message:\n");
@@ -238,7 +254,10 @@ void print_statustext(mavlink_statustext_t &statustext)
     printf("\tText: %s\n", statustext.text);
 }
 
-// Function to print PARAM_VALUE message
+/********************************************************************************
+ * Function: print_param_value
+ * Description: Print the value of a parameter.
+ ********************************************************************************/
 void print_param_value(mavlink_param_value_t &param_value) 
 {
     printf("Parameter Name: %s\n", param_value.param_id);
@@ -248,6 +267,10 @@ void print_param_value(mavlink_param_value_t &param_value)
     printf("\tIndex: %d\n", param_value.param_index);
 }
 
+/********************************************************************************
+ * Function: print_autopilot_version
+ * Description: Print the autopilot version mavlink message.
+ ********************************************************************************/
 void print_autopilot_version(mavlink_autopilot_version_t &autopilot_version) 
 {
     printf("Autopilot Version:\n");
@@ -259,42 +282,12 @@ void print_autopilot_version(mavlink_autopilot_version_t &autopilot_version)
     printf("\tFlight Custom Version: %lu\n", autopilot_version.flight_custom_version);
     printf("\tMiddleware Custom Version: %lu\n", autopilot_version.middleware_custom_version);
     printf("\tOS Custom Version: %lu\n", autopilot_version.os_custom_version);
-    /*
-    printf("\tVendor ID: ");
-    for (int i = 0; i < 20; ++i) {
-        printf("%02X ", static_cast<unsigned char>(autopilot_version.vendor_id[i]));
-    }
-    printf("\n");
-
-    printf("\tProduct ID: ");
-    for (int i = 0; i < 20; ++i) {
-        printf("%02X ", static_cast<unsigned char>(autopilot_version.product_id[i]));
-    }
-    printf("\n");
-
-    printf("\tUID: ");
-    for (int i = 0; i < 20; ++i) {
-        printf("%02X ", static_cast<unsigned char>(autopilot_version.uid[i]));
-    }
-    printf("\n");*/
 }
 
-/*
-// Function to print MAV_PROTOCOL_CAPABILITY
-void print_protocol_capability(mavlink_protocol_version_t &protocol_capability) 
-{
-   printf("Protocol Capability:\n");
-    
-    // Print decimal values
-    printf("\tLink ID: %u\n", protocol_capability.link_id);
-    printf("\tCapabilities: %lu\n", protocol_capability.capabilities);
-
-    // Print binary values using std::bitset
-    printf("\tBinary Link ID: %s\n", std::bitset<8>(protocol_capability.link_id).to_string().c_str());
-    printf("\tBinary Capabilities: %s\n", std::bitset<64>(protocol_capability.capabilities).to_string().c_str());
-}*/
-
-// Function to print ATTITUDE_TARGET
+/********************************************************************************
+ * Function: print_attitude_target
+ * Description: Print the attitude target mavlink message.
+ ********************************************************************************/
 void print_attitude_target(mavlink_attitude_target_t &attitude_target) 
 {
     printf("Attitude Target:\n");
@@ -307,6 +300,10 @@ void print_attitude_target(mavlink_attitude_target_t &attitude_target)
     printf("\tThrust: %f\n", attitude_target.thrust);
 }
 
+/********************************************************************************
+ * Function: print_attitude_quaternion
+ * Description: Print the attitude quaternion mavlink message.
+ ********************************************************************************/
 void print_attitude_quaternion(mavlink_attitude_quaternion_t &attitude_quaternion) 
 {
     printf("Attitude Quaternion:\n");
@@ -318,6 +315,10 @@ void print_attitude_quaternion(mavlink_attitude_quaternion_t &attitude_quaternio
     printf("\tRotation offset: [%f, %f, %f, %f]\n", attitude_quaternion.repr_offset_q[0], attitude_quaternion.repr_offset_q[1], attitude_quaternion.repr_offset_q[2], attitude_quaternion.repr_offset_q[3]);
 }
 
+/********************************************************************************
+ * Function: print_command_ack
+ * Description: Print the mavlink command received by the autopilot.
+ ********************************************************************************/
 void print_command_ack(mavlink_command_ack_t &command_ack) 
 {
     printf("Command ACK received:\n");

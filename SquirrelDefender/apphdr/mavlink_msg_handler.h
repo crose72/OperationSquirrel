@@ -1,11 +1,22 @@
+/********************************************************************************
+ * @file    mavlink_msg_handler.h
+ * @author  Cameron Rose
+ * @date    12/27/2023
+ ********************************************************************************/
 #ifndef MAVLINK_MSG_HANDLER_H
 #define MAVLINK_MSG_HANDLER_H
 
-#include "standard_libs.h"
+/********************************************************************************
+ * Includes
+ ********************************************************************************/
+#include "common_inc.h"
 #include "mavlink_print_info.h"
 #include "serial_port_handler.h"
-#include "mavlink_command_handler.h"
+#include "mavlink_cmd_handler.h"
 
+/********************************************************************************
+ * Imported objects
+ ********************************************************************************/
 extern const uint8_t SENDER_SYS_ID;
 extern const uint8_t SENDER_COMP_ID;
 extern const uint8_t TARGET_SYS_ID;
@@ -56,6 +67,13 @@ extern float thrust_actual;
 extern uint32_t time_since_boot_ms;
 extern uint64_t unix_timestamp_us;
 
+/********************************************************************************
+ * Exported objects
+ ********************************************************************************/
+
+/********************************************************************************
+ * Function prototypes
+ ********************************************************************************/
 void set_message_rates(void);
 void request_messages(void);
 void parse_serial_data(void);

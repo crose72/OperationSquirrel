@@ -1,14 +1,68 @@
+/********************************************************************************
+ * @file    serial_port_handler.cpp
+ * @author  Cameron Rose
+ * @date    12/27/2023
+ * @brief   Configure and enable serial ports for simulated and real serial
+ *          data.  TCP is used for SITL and UART is used for the hardware drone.
+ ********************************************************************************/
+
+/********************************************************************************
+ * Includes
+ ********************************************************************************/
 #include "serial_port_handler.h"
 
+/********************************************************************************
+ * Typedefs
+ ********************************************************************************/
+#ifdef USE_UART
+    // Do nothing
+#elif USE_TCP
+    struct sockaddr_in sim_addr;
+#else
+    #error "Please define either USE_UART or USE_TCP to enable the corresponding functionality."
+#endif
+
+/********************************************************************************
+ * Private macros and defines
+ ********************************************************************************/
 #ifdef USE_UART
     #define SERIAL_PORT "/dev/ttyTHS1"
     #define BAUD_RATE B115200
+#elif USE_TCP
+    #define _POSIX_C_SOURCE 200809L // enable certain POSIX-specific functionality
+    #define SIM_IP "127.0.0.1" // IP address of SITL simulation
+    #define SIM_PORT 5762      // Port number used by SITL simulation
+#else
+    #error "Please define either USE_UART or USE_TCP to enable the corresponding functionality."
+#endif
 
+/********************************************************************************
+ * Object definitions
+ ********************************************************************************/
+#ifdef USE_UART
     int serial_port = 0;
+#elif USE_TCP
+    int sock;
+#else
+    #error "Please define either USE_UART or USE_TCP to enable the corresponding functionality."
+#endif
 
+/********************************************************************************
+ * Calibration definitions
+ ********************************************************************************/
+
+/********************************************************************************
+ * Function definitions
+ ********************************************************************************/
+#ifdef USE_UART
+    /********************************************************************************
+     * Function: open_serial_port
+     * Description: Configure and make available the serial port to be used for 
+     *              UART comms.
+     ********************************************************************************/
     void open_serial_port(void)
     {
-        // Open thea serial port for reading and writing
+        // Open the serial port for reading and writing
         serial_port = open(SERIAL_PORT, O_RDWR);
         if (serial_port < 0) 
         {
@@ -26,6 +80,10 @@
         tcsetattr(serial_port, TCSANOW, &serial_config);
     }
 
+    /********************************************************************************
+     * Function: write_serial_port
+     * Description: Send a buffer of bytes on the serial port.
+     ********************************************************************************/
     void write_serial_port(uint8_t* buffer, uint16_t len)
     {
         // Write to serial port
@@ -44,6 +102,10 @@
         clear_buffer(buffer, len);
     }
 
+    /********************************************************************************
+     * Function: read_serial_port
+     * Description: Read some bytes from the serial port.
+     ********************************************************************************/
     uint8_t read_serial_port(void) 
     {
         // Read a byte from the serial port
@@ -56,20 +118,21 @@
         return byte;
     }
 
+    /********************************************************************************
+     * Function: close_serial_port
+     * Description: Close the serial port so it is no longer able to transmit.
+     ********************************************************************************/
     void close_serial_port(void)
     {
         // Close the serial port
         close(serial_port);
     }
-
 #elif USE_TCP
-    #define _POSIX_C_SOURCE 200809L // enable certain POSIX-specific functionality
-    #define SIM_IP "127.0.0.1" // IP address of SITL simulation
-    #define SIM_PORT 5762      // Port number used by SITL simulation
-    struct sockaddr_in sim_addr;
-
-    int sock;
-
+    /********************************************************************************
+     * Function: open_serial_port
+     * Description: Configure and make available the TCP port to be use like a serial
+     *              port.
+     ********************************************************************************/
     void open_serial_port(void)
     {
         // Create a socket for the TCP connection
@@ -95,6 +158,10 @@
         fcntl(sock, F_SETFL, flags | O_NONBLOCK);
     }
 
+    /********************************************************************************
+     * Function: write_serial_port
+     * Description: Send a buffer of bytes on the serial port.
+     ********************************************************************************/
     void write_serial_port(uint8_t* buffer, uint16_t len)
     {
         // Write to serial port
@@ -113,6 +180,10 @@
         clear_buffer(buffer, len);
     }
 
+    /********************************************************************************
+     * Function: read_serial_port
+     * Description: Read some bytes from the serial port.
+     ********************************************************************************/
     uint8_t read_serial_port(void) 
     {
         // Read a byte from the serial port
@@ -126,24 +197,33 @@
         return byte;
     }
 
+    /********************************************************************************
+     * Function: close_serial_port
+     * Description: Close the serial port so it is no longer able to transmit.
+     ********************************************************************************/
     void close_serial_port(void)
     {
         // Close the serial port
         close(sock);
     }
-
 #else
     #error "Please define either USE_UART or USE_TCP to enable the corresponding functionality."
-
 #endif
 
+/********************************************************************************
+ * Function: offset_buffer
+ * Description: Offset the buffer by the its length to avoid overlapping buffers.
+ ********************************************************************************/
 void offset_buffer(uint8_t* buffer, uint16_t &len, mavlink_message_t &msg)
 {
     len = len + mavlink_msg_to_send_buffer(&buffer[len], &msg);
 }
 
+/********************************************************************************
+ * Function: clear_buffer
+ * Description: Clear the buffer
+ ********************************************************************************/
 void clear_buffer(uint8_t* buffer, uint16_t len)
 {
     memset(buffer, 0, len);
 }
-

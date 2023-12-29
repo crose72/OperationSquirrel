@@ -1,10 +1,44 @@
+/********************************************************************************
+ * @file    datalog.cpp
+ * @author  Cameron Rose
+ * @date    12/27/2023
+ * @brief   Record key information in a text file for debugging and issue
+ *          resolution.
+ ********************************************************************************/
+
+/********************************************************************************
+ * Includes
+ ********************************************************************************/
 #include "datalog.h"
 
+/********************************************************************************
+ * Typedefs
+ ********************************************************************************/
+
+/********************************************************************************
+ * Private macros and defines
+ ********************************************************************************/
+
+/********************************************************************************
+ * Object definitions
+ ********************************************************************************/
 bool headingsWritten = false;
 std::string dataFileName = "data";
 std::string unusedDataFileName = "";
 std::vector<std::vector<std::string>> data = {};
 
+/********************************************************************************
+ * Calibration definitions
+ ********************************************************************************/
+
+/********************************************************************************
+ * Function definitions
+ ********************************************************************************/
+
+/********************************************************************************
+ * Function: toString
+ * Description: Convert a value to a string (float, integer, etc.)..
+ ********************************************************************************/
 template <typename T>
 std::string toString(const T& value) 
 {
@@ -13,6 +47,10 @@ std::string toString(const T& value)
     return oss.str();
 }
 
+/********************************************************************************
+ * Function: logData
+ * Description: Determine when to log flight data and then log it.
+ ********************************************************************************/
 void logData(void)
 {
     if (firstLoopAfterStartup == true)
@@ -80,6 +118,10 @@ void logData(void)
     writeToCSV(unusedDataFileName, data);
 }
 
+/********************************************************************************
+ * Function: writeToCSV
+ * Description: Write the data passed to this function into a CSV.
+ ********************************************************************************/
 void writeToCSV(const std::string& filename, const std::vector<std::vector<std::string>>& data) 
 {
     std::ofstream outFile(filename, std::ios_base::app); // Open in append mode
@@ -113,6 +155,11 @@ void writeToCSV(const std::string& filename, const std::vector<std::vector<std::
     // std::cout << "File " << filename << " written successfully." << std::endl;
 }
 
+/********************************************************************************
+ * Function: checkAndAppendFileName
+ * Description: Search for existing file name and increment the file number to 1
+ *              greater than the highest existing file number.
+ ********************************************************************************/
 std::string checkAndAppendFileName(const std::string& filename) 
 {
     int counter = 1;

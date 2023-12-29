@@ -1,19 +1,52 @@
-// Custom headers
-#include "standard_libs.h"
+/********************************************************************************
+ * @file    ${file_name}
+ * @author  ${user}
+ * @date    ${date}
+ * @brief   
+ ********************************************************************************/
+
+/********************************************************************************
+ * Includes
+ ********************************************************************************/
+#include "common_inc.h"
 #include "global_objects.h"
 #include "global_calibrations.h"
 #include "serial_port_handler.h"
 #include "mavlink_msg_handler.h"
-#include "mavlink_command_handler.h"
+#include "mavlink_cmd_handler.h"
 #include "scheduler.h"
 #include "datalog.h"
 #include "time_calc.h"
 
 // Test flights
-// #include "sim_flight_test_1_GPSWaypoint.h"
+// #include "sim_flight_test_1_GPSWaypoints.h"
 // #include "sim_flight_test_2_AttitudeControl.h"
-#include "sim_flight_test_3_VehiclePositionControl.h"
+#include "sim_flight_test_3_VelocityControl.h"
 
+/********************************************************************************
+ * Typedefs
+ ********************************************************************************/
+
+/********************************************************************************
+ * Private macros and defines
+ ********************************************************************************/
+
+/********************************************************************************
+ * Object definitions
+ ********************************************************************************/
+
+/********************************************************************************
+ * Calibration definitions
+ ********************************************************************************/
+
+/********************************************************************************
+ * Function definitions
+ ********************************************************************************/
+
+/********************************************************************************
+ * Function: main
+ * Description: Main point of entry for the program.
+ ********************************************************************************/
 int main() 
 {
     initialize();
@@ -29,6 +62,10 @@ int main()
     return 0;
 }
 
+/********************************************************************************
+ * Function: initialize
+ * Description: Any code that needs to be run once at the start of the program.
+ ********************************************************************************/
 void initialize(void)
 {
     // Code here is to be run once at the start of the program
@@ -46,11 +83,15 @@ void initialize(void)
     takeoff_sequence((float)6);
 }
 
-// Function to handle timer interrupt at 40Hz
+/********************************************************************************
+ * Function: task_25ms
+ * Description: Function to handle timer interrupt at 25ms (40Hz).  This periodic
+ *              function runs the main code at the specified rate.
+ ********************************************************************************/
 void task_25ms(int sig, siginfo_t* si, void* uc)
 {
     std::lock_guard<std::mutex> lock(mutex);
-    calcExecutionTime();
+    calcElapsedTime();
     parse_serial_data();
     test_flight();
     // logData();

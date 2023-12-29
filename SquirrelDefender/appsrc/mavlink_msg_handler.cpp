@@ -1,5 +1,28 @@
+/********************************************************************************
+ * @file    mavlink_msg_handler.cpp
+ * @author  Cameron Rose
+ * @date    12/27/2023
+ * @brief   Handles all incoming mavlink messages by setting the desired rate to
+ *          receive each, and parsing the serial data to separate out
+ *          specific messages.
+ ********************************************************************************/
+
+/********************************************************************************
+ * Includes
+ ********************************************************************************/
 #include "mavlink_msg_handler.h"
 
+/********************************************************************************
+ * Typedefs
+ ********************************************************************************/
+
+/********************************************************************************
+ * Private macros and defines
+ ********************************************************************************/
+
+/********************************************************************************
+ * Object definitions
+ ********************************************************************************/
 int32_t lat = 0; /*< [degE7] Latitude, expressed*/
 int32_t lon = 0; /*< [degE7] Longitude, expressed*/
 int32_t alt = 0; /*< [mm] Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.*/
@@ -42,31 +65,53 @@ float thrust_actual = 0.0;
 uint32_t time_since_boot_ms = 0;
 uint64_t unix_timestamp_us = 0;
 
+/********************************************************************************
+ * Calibration definitions
+ ********************************************************************************/
 
+/********************************************************************************
+ * Function definitions
+ ********************************************************************************/
+
+/********************************************************************************
+ * Function: set_message_rates
+ * Description: Tell the autopilot the frequency to send specific mavlink 
+ *              messages.
+ ********************************************************************************/
 void set_message_rates(void)
 {
-    send_command_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_DEFAULT);
-    send_command_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_DEFAULT);
-    send_command_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_SCALED_IMU, MESSAGE_RATE_DEFAULT);
-    send_command_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_ATTITUDE, MESSAGE_RATE_1000us);
-    send_command_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_1000us);
-    send_command_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_1000us);
-    send_command_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_GLOBAL_POSITION_INT, MESSAGE_RATE_DEFAULT);
-    send_command_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_AUTOPILOT_VERSION, MESSAGE_RATE_DEFAULT);
+    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_DEFAULT);
+    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_DEFAULT);
+    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_SCALED_IMU, MESSAGE_RATE_DEFAULT);
+    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_ATTITUDE, MESSAGE_RATE_1000us);
+    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_1000us);
+    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_1000us);
+    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_GLOBAL_POSITION_INT, MESSAGE_RATE_DEFAULT);
+    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_AUTOPILOT_VERSION, MESSAGE_RATE_DEFAULT);
 }
 
+/********************************************************************************
+ * Function: request_messages
+ * Description: Tell the autopilot to begin sending specific messages, whose
+ *              rate has already been set.
+ ********************************************************************************/
 void request_messages(void)
 {
-    send_command_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_HEARTBEAT);
-    send_command_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_SYSTEM_TIME);
-    send_command_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_SCALED_IMU);
-    send_command_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_ATTITUDE);
-    send_command_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_ATTITUDE_TARGET);
-    send_command_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_ATTITUDE_QUATERNION);
-    send_command_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_GLOBAL_POSITION_INT);
-    send_command_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_AUTOPILOT_VERSION);
+    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_HEARTBEAT);
+    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_SYSTEM_TIME);
+    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_SCALED_IMU);
+    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_ATTITUDE);
+    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_ATTITUDE_TARGET);
+    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_ATTITUDE_QUATERNION);
+    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_GLOBAL_POSITION_INT);
+    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_AUTOPILOT_VERSION);
 }
 
+/********************************************************************************
+ * Function: parse_serial_data
+ * Description: Read the serial port and unpack specific messages if its 
+ *              specific mavlink message ID has been received.
+ ********************************************************************************/
 void parse_serial_data(void)
 {
     uint16_t len = 0; // length of buffer

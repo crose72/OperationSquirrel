@@ -1,8 +1,19 @@
+/********************************************************************************
+ * @file    datalog.h
+ * @author  Cameron Rose
+ * @date    12/27/2023
+ ********************************************************************************/
 #ifndef DATALOG_H
 #define DATALOG_H
 
-#include "standard_libs.h"
+/************************************
+ * Includes
+ ************************************/
+#include "common_inc.h"
 
+/************************************
+ * Imported objects
+ ************************************/
 extern float elapsedTimeSeconds;
 extern int32_t lat;
 extern int32_t lon;
@@ -28,9 +39,15 @@ extern int16_t xmag;
 extern int16_t ymag;
 extern int16_t zmag;
 
+/************************************
+ * Exported objects
+ ************************************/
+
+/************************************
+ * Function prototypes
+ ************************************/
 template <typename T>
 std::string toString(const T& value);
-
 void logData(void);
 void writeToCSV(const std::string& filename, const std::vector<std::vector<std::string>>& data);
 std::string checkAndAppendFileName(const std::string& filename);

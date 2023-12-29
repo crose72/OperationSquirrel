@@ -1,9 +1,9 @@
 /********************************************************************************
- * @file    sim_flight_test_2_AttitudeControl.h
+ * @file    sim_flight_test_3_VelocityControl.h
  * @author  Cameron Rose
  * @date    12/27/2023
- * @brief   A test to understand the set attitude target message for controlling
- *          the drone.
+ * @brief   Command the drone to follow a NED velocity vector where +x is 
+ *          forward, +y is right, and +z is down.
  ********************************************************************************/
 
 /********************************************************************************
@@ -12,7 +12,7 @@
 #include "common_inc.h"
 #include "mavlink_msg_handler.h"
 #include "mavlink_cmd_handler.h"
-#include "attitude_controller.h"
+#include "velocity_controller.h"
 
 /********************************************************************************
  * Imported objects
@@ -22,6 +22,7 @@ extern int32_t alt;
 /********************************************************************************
  * Test flight object definitions
  ********************************************************************************/
+float target_velocity[3] = {0.0,0.0,0.0};
 float timerVal = 0;
 int stage = 0;
 
@@ -48,21 +49,35 @@ void test_flight(void)
 {
     countupTimer();
 
-    if (alt > 5.0 && stage == 0)
+    if (timerVal > 6.0 && stage == 0)
     {
-        move_forward();
+        target_velocity[0] = 10.0;
+        target_velocity[1] = -4.0;
+        target_velocity[2] = -4.0;
+        cmd_velocity(target_velocity);
         stage = 1;
     }
 
-    // if (timerVal > 8 && stage == 1)
-    // {
-    //     brake();
-    //     stage = 2;
-    //     //return_to_launch();
-    // }
+    if (timerVal > 12 && stage == 1)
+    {
+        target_velocity[0] = 5.0;
+        target_velocity[1] = 7.0;
+        target_velocity[2] = 1.0;
+        cmd_velocity(target_velocity);
+        stage = 2;
+    }
 
-    /*if (timerVal > 14.0)
+    if (timerVal > 16.0 && stage == 2)
+    {
+        target_velocity[0] = -6.0;
+        target_velocity[1] = 4.0;
+        target_velocity[2] = -2.0;
+        cmd_velocity(target_velocity);
+        stage = 3;
+    }
+
+    if (timerVal > 23 && stage == 3)
     {
         return_to_launch();
-    }*/
+    }
 }
