@@ -1,14 +1,11 @@
-# Setting up the OperationSquirrel workflow
+# Setting up the Operation Squirrel workflow
 
 ## Summary
-This document will guide you through setting up the entire workflow needed for development, including setting up the ArduPilot SITL, using the SITL, and connecting to SITL with the companion computer code.  The complete instructions for setting up SITL are here https://ardupilot.org/dev/docs/building-setup-windows10.html#building-setup-windows10 but it can be a little confusing because it takes you to some other pages so then you’ll have to follow those steps and come back to that link.  Hopefully this will make things less confusing.  But if this guide fails you can always refer to the original documentation.  This page only shows how to set up the environment, not how to run the SITL.  But I will include a link to basic SITL usage.  You really only end up doing two things when setting up the SITL:
 
-1. Install WSL2
-2. Clone the ardupilot repo
-    
-But it’s a tiny bit more nuanced than that.  And I'll get into that below.
+This document will guide you through setting up the entire workflow needed for development, including setting up the ArduPilot SITL, using the SITL, and connecting to SITL with the companion computer code.  The complete instructions for setting up SITL are here https://ardupilot.org/dev/docs/building-setup-windows10.html#building-setup-windows10 but it can be a little confusing because it takes you to some other pages so then you’ll have to follow those steps and come back to that link.  Hopefully this will make things less confusing.  But if this guide fails you can always refer to the original documentation.  This page only shows how to set up the environment, not how to run the SITL.  But I will include a link to basic SITL usage.  These instructions are stand alone.
 
-## Setting up the ArduPilot build environment:
+## Setting up the ArduPilot build environment
+
 1. Install WSL2 (Ubuntu-20.04 is what we’re using) 
     - https://learn.microsoft.com/en-us/windows/wsl/install
     - Be sure you’re not root when doing everything.  You should have to use the “sudo” command for some things.        If your WSL2 terminal is a little weird (maybe a little gray) or you never need to “sudo” anything (get permission) then you may be root and need to remove WSL2 and reinstall it.
@@ -34,13 +31,16 @@ But it’s a tiny bit more nuanced than that.  And I'll get into that below.
         - https://learn.microsoft.com/en-us/windows/wsl/install-manual#step-4---download-the-linux-kernel-update-package
 
 ## Start the simulation
+
 1. First time setup of SITL
     - https://ardupilot.org/dev/docs/setting-up-sitl-on-linux.html#setting-up-sitl-on-linux
         - Look under **Start SITL simulator**.  It will have you execute the simulation twice, first with the `-w` flag to clear the virtual EEPROM.  You only need to do this on the first set up and if you want to wipe the parameters.
 2. SITL tutorial
     - https://ardupilot.org/dev/docs/copter-sitl-mavproxy-tutorial.html
         - This will help you just get the thing up in the air so you can see it move.  Very basic but it's the "hello world" of ArduPilot SITL.
-#### You have now successfully setup SITL
+
+You have now successfully setup SITL
         
 ## How to use our code to communicate with SITL
-Read `Connecting-Jetson-Nano-to-SITL-and-real-drone.md` and `Connecting-WSL-code-to-SITL.md` for instructions on how to control the SITL drone with our code.
+
+Read [02-Connecting-WSL-code-to-SITL](https://github.com/crose72/OperationSquirrel/blob/master/Docs/02-Connecting-WSL-code-to-SITL.md) and [03-Connecting-Jetson-Nano-to-SITL-and-real-drone](https://github.com/crose72/OperationSquirrel/blob/master/Docs/03-Connecting-Jetson-Nano-to-SITL-and-real-drone.md) to learn how to use control a simulated or real drone with the code.

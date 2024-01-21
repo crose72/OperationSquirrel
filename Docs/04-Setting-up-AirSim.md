@@ -2,14 +2,14 @@
 
 ## Summary
 
-This document will guide you through setting up AirSim to work with SITL.  The original instructions can be found here <https://ardupilot.org/dev/docs/sitl-with-airsim.html>, but I will try to simplify it after having done the process.  Note that the AirSim repository is no longer supported.  It should still work, but Codex Labs forked AirSim to a new repo called Colosseum to keep AirSim alive, and it works with Unreal Engine 5.  AirSim and Colosseum are synonymous in this document, they mean the same simulation environment, one repo is just no longer supported.  Instructions for using pre compiled binaries is also included so you can use AirSim without installing Unreal Engine or building AirSim.
+This document will guide you through setting up AirSim to work with SITL.  The original instructions can be found here <https://ardupilot.org/dev/docs/sitl-with-airsim.html>, but I will try to simplify it after having done the process.  Note that the AirSim repository is no longer supported.  It should still work, but Codex Labs forked AirSim to a new repo called Colosseum to keep AirSim alive, and it works with Unreal Engine 5.  AirSim and Colosseum are synonymous in this document, they mean the same simulation environment, one repo is just no longer supported.  Instructions for using pre compiled binaries is also included so you can use AirSim without installing Unreal Engine or building AirSim.  These instructions depend on [01-Setting-up-the-workflow](https://github.com/crose72/OperationSquirrel/blob/master/Docs/01-Setting-up-the-workflow.md).
 
 - AirSim repo: <https://github.com/microsoft/AirSim>
 - Colosseum repo: <https://github.com/CodexLabsLLC/Colosseum>
 
 ## Using AirSim binaries
 
-#### If you don't want to install unreal engine and build AirSim/Colosseum, then you can use precompiled binaries found here <https://github.com/microsoft/AirSim/releases>.  Just download the zip file for the environment you want to use, unzip it, and execute the application (e.g. double click `AbandonedPark.exe`)
+If you don't want to install unreal engine and build AirSim/Colosseum, then you can use precompiled binaries found here <https://github.com/microsoft/AirSim/releases>.  Just download the zip file for the environment you want to use, unzip it, and execute the application (e.g. double click `AbandonedPark.exe`)
 
 ## Setting up AirSim on Windows
 
@@ -18,18 +18,18 @@ This document will guide you through setting up AirSim to work with SITL.  The o
 2. Follow these instructions for installing Unreal Engine and Building Colosseum
     - <https://github.com/microsoft/AirSim/blob/main/docs/build_windows.md#build-airsim>
 
-###### Note: Use the `Developer Command Prompt for VS 2022` when running `build.cmd`
+Note: Use the `Developer Command Prompt for VS 2022` when running `build.cmd`
 
-###### Note: Replace `AirSim` with `Colosseum` when it instructs to go to the AirSim directory
+Note: Replace `AirSim` with `Colosseum` when it instructs to go to the AirSim directory
 
 3. Follow these instructions to set up the Blocks environment
     - <https://github.com/microsoft/AirSim/blob/main/docs/unreal_blocks.md>
 
-###### Note: Again these steps are taking place in the `Colosseum` directory instead of AirSim because we cloned Colosseum
+Note: Again these steps are taking place in the `Colosseum` directory instead of AirSim because we cloned Colosseum
 
 ## Connecting SITL to AirSim
 
-#### You should already have SITL working independently before proceeding with these instructions.  AirSim is supposed to work with WSL2 according to these instructions: <https://discuss.ardupilot.org/t/gsoc-2019-airsim-simulator-support-for-ardupilot-sitl-part-ii/46395/5>, but I could not make it work with WSL2, I can get it working with WSL version 1, however.  These steps were done on Windows 11.  The only steps that should need to be repeated are 7 and 8 to start AirSim first and then SITL afterwards.  I have noticed that when I restart WSL I need to do step 5 again to apply the changes to the bash configuration, and VcXsrv does need to be opened again after restarting your computer
+You should already have SITL working independently before proceeding with these instructions.  AirSim is supposed to work with WSL2 according to these instructions: <https://discuss.ardupilot.org/t/gsoc-2019-airsim-simulator-support-for-ardupilot-sitl-part-ii/46395/5>, but I could not make it work with WSL2, I can get it working with WSL version 1, however.  These steps were done on Windows 11.  The only steps that should need to be repeated are 7 and 8 to start AirSim first and then SITL afterwards.  I have noticed that when I restart WSL I need to do step 5 again to apply the changes to the bash configuration, and VcXsrv does need to be opened again after restarting your computer
 
 1. Set up the ArduPilot development environment according to `[Start-Here]
 2.Setting-up-the-workflow.md`
@@ -80,7 +80,7 @@ export DISPLAY=0:0
     - Select how to start clients: Must select “Start no Client”
     - Extra settings: Must check “Disable access control”
 
-###### Even if you're on Windows 11 - which natively supports x server displays in WSL2 because we are in WSL version 1 we need this 3rd party x server client
+Even if you're on Windows 11 - which natively supports x server displays in WSL2 - because we are in WSL version 1 we need this 3rd party x server client
 
 7. Start AirSim by pressing the play button in VS with your Blocks or other project open
 8. Start SITL
