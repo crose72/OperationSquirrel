@@ -21,7 +21,7 @@ ORB-SLAM3 repo: https://github.com/UZ-SLAMLab/ORB_SLAM3
     sudo apt-get install libssl-dev
     ```
 3. Install the prerequisites for ORB-SLAM3 which can be found at https://github.com/UZ-SLAMLab/ORB_SLAM3
-4. Add an additional 4GB of swap for the ORB-SLAM3 build, which will bring you to a total of 8GB of swap (you should have added 4GB when you installed OpenCV).  This method adds swap in a different way
+4. Add an additional 4GB of swap for the ORB-SLAM3 build to avoid running out of memory while compiling.  This will bring you to a total of 8GB of swap (you should have added 4GB when you installed OpenCV).  This method adds swap in a different way
     ```
     sudo systemctl disable nvzramconfig
     sudo fallocate -l 4G /mnt/4GB.swap

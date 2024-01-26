@@ -9,17 +9,17 @@
             SET_ATTITUDE_TARGET ( #82 )
             [Message] Sets a desired vehicle attitude. Used by an external controller to command the vehicle (manual controller or other system).
 
-            Field Name	    Type	    Units	Values	Description
+            Field Name	        Type	    Units	Values	Description
             time_boot_ms	    uint32_t	ms		        Timestamp (time since system boot).
-            target_system	uint8_t			            System ID
-            target_component	uint8_t			            Component ID
-            type_mask	    uint8_t		                ATTITUDE_TARGET_TYPEMASK	Bitmap to indicate which dimensions should be ignored by the vehicle.
-            q	            float[4]			        Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0) from MAV_FRAME_LOCAL_NED to MAV_FRAME_BODY_FRD
-            body_roll_rate	float	    rad/s		    Body roll rate
-            body_pitch_rate	float	    rad/s		    Body pitch rate
-            body_yaw_rate	float	    rad/s		    Body yaw rate
-            thrust	float			                    Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)
-            thrust_body **	float[3]			        3D thrust setpoint in the body NED frame, normalized to -1 .. 1
+            target_system	    uint8_t			            System ID
+            target_component    uint8_t			            Component ID
+            type_mask	        uint8_t		                ATTITUDE_TARGET_TYPEMASK	Bitmap to indicate which dimensions should be ignored by the vehicle.
+            q	                float[4]			        Attitude quaternion (w, x, y, z order, zero-rotation is 1, 0, 0, 0) from MAV_FRAME_LOCAL_NED to MAV_FRAME_BODY_FRD
+            body_roll_rate	    float	    rad/s		    Body roll rate
+            body_pitch_rate	    float	    rad/s		    Body pitch rate
+            body_yaw_rate	    float	    rad/s		    Body yaw rate
+            thrust	float	    		                    Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)
+            thrust_body **	    float[3]			        3D thrust setpoint in the body NED frame, normalized to -1 .. 1
 
             ATTITUDE_TARGET_TYPEMASK
             [Enum] Bitmap to indicate which dimensions should be ignored by the vehicle: a value of 0b00000000 indicates that none of the setpoint dimensions should be ignored.
