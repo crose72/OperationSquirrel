@@ -1,6 +1,6 @@
 # Setting up the Operation Squirrel workflow
 
-## Summary
+## Description
 
 This document will guide you through setting up the entire workflow needed for development, including setting up the ArduPilot SITL, using the SITL, and connecting to SITL with the companion computer code.  The complete instructions for setting up SITL are here https://ardupilot.org/dev/docs/building-setup-windows10.html#building-setup-windows10 but it can be a little confusing because it takes you to some other pages so then you’ll have to follow those steps and come back to that link.  Hopefully this will make things less confusing.  But if this guide fails you can always refer to the original documentation.  This page only shows how to set up the environment, not how to run the SITL.  But I will include a link to basic SITL usage.  These instructions are stand alone.
 
@@ -43,4 +43,4 @@ You have now successfully setup SITL
         
 ## How to use our code to communicate with SITL
 
-Read [02-Connecting-WSL-code-to-SITL](https://github.com/crose72/OperationSquirrel/blob/master/Docs/02-Connecting-WSL-code-to-SITL.md) and [03-Connecting-Jetson-Nano-to-SITL-and-real-drone](https://github.com/crose72/OperationSquirrel/blob/master/Docs/03-Connecting-Jetson-Nano-to-SITL-and-real-drone.md) to learn how to use control a simulated or real drone with the code.
+Read [02-Connecting-WSL-and-Jetson-Nano-to-SITL](https://github.com/crose72/OperationSquirrel/blob/master/Docs/02-Connecting-WSL-and-Jetson-Nano-to-SITL.md) to learn how to use control a simulated or real drone with the code.
