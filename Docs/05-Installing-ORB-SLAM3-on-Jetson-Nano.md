@@ -1,6 +1,6 @@
 # Installing ORB-SLAM3 on the Jetson Nano
 
-## Summary
+## Description
 
 This document will guide you through installing ORB-SLAM3 on the Jetson Nano.  The reason for using SLAM is to provide the distance of objects in the video frame to do obstacle avoidance, and to provide a vector for the drone to follow a moving target.  These instructions are stand alone.
 

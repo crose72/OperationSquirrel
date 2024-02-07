@@ -1,6 +1,6 @@
 # Installing Jetson Inference on the Jetson Nano
 
-## Summary
+## Description
 
 This document will guide you through installing Jetson Inference on the Jetson Nano.  This library contains examples for object detections, image recognition, segmentation, and more, using CUDA to utilize the Jetson's GPU.  These instructions are stand alone.
 
