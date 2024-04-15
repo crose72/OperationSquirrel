@@ -42,19 +42,16 @@
  ********************************************************************************/
 
 /********************************************************************************
- * Function: msg_handler
- * Description: Forgot the purpose of this, may be unnecessary.
+ * Function: MavCmd
+ * Description: Class constructor
  ********************************************************************************/
-void msg_handler(uint16_t mavlink_command, uint16_t msg_id, float msg_interval) 
-{
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize/*< [degE7] Longitude, expressed*/ the Madvlink message buffer
+//MavCmd(){}
 
-    mavlink_msg_command_long_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, mavlink_command, 0, msg_id, msg_interval, 0, 0, 0, 0, 0);
-    offset_buffer(buffer, len, msg);
-    write_serial_port(buffer, len);
-}
+/********************************************************************************
+ * Function: ~MavCmd
+ * Description: Class destructor
+ ********************************************************************************/
+//~MavCmd(){}
 
 /********************************************************************************
  * Function: takeoff_sequence
@@ -63,27 +60,73 @@ void msg_handler(uint16_t mavlink_command, uint16_t msg_id, float msg_interval)
 void takeoff_sequence(float takeoff_alt)
 {
     // Set flight mode to guided
-    // enable or disable custom mode (including guided), mode # (found in mode.h), custom submode, empty, etc
-    send_cmd_long(MAV_CMD_DO_SET_MODE, 0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, 4, 0, 0, 0, 0, 0); // guided = 4
+    set_mode_GUIDED();
 
-    // Hand control over to the companion computer
-    // send_cmd_long(MAV_CMD_NAV_GUIDED_ENABLE, 0, 1, 0, 0, 0, 0, 0, 0);
-    
     // ARM the vehicle
-    send_cmd_long(MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 1, 0, 0, 0, 0, 0);
+    arm_vehicle();
 
     // Takeoff
-    send_cmd_long(MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, takeoff_alt);
+    takeoff_GPS_long(takeoff_alt);
 }
 
 /********************************************************************************
- * Function: return_to_launch
+ * Function: takeoff_LOCAL
+ * Description: Takekoff to specified height.
+ ********************************************************************************/
+void takeoff_LOCAL(float pitch, float ascend_rate, float yaw, int32_t x, int32_t y, float z)
+{
+    // All relevant arguments for MAV_CMD_NAV_TAKEOFF: uint8_t frame, uint16_t command, float param1, float param2, float param3, float param4, int32_t x, int32_t y, float z
+    send_cmd_int(MAV_FRAME_BODY_OFFSET_NED, MAV_CMD_NAV_TAKEOFF_LOCAL, pitch, 0, ascend_rate, yaw, x, y, z);
+}
+
+/********************************************************************************
+ * Function: takeoff_GPS_long
+ * Description: Takekoff to specified height using command_long.
+ ********************************************************************************/
+void takeoff_GPS_long(float alt)
+{
+    send_cmd_long(MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, alt);
+}
+
+/********************************************************************************
+ * Function: arm_vehicle
+ * Description: Arm vehicle.
+ ********************************************************************************/
+void arm_vehicle(void)
+{
+    // Arm throttle - param2 = 0 requires safety checks, param2 = 21196 allows
+    // arming to override preflight checks and disarming in flight
+    send_cmd_long(MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 0, 0, 0, 0, 0, 0);
+}
+
+/********************************************************************************
+ * Function: disarm_vehicle
+ * Description: Disarm vehicle.
+ ********************************************************************************/
+void disarm_vehicle(void)
+{
+    // Disarm throttle - param2 = 0 requires safety checks, param2 = 21196 allows
+    // arming to override preflight checks and disarming in flight
+    send_cmd_long(MAV_CMD_COMPONENT_ARM_DISARM, 0, 0, 1, 0, 0, 0, 0, 0);
+}
+
+/********************************************************************************
+ * Function: set_mode_GUIDED
+ * Description: Change mode to GUIDED to allow control from a companion computer.
+ ********************************************************************************/
+void set_mode_GUIDED(void)
+{
+    set_flight_mode(0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::GUIDED, 0);
+}
+
+
+/********************************************************************************
+ * Function: set_mode_RTL
  * Description: Change mode to RTL and vehicle will return to launch location.
  ********************************************************************************/
-void return_to_launch(void)
+void set_mode_RTL(void)
 {
-    // Set flight mode to RTL
-    send_cmd_long(MAV_CMD_DO_SET_MODE, 0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, 6, 0, 0, 0, 0, 0);
+    set_flight_mode(0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::RTL, 0);
 }
 
 /********************************************************************************
@@ -97,16 +140,25 @@ void go_to_waypoint(int32_t lat, int32_t lon, float alt)
 }
 
 /********************************************************************************
- * Function: send_cmd_long
- * Description: This overloaded function is specifically designed to send a 
+ * Function: set_flight_mode
+ * Description: Set the vehicle flight mode 
+ ********************************************************************************/
+ void set_flight_mode(uint8_t confirmation, float mode, float custom_mode, float custom_submode)
+ {
+    send_cmd_long(MAV_CMD_DO_SET_MODE, confirmation, mode, custom_mode, custom_submode, 0, 0, 0, 0);
+ }
+
+/********************************************************************************
+ * Function: set_mav_msg_rate
+ * Description: This function is specifically designed to send a 
  *              mavlink command long to request that a mavlink message ID is 
  *              sent at a desired rate.
  ********************************************************************************/
-void send_cmd_long(uint16_t mavlink_command, uint16_t msg_id, float msg_interval) 
+void set_mav_msg_rate(uint16_t mavlink_command, uint16_t msg_id, float msg_interval) 
 {
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize the Madvlink message buffer
+    uint16_t len = 0;
+    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+    mavlink_message_t msg;
 
     mavlink_msg_command_long_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, mavlink_command, 0, msg_id, msg_interval, 0, 0, 0, 0, 0);
     offset_buffer(buffer, len, msg);
@@ -114,16 +166,16 @@ void send_cmd_long(uint16_t mavlink_command, uint16_t msg_id, float msg_interval
 }
 
 /********************************************************************************
- * Function: send_cmd_long
+ * Function: req_mav_msg
  * Description: This overloaded function is specifically designed to send a 
  *              mavlink command long torequest that a specific mavlink message 
  *              ID is sent.
  ********************************************************************************/
-void send_cmd_long(uint16_t mavlink_command, uint16_t msg_id) 
+void req_mav_msg(uint16_t mavlink_command, uint16_t msg_id) 
 {
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize the Madvlink message buffer
+    uint16_t len = 0;
+    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+    mavlink_message_t msg;
 
     mavlink_msg_command_long_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, mavlink_command, 0, msg_id, 0, 0, 0, 0, 0, 0);
     offset_buffer(buffer, len, msg);
@@ -131,16 +183,35 @@ void send_cmd_long(uint16_t mavlink_command, uint16_t msg_id)
 }
 
 /********************************************************************************
- * Function: send_cmd_long
+ * Function: send_cmd_int
  * Description: This overloaded function allows for various mavlink command 
  *              longs to be sent, including a mode change, takeoff, ARM throttle, 
  *              and more.
  ********************************************************************************/
+void send_cmd_int(uint8_t frame, uint16_t command, float param1, float param2, float param3, float param4, int32_t x, int32_t y, float z) 
+{
+    uint16_t len = 0;
+    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+    mavlink_message_t msg;
+    uint8_t current = 0;        // no used according to documentation, set 0
+    uint8_t autocontinue = 0;   // no used according to documentation, set 0
+
+    mavlink_msg_command_int_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, frame, command, current, autocontinue, param1, param2, param3, param4, x, y, z);
+    offset_buffer(buffer, len, msg);
+    write_serial_port(buffer, len);
+}
+
+/********************************************************************************
+ * Function: send_cmd_long
+ * Description: This function sends mavlink command 
+ *              long which can do a mode change, takeoff, ARM throttle, 
+ *              and more.
+ ********************************************************************************/
 void send_cmd_long(uint16_t mavlink_command, uint8_t confirmation, float param1, float param2, float param3, float param4, float param5, float param6, float param7) 
 {
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize the Madvlink message buffer
+    uint16_t len = 0;
+    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+    mavlink_message_t msg;
 
     mavlink_msg_command_long_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, mavlink_command, confirmation, param1, param2, param3, param4, param5, param6, param7);
     offset_buffer(buffer, len, msg);
@@ -155,9 +226,9 @@ void send_cmd_long(uint16_t mavlink_command, uint8_t confirmation, float param1,
  ********************************************************************************/
 void send_cmd_set_position_target_global_int(uint8_t coordinate_frame, uint16_t type_mask, int32_t lat_int, int32_t lon_int, float alt, float vx, float vy, float vz, float afx, float afy, float afz, float yaw, float yaw_rate) 
 {
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize the Madvlink message buffer
+    uint16_t len = 0;
+    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+    mavlink_message_t msg;
 
     // There should be an _encode function we want to use instead of the pack function
     mavlink_msg_set_position_target_global_int_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, 0, TARGET_SYS_ID, TARGET_COMP_ID, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, (uint16_t)0b111111111000, lat_int, lon_int, alt, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -173,9 +244,9 @@ void send_cmd_set_position_target_global_int(uint8_t coordinate_frame, uint16_t 
  ********************************************************************************/
 void send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired_attitude_target)
 {
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize the Madvlink message buffer
+    uint16_t len = 0;
+    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+    mavlink_message_t msg;
 
     mavlink_msg_set_attitude_target_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, desired_attitude_target);
     offset_buffer(buffer, len, msg);
@@ -185,17 +256,16 @@ void send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired_attitud
 /********************************************************************************
  * Function: send_cmd_set_position_target_local_ned
  * Description: This function uses the mavlink message set position target to 
- *              allow for manually controlling the position, velocity, and
+ *              allow for manually controlling the position, velocity, or
  *              acceleration of a vehicle using an external controller.
  ********************************************************************************/
-void send_cmd_set_position_target_local_ned(mavlink_set_position_target_local_ned_t *desired_position_target)
+void send_cmd_set_position_target_local_ned(mavlink_set_position_target_local_ned_t *desired_target)
 {
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize the Madvlink message buffer
+    uint16_t len = 0;
+    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
+    mavlink_message_t msg;
 
-    mavlink_msg_set_position_target_local_ned_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, desired_position_target);
+    mavlink_msg_set_position_target_local_ned_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, desired_target);
     offset_buffer(buffer, len, msg);
     write_serial_port(buffer, len);
 }
-

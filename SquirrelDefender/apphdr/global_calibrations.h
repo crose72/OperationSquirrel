@@ -20,5 +20,6 @@ extern const uint8_t TARGET_SYS_ID;
 extern const uint8_t TARGET_COMP_ID;
 extern const int32_t MESSAGE_RATE_DEFAULT; // microseconds
 extern const int32_t MESSAGE_RATE_1000us;
+extern const int32_t MESSAGE_RATE_25000us;
 
 #endif // GLOBAL_CALIBRATIONS_H

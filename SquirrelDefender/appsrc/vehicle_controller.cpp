@@ -1,28 +1,17 @@
 /********************************************************************************
- * @file    ${file_name}
- * @author  ${user}
- * @date    ${date}
- * @brief   
+ * @file    vehicle_controller.cpp
+ * @author  Cameron Rose
+ * @date    12/27/2023
+ * @brief   Control the position, velocity, and acceleration of the drone by 
+ *          sending the following MAVLINK message to the drone.  Control the
+ *          vector position, velocity, acceleration, and yaw/yaw rate.
+ * 
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "global_objects.h"
-#include "global_calibrations.h"
-#include "serial_port_handler.h"
-#include "mavlink_msg_handler.h"
-#include "mavlink_cmd_handler.h"
-#include "scheduler.h"
-#include "datalog.h"
-#include "time_calc.h"
-
-// Test flights
-// #include "sim_flight_test_1_GPSWaypoints.h"
-// #include "sim_flight_test_2_AttitudeControl.h"
-// #include "sim_flight_test_3_VelocityControl.h"
-#include "sim_flight_test_4_VelocityControl.h"
+#include "vehicle_controller.h"
 
 /********************************************************************************
  * Typedefs
@@ -45,60 +34,24 @@
  ********************************************************************************/
 
 /********************************************************************************
- * Function: main
- * Description: Main point of entry for the program.
+ * Function: VehicleController
+ * Description: Class constructor
  ********************************************************************************/
-int main() 
-{
-    initialize();
-    startTask_25ms();
-
-    while (!stopProgram) 
-	{
-        // Main code is executed in task_25ms()
-    }
-
-    stopTask_25ms();
-
-    return 0;
-}
+VehicleController::VehicleController(){}
 
 /********************************************************************************
- * Function: initialize
- * Description: Any code that needs to be run once at the start of the program.
+ * Function: ~VehicleController
+ * Description: Class destructor
  ********************************************************************************/
-void initialize(void)
-{
-    // Code here is to be run once at the start of the program
-    calcStartTimeMS();
-    setupTask_25ms();
-
-    // Setup serial communication
-    open_serial_port();
-
-    // Set rates and request mavlink data from the flight controller
-    set_message_rates();
-    request_messages();
-
-    // Startup commands for drone
-    takeoff_sequence((float)6);
-}
+VehicleController::~VehicleController(){}
 
 /********************************************************************************
- * Function: task_25ms
- * Description: Function to handle timer interrupt at 25ms (40Hz).  This periodic
- *              function runs the main code at the specified rate.
+ * Function: cmd_position
+ * Description: Command drone to move to an x, y, z position relative to the
+ *              drone in the NED reference frame.
  ********************************************************************************/
-void task_25ms(int sig, siginfo_t* si, void* uc)
+void VehicleController::cmd_position(float position_target[3])
 {
-    std::lock_guard<std::mutex> lock(mutex);
-    calcElapsedTime();
-    parse_serial_data();
-    test_flight();
-    // logData();
-
-    if (firstLoopAfterStartup == true)
-    {
-        firstLoopAfterStartup = false;
-    }
+    
 }
+

@@ -31,6 +31,41 @@
  ********************************************************************************/
 
 /********************************************************************************
+ * Function: print_set_position_target_local_ned
+ * Description: Print the set_position_target_local_ned mavlink message.
+ ********************************************************************************/
+void print_set_position_target_local_ned(mavlink_set_position_target_local_ned_t& set_position_target_local_ned)
+{
+    printf("\tTime since boot (ms): %u\n", set_position_target_local_ned.time_boot_ms);
+    printf("\tPosition (X, Y, Z): %.3f, %.3f, %.3f\n", set_position_target_local_ned.x, set_position_target_local_ned.y, set_position_target_local_ned.z);
+    printf("\tVelocity (X, Y, Z): %.3f, %.3f, %.3f\n", set_position_target_local_ned.vx, set_position_target_local_ned.vy, set_position_target_local_ned.vz);
+    printf("\tAcceleration/Force (X, Y, Z): %.3f, %.3f, %.3f\n", set_position_target_local_ned.afx, set_position_target_local_ned.afy, set_position_target_local_ned.afz);
+    printf("\tYaw setpoint: %.3f radians\n", set_position_target_local_ned.yaw);
+    printf("\tYaw rate setpoint: %.3f radians/second\n", set_position_target_local_ned.yaw_rate);
+    printf("\tType mask: %u\n", set_position_target_local_ned.type_mask);
+    printf("\tTarget system ID: %d\n", set_position_target_local_ned.target_system);
+    printf("\tTarget component ID: %d\n", set_position_target_local_ned.target_component);
+    printf("\tCoordinate frame: %d\n", set_position_target_local_ned.coordinate_frame);
+}
+
+/********************************************************************************
+ * Function: print_position_target_local_ned
+ * Description: Print the position_target_local_ned mavlink message.
+ ********************************************************************************/
+void print_position_target_local_ned(mavlink_position_target_local_ned_t& position_target_local_ned) 
+{
+    printf("Position target local NED: %u\n", position_target_local_ned.time_boot_ms);
+    printf("\tTime since boot (ms): %u\n", position_target_local_ned.time_boot_ms);
+    printf("\tPosition (X, Y, Z): %.3f, %.3f, %.3f\n", position_target_local_ned.x, position_target_local_ned.y, position_target_local_ned.z);
+    printf("\tVelocity (X, Y, Z): %.3f, %.3f, %.3f\n", position_target_local_ned.vx, position_target_local_ned.vy, position_target_local_ned.vz);
+    printf("\tAcceleration/Force (X, Y, Z): %.3f, %.3f, %.3f\n", position_target_local_ned.afx, position_target_local_ned.afy, position_target_local_ned.afz);
+    printf("\tYaw setpoint: %.3f radians\n", position_target_local_ned.yaw);
+    printf("\tYaw rate setpoint: %.3f radians/second\n", position_target_local_ned.yaw_rate);
+    printf("\tType mask: %u\n", position_target_local_ned.type_mask);
+    printf("\tCoordinate frame: %d\n", position_target_local_ned.coordinate_frame);
+}
+
+/********************************************************************************
  * Function: print_heartbeat
  * Description: Print the heartbeat mavlink message.
  ********************************************************************************/
@@ -109,10 +144,9 @@ void print_global_position_int(mavlink_global_position_int_t &global_pos_int)
  * Function: print_scale_imu
  * Description: Print the scaled imu mavlink message.
  ********************************************************************************/
-void print_scaled_imu(mavlink_raw_imu_t &scaled_imu) 
+void print_scaled_imu(mavlink_scaled_imu_t &scaled_imu) 
 {
     printf("Scaled IMU data:\n");
-    printf("\tTime: %llu\n", (unsigned long long)scaled_imu.time_usec);
     printf("\tX acceleration: %d\n", scaled_imu.xacc);
     printf("\tY acceleration: %d\n", scaled_imu.yacc);
     printf("\tZ acceleration: %d\n", scaled_imu.zacc);
@@ -307,7 +341,7 @@ void print_attitude_target(mavlink_attitude_target_t &attitude_target)
 void print_attitude_quaternion(mavlink_attitude_quaternion_t &attitude_quaternion) 
 {
     printf("Attitude Quaternion:\n");
-    printf("\tTime Boot (ms): %lu\n", attitude_quaternion.time_boot_ms);
+    printf("\tTime Boot (ms): %ul\n", attitude_quaternion.time_boot_ms);
     printf("\tQuaternion (q): [%f, %f, %f, %f]\n", attitude_quaternion.q1, attitude_quaternion.q2, attitude_quaternion.q3, attitude_quaternion.q4);
     printf("\tBody Roll Rate: %f\n", attitude_quaternion.rollspeed);
     printf("\tBody Pitch Rate: %f\n", attitude_quaternion.pitchspeed);

@@ -80,14 +80,15 @@ uint64_t unix_timestamp_us = 0;
  ********************************************************************************/
 void set_message_rates(void)
 {
-    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_DEFAULT);
-    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_DEFAULT);
-    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_SCALED_IMU, MESSAGE_RATE_DEFAULT);
-    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_ATTITUDE, MESSAGE_RATE_1000us);
-    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_1000us);
-    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_1000us);
-    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_GLOBAL_POSITION_INT, MESSAGE_RATE_DEFAULT);
-    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_AUTOPILOT_VERSION, MESSAGE_RATE_DEFAULT);
+    set_mav_msg_rate(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_DEFAULT);
+    set_mav_msg_rate(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_DEFAULT);
+    set_mav_msg_rate(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_SCALED_IMU, MESSAGE_RATE_25000us);
+    set_mav_msg_rate(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_ATTITUDE, MESSAGE_RATE_25000us);
+    set_mav_msg_rate(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_25000us);
+    set_mav_msg_rate(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_25000us);
+    set_mav_msg_rate(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_GLOBAL_POSITION_INT, MESSAGE_RATE_DEFAULT);
+    set_mav_msg_rate(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_AUTOPILOT_VERSION, MESSAGE_RATE_DEFAULT);
+    set_mav_msg_rate(MAV_CMD_SET_MESSAGE_INTERVAL, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_25000us);
 }
 
 /********************************************************************************
@@ -97,14 +98,15 @@ void set_message_rates(void)
  ********************************************************************************/
 void request_messages(void)
 {
-    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_HEARTBEAT);
-    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_SYSTEM_TIME);
-    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_SCALED_IMU);
-    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_ATTITUDE);
-    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_ATTITUDE_TARGET);
-    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_ATTITUDE_QUATERNION);
-    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_GLOBAL_POSITION_INT);
-    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_AUTOPILOT_VERSION);
+    req_mav_msg(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_HEARTBEAT);
+    req_mav_msg(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_SYSTEM_TIME);
+    req_mav_msg(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_SCALED_IMU);
+    req_mav_msg(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_ATTITUDE);
+    req_mav_msg(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_ATTITUDE_TARGET);
+    req_mav_msg(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_ATTITUDE_QUATERNION);
+    req_mav_msg(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_GLOBAL_POSITION_INT);
+    req_mav_msg(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_AUTOPILOT_VERSION);
+    req_mav_msg(MAV_CMD_REQUEST_MESSAGE, MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED);
 }
 
 /********************************************************************************
@@ -133,14 +135,14 @@ void parse_serial_data(void)
             case MAVLINK_MSG_ID_HEARTBEAT:
                 mavlink_heartbeat_t heartbeat;
                 mavlink_msg_heartbeat_decode(&msg, &heartbeat);
-                //print_heartbeat(heartbeat);
+                print_heartbeat(heartbeat);
                 break;
             case MAVLINK_MSG_ID_SYSTEM_TIME:
                 mavlink_system_time_t system_time;
                 mavlink_msg_system_time_decode(&msg, &system_time);
                 time_since_boot_ms = system_time.time_boot_ms;
                 unix_timestamp_us = system_time.time_unix_usec;
-                //print_system_time(system_time);
+                print_system_time(system_time);
                 break;
             case MAVLINK_MSG_ID_ATTITUDE:
                 mavlink_attitude_t attitude;
@@ -151,7 +153,7 @@ void parse_serial_data(void)
                 rollspeed = attitude.rollspeed;
                 pitchspeed = attitude.pitchspeed;
                 yawspeed = attitude.yawspeed;
-                //print_attitude(attitude);
+                print_attitude(attitude);
                 break;
             case MAVLINK_MSG_ID_SCALED_IMU:
                 mavlink_scaled_imu_t scaled_imu;
@@ -165,7 +167,7 @@ void parse_serial_data(void)
                 xmag = scaled_imu.xmag;
                 ymag = scaled_imu.ymag;
                 zmag = scaled_imu.zmag;
-                //print_scaled_imu(scaled_imu);
+                print_scaled_imu(scaled_imu);
                 break;
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
                 mavlink_global_position_int_t global_pos_int;
@@ -188,27 +190,22 @@ void parse_serial_data(void)
             case MAVLINK_MSG_ID_PARAM_REQUEST_READ:
                 mavlink_param_request_read_t param_request_read;
                 mavlink_msg_param_request_read_decode(&msg, &param_request_read);
-                //print_param_request_read(param_request_read);
-                break;
-            case MAVLINK_MSG_ID_REQUEST_DATA_STREAM:
-                mavlink_request_data_stream_t request_data_stream;
-                mavlink_msg_request_data_stream_decode(&msg, &request_data_stream);
-                //print_request_data_stream(request_data_stream);
+                print_param_request_read(param_request_read);
                 break;
             case MAVLINK_MSG_ID_GPS_GLOBAL_ORIGIN:
                 mavlink_gps_global_origin_t gps_global_origin;
                 mavlink_msg_gps_global_origin_decode(&msg, &gps_global_origin);
-                //print_gps_global_origin(gps_global_origin);
+                print_gps_global_origin(gps_global_origin);
                 break;
             case MAVLINK_MSG_ID_HOME_POSITION:
                 mavlink_home_position_t home_position;
                 mavlink_msg_home_position_decode(&msg, &home_position);
-                //print_home_position(home_position);
+                print_home_position(home_position);
                 break;
             case MAVLINK_MSG_ID_STATUSTEXT:
                 mavlink_statustext_t statustext;
                 mavlink_msg_statustext_decode(&msg, &statustext);
-                //print_statustext(statustext);
+                print_statustext(statustext);
                 break;
             case MAVLINK_MSG_ID_PARAM_VALUE:
                 mavlink_param_value_t param_value;
@@ -223,12 +220,12 @@ void parse_serial_data(void)
             case MAVLINK_MSG_ID_GPS_RAW_INT:
                 mavlink_gps_raw_int_t msg_gps_raw_int;
                 mavlink_msg_gps_raw_int_decode(&msg, &msg_gps_raw_int);
-                //print_gps_raw_int(msg_gps_raw_int);
+                print_gps_raw_int(msg_gps_raw_int);
                 break;
             case MAVLINK_MSG_ID_AUTOPILOT_VERSION:
                 mavlink_autopilot_version_t autopilot_version;
                 mavlink_msg_autopilot_version_decode(&msg, &autopilot_version);
-                //print_autopilot_version(autopilot_version);
+                print_autopilot_version(autopilot_version);
                 break;
             case MAVLINK_MSG_ID_ATTITUDE_TARGET:
                 mavlink_attitude_target_t attitude_target;
@@ -241,7 +238,7 @@ void parse_serial_data(void)
                 pitch_rate_target = attitude_target.body_pitch_rate;
                 yaw_rate_target = attitude_target.body_yaw_rate;
                 thrust_target = attitude_target.thrust;
-                print_attitude_target(attitude_target);
+                //print_attitude_target(attitude_target);
                 break;
             case MAVLINK_MSG_ID_ATTITUDE_QUATERNION:
                 mavlink_attitude_quaternion_t attitude_quaternion;
@@ -253,7 +250,17 @@ void parse_serial_data(void)
                 roll_rate_actual = attitude_quaternion.rollspeed;
                 pitch_rate_actual = attitude_quaternion.pitchspeed;
                 yaw_rate_actual = attitude_quaternion.yawspeed;
-                //print_attitude_quaternion(attitude_quaternion);
+                print_attitude_quaternion(attitude_quaternion);
+                break;
+            case MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED:
+                mavlink_set_position_target_local_ned_t set_position_target_local_ned;
+                mavlink_msg_set_position_target_local_ned_decode(&msg, &set_position_target_local_ned);
+                //print_set_position_target_local_ned(set_position_target_local_ned);
+                break;
+            case MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED:
+                mavlink_position_target_local_ned_t position_target_local_ned;
+                mavlink_msg_position_target_local_ned_decode(&msg, &position_target_local_ned);
+                print_position_target_local_ned(position_target_local_ned);
                 break;
             //case MAVLINK_MSG_ID_PROTOCOL_CAPABILITY: {
                 //mavlink_protocol_version_t protocol_capability;
