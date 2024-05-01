@@ -2,7 +2,7 @@
 
 ## Description
 
-This document will guide you through setting up the entire workflow needed for development, including setting up the ArduPilot SITL, using the SITL, and connecting to SITL with the companion computer code.  The complete instructions for setting up SITL are here https://ardupilot.org/dev/docs/building-setup-windows10.html#building-setup-windows10 but it can be a little confusing because it takes you to some other pages so then you’ll have to follow those steps and come back to that link.  Hopefully this will make things less confusing.  But if this guide fails you can always refer to the original documentation.  This page only shows how to set up the environment, not how to run the SITL.  But I will include a link to basic SITL usage.  These instructions are stand alone.
+This document will guide you through setting up the entire workflow needed for development, including setting up the ArduPilot SITL, using the SITL, and connecting to SITL with the companion computer code.  The complete instructions for setting up SITL are here https://ardupilot.org/dev/docs/building-setup-windows10.html#building-setup-windows10 but it can be a little confusing because it takes you to some other pages so then you’ll have to follow those steps and come back to that link.  Hopefully this will make things less confusing.  But if this guide fails you can always refer to the original documentation.  This page only shows how to set up the environment, not how to run the SITL.  But I will include a link to basic SITL usage.  These instructions are stand alone unless otherwise specified.
 
 ## Setting up the ArduPilot build environment
 
