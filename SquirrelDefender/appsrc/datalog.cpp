@@ -106,15 +106,15 @@ void logData(void)
                     toString(rollspeed),
                     toString(pitchspeed),
                     toString(yawspeed),
-                    toString(xacc),
-                    toString(yacc),
-                    toString(zacc),
-                    toString(xgyro),
-                    toString(ygyro),
-                    toString(zgyro),
-                    toString(xmag),
-                    toString(ymag),
-                    toString(zmag)}});
+                    toString(accel_x),
+                    toString(accel_y),
+                    toString(accel_z),
+                    toString(gyro_x),
+                    toString(gyro_y),
+                    toString(gyro_z),
+                    toString(mag_x),
+                    toString(mag_y),
+                    toString(mag_z)}});
     writeToCSV(unusedDataFileName, data);
 }
 
