@@ -1,5 +1,35 @@
+/*
+ * Copyright (c) 2020, NVIDIA CORPORATION. All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
 
 #include "camera_handler.h"
+#include "target_tracking.h"
+#include <chrono>
+#include <thread>
+
+
+commandLine cmdLine(0, nullptr);
+int argc;
+char** argv;
 
 bool signal_recieved = false;
 
@@ -31,8 +61,7 @@ int usage()
 	return 0;
 }
 
-
-int main( int argc, char** argv )
+int command_line_inputs(void)
 {
 	/*
 	 * parse command line
@@ -41,141 +70,77 @@ int main( int argc, char** argv )
 
 	if( cmdLine.GetFlag("help") )
 		return usage();
-
-
-	/*
-	 * attach signal handler
-	 */
-	if( signal(SIGINT, sig_handler) == SIG_ERR )
-		LogError("can't catch SIGINT\n");
-
-
-	/*
-	 * create input stream
-	 */
-	videoSource* input = videoSource::Create(cmdLine, ARG_POSITION(0));
-
-	if( !input )
-	{
-		LogError("detectnet:  failed to create input stream\n");
-		return 1;
-	}
-
-
-	/*
-	 * create output stream
-	 */
-	videoOutput* output = videoOutput::Create(cmdLine, ARG_POSITION(1));
 	
-	if( !output )
-	{
-		LogError("detectnet:  failed to create output stream\n");	
-		return 1;
-	}
-	
+	return 1;
 
-	/*
-	 * create detection network
-	 */
-
-	//cmdLine.GetString("model", "./ssd-mobilenet.onnx");  // Path to your ONNX model in the current directory
-    //cmdLine.GetString("labels", "./labels.txt");  // Path to your class labels file in the current directory
-
-	detectNet* net = detectNet::Create(cmdLine);
-	
-	if( !net )
-	{
-		LogError("detectnet:  failed to load detectNet model\n");
-		return 1;
-	}
-
-	// parse overlay flags
-	const uint32_t overlayFlags = detectNet::OverlayFlagsFromStr(cmdLine.GetString("overlay", "box,labels,conf"));
-	
-
-	/*
-	 * processing loop
-	 */
-	while( !signal_recieved )
-	{
-		// capture next image
-		uchar3* image = NULL;
-		int status = 0;
-		
-		if( !input->Capture(&image, &status) )
-		{
-			if( status == videoSource::TIMEOUT )
-				continue;
-			
-			break; // EOS
-		}
-
-		// detect objects in the frame
-		detectNet::Detection* detections = NULL;
-	
-		const int numDetections = net->Detect(image, input->GetWidth(), input->GetHeight(), &detections, overlayFlags);
-		
-		if( numDetections > 0 )
-		{
-			LogVerbose("%i objects detected\n", numDetections);
-		
-			for( int n=0; n < numDetections; n++ )
-			{
-				LogVerbose("\ndetected obj %i  class #%u (%s)  confidence=%f\n", n, detections[n].ClassID, net->GetClassDesc(detections[n].ClassID), detections[n].Confidence);
-				LogVerbose("bounding box %i  (%.2f, %.2f)  (%.2f, %.2f)  w=%.2f  h=%.2f\n", n, detections[n].Left, detections[n].Top, detections[n].Right, detections[n].Bottom, detections[n].Width(), detections[n].Height()); 
-			
-				if( detections[n].TrackID >= 0 ) // is this a tracked object?
-					LogVerbose("tracking  ID %i  status=%i  frames=%i  lost=%i\n", detections[n].TrackID, detections[n].TrackStatus, detections[n].TrackFrames, detections[n].TrackLost);
-			
-				// Calculate corner positions relative to top-left corner of video feed
-                float videoWidth = static_cast<float>(input->GetWidth());
-                float videoHeight = static_cast<float>(input->GetHeight());
-				
-                float boxLeft = detections[n].Left;
-                float boxTop = detections[n].Top;
-                float boxRight = detections[n].Right;
-                float boxBottom = detections[n].Bottom;
-				float boxWidth = detections[n].Width();
-				float boxHeight = detections[n].Height();
-
-                LogVerbose("left: (%.2f)\n", boxLeft);
-				LogVerbose("right: (%.2f)\n", boxRight);
-                LogVerbose("bottom: (%.2f)\n", boxBottom);
-                LogVerbose("top: (%.2f)\n", boxTop);
-				LogVerbose("box width, box height: (%.2f, %.2f)\n", boxWidth, boxHeight);
-				LogVerbose("video width, video height: (%.2f, %.2f)\n", videoWidth, videoHeight);
-			}
-		}	
-
-		// render outputs
-		if( output != NULL )
-		{
-			output->Render(image, input->GetWidth(), input->GetHeight());
-
-			// update the status bar
-			char str[256];
-			sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(net->GetPrecision()), net->GetNetworkFPS());
-			output->SetStatus(str);
-
-			// check if the user quit
-			if( !output->IsStreaming() )
-				break;
-		}
-
-		// print out timing info
-		net->PrintProfilerTimes();
-	}
-	
-
-	/*
-	 * destroy resources
-	 */
-	LogVerbose("detectnet:  shutting down...\n");
-	
-	SAFE_DELETE(input);
-	SAFE_DELETE(output);
-	SAFE_DELETE(net);
-
-	LogVerbose("detectnet:  shutdown complete.\n");
-	return 0;
 }
+
+
+int main(void)
+{
+    command_line_inputs();
+
+    // Attach signal handler
+    if (signal(SIGINT, sig_handler) == SIG_ERR)
+        LogError("can't catch SIGINT\n");
+
+    input_video(cmdLine, ARG_POSITION(0));
+    output_video(cmdLine, ARG_POSITION(1));
+    create_detection_network(cmdLine);
+
+    // Define time interval (25 ms)
+    constexpr int interval_ms = 25;
+
+    // Get the current time
+    auto start_time = std::chrono::steady_clock::now();
+
+    /*
+     * Processing loop
+     */
+    while (!signal_recieved)
+    {
+        // Capture next image
+        if (!capture_image())
+        {
+            break;
+        }
+
+        // Track target
+        track_target(cmdLine);
+
+        // Render output
+        if (!render_output())
+        {
+            break;
+        }
+
+        // Print performance stats
+        print_performance_stats();
+
+        // Calculate elapsed time since the start of the loop
+        auto end_time = std::chrono::steady_clock::now();
+        auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+
+        // If less than 25 ms have elapsed, sleep to meet the interval
+        if (elapsed_time < interval_ms)
+        {
+            auto sleep_duration = std::chrono::milliseconds(interval_ms - elapsed_time);
+            std::this_thread::sleep_for(sleep_duration);
+        }
+
+        // Update start time for the next iteration
+        start_time = std::chrono::steady_clock::now();
+    }
+
+    /*
+     * Destroy resources
+     */
+    LogVerbose("detectnet:  shutting down...\n");
+    delete_input();
+    delete_output();
+    delete_tracking_net();
+
+    LogVerbose("detectnet:  shutdown complete.\n");
+    return 0;
+}
+

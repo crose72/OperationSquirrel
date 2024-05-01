@@ -7,14 +7,12 @@
 #include <jetson-inference/objectTrackerIOU.h>
 #include <signal.h>
 
-extern videoSource* input;
-extern videoOutput* output;
-extern uchar3* image;
 extern detectNet* net;
+extern detectNet::Detection* detections;
+extern videoSource* input;
+extern uchar3* image;
 
-int input_video(const commandLine& cmdLine, int positionArg);
-int output_video(const commandLine& cmdLine, int positionArg);
-bool capture_image(void);
-bool render_output(void);
-void delete_input(void);
-void delete_output(void);
+int create_detection_network(const commandLine& cmdLine);
+void track_target(const commandLine& cmdLine);
+void print_performance_stats(void);
+void delete_tracking_net(void);

@@ -8,10 +8,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/experimental)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/plugins)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/tracking)
 
-# declare detectnet project
+# declare my-recognition project
 project(detectnet)
 
-# import jetson-inference and jetson-utils packages
+# import jetson-inference and jetson-utils packages.
+# note that if you didn't do "sudo make install"
+# while building jetson-inference, this will error.
 find_package(jetson-utils)
 find_package(jetson-inference)
 
@@ -24,22 +26,9 @@ find_package(CUDA)
 # add directory for libnvbuf-utils to program
 link_directories(/usr/lib/aarch64-linux-gnu/tegra)
 
-# List your source files
-set(SOURCES
-    main.cpp
-    camera_handler.cpp
-	target_tracking.cpp
-)
+# compile the my-recognition program
+cuda_add_executable(detectnet detectnet.cpp)
 
-# List your header files
-set(HEADERS
-    camera_handler.h  # Add your header files here
-    # Other header files...
-)
-
-# compile the detectnet program
-cuda_add_executable(detectnet ${SOURCES} ${HEADERS})
-
-# link detectnet to jetson-inference library
+# link my-recognition to jetson-inference library
 target_link_libraries(detectnet jetson-inference)
 
