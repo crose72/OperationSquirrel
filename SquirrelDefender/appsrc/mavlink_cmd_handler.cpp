@@ -59,6 +59,7 @@
  ********************************************************************************/
 void takeoff_sequence(float takeoff_alt)
 {
+    float target_velocity[3] = {0.0,0.0,0.0};
     // Set flight mode to guided
     set_mode_GUIDED();
 
@@ -66,7 +67,11 @@ void takeoff_sequence(float takeoff_alt)
     arm_vehicle();
 
     // Takeoff
-    takeoff_GPS_long(takeoff_alt);
+    //takeoff_GPS_long(takeoff_alt);
+    target_velocity[0] = 0.0;
+    target_velocity[1] = 0.0;
+    target_velocity[2] = -takeoff_alt;
+    cmd_position(target_velocity);
 }
 
 /********************************************************************************
