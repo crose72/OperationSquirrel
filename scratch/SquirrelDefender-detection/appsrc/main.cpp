@@ -1,0 +1,193 @@
+/*
+ * Copyright (c) 2020, NVIDIA CORPORATION. All rights reserved.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+#include "common_inc.h"
+#include "global_objects.h"
+#include "global_calibrations.h"
+#include "serial_port_handler.h"
+#include "mavlink_msg_handler.h"
+#include "mavlink_cmd_handler.h"
+#include "scheduler.h"
+#include "datalog.h"
+#include "time_calc.h"
+
+
+#include "videoIO.h"
+#include "target_tracking.h"
+#include <chrono>
+#include <thread>
+
+
+// Test flights
+// #include "sim_flight_test_1_GPSWaypoints.h"
+// #include "sim_flight_test_2_AttitudeControl.h"
+// #include "sim_flight_test_3_VelocityControl.h"
+#include "sim_flight_test_4_VelocityControl.h"
+
+commandLine cmdLine(0, nullptr);
+int argc;
+char** argv;
+
+bool signal_recieved = false;
+
+// Define time interval (25 ms)
+constexpr int interval_ms = 25;
+//auto start_time = 0;
+
+void sig_handler(int signo)
+{
+	if( signo == SIGINT )
+	{
+		LogVerbose("received SIGINT\n");
+		signal_recieved = true;
+	}
+}
+
+int usage()
+{
+	printf("usage: detectnet [--help] [--network=NETWORK] [--threshold=THRESHOLD] ...\n");
+	printf("                 input [output]\n\n");
+	printf("Locate objects in a video/image stream using an object detection DNN.\n");
+	printf("See below for additional arguments that may not be shown above.\n\n");
+	printf("positional arguments:\n");
+	printf("    input           resource URI of input stream  (see videoSource below)\n");
+	printf("    output          resource URI of output stream (see videoOutput below)\n\n");
+
+	printf("%s", detectNet::Usage());
+	printf("%s", objectTracker::Usage());
+	printf("%s", videoSource::Usage());
+	printf("%s", videoOutput::Usage());
+	printf("%s", Log::Usage());
+
+	return 0;
+}
+
+int command_line_inputs(void)
+{
+	/*
+	 * parse command line
+	 */
+	commandLine cmdLine(argc, argv);
+
+	if( cmdLine.GetFlag("help") )
+		return usage();
+	
+	return 1;
+
+}
+
+
+int main(void)
+{
+    //initialize();
+    //startTask_25ms();
+
+    // Attach signal handler to exit program
+    if (signal(SIGINT, sig_handler) == SIG_ERR)
+    {
+        LogError("can't catch SIGINT\n");
+    }
+
+    calcStartTimeMS();
+    setupTask_25ms();
+    open_serial_port();
+    set_message_rates();
+    request_messages();
+    command_line_inputs();
+    input_video(cmdLine, ARG_POSITION(0));
+    output_video(cmdLine, ARG_POSITION(1));
+    create_detection_network();
+    set_mode_GUIDED();
+    arm_vehicle();
+    takeoff_GPS_long((float)2);
+
+    // Get the current time
+    auto start_time = std::chrono::steady_clock::now();
+    
+
+    while (!signal_recieved) 
+	{
+        std::lock_guard<std::mutex> lock(mutex);
+		calcElapsedTime();
+		
+		if (!capture_image())
+		{
+		    //break;
+		}
+
+		detect_objects();
+		get_object_info();
+		print_object_info();
+
+		if (!render_output())
+		{
+		    //break;
+		}
+
+		print_performance_stats();
+		parse_serial_data();
+		//test_flight();
+		// logData();
+		
+		// Calculate elapsed time since the start of the loop
+		auto end_time = std::chrono::steady_clock::now();
+		auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+		
+
+		if (firstLoopAfterStartup == true)
+		{
+		    firstLoopAfterStartup = false;
+		}
+
+		if (elapsed_time < interval_ms)
+		{
+		    auto sleep_duration = std::chrono::milliseconds(interval_ms - elapsed_time);
+		    std::this_thread::sleep_for(sleep_duration);
+		}
+
+		// Update start time for the next iteration
+		start_time = std::chrono::steady_clock::now();
+    }
+
+    LogVerbose("detectnet:  shutting down...\n");
+    
+    delete_input();
+    delete_output();
+    delete_tracking_net();
+    
+    LogVerbose("detectnet:  shutdown complete.\n");
+
+    return 0;
+}
+
+void initialize(void)
+{
+
+}
+
+void task_25ms(int sig, siginfo_t* si, void* uc)
+{
+    
+
+}
+
+
