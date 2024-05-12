@@ -50,8 +50,4 @@ VehicleController::~VehicleController(){}
  * Description: Command drone to move to an x, y, z position relative to the
  *              drone in the NED reference frame.
  ********************************************************************************/
-void VehicleController::cmd_position(float position_target[3])
-{
-    
-}
 

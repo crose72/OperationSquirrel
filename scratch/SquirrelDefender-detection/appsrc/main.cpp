@@ -61,6 +61,86 @@ void sig_handler(int signo)
 		signal_recieved = true;
 	}
 }
+float err_x = 0.0;
+float err_y = 0.0;
+float err_x_prv = 0.0;
+float err_y_prv = 0.0;
+float err_x_sum = 0.0;
+float err_y_sum = 0.0;
+
+float PID(float Kp, float Ki, float Kd, float desired, float actual, float desired2, float actual2, float w1, float w2, int dim)
+{
+	float dt = 0.025;
+	float error = (desired - actual) * w1 + (desired2 - actual2) * w2;
+	float err_sum = 0.0;
+	float err_prv = 0.0;
+	
+	if (dim == 0)
+	{
+		err_sum = err_x_sum;
+		err_prv = err_x_prv;
+	}
+	else if (dim == 1)
+	{
+		err_sum = err_y_sum;	
+		err_prv = err_y_prv;
+	}
+	
+	float integral = (err_sum+error*dt)*Ki;
+	float derivative = (error-err_prv)/dt*Kd;
+	float control = error*Kp+integral*Ki+derivative*Kd;
+	
+	if (dim == 0)
+	{
+		err_x_sum = err_x_sum + error;
+		err_x_prv = error;
+	}
+	else if (dim == 1)
+	{
+		err_y_sum = err_y_sum + error;
+		err_y_prv = error;	
+	}
+	
+	return control;
+}
+
+/*  Basic follow/turning
+float target_velocity[3] = {0.0,0.0,0.0};
+if( numDetections > 0 )
+{
+	for( int n=0; n < numDetections; n++ )
+	{
+		if (detections[n].ClassID == 1 && detections[n].Confidence > 0.8)
+		{
+			if (detections[n].Width() < 200 || detections[n].Height() < 700)
+			{
+				if (detections[n].Right <= 600)
+				{
+			        target_velocity[0] = 2.0;
+					target_velocity[1] = -0.1;
+					target_velocity[2] = 0.0;
+					cmd_velocity(target_velocity);	
+				}
+				else
+				{
+			        target_velocity[0] = 2.0;
+					target_velocity[1] = 0.1;
+					target_velocity[2] = 0.0;
+					cmd_velocity(target_velocity);	
+				}
+
+			}
+			else
+			{
+		        target_velocity[0] = 0.0;
+				target_velocity[1] = 0.0;
+				target_velocity[2] = 0.0;
+				cmd_velocity(target_velocity);	
+			}
+		}
+	}
+}	
+*/
 
 int usage()
 {
@@ -118,10 +198,11 @@ int main(void)
     create_detection_network();
     set_mode_GUIDED();
     arm_vehicle();
-    takeoff_GPS_long((float)2);
+    takeoff_GPS_long((float)2.0);
 
     // Get the current time
     auto start_time = std::chrono::steady_clock::now();
+    float desired_width;
     
 
     while (!signal_recieved) 
@@ -142,11 +223,58 @@ int main(void)
 		{
 		    //break;
 		}
+		
+		float target_velocity[3] = {0.0,0.0,0.0};
+		if( numDetections > 0 )
+		{
+			for( int n=0; n < numDetections; n++ )
+			{
+				if( detections[n].TrackID >= 0 ) // is this a tracked object?
+				{			
+					if (detections[n].ClassID == 1 && detections[n].Confidence > 0.8)
+					{
+						float Kp = 0.1;
+						float Ki = 0.0;
+						float Kd = 0.0;
+						float x_desired = 360.0;
+						float x_actual = detections[n].Height()/2.0 + detections[n].Top;
+						float height_desired = 650;
+						float height_actual = detections[n].Height();
+						float w1 = 0.5;
+						float w2 = 0.5;
+						float vx_adjust = PID(Kp, Ki, Kd, x_desired, x_actual, 											height_desired, height_actual, w1, w2, 0);
+						std::cout << "Control signal x: " << vx_adjust << std::endl;
+						if (vx_adjust < 0)
+						{
+							vx_adjust = -vx_adjust;
+						}
+						if (height_actual >= height_desired)
+						{
+							vx_adjust = 0.0;
+						}
+						target_velocity[0] = vx_adjust;
 
-		print_performance_stats();
+						Kp = 0.0001;
+						Ki = 0.0;
+						Kd = 0.0;
+						float y_desired = 640.0;
+						float y_actual = detections[n].Width()/2.0 + detections[n].Left;
+						float vy_adjust = -PID(Kp, Ki, Kd, y_desired, y_actual, 										0.0, 0.0, 1.0, 0.0, 1);
+						std::cout << "Control signal y: " << vy_adjust << std::endl;
+						target_velocity[1] = vy_adjust;
+
+						cmd_velocity(target_velocity);	
+					}
+				}
+				
+			}
+		}	
+
+		//print_performance_stats();
 		parse_serial_data();
 		//test_flight();
 		// logData();
+
 		
 		// Calculate elapsed time since the start of the loop
 		auto end_time = std::chrono::steady_clock::now();

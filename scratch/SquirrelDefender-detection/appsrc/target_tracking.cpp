@@ -68,12 +68,18 @@ void print_object_info(void)
 
 		for( int n=0; n < numDetections; n++ )
 		{
-			LogVerbose("\ndetected obj %i  class #%u (%s)  confidence=%f\n", n, detections[n].ClassID, net->GetClassDesc(detections[n].ClassID), detections[n].Confidence);
-			LogVerbose("bounding box %i  (%.2f, %.2f)  (%.2f, %.2f)  w=%.2f  h=%.2f\n", n, detections[n].Left, detections[n].Top, detections[n].Right, detections[n].Bottom, detections[n].Width(), detections[n].Height()); 
-		
 			if( detections[n].TrackID >= 0 ) // is this a tracked object?
-			{
-				LogVerbose("tracking  ID %i  status=%i  frames=%i  lost=%i\n", detections[n].TrackID, detections[n].TrackStatus, detections[n].TrackFrames, detections[n].TrackLost);
+			{			
+				if (detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
+				{
+					LogVerbose("\ndetected obj %i  class #%u (%s)  confidence=%f\n", n, detections[n].ClassID, net->GetClassDesc(detections[n].ClassID), detections[n].Confidence);
+					LogVerbose("bounding box %i  (%.2f, %.2f)  (%.2f, %.2f)  w=%.2f  h=%.2f\n", n, detections[n].Left, detections[n].Top, detections[n].Right, detections[n].Bottom, detections[n].Width(), detections[n].Height());
+					LogVerbose("tracking  ID %i  status=%i  frames=%i  lost=%i\n", detections[n].TrackID, detections[n].TrackStatus, detections[n].TrackFrames, detections[n].TrackLost);
+					std::cout << "Left: " << detections[n].Left << std::endl;
+					std::cout << "Right: " << detections[n].Right << std::endl;
+					std::cout << "Top: " << detections[n].Top << std::endl;
+					std::cout << "Bottom: " << detections[n].Bottom << std::endl;
+				}
 			}
 		}
 	}

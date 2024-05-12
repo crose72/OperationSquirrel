@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common_inc.h"
 #include "jetson-utils/videoSource.h"
 #include "jetson-utils/videoOutput.h"
 #include "jetson-inference/detectNet.h"
@@ -11,6 +12,7 @@ extern detectNet* net;
 extern detectNet::Detection* detections;
 extern videoSource* input;
 extern uchar3* image;
+extern int numDetections;
 
 int create_detection_network(void);
 void detect_objects(void);

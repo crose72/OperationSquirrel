@@ -1,0 +1,56 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/cameroncrose72/Documents/GitHub/OperationSquirrel/scratch/SquirrelDefender-detection/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_3a508/fast"
+/usr/bin/make -f CMakeFiles/cmTC_3a508.dir/build.make CMakeFiles/cmTC_3a508.dir/build
+make[1]: Entering directory '/home/cameroncrose72/Documents/GitHub/OperationSquirrel/scratch/SquirrelDefender-detection/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_3a508.dir/CheckSymbolExists.c.o
+/usr/lib/ccache/cc   -fPIC    -o CMakeFiles/cmTC_3a508.dir/CheckSymbolExists.c.o   -c /home/cameroncrose72/Documents/GitHub/OperationSquirrel/scratch/SquirrelDefender-detection/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_3a508
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_3a508.dir/link.txt --verbose=1
+/usr/lib/ccache/cc -fPIC     -rdynamic CMakeFiles/cmTC_3a508.dir/CheckSymbolExists.c.o  -o cmTC_3a508 
+CMakeFiles/cmTC_3a508.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x14): undefined reference to `pthread_create'
+CheckSymbolExists.c:(.text+0x18): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_3a508.dir/build.make:97: recipe for target 'cmTC_3a508' failed
+make[1]: *** [cmTC_3a508] Error 1
+make[1]: Leaving directory '/home/cameroncrose72/Documents/GitHub/OperationSquirrel/scratch/SquirrelDefender-detection/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_3a508/fast' failed
+make: *** [cmTC_3a508/fast] Error 2
+
+File /home/cameroncrose72/Documents/GitHub/OperationSquirrel/scratch/SquirrelDefender-detection/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/cameroncrose72/Documents/GitHub/OperationSquirrel/scratch/SquirrelDefender-detection/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1267e/fast"
+/usr/bin/make -f CMakeFiles/cmTC_1267e.dir/build.make CMakeFiles/cmTC_1267e.dir/build
+make[1]: Entering directory '/home/cameroncrose72/Documents/GitHub/OperationSquirrel/scratch/SquirrelDefender-detection/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1267e.dir/CheckFunctionExists.c.o
+/usr/lib/ccache/cc   -fPIC -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_1267e.dir/CheckFunctionExists.c.o   -c /usr/share/cmake-3.10/Modules/CheckFunctionExists.c
+Linking C executable cmTC_1267e
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1267e.dir/link.txt --verbose=1
+/usr/lib/ccache/cc -fPIC -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_1267e.dir/CheckFunctionExists.c.o  -o cmTC_1267e -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_1267e.dir/build.make:97: recipe for target 'cmTC_1267e' failed
+make[1]: *** [cmTC_1267e] Error 1
+make[1]: Leaving directory '/home/cameroncrose72/Documents/GitHub/OperationSquirrel/scratch/SquirrelDefender-detection/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_1267e/fast' failed
+make: *** [cmTC_1267e/fast] Error 2
+
+
