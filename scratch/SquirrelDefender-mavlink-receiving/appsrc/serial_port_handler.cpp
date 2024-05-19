@@ -80,6 +80,8 @@
         serial_config.c_lflag = 0;
         tcflush(serial_port, TCIFLUSH);
         tcsetattr(serial_port, TCSANOW, &serial_config);
+
+        uart_fd = serial_port;
     }
 
     /********************************************************************************
