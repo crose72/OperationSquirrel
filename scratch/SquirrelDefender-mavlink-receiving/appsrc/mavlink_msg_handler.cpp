@@ -110,9 +110,10 @@ void parse_serial_data(void)
     uint8_t byte;
 
     //printf("before while: %d\n", bytes_available());
-    while(bytes_available() > 0)
+    int n = bytes_available();
+    for(int i = n; i > 0; i--)
     {
-        //printf("inside while\n");
+        //printf("bytes_available(): %d\n", bytes_available());
         byte = read_serial_port();
         
         // Parse the byte and check if a message has been received

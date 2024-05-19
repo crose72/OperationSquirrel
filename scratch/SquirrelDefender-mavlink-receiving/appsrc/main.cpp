@@ -61,7 +61,7 @@ int main()
         std::lock_guard<std::mutex> lock(mutex);
         calcElapsedTime();
         parse_serial_data();
-        //test_flight();
+        test_flight();
         // logData();
 
         // Calculate elapsed time since the start of the loop
