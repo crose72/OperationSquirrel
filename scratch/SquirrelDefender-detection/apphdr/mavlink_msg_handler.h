@@ -22,8 +22,8 @@ extern const uint8_t SENDER_COMP_ID;
 extern const uint8_t TARGET_SYS_ID;
 extern const uint8_t TARGET_COMP_ID;
 extern const int32_t MESSAGE_RATE_DEFAULT;
-extern const int32_t MESSAGE_RATE_1000us;
-extern const int32_t MESSAGE_RATE_25000us;
+extern const int32_t MESSAGE_RATE_1Hz;
+extern const int32_t MESSAGE_RATE_40Hz;
 
 extern int32_t mav_veh_lat;
 extern int32_t mav_veh_lon;

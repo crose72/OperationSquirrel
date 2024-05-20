@@ -93,14 +93,14 @@ MavMsg::~MavMsg(){};
 void set_message_rates(void)
 {
     MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_DEFAULT);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_GLOBAL_POSITION_INT, 3125);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_GLOBAL_POSITION_INT, MESSAGE_RATE_1Hz);
     MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_DEFAULT);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_SCALED_IMU, MESSAGE_RATE_25000us);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE, MESSAGE_RATE_25000us);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_25000us);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_25000us);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_SCALED_IMU, MESSAGE_RATE_DEFAULT);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE, MESSAGE_RATE_DEFAULT);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_DEFAULT);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_DEFAULT);
     MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_AUTOPILOT_VERSION, MESSAGE_RATE_DEFAULT);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_25000us);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_DEFAULT);
 }
 
 /********************************************************************************
