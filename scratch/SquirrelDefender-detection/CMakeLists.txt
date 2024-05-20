@@ -66,3 +66,6 @@ cuda_add_executable(main ${SOURCES} ${HEADERS})
 
 # link main to jetson-inference library
 target_link_libraries(main jetson-inference)
+
+target_link_libraries(main jsoncpp)
+

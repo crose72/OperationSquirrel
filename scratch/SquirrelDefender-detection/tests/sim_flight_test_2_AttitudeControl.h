@@ -17,7 +17,7 @@
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern int32_t alt;
+extern int32_t mav_veh_alt;
 
 /********************************************************************************
  * Test flight object definitions
@@ -48,7 +48,7 @@ void test_flight(void)
 {
     countupTimer();
 
-    if (alt > 5.0 && stage == 0)
+    if (mav_veh_alt > 5.0 && stage == 0)
     {
         move_forward();
         stage = 1;

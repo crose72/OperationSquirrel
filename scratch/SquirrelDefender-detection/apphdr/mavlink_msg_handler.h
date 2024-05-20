@@ -11,7 +11,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "mavlink_print_info.h"
-#include "serial_port_handler.h"
+#include "serial_comm.h"
 #include "mavlink_cmd_handler.h"
 
 /********************************************************************************
@@ -25,14 +25,14 @@ extern const int32_t MESSAGE_RATE_DEFAULT;
 extern const int32_t MESSAGE_RATE_1000us;
 extern const int32_t MESSAGE_RATE_25000us;
 
-extern int32_t lat;
-extern int32_t lon;
-extern int32_t alt;
-extern int32_t relative_alt;
-extern int16_t vx;
-extern int16_t vy;
-extern int16_t vz;
-extern uint16_t hdg;
+extern int32_t mav_veh_lat;
+extern int32_t mav_veh_lon;
+extern int32_t mav_veh_alt;
+extern int32_t mav_rel_alt;
+extern int16_t mav_veh_gps_vx;
+extern int16_t mav_veh_gps_vy;
+extern int16_t mav_veh_gps_vz;
+extern uint16_t mav_veh_gps_hdg;
 extern float roll;
 extern float pitch;
 extern float yaw;
@@ -75,8 +75,25 @@ extern uint64_t unix_timestamp_us;
 /********************************************************************************
  * Function prototypes
  ********************************************************************************/
+
+ class MavMsg
+ {
+     public:
+        MavMsg();
+        ~MavMsg();
+
+        static void set_mav_msg_rate(uint16_t msg_id, float msg_interval){MavCmd::set_mav_msg_rate(msg_id, msg_interval);};
+        static void req_mav_msg(uint16_t msg_id){MavCmd::req_mav_msg(msg_id);};
+        static uint8_t read_mav_msg(void){SerialComm::read_uart();};
+        static void proc_mav_heartbeat_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_gps_int_msg(const mavlink_message_t *msg, bool print = false);
+
+     private:
+
+ };
+
 void set_message_rates(void);
 void request_messages(void);
-void parse_serial_data(void);
+void parse_mav_msgs(void);
 
 #endif // MAVLINK_MSG_HANDLER_H

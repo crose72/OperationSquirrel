@@ -9,9 +9,9 @@ OBJ := $(patsubst appsrc/%.cpp,obj/%.o,$(SRCS))
 
 # Define the configuration flag
 # Use UART functionality on Jetson Nano
-# CFLAGS += -DUSE_UART
+CFLAGS += -DUSE_UART
 # Use TCP functionality
-CFLAGS += -DUSE_TCP
+# CFLAGS += -DUSE_TCP
 
 # default target
 all: main

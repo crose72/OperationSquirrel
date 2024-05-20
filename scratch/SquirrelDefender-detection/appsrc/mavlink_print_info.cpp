@@ -137,7 +137,12 @@ void print_global_position_int(mavlink_global_position_int_t &global_pos_int)
     printf("Global position:\n");
     printf("\tLatitude: %d degrees (1e-7)\n", global_pos_int.lat);
     printf("\tLongitude: %d degrees (1e-7)\n", global_pos_int.lon);
-    printf("\tAltitude: %d\n", global_pos_int.alt);
+    printf("\tAltitude: %d mm\n", global_pos_int.alt);
+    printf("\tRelative Altitude: %d mm\n", global_pos_int.relative_alt);
+    printf("\tVelocity X: %d cm/s\n", global_pos_int.vx);
+    printf("\tVelocity Y: %d cm/s\n", global_pos_int.vy);
+    printf("\tVelocity Z: %d cm/s\n", global_pos_int.vz);
+    printf("\tHeading: %d centi-degrees\n", global_pos_int.hdg);
 }
 
 /********************************************************************************

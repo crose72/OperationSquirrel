@@ -109,7 +109,7 @@ void parse_serial_data(void)
 
     uint8_t byte;
 
-    //printf("before while: %d\n", bytes_available());
+    printf("before while: %d\n", bytes_available());
     int n = bytes_available();
     for(int i = n; i > 0; i--)
     {

@@ -23,12 +23,15 @@
 #include "common_inc.h"
 #include "global_objects.h"
 #include "global_calibrations.h"
-#include "serial_port_handler.h"
+#include "serial_comm.h"
 #include "mavlink_msg_handler.h"
 #include "mavlink_cmd_handler.h"
 #include "scheduler.h"
 #include "datalog.h"
 #include "time_calc.h"
+
+#include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
+
 
 
 #include "videoIO.h"
@@ -48,6 +51,7 @@ int argc;
 char** argv;
 
 bool signal_recieved = false;
+extern int32_t mav_rel_alt;
 
 // Define time interval (25 ms)
 constexpr int interval_ms = 25;
@@ -67,6 +71,13 @@ float err_x_prv = 0.0;
 float err_y_prv = 0.0;
 float err_x_sum = 0.0;
 float err_y_sum = 0.0;
+
+float Kp_x;
+float Ki_x;
+float Kd_x;
+float Kp_y;
+float Ki_y;
+float Kd_y;
 
 float PID(float Kp, float Ki, float Kd, float desired, float actual, float desired2, float actual2, float w1, float w2, int dim)
 {
@@ -175,6 +186,20 @@ int command_line_inputs(void)
 
 }
 
+// Function to read PID parameters from a JSON file
+void readPIDParametersFromJSON(const std::string& filename, float& Kp_x, float& Ki_x, float& Kd_x, float& Kp_y, float& Ki_y, float& Kd_y) {
+    std::ifstream configFile(filename);
+    Json::Value root;
+    configFile >> root;
+
+    Kp_x = root["Kp_x"].asFloat();
+    Ki_x = root["Ki_x"].asFloat();
+    Kd_x = root["Kd_x"].asFloat();
+    Kp_y = root["Kp_y"].asFloat();
+    Ki_y = root["Ki_y"].asFloat();
+    Kd_y = root["Kd_y"].asFloat();
+}
+
 
 int main(void)
 {
@@ -188,27 +213,30 @@ int main(void)
     }
 
     calcStartTimeMS();
-    setupTask_25ms();
-    open_serial_port();
+    //setupTask_25ms();
+    SerialComm::start_uart_comm();
     set_message_rates();
     request_messages();
     command_line_inputs();
     input_video(cmdLine, ARG_POSITION(0));
     output_video(cmdLine, ARG_POSITION(1));
     create_detection_network();
-    set_mode_GUIDED();
-    arm_vehicle();
-    takeoff_GPS_long((float)2.0);
+    MavCmd::set_mode_GUIDED();
+    MavCmd::arm_vehicle();
+    MavCmd::takeoff_GPS_long((float)2.0);
+    // Load initial PID parameters from a JSON file
+    readPIDParametersFromJSON("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y);
 
     // Get the current time
     auto start_time = std::chrono::steady_clock::now();
     float desired_width;
-    
 
     while (!signal_recieved) 
 	{
         std::lock_guard<std::mutex> lock(mutex);
 		calcElapsedTime();
+
+        readPIDParametersFromJSON("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y);
 		
 		if (!capture_image())
 		{
@@ -223,6 +251,7 @@ int main(void)
 		{
 		    //break;
 		}
+		//std::cout << "Vx: " << mav_veh_gps_vx << std::endl;
 		
 		float target_velocity[3] = {0.0,0.0,0.0};
 		if( numDetections > 0 )
@@ -231,18 +260,15 @@ int main(void)
 			{
 				if( detections[n].TrackID >= 0 ) // is this a tracked object?
 				{			
-					if (detections[n].ClassID == 1 && detections[n].Confidence > 0.8)
+					if (detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
 					{
-						float Kp = 0.1;
-						float Ki = 0.0;
-						float Kd = 0.0;
 						float x_desired = 360.0;
 						float x_actual = detections[n].Height()/2.0 + detections[n].Top;
 						float height_desired = 650;
 						float height_actual = detections[n].Height();
 						float w1 = 0.5;
 						float w2 = 0.5;
-						float vx_adjust = PID(Kp, Ki, Kd, x_desired, x_actual, 											height_desired, height_actual, w1, w2, 0);
+						float vx_adjust = PID(Kp_x, Ki_x, Kd_x, x_desired, x_actual, 											height_desired, height_actual, w1, w2, 0);
 						std::cout << "Control signal x: " << vx_adjust << std::endl;
 						if (vx_adjust < 0)
 						{
@@ -254,12 +280,9 @@ int main(void)
 						}
 						target_velocity[0] = vx_adjust;
 
-						Kp = 0.0001;
-						Ki = 0.0;
-						Kd = 0.0;
 						float y_desired = 640.0;
 						float y_actual = detections[n].Width()/2.0 + detections[n].Left;
-						float vy_adjust = -PID(Kp, Ki, Kd, y_desired, y_actual, 										0.0, 0.0, 1.0, 0.0, 1);
+						float vy_adjust = -PID(Kp_y, Ki_y, Kd_y, y_desired, y_actual, 										0.0, 0.0, 1.0, 0.0, 1);
 						std::cout << "Control signal y: " << vy_adjust << std::endl;
 						target_velocity[1] = vy_adjust;
 
@@ -268,10 +291,11 @@ int main(void)
 				}
 				
 			}
-		}	
+		}
+		
 
 		//print_performance_stats();
-		parse_serial_data();
+		parse_mav_msgs();
 		//test_flight();
 		// logData();
 
@@ -301,7 +325,7 @@ int main(void)
     delete_input();
     delete_output();
     delete_tracking_net();
-    
+    SerialComm::stop_uart_comm();
     LogVerbose("detectnet:  shutdown complete.\n");
 
     return 0;

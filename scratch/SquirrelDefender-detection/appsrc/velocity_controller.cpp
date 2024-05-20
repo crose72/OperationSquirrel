@@ -74,7 +74,7 @@ void cmd_position(float position_target[3])
     desired_position_target.type_mask = 0b0000101111111000; // Ignore velocity and accel and yaw rate
     desired_position_target.coordinate_frame = MAV_FRAME_BODY_OFFSET_NED; // MAV_FRAME_BODY_OFFSET_NED
 
-    send_cmd_set_position_target_local_ned(&desired_position_target);
+    MavCmd::send_cmd_set_position_target_local_ned(&desired_position_target);
 }
 
 void cmd_velocity(float velocity_target[3])
@@ -90,7 +90,7 @@ void cmd_velocity(float velocity_target[3])
     desired_velocity_target.type_mask = 0b0000101111000111; // Ignore position and accel and yaw rate
     desired_velocity_target.coordinate_frame = MAV_FRAME_BODY_OFFSET_NED; // MAV_FRAME_BODY_OFFSET_NED
 
-    send_cmd_set_position_target_local_ned(&desired_velocity_target);
+    MavCmd::send_cmd_set_position_target_local_ned(&desired_velocity_target);
 }
 
 void cmd_acceleration(float acceleration_target[3])
@@ -106,7 +106,7 @@ void cmd_acceleration(float acceleration_target[3])
     desired_acceleration_target.type_mask = 0b0000100000111111; // Ignore position and vel and yaw
     desired_acceleration_target.coordinate_frame = MAV_FRAME_BODY_OFFSET_NED; // MAV_FRAME_BODY_OFFSET_NED
 
-    send_cmd_set_position_target_local_ned(&desired_acceleration_target);
+    MavCmd::send_cmd_set_position_target_local_ned(&desired_acceleration_target);
 }
 
 float calc_yaw_target(float x, float y)

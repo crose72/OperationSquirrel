@@ -15,14 +15,14 @@
  * Imported objects
  ************************************/
 extern float elapsedTimeSeconds;
-extern int32_t lat;
-extern int32_t lon;
-extern int32_t alt;
-extern int32_t relative_alt;
-extern int16_t vx;
-extern int16_t vy;
-extern int16_t vz;
-extern uint16_t hdg;
+extern int32_t mav_veh_lat;
+extern int32_t mav_veh_lon;
+extern int32_t mav_veh_alt;
+extern int32_t mav_rel_alt;
+extern int16_t mav_veh_gps_vx;
+extern int16_t mav_veh_gps_vy;
+extern int16_t mav_veh_gps_vz;
+extern uint16_t mav_veh_gps_hdg;
 extern float roll;
 extern float pitch;
 extern float yaw;
