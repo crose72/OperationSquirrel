@@ -23,21 +23,21 @@ extern int16_t mav_veh_gps_vx;
 extern int16_t mav_veh_gps_vy;
 extern int16_t mav_veh_gps_vz;
 extern uint16_t mav_veh_gps_hdg;
-extern float roll;
-extern float pitch;
-extern float yaw;
-extern float rollspeed;
-extern float pitchspeed;
-extern float yawspeed;
-extern int16_t xacc;
-extern int16_t yacc;
-extern int16_t zacc;
-extern int16_t xgyro;
-extern int16_t ygyro;
-extern int16_t zgyro;
-extern int16_t xmag;
-extern int16_t ymag;
-extern int16_t zmag;
+extern float mav_veh_roll;
+extern float mav_veh_pitch;
+extern float mav_veh_yaw;
+extern float mav_veh_rollspeed;
+extern float mav_veh_pitchspeed;
+extern float mav_veh_yawspeed;
+extern int16_t mav_veh_imu_ax;
+extern int16_t mav_veh_imu_ay;
+extern int16_t mav_veh_imu_az;
+extern int16_t mav_veh_imu_xgyro;
+extern int16_t mav_veh_imu_ygyro;
+extern int16_t mav_veh_imu_zgyro;
+extern int16_t mav_veh_imu_xmag;
+extern int16_t mav_veh_imu_ymag;
+extern int16_t mav_veh_imu_zmag;
 
 /************************************
  * Exported objects

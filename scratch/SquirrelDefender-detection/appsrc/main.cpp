@@ -245,7 +245,7 @@ int main(void)
 
 		detect_objects();
 		get_object_info();
-		print_object_info();
+		//print_object_info();
 
 		if (!render_output())
 		{
@@ -269,7 +269,7 @@ int main(void)
 						float w1 = 0.5;
 						float w2 = 0.5;
 						float vx_adjust = PID(Kp_x, Ki_x, Kd_x, x_desired, x_actual, 											height_desired, height_actual, w1, w2, 0);
-						std::cout << "Control signal x: " << vx_adjust << std::endl;
+						//std::cout << "Control signal x: " << vx_adjust << std::endl;
 						if (vx_adjust < 0)
 						{
 							vx_adjust = -vx_adjust;
@@ -283,7 +283,7 @@ int main(void)
 						float y_desired = 640.0;
 						float y_actual = detections[n].Width()/2.0 + detections[n].Left;
 						float vy_adjust = -PID(Kp_y, Ki_y, Kd_y, y_desired, y_actual, 										0.0, 0.0, 1.0, 0.0, 1);
-						std::cout << "Control signal y: " << vy_adjust << std::endl;
+						//std::cout << "Control signal y: " << vy_adjust << std::endl;
 						target_velocity[1] = vy_adjust;
 
 						cmd_velocity(target_velocity);	

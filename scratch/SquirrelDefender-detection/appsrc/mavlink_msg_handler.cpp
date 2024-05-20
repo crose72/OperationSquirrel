@@ -31,21 +31,21 @@ int16_t mav_veh_gps_vx = 0; /*< [cm/s] Ground X Speed (Latitude, positive north)
 int16_t mav_veh_gps_vy = 0; /*< [cm/s] Ground Y Speed (Longitude, positive east)*/
 int16_t mav_veh_gps_vz = 0; /*< [cm/s] Ground Z Speed (Altitude, positive down)*/
 uint16_t mav_veh_gps_hdg = 0; /*< [cdeg] Vehicle heading (yaw angle), 0.0..359.99 degrees. If unknown, set to: UINT16_MAX*/
-float roll = 0.0; /*< [rad] Roll angle (-pi..+pi)*/
-float pitch = 0.0; /*< [rad] Pitch angle (-pi..+pi)*/
-float yaw = 0.0; /*< [rad] Yaw angle (-pi..+pi)*/
-float rollspeed = 0.0; /*< [rad/s] Roll angular speed*/
-float pitchspeed = 0.0; /*< [rad/s] Pitch angular speed*/
-float yawspeed = 0.0; /*< [rad/s] Yaw angular speed*/
-int16_t xacc = 0; /*< [mG] X acceleration*/
-int16_t yacc = 0; /*< [mG] Y acceleration*/
-int16_t zacc = 0; /*< [mG] Z acceleration*/
-int16_t xgyro = 0; /*< [mrad/s] Angular speed around X axis*/
-int16_t ygyro = 0; /*< [mrad/s] Angular speed around Y axis*/
-int16_t zgyro = 0; /*< [mrad/s] Angular speed around Z axis*/
-int16_t xmag = 0; /*< [mgauss] X Magnetic field*/
-int16_t ymag = 0; /*< [mgauss] Y Magnetic field*/
-int16_t zmag = 0; /*< [mgauss] Z Magnetic field*/
+float mav_veh_roll = 0.0; /*< [rad] Roll angle (-pi..+pi)*/
+float mav_veh_pitch = 0.0; /*< [rad] Pitch angle (-pi..+pi)*/
+float mav_veh_yaw = 0.0; /*< [rad] Yaw angle (-pi..+pi)*/
+float mav_veh_rollspeed = 0.0; /*< [rad/s] Roll angular speed*/
+float mav_veh_pitchspeed = 0.0; /*< [rad/s] Pitch angular speed*/
+float mav_veh_yawspeed = 0.0; /*< [rad/s] Yaw angular speed*/
+int16_t mav_veh_imu_ax = 0; /*< [mG] X acceleration*/
+int16_t mav_veh_imu_ay = 0; /*< [mG] Y acceleration*/
+int16_t mav_veh_imu_az = 0; /*< [mG] Z acceleration*/
+int16_t mav_veh_imu_xgyro = 0; /*< [mrad/s] Angular speed around X axis*/
+int16_t mav_veh_imu_ygyro = 0; /*< [mrad/s] Angular speed around Y axis*/
+int16_t mav_veh_imu_zgyro = 0; /*< [mrad/s] Angular speed around Z axis*/
+int16_t mav_veh_imu_xmag = 0; /*< [mgauss] X Magnetic field*/
+int16_t mav_veh_imu_ymag = 0; /*< [mgauss] Y Magnetic field*/
+int16_t mav_veh_imu_zmag = 0; /*< [mgauss] Z Magnetic field*/
 float q1_target = 0.0;
 float q2_target = 0.0;
 float q3_target = 0.0;
@@ -193,15 +193,15 @@ void parse_mav_msgs(void)
                 case MAVLINK_MSG_ID_SCALED_IMU:
                     mavlink_scaled_imu_t scaled_imu;
                     mavlink_msg_scaled_imu_decode(&msg, &scaled_imu);
-                    xacc = scaled_imu.xacc;
-                    yacc = scaled_imu.yacc;
-                    zacc = scaled_imu.zacc;
-                    xgyro = scaled_imu.xgyro;
-                    ygyro = scaled_imu.ygyro;
-                    zgyro = scaled_imu.zgyro;
-                    xmag = scaled_imu.xmag;
-                    ymag = scaled_imu.ymag;
-                    zmag = scaled_imu.zmag;
+                    mav_veh_imu_ax = scaled_imu.xacc;
+                    mav_veh_imu_ay = scaled_imu.yacc;
+                    mav_veh_imu_az = scaled_imu.zacc;
+                    mav_veh_imu_xgyro = scaled_imu.xgyro;
+                    mav_veh_imu_ygyro = scaled_imu.ygyro;
+                    mav_veh_imu_zgyro = scaled_imu.zgyro;
+                    mav_veh_imu_xmag = scaled_imu.xmag;
+                    mav_veh_imu_ymag = scaled_imu.ymag;
+                    mav_veh_imu_zmag = scaled_imu.zmag;
                     print_scaled_imu(scaled_imu);
                     break;
                 case MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED:
