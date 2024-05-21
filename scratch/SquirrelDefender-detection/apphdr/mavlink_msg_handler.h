@@ -82,8 +82,7 @@ extern uint64_t unix_timestamp_us;
         MavMsg();
         ~MavMsg();
 
-        static void set_mav_msg_rate(uint16_t msg_id, float msg_interval){MavCmd::set_mav_msg_rate(msg_id, msg_interval);};
-        static void req_mav_msg(uint16_t msg_id){MavCmd::req_mav_msg(msg_id);};
+        static void subscribe(uint16_t msg_id, float msg_interval);
         static uint8_t read_mav_msg(void){SerialComm::read_uart();};
 
         static void proc_mav_heartbeat_msg(const mavlink_message_t *msg, bool print = false);
@@ -104,11 +103,12 @@ extern uint64_t unix_timestamp_us;
         static void proc_mav_command_ack_msg(const mavlink_message_t *msg, bool print = false);
 
      private:
+        static void set_mav_msg_rate(uint16_t msg_id, float msg_interval){MavCmd::set_mav_msg_rate(msg_id, msg_interval);};
+        static void req_mav_msg(uint16_t msg_id){MavCmd::req_mav_msg(msg_id);};
 
  };
 
-void set_message_rates(void);
-void request_messages(void);
+void message_subscriptions(void);
 void parse_mav_msgs(void);
 
 #endif // MAVLINK_MSG_HANDLER_H

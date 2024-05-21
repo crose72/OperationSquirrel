@@ -86,49 +86,14 @@ MavMsg::MavMsg(){};
 MavMsg::~MavMsg(){};
 
 /********************************************************************************
- * Function: set_message_rates
- * Description: Tell the autopilot the frequency to send specific mavlink 
- *              messages.
+ * Function: subscribe
+ * Description: Subscribe to mavlink messages and specify 
+ *              the desired to receive the message at.
  ********************************************************************************/
-void set_message_rates(void)
+void MavMsg::subscribe(uint16_t msg_id, float msg_interval)
 {
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_DEFAULT);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_GLOBAL_POSITION_INT, MESSAGE_RATE_1Hz);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_1Hz);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_SCALED_IMU, MESSAGE_RATE_1Hz);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE, MESSAGE_RATE_1Hz);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_1Hz);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_1Hz);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_AUTOPILOT_VERSION, MESSAGE_RATE_1Hz);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_1Hz);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_SYS_STATUS, MESSAGE_RATE_1Hz);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_STATUSTEXT, MESSAGE_RATE_1Hz);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_PARAM_VALUE, MESSAGE_RATE_1Hz);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_LOCAL_POSITION_NED, MESSAGE_RATE_1Hz);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_1Hz);
-}
-
-/********************************************************************************
- * Function: request_messages
- * Description: Tell the autopilot to begin sending specific messages, whose
- *              rate has already been set.
- ********************************************************************************/
-void request_messages(void)
-{
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_HEARTBEAT);
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_GLOBAL_POSITION_INT);
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_SYSTEM_TIME);
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_SCALED_IMU);
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_ATTITUDE);
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_ATTITUDE_TARGET);
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_ATTITUDE_QUATERNION);
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_AUTOPILOT_VERSION);
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED);
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_SYS_STATUS);
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_STATUSTEXT);
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_PARAM_VALUE);
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_LOCAL_POSITION_NED);
-    MavMsg::req_mav_msg(MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED);
+    set_mav_msg_rate(msg_id, msg_interval);
+    req_mav_msg(msg_id);
 }
 
  /********************************************************************************
@@ -390,6 +355,28 @@ void MavMsg::proc_mav_command_ack_msg(const mavlink_message_t *msg, bool print)
     }
 }
 
+/********************************************************************************
+ * Function: message_subscriptions
+ * Description: Handle all message subscriptions.  Any messages subscribed to
+ *              will be request by the companion computer from the autopilot.
+ ********************************************************************************/
+void message_subscriptions(void)
+{
+    MavMsg::subscribe(MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_DEFAULT);
+    MavMsg::subscribe(MAVLINK_MSG_ID_GLOBAL_POSITION_INT, MESSAGE_RATE_40Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_1Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_SCALED_IMU, MESSAGE_RATE_40Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_ATTITUDE, MESSAGE_RATE_40Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_1Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_1Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_1Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_DEFAULT);
+    MavMsg::subscribe(MAVLINK_MSG_ID_LOCAL_POSITION_NED, MESSAGE_RATE_1Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_SYS_STATUS, MESSAGE_RATE_DEFAULT);
+    MavMsg::subscribe(MAVLINK_MSG_ID_STATUSTEXT, MESSAGE_RATE_DEFAULT);
+    MavMsg::subscribe(MAVLINK_MSG_ID_PARAM_VALUE, MESSAGE_RATE_DEFAULT);
+    MavMsg::subscribe(MAVLINK_MSG_ID_AUTOPILOT_VERSION, MESSAGE_RATE_DEFAULT);
+}
 
 /********************************************************************************
  * Function: parse_mav_msgs
