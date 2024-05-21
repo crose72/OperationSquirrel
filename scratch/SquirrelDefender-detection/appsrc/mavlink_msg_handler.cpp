@@ -94,13 +94,18 @@ void set_message_rates(void)
 {
     MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_DEFAULT);
     MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_GLOBAL_POSITION_INT, MESSAGE_RATE_1Hz);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_DEFAULT);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_SCALED_IMU, MESSAGE_RATE_DEFAULT);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE, MESSAGE_RATE_DEFAULT);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_DEFAULT);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_DEFAULT);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_AUTOPILOT_VERSION, MESSAGE_RATE_DEFAULT);
-    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_DEFAULT);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_1Hz);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_SCALED_IMU, MESSAGE_RATE_1Hz);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE, MESSAGE_RATE_1Hz);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_1Hz);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_1Hz);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_AUTOPILOT_VERSION, MESSAGE_RATE_1Hz);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_1Hz);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_SYS_STATUS, MESSAGE_RATE_1Hz);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_STATUSTEXT, MESSAGE_RATE_1Hz);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_PARAM_VALUE, MESSAGE_RATE_1Hz);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_LOCAL_POSITION_NED, MESSAGE_RATE_1Hz);
+    MavMsg::set_mav_msg_rate(MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_1Hz);
 }
 
 /********************************************************************************
@@ -119,6 +124,11 @@ void request_messages(void)
     MavMsg::req_mav_msg(MAVLINK_MSG_ID_ATTITUDE_QUATERNION);
     MavMsg::req_mav_msg(MAVLINK_MSG_ID_AUTOPILOT_VERSION);
     MavMsg::req_mav_msg(MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED);
+    MavMsg::req_mav_msg(MAVLINK_MSG_ID_SYS_STATUS);
+    MavMsg::req_mav_msg(MAVLINK_MSG_ID_STATUSTEXT);
+    MavMsg::req_mav_msg(MAVLINK_MSG_ID_PARAM_VALUE);
+    MavMsg::req_mav_msg(MAVLINK_MSG_ID_LOCAL_POSITION_NED);
+    MavMsg::req_mav_msg(MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED);
 }
 
  /********************************************************************************
@@ -157,9 +167,229 @@ void request_messages(void)
     if(print)
     {
         print_global_position_int(global_pos_int);
-    }
-    
+    }  
  }
+
+ /********************************************************************************
+ * Function: proc_mav_system_time_msg
+ * Description: Decode system time message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_system_time_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_system_time_t system_time;
+    mavlink_msg_system_time_decode(msg, &system_time);
+
+    if (print)
+    {
+        print_system_time(system_time);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_sys_status_msg
+ * Description: Decode system status message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_sys_status_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_sys_status_t sys_status;
+    mavlink_msg_sys_status_decode(msg, &sys_status);
+
+    if (print)
+    {
+        print_sys_status(sys_status);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_statustext_msg
+ * Description: Decode status text message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_statustext_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_statustext_t statustext;
+    mavlink_msg_statustext_decode(msg, &statustext);
+
+    if (print)
+    {
+        print_statustext(statustext);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_param_value_msg
+ * Description: Decode parameter value message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_param_value_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_param_value_t param_value;
+    mavlink_msg_param_value_decode(msg, &param_value);
+
+    if (print)
+    {
+        print_param_value(param_value);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_autopilot_version_msg
+ * Description: Decode autopilot version message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_autopilot_version_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_autopilot_version_t autopilot_version;
+    mavlink_msg_autopilot_version_decode(msg, &autopilot_version);
+
+    if (print)
+    {
+        print_autopilot_version(autopilot_version);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_scaled_imu_msg
+ * Description: Decode scaled IMU message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_scaled_imu_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_scaled_imu_t scaled_imu;
+    mavlink_msg_scaled_imu_decode(msg, &scaled_imu);
+
+    mav_veh_imu_ax = scaled_imu.xacc;
+    mav_veh_imu_ay = scaled_imu.yacc;
+    mav_veh_imu_az = scaled_imu.zacc;
+    mav_veh_imu_xgyro = scaled_imu.xgyro;
+    mav_veh_imu_ygyro = scaled_imu.ygyro;
+    mav_veh_imu_zgyro = scaled_imu.zgyro;
+    mav_veh_imu_xmag = scaled_imu.xmag;
+    mav_veh_imu_ymag = scaled_imu.ymag;
+    mav_veh_imu_zmag = scaled_imu.zmag;
+
+    if (print)
+    {
+        print_scaled_imu(scaled_imu);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_local_position_msg
+ * Description: Decode local position message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_local_position_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_local_position_ned_t local_position;
+    mavlink_msg_local_position_ned_decode(msg, &local_position);
+
+    if (print)
+    {
+        print_local_position(local_position);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_position_target_local_ned_msg
+ * Description: Decode position target local NED message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_position_target_local_ned_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_position_target_local_ned_t position_target_local_ned;
+    mavlink_msg_position_target_local_ned_decode(msg, &position_target_local_ned);
+
+    if (print)
+    {
+        print_position_target_local_ned(position_target_local_ned);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_set_position_target_local_ned_msg
+ * Description: Decode set position target local NED message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_set_position_target_local_ned_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_set_position_target_local_ned_t set_position_target_local_ned;
+    mavlink_msg_set_position_target_local_ned_decode(msg, &set_position_target_local_ned);
+
+    if (print)
+    {
+        print_set_position_target_local_ned(set_position_target_local_ned);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_attitude_msg
+ * Description: Decode attitude message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_attitude_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_attitude_t attitude;
+    mavlink_msg_attitude_decode(msg, &attitude);
+
+    if (print)
+    {
+        print_attitude(attitude);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_attitude_target_msg
+ * Description: Decode attitude target message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_attitude_target_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_attitude_target_t attitude_target;
+    mavlink_msg_attitude_target_decode(msg, &attitude_target);
+
+    if (print)
+    {
+        print_attitude_target(attitude_target);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_set_attitude_target_msg
+ * Description: Decode set attitude target message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_set_attitude_target_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_set_attitude_target_t set_attitude_target;
+    mavlink_msg_set_attitude_target_decode(msg, &set_attitude_target);
+
+    if (print)
+    {
+        print_set_attitude_target(set_attitude_target);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_attitude_quaternion_msg
+ * Description: Decode attitude quaternion message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_attitude_quaternion_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_attitude_quaternion_t attitude_quaternion;
+    mavlink_msg_attitude_quaternion_decode(msg, &attitude_quaternion);
+
+    if (print)
+    {
+        print_attitude_quaternion(attitude_quaternion);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_command_ack_msg
+ * Description: Decode command acknowledgment message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_command_ack_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_command_ack_t command_ack;
+    mavlink_msg_command_ack_decode(msg, &command_ack);
+
+    if (print)
+    {
+        print_command_ack(command_ack);
+    }
+}
+
 
 /********************************************************************************
  * Function: parse_mav_msgs
@@ -185,54 +415,46 @@ void parse_mav_msgs(void)
             switch (msg.msgid) 
             {
                 case MAVLINK_MSG_ID_HEARTBEAT:
-                    MavMsg::proc_mav_heartbeat_msg(&msg,false);
+                    MavMsg::proc_mav_heartbeat_msg(&msg, true);
                     break;
                 case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
-                    MavMsg::proc_mav_gps_int_msg(&msg,true);
+                    MavMsg::proc_mav_gps_int_msg(&msg, true);
+                    break;
+                case MAVLINK_MSG_ID_SYSTEM_TIME:
+                    MavMsg::proc_mav_system_time_msg(&msg, true);
                     break;
                 case MAVLINK_MSG_ID_SCALED_IMU:
-                    mavlink_scaled_imu_t scaled_imu;
-                    mavlink_msg_scaled_imu_decode(&msg, &scaled_imu);
-                    mav_veh_imu_ax = scaled_imu.xacc;
-                    mav_veh_imu_ay = scaled_imu.yacc;
-                    mav_veh_imu_az = scaled_imu.zacc;
-                    mav_veh_imu_xgyro = scaled_imu.xgyro;
-                    mav_veh_imu_ygyro = scaled_imu.ygyro;
-                    mav_veh_imu_zgyro = scaled_imu.zgyro;
-                    mav_veh_imu_xmag = scaled_imu.xmag;
-                    mav_veh_imu_ymag = scaled_imu.ymag;
-                    mav_veh_imu_zmag = scaled_imu.zmag;
-                    print_scaled_imu(scaled_imu);
+                    MavMsg::proc_mav_scaled_imu_msg(&msg, true);
                     break;
-                case MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED:
-                    mavlink_set_position_target_local_ned_t set_position_target_local_ned;
-                    mavlink_msg_set_position_target_local_ned_decode(&msg, &set_position_target_local_ned);
-                    //print_set_position_target_local_ned(set_position_target_local_ned);
+                case MAVLINK_MSG_ID_ATTITUDE:
+                    MavMsg::proc_mav_attitude_msg(&msg, true);
+                    break;
+                case MAVLINK_MSG_ID_ATTITUDE_TARGET:
+                    MavMsg::proc_mav_attitude_target_msg(&msg, true);
+                    break;
+                case MAVLINK_MSG_ID_ATTITUDE_QUATERNION:
+                    MavMsg::proc_mav_attitude_quaternion_msg(&msg, true);
+                    break;
+                case MAVLINK_MSG_ID_AUTOPILOT_VERSION:
+                    MavMsg::proc_mav_autopilot_version_msg(&msg, true);
                     break;
                 case MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED:
-                    mavlink_position_target_local_ned_t position_target_local_ned;
-                    mavlink_msg_position_target_local_ned_decode(&msg, &position_target_local_ned);
-                    //print_position_target_local_ned(position_target_local_ned);
+                    MavMsg::proc_mav_position_target_local_ned_msg(&msg, true);
                     break;
-                case MAVLINK_MSG_ID_COMMAND_ACK:
-                    mavlink_command_ack_t command_ack;
-                    mavlink_msg_command_ack_decode(&msg, &command_ack);
-                    //print_command_ack(command_ack);
+                case MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED:
+                    MavMsg::proc_mav_set_position_target_local_ned_msg(&msg, true);
                     break;
-                case MAVLINK_MSG_ID_PARAM_REQUEST_READ:
-                    mavlink_param_request_read_t param_request_read;
-                    mavlink_msg_param_request_read_decode(&msg, &param_request_read);
-                    //print_param_request_read(param_request_read);
+                case MAVLINK_MSG_ID_SYS_STATUS:
+                    MavMsg::proc_mav_sys_status_msg(&msg, true);
                     break;
                 case MAVLINK_MSG_ID_STATUSTEXT:
-                    mavlink_statustext_t statustext;
-                    mavlink_msg_statustext_decode(&msg, &statustext);
-                    //print_statustext(statustext);
+                    MavMsg::proc_mav_statustext_msg(&msg, true);
                     break;
                 case MAVLINK_MSG_ID_PARAM_VALUE:
-                    mavlink_param_value_t param_value;
-                    mavlink_msg_param_value_decode(&msg, &param_value);
-                    //print_param_value(param_value);
+                    MavMsg::proc_mav_param_value_msg(&msg, true);
+                    break;
+                case MAVLINK_MSG_ID_COMMAND_ACK:
+                    MavMsg::proc_mav_command_ack_msg(&msg, true);
                     break;
                 default:
                     printf("Received message with ID: %d\n", (int)msg.msgid);

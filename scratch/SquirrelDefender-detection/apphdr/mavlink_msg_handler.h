@@ -85,8 +85,23 @@ extern uint64_t unix_timestamp_us;
         static void set_mav_msg_rate(uint16_t msg_id, float msg_interval){MavCmd::set_mav_msg_rate(msg_id, msg_interval);};
         static void req_mav_msg(uint16_t msg_id){MavCmd::req_mav_msg(msg_id);};
         static uint8_t read_mav_msg(void){SerialComm::read_uart();};
+
         static void proc_mav_heartbeat_msg(const mavlink_message_t *msg, bool print = false);
         static void proc_mav_gps_int_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_system_time_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_sys_status_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_statustext_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_param_value_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_autopilot_version_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_scaled_imu_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_local_position_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_position_target_local_ned_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_set_position_target_local_ned_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_attitude_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_attitude_target_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_set_attitude_target_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_attitude_quaternion_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_command_ack_msg(const mavlink_message_t *msg, bool print = false);
 
      private:
 

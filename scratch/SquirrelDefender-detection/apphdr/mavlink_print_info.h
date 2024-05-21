@@ -44,9 +44,9 @@ void print_servo_output_raw(mavlink_servo_output_raw_t& servo_output_raw);
 void print_autopilot_version(mavlink_autopilot_version_t &autopilot_version);
 void print_attitude_quaternion(mavlink_attitude_quaternion_t &attitude_quaternion);
 void print_attitude_target(mavlink_attitude_target_t &attitude_target);
+void print_set_attitude_target(mavlink_set_attitude_target_t &set_attitude_target);
 void print_system_time(mavlink_system_time_t &system_time);
 void print_set_position_target_local_ned(mavlink_set_position_target_local_ned_t &set_position_target_local_ned);
 void print_position_target_local_ned(mavlink_position_target_local_ned_t &position_target_local_ned);
-//void print_protocol_capability(mavlink_protocol_capability_t& protocol_;capability);
 
 #endif // MAVLINK_PRINT_INFO_H
