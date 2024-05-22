@@ -388,9 +388,9 @@ void MavMsg::proc_mav_distance_sensor_msg(const mavlink_message_t *msg, bool pri
 /********************************************************************************
  * Function: message_subscriptions
  * Description: Handle all message subscriptions.  Any messages subscribed to
- *              will be request by the companion computer from the autopilot.
+ *              is requested by the companion computer from the autopilot.
  ********************************************************************************/
-void message_subscriptions(void)
+void MavMsg::message_subscriptions(void)
 {
     MavMsg::subscribe(MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_DEFAULT);
     MavMsg::subscribe(MAVLINK_MSG_ID_GLOBAL_POSITION_INT, MESSAGE_RATE_40Hz);
@@ -415,7 +415,7 @@ void message_subscriptions(void)
  * Description: Read the serial port and unpack specific messages if its 
  *              specific mavlink message ID has been received.
  ********************************************************************************/
-void parse_mav_msgs(void)
+void MavMsg::parse_mav_msgs(void)
 {
     mavlink_message_t msg; // initialize the Mavlink message buffer
     mavlink_status_t status = {}; // Initialize the Mavlink status
@@ -429,8 +429,6 @@ void parse_mav_msgs(void)
         // Parse the byte and check if a message has been received
         if (mavlink_parse_char(MAVLINK_COMM_0, byte, &msg, &status)) 
         {
-            // Handle the message based on its type
-            // switch case
             switch (msg.msgid) 
             {
                 case MAVLINK_MSG_ID_HEARTBEAT:

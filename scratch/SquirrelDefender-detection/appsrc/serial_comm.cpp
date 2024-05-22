@@ -77,8 +77,9 @@ SerialComm::~SerialComm(void){}
 bool SerialComm::start_uart_comm(void)
 {
     #ifdef USE_UART
-        // Open the uart port for connecting to SITL or the autopilot
+        // Open the uart port
         serial_port = open(SERIAL_PORT, O_RDWR);
+
         if (serial_port < 0) 
         {
             fprintf(stderr,"Error starting serial comms\n");
@@ -235,8 +236,10 @@ void SerialComm::stop_uart_comm(void)
 ********************************************************************************/
 int SerialComm::bytes_available(void)
 {
+    int bytes;
+
     #if USE_UART
-        int bytes;
+        
         if (ioctl(uart_fd, FIONREAD, &bytes) == -1)
         {
             perror("ioctl");
@@ -244,7 +247,7 @@ int SerialComm::bytes_available(void)
         }
         return bytes;
     #elif USE_TCP
-        int bytes;
+
         if (ioctl(tcp_socket_fd, FIONREAD, &bytes) == -1)
         {
             printf("ioctl\n");

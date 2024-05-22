@@ -214,8 +214,8 @@ int main(void)
 
     calcStartTimeMS();
     //setupTask_25ms();
-    SerialComm::start_uart_comm();
-    message_subscriptions();
+    MavMsg::start_mav_comm();
+    MavMsg::message_subscriptions();
     command_line_inputs();
     input_video(cmdLine, ARG_POSITION(0));
     output_video(cmdLine, ARG_POSITION(1));
@@ -234,7 +234,7 @@ int main(void)
 	{
         std::lock_guard<std::mutex> lock(mutex);
 		calcElapsedTime();
-		parse_mav_msgs();
+		MavMsg::parse_mav_msgs();
 
         readPIDParametersFromJSON("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y);
 		
