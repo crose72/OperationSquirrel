@@ -48,5 +48,7 @@ void print_set_attitude_target(mavlink_set_attitude_target_t &set_attitude_targe
 void print_system_time(mavlink_system_time_t &system_time);
 void print_set_position_target_local_ned(mavlink_set_position_target_local_ned_t &set_position_target_local_ned);
 void print_position_target_local_ned(mavlink_position_target_local_ned_t &position_target_local_ned);
+void print_optical_flow(mavlink_optical_flow_t &optical_flow);
+void print_distance_sensor(mavlink_distance_sensor_t &distance_sensor);
 
 #endif // MAVLINK_PRINT_INFO_H

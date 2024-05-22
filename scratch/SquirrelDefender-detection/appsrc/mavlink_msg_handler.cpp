@@ -356,6 +356,36 @@ void MavMsg::proc_mav_command_ack_msg(const mavlink_message_t *msg, bool print)
 }
 
 /********************************************************************************
+ * Function: proc_mav_optical_flow_msg
+ * Description: Decode optical flow message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_optical_flow_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_optical_flow_t optical_flow;
+    mavlink_msg_optical_flow_decode(msg, &optical_flow);
+
+    if (print)
+    {
+        print_optical_flow(optical_flow);
+    }
+}
+
+/********************************************************************************
+ * Function: proc_mav_distance_sensor_msg
+ * Description: Decode distance sensor message and optionally print the information.
+ ********************************************************************************/
+void MavMsg::proc_mav_distance_sensor_msg(const mavlink_message_t *msg, bool print)
+{
+    mavlink_distance_sensor_t distance_sensor;
+    mavlink_msg_distance_sensor_decode(msg, &distance_sensor);
+
+    if (print)
+    {
+        print_distance_sensor(distance_sensor);
+    }
+}
+
+/********************************************************************************
  * Function: message_subscriptions
  * Description: Handle all message subscriptions.  Any messages subscribed to
  *              will be request by the companion computer from the autopilot.
@@ -364,9 +394,11 @@ void message_subscriptions(void)
 {
     MavMsg::subscribe(MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_DEFAULT);
     MavMsg::subscribe(MAVLINK_MSG_ID_GLOBAL_POSITION_INT, MESSAGE_RATE_40Hz);
-    MavMsg::subscribe(MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_1Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_DEFAULT);
     MavMsg::subscribe(MAVLINK_MSG_ID_SCALED_IMU, MESSAGE_RATE_40Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_ATTITUDE, MESSAGE_RATE_40Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_OPTICAL_FLOW, MESSAGE_RATE_40Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_DISTANCE_SENSOR, MESSAGE_RATE_40Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_1Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_1Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_1Hz);
@@ -412,6 +444,12 @@ void parse_mav_msgs(void)
                     break;
                 case MAVLINK_MSG_ID_SCALED_IMU:
                     MavMsg::proc_mav_scaled_imu_msg(&msg, true);
+                    break;
+                case MAVLINK_MSG_ID_OPTICAL_FLOW:
+                    MavMsg::proc_mav_optical_flow_msg(&msg, true);
+                    break;
+                case MAVLINK_MSG_ID_DISTANCE_SENSOR:
+                    MavMsg::proc_mav_distance_sensor_msg(&msg, true);
                     break;
                 case MAVLINK_MSG_ID_ATTITUDE:
                     MavMsg::proc_mav_attitude_msg(&msg, true);

@@ -179,6 +179,50 @@ void print_scaled_imu(mavlink_scaled_imu_t &scaled_imu)
 }
 
 /********************************************************************************
+ * Function: print_optical_flow
+ * Description: Print the optical flow mavlink message.
+ ********************************************************************************/
+void print_optical_flow(mavlink_optical_flow_t &optical_flow) 
+{
+    printf("Optical Flow data:\n");
+    printf("\tTimestamp: %llu us\n", optical_flow.time_usec);
+    printf("\tSensor ID: %d\n", optical_flow.sensor_id);
+    printf("\tFlow in x-sensor direction: %d dpix\n", optical_flow.flow_x);
+    printf("\tFlow in y-sensor direction: %d dpix\n", optical_flow.flow_y);
+    printf("\tFlow in x-sensor direction (angular-speed compensated): %.2f m/s\n", optical_flow.flow_comp_m_x);
+    printf("\tFlow in y-sensor direction (angular-speed compensated): %.2f m/s\n", optical_flow.flow_comp_m_y);
+    printf("\tOptical flow quality / confidence: %d\n", optical_flow.quality);
+    printf("\tGround distance: %.2f m\n", optical_flow.ground_distance);
+    printf("\tFlow rate about X axis: %.2f rad/s\n", optical_flow.flow_rate_x);
+    printf("\tFlow rate about Y axis: %.2f rad/s\n", optical_flow.flow_rate_y);
+}
+
+/********************************************************************************
+ * Function: print_distance_sensor
+ * Description: Print the distance sensor mavlink message.
+ ********************************************************************************/
+void print_distance_sensor(mavlink_distance_sensor_t &distance_sensor) 
+{
+    printf("Distance Sensor data:\n");
+    printf("\tTimestamp: %u ms\n", distance_sensor.time_boot_ms);
+    printf("\tMinimum distance: %u cm\n", distance_sensor.min_distance);
+    printf("\tMaximum distance: %u cm\n", distance_sensor.max_distance);
+    printf("\tCurrent distance reading: %u cm\n", distance_sensor.current_distance);
+    printf("\tType of distance sensor: %u\n", distance_sensor.type);
+    printf("\tOnboard ID of the sensor: %u\n", distance_sensor.id);
+    printf("\tOrientation of the sensor: %u\n", distance_sensor.orientation);
+    printf("\tMeasurement variance: %u cm^2\n", distance_sensor.covariance);
+    printf("\tHorizontal Field of View: %.2f rad\n", distance_sensor.horizontal_fov);
+    printf("\tVertical Field of View: %.2f rad\n", distance_sensor.vertical_fov);
+    printf("\tSensor orientation quaternion: [%.2f, %.2f, %.2f, %.2f]\n", 
+            distance_sensor.quaternion[0], 
+            distance_sensor.quaternion[1], 
+            distance_sensor.quaternion[2], 
+            distance_sensor.quaternion[3]);
+    printf("\tSignal quality: %u%%\n", distance_sensor.signal_quality);
+}
+
+/********************************************************************************
  * Function: print_local_position
  * Description: Print the local position mavlink message.
  ********************************************************************************/

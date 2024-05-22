@@ -101,6 +101,8 @@ extern uint64_t unix_timestamp_us;
         static void proc_mav_set_attitude_target_msg(const mavlink_message_t *msg, bool print = false);
         static void proc_mav_attitude_quaternion_msg(const mavlink_message_t *msg, bool print = false);
         static void proc_mav_command_ack_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_optical_flow_msg(const mavlink_message_t *msg, bool print = false);
+        static void proc_mav_distance_sensor_msg(const mavlink_message_t *msg, bool print = false);
 
      private:
         static void set_mav_msg_rate(uint16_t msg_id, float msg_interval){MavCmd::set_mav_msg_rate(msg_id, msg_interval);};
