@@ -1,8 +1,8 @@
 #include "target_tracking.h"
 
-detectNet* net;
-detectNet::Detection* detections;
-int numDetections;
+detectNet* net = NULL;
+detectNet::Detection* detections = NULL;
+int numDetections = 0;
 
 int create_detection_network(void)
 {

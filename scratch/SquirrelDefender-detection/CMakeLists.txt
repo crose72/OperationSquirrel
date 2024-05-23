@@ -47,6 +47,8 @@ file(GLOB SOURCES ${SOURCE_DIR}/*.cpp)
 # List all header files with .h extension
 file(GLOB HEADERS ${HEADER_DIR}/*.h)
 
+# Enable verbose output during compilation
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # List your source files
 #set(SOURCES
@@ -65,7 +67,7 @@ file(GLOB HEADERS ${HEADER_DIR}/*.h)
 cuda_add_executable(main ${SOURCES} ${HEADERS})
 
 # link main to jetson-inference library
-target_link_libraries(main jetson-inference)
+target_link_libraries(main jetson-inference jetson-utils)
 
 target_link_libraries(main jsoncpp)
 

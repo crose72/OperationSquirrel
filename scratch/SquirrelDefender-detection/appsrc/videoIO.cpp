@@ -1,10 +1,56 @@
+/********************************************************************************
+ * @file    videoIO.cpp
+ * @author  Cameron Rose
+ * @date    5/22/2024
+ * @brief   Configure and start video streams, and output video for other
+			software components.
+ ********************************************************************************/
+
+/********************************************************************************
+ * Includes
+ ********************************************************************************/
 #include "videoIO.h"
 
+/********************************************************************************
+ * Typedefs
+ ********************************************************************************/
+
+/********************************************************************************
+ * Private macros and defines
+ ********************************************************************************/
+
+/********************************************************************************
+ * Object definitions
+ ********************************************************************************/
 videoSource* input;
 videoOutput* output;
 uchar3* image;
 
-int input_video(const commandLine& cmdLine, int positionArg)
+/********************************************************************************
+ * Calibration definitions
+ ********************************************************************************/
+
+/********************************************************************************
+ * Function definitions
+ ********************************************************************************/
+
+/********************************************************************************
+* Function: Video
+* Description: Constructor of the Video class.
+********************************************************************************/
+Video::Video(void){}
+
+/********************************************************************************
+* Function: Video
+* Description: Constructor of the Video class.
+********************************************************************************/
+Video::~Video(void){}
+
+/********************************************************************************
+* Function: create_input_video_stream
+* Description: Create an input video stream from the attached cameras.
+********************************************************************************/
+int Video::create_input_video_stream(const commandLine& cmdLine, int positionArg)
 {
 	/*
 	 * create input stream
@@ -29,7 +75,12 @@ int input_video(const commandLine& cmdLine, int positionArg)
 	}
 }
 
-int output_video(const commandLine& cmdLine, int positionArg)
+/********************************************************************************
+* Function: create_output_video
+* Description: Create an output video stream from the input video stream
+*			   for displaying and passing to other software components.
+********************************************************************************/
+int Video::create_output_video_stream(const commandLine& cmdLine, int positionArg)
 {
 	/*
 	 * create output stream
@@ -43,10 +94,13 @@ int output_video(const commandLine& cmdLine, int positionArg)
 	}
 }
 
-bool capture_image(void)
+/********************************************************************************
+* Function: capture_image
+* Description: Capture an image from the input video stream.
+********************************************************************************/
+bool Video::capture_image(void)
 {
-	// capture next image
-	image = NULL;
+	image = NULL; // is this needed between loops?
 	int status = 0;
 	
 	if( !input->Capture(&image, &status) )
@@ -59,7 +113,11 @@ bool capture_image(void)
 	return true;
 }
 
-bool render_output(void)
+/********************************************************************************
+* Function: render_output
+* Description: Display the image on the screen.
+********************************************************************************/
+bool Video::render_output(void)
 {
 	// render outputs
 	if( output != NULL )
@@ -81,12 +139,20 @@ bool render_output(void)
 	return true;
 }
 
-void delete_input(void)
+/********************************************************************************
+* Function: delete_input_video_stream
+* Description: Delete the input to stop using resources.
+********************************************************************************/
+void Video::delete_input_video_stream(void)
 {
 	SAFE_DELETE(input);
 }
 
-void delete_output(void)
+/********************************************************************************
+* Function: delete_output_video_stream
+* Description: Delete the input to stop using resources.
+********************************************************************************/
+void Video::delete_output_video_stream(void)
 {
 	SAFE_DELETE(output);
 }

@@ -20,21 +20,11 @@
 #include <common.h>
 #include <thread>
 #include <stdint.h>
-#include <fcntl.h>
-#include <termios.h>
-#include <unistd.h>
 #include <fstream>
 #include <vector>
 #include <string>
 #include <sstream>
 #include <iomanip>
-
-// Serial port stuff
-#include <fcntl.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-#include <netinet/in.h>
-#include <sys/socket.h>
 #include <cstdio>  // for perror
 #include <cstdint> // for uint8_t, uint16_t, etc.
 
@@ -43,11 +33,6 @@
 #include "global_calibrations.h"
 #include "global_types.h"
 
-// Conditional includes
-#ifdef USE_TCP
-    #include <sys/socket.h>
-    #include <arpa/inet.h>
-    #include <netinet/in.h>
-#endif
+
 
 #endif // COMMON_INC
