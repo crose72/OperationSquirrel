@@ -203,9 +203,6 @@ void readPIDParametersFromJSON(const std::string& filename, float& Kp_x, float& 
 
 int main(void)
 {
-    //initialize();
-    //startTask_25ms();
-
     // Attach signal handler to exit program
     if (signal(SIGINT, sig_handler) == SIG_ERR)
     {
@@ -213,18 +210,16 @@ int main(void)
     }
 
     calcStartTimeMS();
-    //setupTask_25ms();
+	command_line_inputs();
     MavMsg::start_mav_comm();
     MavMsg::message_subscriptions();
-    command_line_inputs();
     Video::create_input_video_stream(cmdLine, ARG_POSITION(0));
     Video::create_output_video_stream(cmdLine, ARG_POSITION(1));
     create_detection_network();
     MavCmd::set_mode_GUIDED();
     MavCmd::arm_vehicle();
     MavCmd::takeoff_GPS_long((float)2.0);
-    // Load initial PID parameters from a JSON file
-    readPIDParametersFromJSON("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y);
+    readPIDParametersFromJSON("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y);	// Load initial PID parameters from a JSON file
 
     // Get the current time
     auto start_time = std::chrono::steady_clock::now();
@@ -324,7 +319,7 @@ int main(void)
     Video::delete_input_video_stream();
     Video::delete_output_video_stream();
     delete_tracking_net();
-    SerialComm::stop_uart_comm();
+    MavMsg::stop_mav_comm();
     LogVerbose("detectnet:  shutdown complete.\n");
 
     return 0;
