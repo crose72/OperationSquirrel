@@ -18,12 +18,37 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern float elapsedTimeSeconds;
+extern float app_elapsed_time;
 
 /********************************************************************************
  * Function prototypes
  ********************************************************************************/
-void calcStartTimeMS(void);
-void calcElapsedTime(void);
+
+class TimeCalc
+{
+    public:
+
+        TimeCalc();
+        ~TimeCalc();
+
+        std::chrono::_V2::system_clock::time_point app_start_time;
+        std::chrono::_V2::system_clock::time_point app_end_time;
+        std::chrono::_V2::system_clock::time_point loop_start_time;
+        std::chrono::_V2::system_clock::time_point loop_end_time;
+        std::chrono::milliseconds loop_duration;
+
+        void calc_app_start_time(void);
+        void calc_app_end_time(void);
+        void calc_loop_start_time(void);
+        void calc_loop_end_time(void);
+        void loop_rate_controller(void);
+        void calc_elapsed_time(void);
+
+
+    private:
+
+    
+};
+
 
 #endif // TIME_CALC_H

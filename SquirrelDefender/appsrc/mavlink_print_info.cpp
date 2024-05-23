@@ -31,41 +31,6 @@
  ********************************************************************************/
 
 /********************************************************************************
- * Function: print_set_position_target_local_ned
- * Description: Print the set_position_target_local_ned mavlink message.
- ********************************************************************************/
-void print_set_position_target_local_ned(mavlink_set_position_target_local_ned_t& set_position_target_local_ned)
-{
-    printf("\tTime since boot (ms): %u\n", set_position_target_local_ned.time_boot_ms);
-    printf("\tPosition (X, Y, Z): %.3f, %.3f, %.3f\n", set_position_target_local_ned.x, set_position_target_local_ned.y, set_position_target_local_ned.z);
-    printf("\tVelocity (X, Y, Z): %.3f, %.3f, %.3f\n", set_position_target_local_ned.vx, set_position_target_local_ned.vy, set_position_target_local_ned.vz);
-    printf("\tAcceleration/Force (X, Y, Z): %.3f, %.3f, %.3f\n", set_position_target_local_ned.afx, set_position_target_local_ned.afy, set_position_target_local_ned.afz);
-    printf("\tYaw setpoint: %.3f radians\n", set_position_target_local_ned.yaw);
-    printf("\tYaw rate setpoint: %.3f radians/second\n", set_position_target_local_ned.yaw_rate);
-    printf("\tType mask: %u\n", set_position_target_local_ned.type_mask);
-    printf("\tTarget system ID: %d\n", set_position_target_local_ned.target_system);
-    printf("\tTarget component ID: %d\n", set_position_target_local_ned.target_component);
-    printf("\tCoordinate frame: %d\n", set_position_target_local_ned.coordinate_frame);
-}
-
-/********************************************************************************
- * Function: print_position_target_local_ned
- * Description: Print the position_target_local_ned mavlink message.
- ********************************************************************************/
-void print_position_target_local_ned(mavlink_position_target_local_ned_t& position_target_local_ned) 
-{
-    printf("Position target local NED: %u\n", position_target_local_ned.time_boot_ms);
-    printf("\tTime since boot (ms): %u\n", position_target_local_ned.time_boot_ms);
-    printf("\tPosition (X, Y, Z): %.3f, %.3f, %.3f\n", position_target_local_ned.x, position_target_local_ned.y, position_target_local_ned.z);
-    printf("\tVelocity (X, Y, Z): %.3f, %.3f, %.3f\n", position_target_local_ned.vx, position_target_local_ned.vy, position_target_local_ned.vz);
-    printf("\tAcceleration/Force (X, Y, Z): %.3f, %.3f, %.3f\n", position_target_local_ned.afx, position_target_local_ned.afy, position_target_local_ned.afz);
-    printf("\tYaw setpoint: %.3f radians\n", position_target_local_ned.yaw);
-    printf("\tYaw rate setpoint: %.3f radians/second\n", position_target_local_ned.yaw_rate);
-    printf("\tType mask: %u\n", position_target_local_ned.type_mask);
-    printf("\tCoordinate frame: %d\n", position_target_local_ned.coordinate_frame);
-}
-
-/********************************************************************************
  * Function: print_heartbeat
  * Description: Print the heartbeat mavlink message.
  ********************************************************************************/
@@ -114,170 +79,6 @@ void print_sys_status(mavlink_sys_status_t &sys_status)
 }
 
 /********************************************************************************
- * Function: print_attitude
- * Description: Print the attitude mavlink message.
- ********************************************************************************/
-void print_attitude(mavlink_attitude_t &attitude) 
-{
-    printf("Attitude:\n");
-    printf("\tRoll: %.4f radians\n", attitude.roll);
-    printf("\tPitch: %.4f radians\n", attitude.pitch);
-    printf("\tYaw: %.4f radians\n", attitude.yaw);
-    printf("\tRoll speed: %.4f rad/s\n", attitude.rollspeed);
-    printf("\tPitch speed: %.4f rad/s\n", attitude.pitchspeed);
-    printf("\tYaw speed: %.4f rad/s\n", attitude.yawspeed);
-}
-
-/********************************************************************************
- * Function: print_global_position_int
- * Description: Print the global position integer mavlink message.
- ********************************************************************************/
-void print_global_position_int(mavlink_global_position_int_t &global_pos_int) 
-{
-    printf("Global position:\n");
-    printf("\tLatitude: %d degrees (1e-7)\n", global_pos_int.lat);
-    printf("\tLongitude: %d degrees (1e-7)\n", global_pos_int.lon);
-    printf("\tAltitude: %d\n", global_pos_int.alt);
-}
-
-/********************************************************************************
- * Function: print_scale_imu
- * Description: Print the scaled imu mavlink message.
- ********************************************************************************/
-void print_scaled_imu(mavlink_scaled_imu_t &scaled_imu) 
-{
-    printf("Scaled IMU data:\n");
-    printf("\tX acceleration: %d\n", scaled_imu.xacc);
-    printf("\tY acceleration: %d\n", scaled_imu.yacc);
-    printf("\tZ acceleration: %d\n", scaled_imu.zacc);
-    printf("\tX gyro: %d\n", scaled_imu.xgyro);
-    printf("\tY gyro: %d\n", scaled_imu.ygyro);
-    printf("\tZ gyro: %d\n", scaled_imu.zgyro);
-    printf("\tX magnetometer: %d\n", scaled_imu.xmag);
-    printf("\tY magnetometer: %d\n", scaled_imu.ymag);
-    printf("\tZ magnetometer: %d\n", scaled_imu.zmag);
-}
-
-/********************************************************************************
- * Function: print_raw_imu
- * Description: Print the raw imu mavlink message.
- ********************************************************************************/
-void print_raw_imu(mavlink_raw_imu_t &raw_imu) 
-{
-    printf("Raw IMU data:\n");
-    printf("\tTime: %llu\n", (unsigned long long)raw_imu.time_usec);
-    printf("\tX acceleration: %d\n", raw_imu.xacc);
-    printf("\tY acceleration: %d\n", raw_imu.yacc);
-    printf("\tZ acceleration: %d\n", raw_imu.zacc);
-    printf("\tX gyro: %d\n", raw_imu.xgyro);
-    printf("\tY gyro: %d\n", raw_imu.ygyro);
-    printf("\tZ gyro: %d\n", raw_imu.zgyro);
-    printf("\tX magnetometer: %d\n", raw_imu.xmag);
-    printf("\tY magnetometer: %d\n", raw_imu.ymag);
-    printf("\tZ magnetometer: %d\n", raw_imu.zmag);
-}
-
-/********************************************************************************
- * Function: print_servo_output_raw
- * Description: Print the raw servo output mavlink message.
- ********************************************************************************/
-void print_servo_output_raw(mavlink_servo_output_raw_t& servo_output_raw) 
-{
-    printf("Servo Output Raw:\n");
-    printf("\tTimestamp: %u\n", servo_output_raw.time_usec);
-    printf("\tServo Output:\n");
-    printf("\t\tChannel 1: %d\n", servo_output_raw.servo1_raw);
-    printf("\t\tChannel 2: %d\n", servo_output_raw.servo2_raw);
-    printf("\t\tChannel 3: %d\n", servo_output_raw.servo3_raw);
-    printf("\t\tChannel 4: %d\n", servo_output_raw.servo4_raw);
-}
-
-/********************************************************************************
- * Function: print_local_position
- * Description: Print the local position mavlink message.
- ********************************************************************************/
-void print_local_position(mavlink_local_position_ned_t& local_position) 
-{
-    printf("Local Position:\n");
-    printf("\tTimestamp: %u\n", local_position.time_boot_ms);
-    printf("\tPosition (meters):\n");
-    printf("\t\tX: %f\n", local_position.x);
-    printf("\t\tY: %f\n", local_position.y);
-    printf("\t\tZ: %f\n", local_position.z);
-    printf("\tVelocity (m/s):\n");
-    printf("\t\tVX: %f\n", local_position.vx);
-    printf("\t\tVY: %f\n", local_position.vy);
-    printf("\t\tVZ: %f\n", local_position.vz);
-}
-
-/********************************************************************************
- * Function: print_gps_raw_int
- * Description: Print the raw gps integer mavlink message.
- ********************************************************************************/
-void print_gps_raw_int(mavlink_gps_raw_int_t &gps_raw_int) 
-{
-    printf("GPS Raw Int:\n");
-    printf("\tTimestamp: %lu ms\n", gps_raw_int.time_usec);
-    printf("\tFix type: %d\n", gps_raw_int.fix_type);
-    printf("\tLatitude: %d\n", gps_raw_int.lat);
-    printf("\tLongitude: %d\n", gps_raw_int.lon);
-    printf("\tAltitude: %d\n", gps_raw_int.alt);
-    printf("\tSpeed: %d\n", gps_raw_int.vel);
-    printf("\tCourse: %d\n", gps_raw_int.cog);
-    printf("\tSatellites visible: %d\n", gps_raw_int.satellites_visible);
-} 
-
-/********************************************************************************
- * Function: print_param_request_read
- * Description: Print the parameter request read mavlink message.
- ********************************************************************************/
-void print_param_request_read(mavlink_param_request_read_t &param_request_read) 
-{
-    printf("Param Request Read:\n");
-    printf("\tTarget System: %u\n", param_request_read.target_system);
-    printf("\tTarget Component: %u\n", param_request_read.target_component);
-    printf("\tParameter ID: %s\n", param_request_read.param_id);
-}
-
-/********************************************************************************
- * Function: print_request_data_stream
- * Description: Print the request data stream mavlink message.
- ********************************************************************************/
-void print_request_data_stream(mavlink_request_data_stream_t &request_data_stream) 
-{
-    printf("REQUEST_DATA_STREAM message:\n");
-    printf("\tTarget System: %u\n", request_data_stream.target_system);
-    printf("\tTarget Component: %u\n", request_data_stream.target_component);
-    printf("\tStream ID: %u\n", request_data_stream.req_stream_id);
-    printf("\tMessage Rate: %u\n", request_data_stream.req_message_rate);
-    printf("\tStart/Stop: %u\n", request_data_stream.start_stop);
-}
-
-/********************************************************************************
- * Function: print_gps_global_origin
- * Description: Print the gps global origin mavlink message.
- ********************************************************************************/
-void print_gps_global_origin(mavlink_gps_global_origin_t &gps_global_origin) 
-{
-    printf("GPS_GLOBAL_ORIGIN message:\n");
-    printf("\tLatitude: %f\n", (double)gps_global_origin.latitude);
-    printf("\tLongitude: %f\n", (double)gps_global_origin.longitude);
-    printf("\tAltitude: %f\n", (double)gps_global_origin.altitude);
-}
-
-/********************************************************************************
- * Function: print_home_position
- * Description: Print the home position mavlink message.
- ********************************************************************************/
-void print_home_position(mavlink_home_position_t &home_position) 
-{
-    printf("HOME_POSITION message:\n");
-    printf("\tLatitude: %f\n", (double)home_position.latitude);
-    printf("\tLongitude: %f\n", (double)home_position.longitude);
-    printf("\tAltitude: %f\n", (double)home_position.altitude);
-}
-
-/********************************************************************************
  * Function: print_statustext
  * Description: Print the status text mavlink message.
  ********************************************************************************/
@@ -319,6 +120,177 @@ void print_autopilot_version(mavlink_autopilot_version_t &autopilot_version)
 }
 
 /********************************************************************************
+ * Function: print_gps_global_origin
+ * Description: Print the gps global origin mavlink message.
+ ********************************************************************************/
+void print_gps_global_origin(mavlink_gps_global_origin_t &gps_global_origin) 
+{
+    printf("GPS_GLOBAL_ORIGIN message:\n");
+    printf("\tLatitude: %f\n", (double)gps_global_origin.latitude);
+    printf("\tLongitude: %f\n", (double)gps_global_origin.longitude);
+    printf("\tAltitude: %f\n", (double)gps_global_origin.altitude);
+}
+
+/********************************************************************************
+ * Function: print_home_position
+ * Description: Print the home position mavlink message.
+ ********************************************************************************/
+void print_home_position(mavlink_home_position_t &home_position) 
+{
+    printf("HOME_POSITION message:\n");
+    printf("\tLatitude: %f\n", (double)home_position.latitude);
+    printf("\tLongitude: %f\n", (double)home_position.longitude);
+    printf("\tAltitude: %f\n", (double)home_position.altitude);
+}
+
+/********************************************************************************
+ * Function: print_global_position_int
+ * Description: Print the global position integer mavlink message.
+ ********************************************************************************/
+void print_global_position_int(mavlink_global_position_int_t &global_pos_int) 
+{
+    printf("Global position:\n");
+    printf("\tLatitude: %d degrees (1e-7)\n", global_pos_int.lat);
+    printf("\tLongitude: %d degrees (1e-7)\n", global_pos_int.lon);
+    printf("\tAltitude: %d mm\n", global_pos_int.alt);
+    printf("\tRelative Altitude: %d mm\n", global_pos_int.relative_alt);
+    printf("\tVelocity X: %d cm/s\n", global_pos_int.vx);
+    printf("\tVelocity Y: %d cm/s\n", global_pos_int.vy);
+    printf("\tVelocity Z: %d cm/s\n", global_pos_int.vz);
+    printf("\tHeading: %d centi-degrees\n", global_pos_int.hdg);
+}
+
+/********************************************************************************
+ * Function: print_scaled_imu
+ * Description: Print the scaled imu mavlink message.
+ ********************************************************************************/
+void print_scaled_imu(mavlink_scaled_imu_t &scaled_imu) 
+{
+    printf("Scaled IMU data:\n");
+    printf("\tX acceleration: %d\n", scaled_imu.xacc);
+    printf("\tY acceleration: %d\n", scaled_imu.yacc);
+    printf("\tZ acceleration: %d\n", scaled_imu.zacc);
+    printf("\tX gyro: %d\n", scaled_imu.xgyro);
+    printf("\tY gyro: %d\n", scaled_imu.ygyro);
+    printf("\tZ gyro: %d\n", scaled_imu.zgyro);
+    printf("\tX magnetometer: %d\n", scaled_imu.xmag);
+    printf("\tY magnetometer: %d\n", scaled_imu.ymag);
+    printf("\tZ magnetometer: %d\n", scaled_imu.zmag);
+}
+
+/********************************************************************************
+ * Function: print_optical_flow
+ * Description: Print the optical flow mavlink message.
+ ********************************************************************************/
+void print_optical_flow(mavlink_optical_flow_t &optical_flow) 
+{
+    printf("Optical Flow data:\n");
+    printf("\tTimestamp: %llu us\n", optical_flow.time_usec);
+    printf("\tSensor ID: %d\n", optical_flow.sensor_id);
+    printf("\tFlow in x-sensor direction: %d dpix\n", optical_flow.flow_x);
+    printf("\tFlow in y-sensor direction: %d dpix\n", optical_flow.flow_y);
+    printf("\tFlow in x-sensor direction (angular-speed compensated): %.2f m/s\n", optical_flow.flow_comp_m_x);
+    printf("\tFlow in y-sensor direction (angular-speed compensated): %.2f m/s\n", optical_flow.flow_comp_m_y);
+    printf("\tOptical flow quality / confidence: %d\n", optical_flow.quality);
+    printf("\tGround distance: %.2f m\n", optical_flow.ground_distance);
+    printf("\tFlow rate about X axis: %.2f rad/s\n", optical_flow.flow_rate_x);
+    printf("\tFlow rate about Y axis: %.2f rad/s\n", optical_flow.flow_rate_y);
+}
+
+/********************************************************************************
+ * Function: print_distance_sensor
+ * Description: Print the distance sensor mavlink message.
+ ********************************************************************************/
+void print_distance_sensor(mavlink_distance_sensor_t &distance_sensor) 
+{
+    printf("Distance Sensor data:\n");
+    printf("\tTimestamp: %u ms\n", distance_sensor.time_boot_ms);
+    printf("\tMinimum distance: %u cm\n", distance_sensor.min_distance);
+    printf("\tMaximum distance: %u cm\n", distance_sensor.max_distance);
+    printf("\tCurrent distance reading: %u cm\n", distance_sensor.current_distance);
+    printf("\tType of distance sensor: %u\n", distance_sensor.type);
+    printf("\tOnboard ID of the sensor: %u\n", distance_sensor.id);
+    printf("\tOrientation of the sensor: %u\n", distance_sensor.orientation);
+    printf("\tMeasurement variance: %u cm^2\n", distance_sensor.covariance);
+    printf("\tHorizontal Field of View: %.2f rad\n", distance_sensor.horizontal_fov);
+    printf("\tVertical Field of View: %.2f rad\n", distance_sensor.vertical_fov);
+    printf("\tSensor orientation quaternion: [%.2f, %.2f, %.2f, %.2f]\n", 
+            distance_sensor.quaternion[0], 
+            distance_sensor.quaternion[1], 
+            distance_sensor.quaternion[2], 
+            distance_sensor.quaternion[3]);
+    printf("\tSignal quality: %u%%\n", distance_sensor.signal_quality);
+}
+
+/********************************************************************************
+ * Function: print_local_position
+ * Description: Print the local position mavlink message.
+ ********************************************************************************/
+void print_local_position(mavlink_local_position_ned_t& local_position) 
+{
+    printf("Local Position:\n");
+    printf("\tTimestamp: %u\n", local_position.time_boot_ms);
+    printf("\tPosition (meters):\n");
+    printf("\t\tX: %f\n", local_position.x);
+    printf("\t\tY: %f\n", local_position.y);
+    printf("\t\tZ: %f\n", local_position.z);
+    printf("\tVelocity (m/s):\n");
+    printf("\t\tVX: %f\n", local_position.vx);
+    printf("\t\tVY: %f\n", local_position.vy);
+    printf("\t\tVZ: %f\n", local_position.vz);
+}
+
+/********************************************************************************
+ * Function: print_position_target_local_ned
+ * Description: Print the position_target_local_ned mavlink message.
+ ********************************************************************************/
+void print_position_target_local_ned(mavlink_position_target_local_ned_t& position_target_local_ned) 
+{
+    printf("Position target local NED: %u\n", position_target_local_ned.time_boot_ms);
+    printf("\tTime since boot (ms): %u\n", position_target_local_ned.time_boot_ms);
+    printf("\tPosition (X, Y, Z): %.3f, %.3f, %.3f\n", position_target_local_ned.x, position_target_local_ned.y, position_target_local_ned.z);
+    printf("\tVelocity (X, Y, Z): %.3f, %.3f, %.3f\n", position_target_local_ned.vx, position_target_local_ned.vy, position_target_local_ned.vz);
+    printf("\tAcceleration/Force (X, Y, Z): %.3f, %.3f, %.3f\n", position_target_local_ned.afx, position_target_local_ned.afy, position_target_local_ned.afz);
+    printf("\tYaw setpoint: %.3f radians\n", position_target_local_ned.yaw);
+    printf("\tYaw rate setpoint: %.3f radians/second\n", position_target_local_ned.yaw_rate);
+    printf("\tType mask: %u\n", position_target_local_ned.type_mask);
+    printf("\tCoordinate frame: %d\n", position_target_local_ned.coordinate_frame);
+}
+
+/********************************************************************************
+ * Function: print_set_position_target_local_ned
+ * Description: Print the set_position_target_local_ned mavlink message.
+ ********************************************************************************/
+void print_set_position_target_local_ned(mavlink_set_position_target_local_ned_t& set_position_target_local_ned)
+{
+    printf("\tTime since boot (ms): %u\n", set_position_target_local_ned.time_boot_ms);
+    printf("\tPosition (X, Y, Z): %.3f, %.3f, %.3f\n", set_position_target_local_ned.x, set_position_target_local_ned.y, set_position_target_local_ned.z);
+    printf("\tVelocity (X, Y, Z): %.3f, %.3f, %.3f\n", set_position_target_local_ned.vx, set_position_target_local_ned.vy, set_position_target_local_ned.vz);
+    printf("\tAcceleration/Force (X, Y, Z): %.3f, %.3f, %.3f\n", set_position_target_local_ned.afx, set_position_target_local_ned.afy, set_position_target_local_ned.afz);
+    printf("\tYaw setpoint: %.3f radians\n", set_position_target_local_ned.yaw);
+    printf("\tYaw rate setpoint: %.3f radians/second\n", set_position_target_local_ned.yaw_rate);
+    printf("\tType mask: %u\n", set_position_target_local_ned.type_mask);
+    printf("\tTarget system ID: %d\n", set_position_target_local_ned.target_system);
+    printf("\tTarget component ID: %d\n", set_position_target_local_ned.target_component);
+    printf("\tCoordinate frame: %d\n", set_position_target_local_ned.coordinate_frame);
+}
+
+/********************************************************************************
+ * Function: print_attitude
+ * Description: Print the attitude mavlink message.
+ ********************************************************************************/
+void print_attitude(mavlink_attitude_t &attitude) 
+{
+    printf("Attitude:\n");
+    printf("\tRoll: %.4f radians\n", attitude.roll);
+    printf("\tPitch: %.4f radians\n", attitude.pitch);
+    printf("\tYaw: %.4f radians\n", attitude.yaw);
+    printf("\tRoll speed: %.4f rad/s\n", attitude.rollspeed);
+    printf("\tPitch speed: %.4f rad/s\n", attitude.pitchspeed);
+    printf("\tYaw speed: %.4f rad/s\n", attitude.yawspeed);
+}
+
+/********************************************************************************
  * Function: print_attitude_target
  * Description: Print the attitude target mavlink message.
  ********************************************************************************/
@@ -332,6 +304,24 @@ void print_attitude_target(mavlink_attitude_target_t &attitude_target)
     printf("\tBody Pitch Rate: %f\n", attitude_target.body_pitch_rate);
     printf("\tBody Yaw Rate: %f\n", attitude_target.body_yaw_rate);
     printf("\tThrust: %f\n", attitude_target.thrust);
+}
+
+/********************************************************************************
+ * Function: print_set_attitude_target
+ * Description: Print the set_attitude_target mavlink message.
+ ********************************************************************************/
+void print_set_attitude_target(mavlink_set_attitude_target_t &set_attitude_target) 
+{
+    printf("Set Attitude Target:\n");
+    printf("\tTime Boot (ms): %lu\n", set_attitude_target.time_boot_ms);
+    printf("\tTarget System: %u\n", set_attitude_target.target_system);
+    printf("\tTarget Component: %u\n", set_attitude_target.target_component);
+    printf("\tType Mask: %u\n", set_attitude_target.type_mask);
+    printf("\tQuaternion (q): [%f, %f, %f, %f]\n", set_attitude_target.q[0], set_attitude_target.q[1], set_attitude_target.q[2], set_attitude_target.q[3]);
+    printf("\tBody Roll Rate: %f\n", set_attitude_target.body_roll_rate);
+    printf("\tBody Pitch Rate: %f\n", set_attitude_target.body_pitch_rate);
+    printf("\tBody Yaw Rate: %f\n", set_attitude_target.body_yaw_rate);
+    printf("\tThrust: %f\n", set_attitude_target.thrust);
 }
 
 /********************************************************************************

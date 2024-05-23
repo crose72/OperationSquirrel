@@ -14,30 +14,30 @@
 /************************************
  * Imported objects
  ************************************/
-extern float elapsedTimeSeconds;
-extern int32_t lat;
-extern int32_t lon;
-extern int32_t alt;
-extern int32_t relative_alt;
-extern int16_t vx;
-extern int16_t vy;
-extern int16_t vz;
-extern uint16_t hdg;
-extern float roll;
-extern float pitch;
-extern float yaw;
-extern float rollspeed;
-extern float pitchspeed;
-extern float yawspeed;
-extern int16_t accel_x;
-extern int16_t accel_y;
-extern int16_t accel_z;
-extern int16_t gyro_x;
-extern int16_t gyro_y;
-extern int16_t gyro_z;
-extern int16_t mag_x;
-extern int16_t mag_y;
-extern int16_t mag_z;
+extern float app_elapsed_time;
+extern int32_t mav_veh_lat;
+extern int32_t mav_veh_lon;
+extern int32_t mav_veh_alt;
+extern int32_t mav_rel_alt;
+extern int16_t mav_veh_gps_vx;
+extern int16_t mav_veh_gps_vy;
+extern int16_t mav_veh_gps_vz;
+extern uint16_t mav_veh_gps_hdg;
+extern float mav_veh_roll;
+extern float mav_veh_pitch;
+extern float mav_veh_yaw;
+extern float mav_veh_rollspeed;
+extern float mav_veh_pitchspeed;
+extern float mav_veh_yawspeed;
+extern int16_t mav_veh_imu_ax;
+extern int16_t mav_veh_imu_ay;
+extern int16_t mav_veh_imu_az;
+extern int16_t mav_veh_imu_xgyro;
+extern int16_t mav_veh_imu_ygyro;
+extern int16_t mav_veh_imu_zgyro;
+extern int16_t mav_veh_imu_xmag;
+extern int16_t mav_veh_imu_ymag;
+extern int16_t mav_veh_imu_zmag;
 
 /************************************
  * Exported objects

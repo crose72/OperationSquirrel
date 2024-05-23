@@ -11,7 +11,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "mavlink_print_info.h"
-#include "serial_port_handler.h"
+#include "serial_comm.h"
 #include "mavlink_cmd_handler.h"
 
 /********************************************************************************
@@ -22,32 +22,32 @@ extern const uint8_t SENDER_COMP_ID;
 extern const uint8_t TARGET_SYS_ID;
 extern const uint8_t TARGET_COMP_ID;
 extern const int32_t MESSAGE_RATE_DEFAULT;
-extern const int32_t MESSAGE_RATE_1000us;
-extern const int32_t MESSAGE_RATE_25000us;
+extern const int32_t MESSAGE_RATE_1Hz;
+extern const int32_t MESSAGE_RATE_40Hz;
 
-extern int32_t lat;
-extern int32_t lon;
-extern int32_t alt;
-extern int32_t relative_alt;
-extern int16_t vx;
-extern int16_t vy;
-extern int16_t vz;
-extern uint16_t hdg;
-extern float roll;
-extern float pitch;
-extern float yaw;
-extern float rollspeed;
-extern float pitchspeed;
-extern float yawspeed;
-extern int16_t accel_x;
-extern int16_t accel_y;
-extern int16_t accel_z;
-extern int16_t gyro_x;
-extern int16_t gyro_y;
-extern int16_t gyro_z;
-extern int16_t mag_x;
-extern int16_t mag_y;
-extern int16_t mag_z;
+extern int32_t mav_veh_lat;
+extern int32_t mav_veh_lon;
+extern int32_t mav_veh_alt;
+extern int32_t mav_rel_alt;
+extern int16_t mav_veh_gps_vx;
+extern int16_t mav_veh_gps_vy;
+extern int16_t mav_veh_gps_vz;
+extern uint16_t mav_veh_gps_hdg;
+extern float mav_veh_roll;
+extern float mav_veh_pitch;
+extern float mav_veh_yaw;
+extern float mav_veh_rollspeed;
+extern float mav_veh_pitchspeed;
+extern float mav_veh_yawspeed;
+extern int16_t mav_veh_imu_ax;
+extern int16_t mav_veh_imu_ay;
+extern int16_t mav_veh_imu_az;
+extern int16_t mav_veh_imu_xgyro;
+extern int16_t mav_veh_imu_ygyro;
+extern int16_t mav_veh_imu_zgyro;
+extern int16_t mav_veh_imu_xmag;
+extern int16_t mav_veh_imu_ymag;
+extern int16_t mav_veh_imu_zmag;
 
 extern float q1_target;
 extern float q2_target;
@@ -75,8 +75,45 @@ extern uint64_t unix_timestamp_us;
 /********************************************************************************
  * Function prototypes
  ********************************************************************************/
-void set_message_rates(void);
-void request_messages(void);
-void parse_serial_data(void);
+
+class MavMsg
+{
+   public:
+      MavMsg();
+      ~MavMsg();
+
+      static void start_mav_comm(void){SerialComm::start_uart_comm();};  // Open up uart port for mavlink messages
+      static void stop_mav_comm(void){SerialComm::stop_uart_comm();};    // Stop mavlink comms on uart port
+      static uint8_t read_mav_msg(void){return SerialComm::read_uart();};       // Read a byte
+      static void subscribe(uint16_t msg_id, float msg_interval);
+      static void message_subscriptions(void);
+      static void parse_mav_msgs(void);
+
+      static void proc_mav_heartbeat_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_gps_int_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_system_time_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_sys_status_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_statustext_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_param_value_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_autopilot_version_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_scaled_imu_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_local_position_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_position_target_local_ned_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_set_position_target_local_ned_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_attitude_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_attitude_target_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_set_attitude_target_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_attitude_quaternion_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_command_ack_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_optical_flow_msg(const mavlink_message_t *msg, bool print = false);
+      static void proc_mav_distance_sensor_msg(const mavlink_message_t *msg, bool print = false);
+
+   private:
+      static void set_mav_msg_rate(uint16_t msg_id, float msg_interval){MavCmd::set_mav_msg_rate(msg_id, msg_interval);};
+      static void req_mav_msg(uint16_t msg_id){MavCmd::req_mav_msg(msg_id);};
+
+};
+
+
 
 #endif // MAVLINK_MSG_HANDLER_H

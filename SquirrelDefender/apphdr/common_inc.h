@@ -29,6 +29,15 @@
 #include <sstream>
 #include <iomanip>
 
+// Serial port stuff
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <cstdio>  // for perror
+#include <cstdint> // for uint8_t, uint16_t, etc.
+
 // Custom includes for global objects
 #include "global_objects.h"
 #include "global_calibrations.h"

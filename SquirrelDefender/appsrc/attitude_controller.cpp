@@ -111,7 +111,7 @@ void move_forward (void)
 
     for (int i = 0; i < 1; i++)
     {
-        send_cmd_set_attitude_target(&desired_attitude_target);
+        MavCmd::send_cmd_set_attitude_target(&desired_attitude_target);
     }
 }
 
@@ -140,6 +140,6 @@ void brake (void)
 
     for (int i = 0; i < 2; i++)
     {
-        send_cmd_set_attitude_target(&desired_attitude_target);
+        MavCmd::send_cmd_set_attitude_target(&desired_attitude_target);
     }
 }
