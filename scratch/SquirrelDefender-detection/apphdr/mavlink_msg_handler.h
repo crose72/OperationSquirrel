@@ -84,7 +84,7 @@ class MavMsg
 
       static void start_mav_comm(void){SerialComm::start_uart_comm();};  // Open up uart port for mavlink messages
       static void stop_mav_comm(void){SerialComm::stop_uart_comm();};    // Stop mavlink comms on uart port
-      static uint8_t read_mav_msg(void){SerialComm::read_uart();};       // Read a byte
+      static uint8_t read_mav_msg(void){return SerialComm::read_uart();};       // Read a byte
       static void subscribe(uint16_t msg_id, float msg_interval);
       static void message_subscriptions(void);
       static void parse_mav_msgs(void);
