@@ -9,6 +9,8 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#ifdef USE_JETSON
+
 #include "videoIO.h"
 
 /********************************************************************************
@@ -156,3 +158,6 @@ void Video::delete_output_video_stream(void)
 {
 	SAFE_DELETE(output);
 }
+#else
+	//#error "Please define USE_JETSON to enable use of this code."
+#endif

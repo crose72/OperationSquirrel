@@ -30,12 +30,16 @@
 #include "datalog.h"
 #include "time_calc.h"
 
-#include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
+#ifdef USE_JETSON
+	#include "videoIO.h"
+	#include "target_tracking.h"
+	#include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
+	commandLine cmdLine(0, nullptr);
+#else
+	//#error "Please define USE_JETSON to enable use of this code."
+#endif
 
 
-
-#include "videoIO.h"
-#include "target_tracking.h"
 #include <chrono>
 #include <thread>
 
@@ -46,7 +50,6 @@
 // #include "sim_flight_test_3_VelocityControl.h"
 #include "sim_flight_test_4_VelocityControl.h"
 
-commandLine cmdLine(0, nullptr);
 int argc;
 char** argv;
 
@@ -61,7 +64,11 @@ void sig_handler(int signo)
 {
 	if( signo == SIGINT )
 	{
+		#ifdef USE_JETSON
 		LogVerbose("received SIGINT\n");
+		#else
+			//#error "Please define USE_JETSON to enable use of this code."
+		#endif
 		signal_recieved = true;
 	}
 }
@@ -115,44 +122,7 @@ float PID(float Kp, float Ki, float Kd, float desired, float actual, float desir
 	return control;
 }
 
-/*  Basic follow/turning
-float target_velocity[3] = {0.0,0.0,0.0};
-if( numDetections > 0 )
-{
-	for( int n=0; n < numDetections; n++ )
-	{
-		if (detections[n].ClassID == 1 && detections[n].Confidence > 0.8)
-		{
-			if (detections[n].Width() < 200 || detections[n].Height() < 700)
-			{
-				if (detections[n].Right <= 600)
-				{
-			        target_velocity[0] = 2.0;
-					target_velocity[1] = -0.1;
-					target_velocity[2] = 0.0;
-					cmd_velocity(target_velocity);	
-				}
-				else
-				{
-			        target_velocity[0] = 2.0;
-					target_velocity[1] = 0.1;
-					target_velocity[2] = 0.0;
-					cmd_velocity(target_velocity);	
-				}
-
-			}
-			else
-			{
-		        target_velocity[0] = 0.0;
-				target_velocity[1] = 0.0;
-				target_velocity[2] = 0.0;
-				cmd_velocity(target_velocity);	
-			}
-		}
-	}
-}	
-*/
-
+#ifdef USE_JETSON
 int usage()
 {
 	printf("usage: detectnet [--help] [--network=NETWORK] [--threshold=THRESHOLD] ...\n");
@@ -200,6 +170,9 @@ void readPIDParametersFromJSON(const std::string& filename, float& Kp_x, float& 
     Kd_y = root["Kd_y"].asFloat();
 }
 
+#else
+	//#error "Please define USE_JETSON to enable use of this code."
+#endif
 
 int main(void)
 {
@@ -209,22 +182,34 @@ int main(void)
     // Attach signal handler to exit program
     if (signal(SIGINT, sig_handler) == SIG_ERR)
     {
+		#ifdef USE_JETSON
         LogError("can't catch SIGINT\n");
+		#else
+			//#error "Please define USE_JETSON to enable use of this code."
+		#endif
+		
     }
 
     calcStartTimeMS();
     //setupTask_25ms();
     MavMsg::start_mav_comm();
     MavMsg::message_subscriptions();
-    command_line_inputs();
-    Video::create_input_video_stream(cmdLine, ARG_POSITION(0));
-    Video::create_output_video_stream(cmdLine, ARG_POSITION(1));
-    create_detection_network();
+    
+
+	#ifdef USE_JETSON
+		command_line_inputs();
+		Video::create_input_video_stream(cmdLine, ARG_POSITION(0));
+		Video::create_output_video_stream(cmdLine, ARG_POSITION(1));
+		create_detection_network();
+		readPIDParametersFromJSON("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y);
+	#else
+		//#error "Please define USE_JETSON to enable use of this code."
+	#endif
     MavCmd::set_mode_GUIDED();
     MavCmd::arm_vehicle();
     MavCmd::takeoff_GPS_long((float)2.0);
     // Load initial PID parameters from a JSON file
-    readPIDParametersFromJSON("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y);
+    
 
     // Get the current time
     auto start_time = std::chrono::steady_clock::now();
@@ -235,9 +220,9 @@ int main(void)
         std::lock_guard<std::mutex> lock(mutex);
 		calcElapsedTime();
 		MavMsg::parse_mav_msgs();
-
-        readPIDParametersFromJSON("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y);
 		
+		#ifdef USE_JETSON
+		readPIDParametersFromJSON("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y);
 		if (!Video::capture_image())
 		{
 		    //break;
@@ -292,7 +277,9 @@ int main(void)
 				
 			}
 		}
-		
+		#else
+			//#error "Please define USE_JETSON to enable use of this code."
+		#endif	
 
 		//print_performance_stats();
 		//test_flight();
@@ -319,26 +306,16 @@ int main(void)
 		start_time = std::chrono::steady_clock::now();
     }
 
-    LogVerbose("detectnet:  shutting down...\n");
-    
-    Video::delete_input_video_stream();
-    Video::delete_output_video_stream();
-    delete_tracking_net();
-    SerialComm::stop_uart_comm();
-    LogVerbose("detectnet:  shutdown complete.\n");
+	#ifdef USE_JETSON
+		LogVerbose("detectnet:  shutting down...\n");
+		Video::delete_input_video_stream();
+		Video::delete_output_video_stream();
+		delete_tracking_net();
+		LogVerbose("detectnet:  shutdown complete.\n");
+	#else
+		//#error "Please define USE_JETSON to enable use of this code."
+	#endif
+    MavMsg::stop_mav_comm();
 
     return 0;
 }
-
-void initialize(void)
-{
-
-}
-
-void task_25ms(int sig, siginfo_t* si, void* uc)
-{
-    
-
-}
-
-

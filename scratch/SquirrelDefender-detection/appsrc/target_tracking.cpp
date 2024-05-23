@@ -1,3 +1,5 @@
+#ifdef USE_JETSON
+
 #include "target_tracking.h"
 
 detectNet* net;
@@ -96,3 +98,6 @@ void delete_tracking_net(void)
 	SAFE_DELETE(net);
 }
 
+#else
+	//#error "Please define USE_JETSON to enable use of this code."
+#endif

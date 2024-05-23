@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef USE_JETSON
+
 #include "jetson-utils/videoSource.h"
 #include "jetson-utils/videoOutput.h"
 #include "jetson-inference/detectNet.h"
@@ -31,6 +33,6 @@ class Video
 
 };
 
-
-
-
+#else
+	//#error "Please define USE_JETSON to enable use of this code."
+#endif

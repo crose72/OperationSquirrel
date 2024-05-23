@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef USE_JETSON
+
 #include "common_inc.h"
 #include "jetson-utils/videoSource.h"
 #include "jetson-utils/videoOutput.h"
@@ -20,3 +22,7 @@ void get_object_info(void);
 void print_object_info(void);
 void print_performance_stats(void);
 void delete_tracking_net(void);
+
+#else
+	//#error "Please define USE_JETSON to enable use of this code."
+#endif
