@@ -2,11 +2,11 @@
 cmake_minimum_required(VERSION 2.8)
 
 # Add options to manually enable or disable features
-option(USE_JETSON "Enable Jetson Nano specific features" OFF)
-option(USE_WSL "Enable Jetson Nano specific features" ON)
+option(USE_JETSON "Enable Jetson Nano specific features" ON)
+option(USE_WSL "Enable WSL specific features" OFF)
 
 if (USE_JETSON)
-    project(SquirrelDefender C CXX CUDA)
+    project(SquirrelDefender)
     option(USE_UART "Use UART functionality for Jetson Nano -> SITL or Jetson Nano -> real drone" ON)
     option(USE_TCP "Use TCP functionality for WSL -> WSL SITL" OFF)
     add_definitions(-DUSE_JETSON)
@@ -68,9 +68,11 @@ file(GLOB SOURCES ${SOURCE_DIR}/*.cpp)
 file(GLOB HEADERS ${HEADER_DIR}/*.h)
 
 # Compile the main program
-add_executable(main ${SOURCES} ${HEADERS})
 
 if (USE_JETSON)
-    # Link main to jetson-inference library
+    cuda_add_executable(main ${SOURCES} ${HEADERS})
     target_link_libraries(main jetson-inference)
+    target_link_libraries(main jsoncpp)
+elseif(USE_WSL)
+    add_executable(main ${SOURCES} ${HEADERS})
 endif()
