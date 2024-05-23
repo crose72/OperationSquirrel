@@ -217,8 +217,8 @@ int main(void)
     MavMsg::start_mav_comm();
     MavMsg::message_subscriptions();
     command_line_inputs();
-    input_video(cmdLine, ARG_POSITION(0));
-    output_video(cmdLine, ARG_POSITION(1));
+    Video::create_input_video_stream(cmdLine, ARG_POSITION(0));
+    Video::create_output_video_stream(cmdLine, ARG_POSITION(1));
     create_detection_network();
     MavCmd::set_mode_GUIDED();
     MavCmd::arm_vehicle();
@@ -238,7 +238,7 @@ int main(void)
 
         readPIDParametersFromJSON("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y);
 		
-		if (!capture_image())
+		if (!Video::capture_image())
 		{
 		    //break;
 		}
@@ -247,7 +247,7 @@ int main(void)
 		get_object_info();
 		//print_object_info();
 
-		if (!render_output())
+		if (!Video::render_output())
 		{
 		    //break;
 		}
@@ -321,8 +321,8 @@ int main(void)
 
     LogVerbose("detectnet:  shutting down...\n");
     
-    delete_input();
-    delete_output();
+    Video::delete_input_video_stream();
+    Video::delete_output_video_stream();
     delete_tracking_net();
     SerialComm::stop_uart_comm();
     LogVerbose("detectnet:  shutdown complete.\n");

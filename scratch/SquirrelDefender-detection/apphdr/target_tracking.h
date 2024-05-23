@@ -1,14 +1,4 @@
-/********************************************************************************
- * @file    target_tracking.h
- * @author  Cameron Rose
- * @date    12/27/2023
- ********************************************************************************/
-#ifndef TARGET_TRACKING_H
-#define TARGET_TRACKING_H
-
-/********************************************************************************
- * Includes
- ********************************************************************************/
+#pragma once
 
 #include "common_inc.h"
 #include "jetson-utils/videoSource.h"
@@ -30,6 +20,3 @@ void get_object_info(void);
 void print_object_info(void);
 void print_performance_stats(void);
 void delete_tracking_net(void);
-
-
-#endif // TARGET_TRACKING_H

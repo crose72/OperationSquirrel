@@ -10,16 +10,6 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include <fcntl.h> // for open, fcntl, etc.
-#include <termios.h> // for terminal I/O
-#include <unistd.h> // for POSIX API functions
-#include <sys/ioctl.h> // for ioctl
-#include <sys/socket.h>
-
-// For TCP only
-#include <sys/socket.h> // for socket operations
-#include <arpa/inet.h> // for inet_addr
-#include <netinet/in.h> // for sockaddr_in
 
 /********************************************************************************
  * Imported objects
