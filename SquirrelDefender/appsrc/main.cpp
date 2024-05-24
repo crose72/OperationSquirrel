@@ -116,9 +116,7 @@ int main(void)
     
 	#ifdef USE_JETSON
 		command_line_inputs();
-		Video::create_input_video_stream(cmdLine, ARG_POSITION(0));
-		Video::create_output_video_stream(cmdLine, ARG_POSITION(1));
-		Video::calc_video_res();
+		Video::initialize_video_streams(cmdLine, ARG_POSITION(0));
 		create_detection_network();
 	#endif
 	

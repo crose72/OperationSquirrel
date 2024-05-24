@@ -171,4 +171,15 @@ void Video::delete_output_video_stream(void)
 	SAFE_DELETE(output);
 }
 
+/********************************************************************************
+* Function: initialize_video_streams
+* Description: Code to initialize video streams to run onces at the start of the program.
+********************************************************************************/
+void Video::initialize_video_streams(const commandLine& cmdLine, int positionArg)
+{
+	create_input_video_stream(cmdLine, ARG_POSITION(0));
+	create_output_video_stream(cmdLine, ARG_POSITION(1));
+	calc_video_res();
+}
+
 #endif // USE_JETSON

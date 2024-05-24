@@ -23,6 +23,7 @@ class Video
         Video();
         ~Video();
 
+        static void initialize_video_streams(const commandLine& cmdLine, int positionArg);
         static int create_input_video_stream(const commandLine& cmdLine, int positionArg);
         static int create_output_video_stream(const commandLine& cmdLine, int positionArg);
         static bool capture_image(void);
