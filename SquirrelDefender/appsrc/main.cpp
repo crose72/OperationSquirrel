@@ -281,25 +281,15 @@ int main(void)
 		//test_flight();
 		// logData();
 
-		
-		// Calculate elapsed time since the start of the loop
-		auto end_time = std::chrono::steady_clock::now();
-		auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
-		
+        Time.loop_rate_controller();
 
 		if (firstLoopAfterStartup == true)
 		{
 		    firstLoopAfterStartup = false;
 		}
-
-		if (elapsed_time < interval_ms)
-		{
-		    auto sleep_duration = std::chrono::milliseconds(interval_ms - elapsed_time);
-		    std::this_thread::sleep_for(sleep_duration);
-		}
-
+		// logData();
 		// Update start time for the next iteration
-		start_time = std::chrono::steady_clock::now();
+		Time.calc_loop_start_time();
     }
 
 	#ifdef USE_JETSON

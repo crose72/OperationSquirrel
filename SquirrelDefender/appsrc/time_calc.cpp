@@ -21,11 +21,11 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-float app_elapsed_time = (float)0.0;
-const float time_step = (float)0.025;
-std::chrono::time_point<std::chrono::high_resolution_clock> start_time = std::chrono::high_resolution_clock::now();
-std::chrono::time_point<std::chrono::high_resolution_clock> current_time = std::chrono::high_resolution_clock::now();
-std::chrono::duration<float, std::milli> elapsed_time(0.0);
+float app_elapsed_time = 0.0f;
+const float time_step = 0.025f;
+std::chrono::time_point<std::chrono::steady_clock> start_time = std::chrono::steady_clock::now();
+std::chrono::time_point<std::chrono::steady_clock> current_time = std::chrono::steady_clock::now();
+std::chrono::duration<float, std::milli> elapsed_time(0.0f);
 
 /********************************************************************************
  * Calibration definitions
@@ -39,13 +39,13 @@ std::chrono::duration<float, std::milli> elapsed_time(0.0);
  * Function: TimeCalc
  * Description: Class constructor
  ********************************************************************************/
-TimeCalc::TimeCalc(void){}
+TimeCalc::TimeCalc(void) {}
 
 /********************************************************************************
  * Function: ~TimeCalc
  * Description: Class destructor
  ********************************************************************************/
-TimeCalc::~TimeCalc(void){}
+TimeCalc::~TimeCalc(void) {}
 
 /********************************************************************************
  * Function: calc_app_start_time
@@ -53,16 +53,16 @@ TimeCalc::~TimeCalc(void){}
  ********************************************************************************/
 void TimeCalc::calc_app_start_time(void)
 {
-    std::chrono::_V2::system_clock::time_point app_start_time = std::chrono::high_resolution_clock::now();
+    start_time = std::chrono::steady_clock::now();
 }
 
 /********************************************************************************
  * Function: calc_app_end_time
- * Description: Get program start time
+ * Description: Get program end time
  ********************************************************************************/
 void TimeCalc::calc_app_end_time(void)
 {
-    std::chrono::_V2::system_clock::time_point app_end_time = std::chrono::high_resolution_clock::now();
+    std::chrono::time_point<std::chrono::steady_clock> app_end_time = std::chrono::steady_clock::now();
 }
 
 /********************************************************************************
@@ -71,7 +71,7 @@ void TimeCalc::calc_app_end_time(void)
  ********************************************************************************/
 void TimeCalc::calc_loop_start_time(void)
 {
-    std::chrono::_V2::system_clock::time_point loop_start_time = std::chrono::high_resolution_clock::now();
+    loop_start_time = std::chrono::steady_clock::now();
 }
 
 /********************************************************************************
@@ -80,7 +80,7 @@ void TimeCalc::calc_loop_start_time(void)
  ********************************************************************************/
 void TimeCalc::calc_loop_end_time(void)
 {
-    std::chrono::_V2::system_clock::time_point loop_end_time = std::chrono::high_resolution_clock::now();
+    loop_end_time = std::chrono::steady_clock::now();
 }
 
 /********************************************************************************
@@ -90,10 +90,14 @@ void TimeCalc::calc_loop_end_time(void)
  ********************************************************************************/
 void TimeCalc::loop_rate_controller(void)
 {
+    calc_loop_end_time();
+
     std::chrono::milliseconds loop_duration = std::chrono::duration_cast<std::chrono::milliseconds>(loop_end_time - loop_start_time);
     while (loop_duration < std::chrono::milliseconds(25))
     {
-        /* wait */
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); // wait in small increments
+        loop_end_time = std::chrono::steady_clock::now();
+        loop_duration = std::chrono::duration_cast<std::chrono::milliseconds>(loop_end_time - loop_start_time);
     }
 }
 
@@ -105,21 +109,21 @@ void TimeCalc::calc_elapsed_time(void)
 {
     if (firstLoopAfterStartup == true)
     {
-        app_elapsed_time = (float)0.0;
+        app_elapsed_time = 0.0f;
     }
     else
     {
         // Get the current timestamp
-        current_time = std::chrono::high_resolution_clock::now();
+        current_time = std::chrono::steady_clock::now();
 
         // Calculate the elapsed time since the start of the program
         elapsed_time = current_time - start_time;
 
         // Convert elapsed time to seconds with millisecond precision
-        float app_elapsed_time_tmp = elapsed_time.count() / 1000.0;
+        float app_elapsed_time_tmp = elapsed_time.count() / 1000.0f;
 
         // Truncate the number to three decimal places
-        app_elapsed_time = (floor(app_elapsed_time_tmp * 1000.0) / 1000.0 - time_step);
+        app_elapsed_time = (std::floor(app_elapsed_time_tmp * 1000.0f) / 1000.0f - time_step);
 
         // Print program run time
         // printf("Elapsed Time: %0.3f\n", app_elapsed_time);
