@@ -36,44 +36,14 @@
 	#include "videoIO.h"
 	#include "target_tracking.h"
 	#include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
-	commandLine cmdLine(0, nullptr);
-#else
-	//#error "Please define USE_JETSON to enable use of this code."
 #endif
 
-
-#include <chrono>
-#include <thread>
-
-
-// Test flights
-// #include "sim_flight_test_1_GPSWaypoints.h"
-// #include "sim_flight_test_2_AttitudeControl.h"
-// #include "sim_flight_test_3_VelocityControl.h"
-#include "sim_flight_test_4_VelocityControl.h"
-
+#ifdef USE_JETSON
 int argc;
 char** argv;
-
 bool signal_recieved = false;
-extern int32_t mav_rel_alt;
-
-// Define time interval (25 ms)
-constexpr int interval_ms = 25;
-//auto start_time = 0;
-
-void sig_handler(int signo)
-{
-	if( signo == SIGINT )
-	{
-		#ifdef USE_JETSON
-		LogVerbose("received SIGINT\n");
-		#else
-			//#error "Please define USE_JETSON to enable use of this code."
-		#endif
-		signal_recieved = true;
-	}
-}
+commandLine cmdLine(0, nullptr);
+#endif
 
 #ifdef USE_JETSON
 int usage()
@@ -108,46 +78,52 @@ int command_line_inputs(void)
 	return 1;
 
 }
-
-#else
-	//#error "Please define USE_JETSON to enable use of this code."
 #endif
 
-int main(void)
+void sig_handler(int signo)
 {
-	TimeCalc Time;
-    // Attach signal handler to exit program
+	if( signo == SIGINT )
+	{
+		#ifdef USE_JETSON
+		LogVerbose("received SIGINT\n");
+		#else
+			//#error "Please define USE_JETSON to enable use of this code."
+		#endif
+		signal_recieved = true;
+	}
+}
+
+void attach_sig_handler(void)
+{
+	// This will allow the program to stop of Ctl+C is received
     if (signal(SIGINT, sig_handler) == SIG_ERR)
     {
 		#ifdef USE_JETSON
         LogError("can't catch SIGINT\n");
-		#else
-			//#error "Please define USE_JETSON to enable use of this code."
 		#endif
 		
     }
+}
+
+int main(void)
+{
+	TimeCalc Time;
 
     Time.calc_app_start_time();
+	attach_sig_handler();
     MavMsg::start_mav_comm();
     MavMsg::message_subscriptions();
     
-
 	#ifdef USE_JETSON
 		command_line_inputs();
 		Video::create_input_video_stream(cmdLine, ARG_POSITION(0));
 		Video::create_output_video_stream(cmdLine, ARG_POSITION(1));
 		create_detection_network();
-	#else
-		//#error "Please define USE_JETSON to enable use of this code."
 	#endif
-
+	
     MavCmd::set_mode_GUIDED();
     MavCmd::arm_vehicle();
     MavCmd::takeoff_GPS_long((float)2.0);
-
-    // Get the current time
-    auto start_time = std::chrono::steady_clock::now();
-    float desired_width;
 
     while (!signal_recieved) 
 	{
@@ -159,7 +135,7 @@ int main(void)
 		
 		if (!Video::capture_image())
 		{
-		    //break;
+		    break;
 		}
 
 		detect_objects();
@@ -168,17 +144,13 @@ int main(void)
 
 		if (!Video::render_output())
 		{
-		    //break;
+		    break;
 		}
-		//std::cout << "Vx: " << mav_veh_gps_vx << std::endl;
+
 		follow_target();
-		#else
-			//#error "Please define USE_JETSON to enable use of this code."
 		#endif	
 
 		//print_performance_stats();
-		//test_flight();
-		// logData();
 
         Time.loop_rate_controller();
 
@@ -187,7 +159,6 @@ int main(void)
 		    firstLoopAfterStartup = false;
 		}
 		// logData();
-		// Update start time for the next iteration
 		Time.calc_loop_start_time();
     }
 
@@ -197,9 +168,8 @@ int main(void)
 		Video::delete_output_video_stream();
 		delete_tracking_net();
 		LogVerbose("detectnet:  shutdown complete.\n");
-	#else
-		//#error "Please define USE_JETSON to enable use of this code."
 	#endif
+	
     MavMsg::stop_mav_comm();
 
     return 0;
