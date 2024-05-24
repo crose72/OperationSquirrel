@@ -88,6 +88,6 @@ void test_flight(void)
 
     if (timerVal > 29 && stage == 4)
     {
-        set_mode_RTL();
+        MavCmd::set_mode_RTL();
     }
 }
