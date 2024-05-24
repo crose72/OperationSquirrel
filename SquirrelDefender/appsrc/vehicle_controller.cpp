@@ -104,7 +104,7 @@ float VehicleController::pid_controller_2d(float Kp, float Ki, float Kd,
  * Description: PID controller with up to 2 parameters to control.
  ********************************************************************************/
 // Function to read PID parameters from a JSON file
-void VehicleController::readPIDParametersFromJSON(const std::string& filename, float& Kp_x, float& Ki_x, float& Kd_x, float& Kp_y, float& Ki_y, float& Kd_y) 
+void VehicleController::read_veh_controller_params(const std::string& filename, float& Kp_x, float& Ki_x, float& Kd_x, float& Kp_y, float& Ki_y, float& Kd_y) 
 {
     #ifdef USE_JETSON
     std::ifstream configFile(filename);

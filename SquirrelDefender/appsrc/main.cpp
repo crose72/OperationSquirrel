@@ -118,6 +118,7 @@ int main(void)
 		command_line_inputs();
 		Video::create_input_video_stream(cmdLine, ARG_POSITION(0));
 		Video::create_output_video_stream(cmdLine, ARG_POSITION(1));
+		Video::calc_video_res();
 		create_detection_network();
 	#endif
 	
@@ -133,21 +134,8 @@ int main(void)
 		
 		#ifdef USE_JETSON
 		
-		if (!Video::capture_image())
-		{
-		    break;
-		}
 
-		detect_objects();
-		get_object_info();
-		//print_object_info();
-
-		if (!Video::render_output())
-		{
-		    break;
-		}
-
-		follow_target();
+		Follow::follow_target();
 		#endif	
 
 		//print_performance_stats();
@@ -169,7 +157,7 @@ int main(void)
 		delete_tracking_net();
 		LogVerbose("detectnet:  shutdown complete.\n");
 	#endif
-	
+
     MavMsg::stop_mav_comm();
 
     return 0;

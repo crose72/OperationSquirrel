@@ -36,6 +36,7 @@ extern float Kd_x;
 extern float Kp_y;
 extern float Ki_y;
 extern float Kd_y;
+
 /************************************
  * Exported objects
  ************************************/
@@ -43,6 +44,14 @@ extern float Kd_y;
 /************************************
  * Function prototypes
  ************************************/
-void follow_target(void);
+class Follow
+{
+    public:
+        Follow();
+        ~Follow();
+
+        static void follow_target(void);
+        static void overtake_target(void);
+};
 
 #endif // FOLLOW_TARGET_H

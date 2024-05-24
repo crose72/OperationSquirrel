@@ -14,6 +14,8 @@ extern videoSource* input;
 extern videoOutput* output;
 extern uchar3* image;
 extern detectNet* net;
+extern uint32_t input_video_width;
+extern uint32_t input_video_height;
 
 class Video
 {
@@ -25,6 +27,7 @@ class Video
         static int create_output_video_stream(const commandLine& cmdLine, int positionArg);
         static bool capture_image(void);
         static bool render_output(void);
+        static void calc_video_res(void);
         static void delete_input_video_stream(void);
         static void delete_output_video_stream(void);
 

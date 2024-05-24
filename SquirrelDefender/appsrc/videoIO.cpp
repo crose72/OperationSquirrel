@@ -27,6 +27,8 @@
 videoSource* input;
 videoOutput* output;
 uchar3* image;
+uint32_t input_video_width;
+uint32_t input_video_height;
 
 /********************************************************************************
  * Calibration definitions
@@ -142,6 +144,16 @@ bool Video::render_output(void)
 }
 
 /********************************************************************************
+* Function: calc_video_res
+* Description: Delete the input to stop using resources.
+********************************************************************************/
+void Video::calc_video_res(void)
+{
+	input_video_width = input->GetWidth();
+	input_video_height = input->GetHeight();
+}
+
+/********************************************************************************
 * Function: delete_input_video_stream
 * Description: Delete the input to stop using resources.
 ********************************************************************************/
@@ -158,6 +170,5 @@ void Video::delete_output_video_stream(void)
 {
 	SAFE_DELETE(output);
 }
-#else
-	//#error "Please define USE_JETSON to enable use of this code."
-#endif
+
+#endif // USE_JETSON

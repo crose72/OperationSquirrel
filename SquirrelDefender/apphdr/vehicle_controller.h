@@ -52,7 +52,7 @@ public:
     static float pid_controller_2d(float Kp, float Ki, float Kd, 
                                             float desired, float actual, float desired2, 
                                             float actual2, float w1, float w2, int dim);
-    static void readPIDParametersFromJSON(const std::string& filename, float& Kp_x, float& Ki_x, float& Kd_x, 
+    static void read_veh_controller_params(const std::string& filename, float& Kp_x, float& Ki_x, float& Kd_x, 
                                           float& Kp_y, float& Ki_y, float& Kd_y);
 
 private:
