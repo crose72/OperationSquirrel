@@ -26,6 +26,8 @@
 #include "serial_comm.h"
 #include "mavlink_msg_handler.h"
 #include "mavlink_cmd_handler.h"
+#include "vehicle_controller.h"
+#include "follow_target.h"
 #include "scheduler.h"
 #include "datalog.h"
 #include "time_calc.h"
@@ -72,55 +74,6 @@ void sig_handler(int signo)
 		signal_recieved = true;
 	}
 }
-float err_x = 0.0;
-float err_y = 0.0;
-float err_x_prv = 0.0;
-float err_y_prv = 0.0;
-float err_x_sum = 0.0;
-float err_y_sum = 0.0;
-
-float Kp_x;
-float Ki_x;
-float Kd_x;
-float Kp_y;
-float Ki_y;
-float Kd_y;
-
-float PID(float Kp, float Ki, float Kd, float desired, float actual, float desired2, float actual2, float w1, float w2, int dim)
-{
-	float dt = 0.025;
-	float error = (desired - actual) * w1 + (desired2 - actual2) * w2;
-	float err_sum = 0.0;
-	float err_prv = 0.0;
-	
-	if (dim == 0)
-	{
-		err_sum = err_x_sum;
-		err_prv = err_x_prv;
-	}
-	else if (dim == 1)
-	{
-		err_sum = err_y_sum;	
-		err_prv = err_y_prv;
-	}
-	
-	float integral = (err_sum+error*dt)*Ki;
-	float derivative = (error-err_prv)/dt*Kd;
-	float control = error*Kp+integral*Ki+derivative*Kd;
-	
-	if (dim == 0)
-	{
-		err_x_sum = err_x_sum + error;
-		err_x_prv = error;
-	}
-	else if (dim == 1)
-	{
-		err_y_sum = err_y_sum + error;
-		err_y_prv = error;	
-	}
-	
-	return control;
-}
 
 #ifdef USE_JETSON
 int usage()
@@ -156,20 +109,6 @@ int command_line_inputs(void)
 
 }
 
-// Function to read PID parameters from a JSON file
-void readPIDParametersFromJSON(const std::string& filename, float& Kp_x, float& Ki_x, float& Kd_x, float& Kp_y, float& Ki_y, float& Kd_y) {
-    std::ifstream configFile(filename);
-    Json::Value root;
-    configFile >> root;
-
-    Kp_x = root["Kp_x"].asFloat();
-    Ki_x = root["Ki_x"].asFloat();
-    Kd_x = root["Kd_x"].asFloat();
-    Kp_y = root["Kp_y"].asFloat();
-    Ki_y = root["Ki_y"].asFloat();
-    Kd_y = root["Kd_y"].asFloat();
-}
-
 #else
 	//#error "Please define USE_JETSON to enable use of this code."
 #endif
@@ -198,7 +137,6 @@ int main(void)
 		Video::create_input_video_stream(cmdLine, ARG_POSITION(0));
 		Video::create_output_video_stream(cmdLine, ARG_POSITION(1));
 		create_detection_network();
-		readPIDParametersFromJSON("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y); // Load initial PID parameters from a JSON file
 	#else
 		//#error "Please define USE_JETSON to enable use of this code."
 	#endif
@@ -218,7 +156,7 @@ int main(void)
 		MavMsg::parse_mav_msgs();
 		
 		#ifdef USE_JETSON
-		readPIDParametersFromJSON("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y);
+		
 		if (!Video::capture_image())
 		{
 		    //break;
@@ -233,46 +171,7 @@ int main(void)
 		    //break;
 		}
 		//std::cout << "Vx: " << mav_veh_gps_vx << std::endl;
-		
-		float target_velocity[3] = {0.0,0.0,0.0};
-		if( numDetections > 0 )
-		{
-			for( int n=0; n < numDetections; n++ )
-			{
-				if( detections[n].TrackID >= 0 ) // is this a tracked object?
-				{			
-					if (detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
-					{
-						float x_desired = 360.0;
-						float x_actual = detections[n].Height()/2.0 + detections[n].Top;
-						float height_desired = 650;
-						float height_actual = detections[n].Height();
-						float w1 = 0.5;
-						float w2 = 0.5;
-						float vx_adjust = PID(Kp_x, Ki_x, Kd_x, x_desired, x_actual, 											height_desired, height_actual, w1, w2, 0);
-						//std::cout << "Control signal x: " << vx_adjust << std::endl;
-						if (vx_adjust < 0)
-						{
-							vx_adjust = -vx_adjust;
-						}
-						if (height_actual >= height_desired)
-						{
-							vx_adjust = 0.0;
-						}
-						target_velocity[0] = vx_adjust;
-
-						float y_desired = 640.0;
-						float y_actual = detections[n].Width()/2.0 + detections[n].Left;
-						float vy_adjust = -PID(Kp_y, Ki_y, Kd_y, y_desired, y_actual, 										0.0, 0.0, 1.0, 0.0, 1);
-						//std::cout << "Control signal y: " << vy_adjust << std::endl;
-						target_velocity[1] = vy_adjust;
-
-						cmd_velocity(target_velocity);	
-					}
-				}
-				
-			}
-		}
+		follow_target();
 		#else
 			//#error "Please define USE_JETSON to enable use of this code."
 		#endif	
