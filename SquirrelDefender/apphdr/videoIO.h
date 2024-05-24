@@ -7,7 +7,7 @@
 #include "jetson-inference/detectNet.h"
 #include "jetson-inference/objectTracker.h"
 #include <jetson-inference/objectTrackerIOU.h>
-#include "target_tracking.h"
+#include "object_detection.h"
 #include <signal.h>
 
 extern videoSource* input;
@@ -24,6 +24,9 @@ class Video
         ~Video();
 
         static void initialize_video_streams(const commandLine& cmdLine, int positionArg);
+        static void video_input_loop(void);
+        static void video_output_loop(void);
+        static void shutdown(void);
         static int create_input_video_stream(const commandLine& cmdLine, int positionArg);
         static int create_output_video_stream(const commandLine& cmdLine, int positionArg);
         static bool capture_image(void);

@@ -182,4 +182,34 @@ void Video::initialize_video_streams(const commandLine& cmdLine, int positionArg
 	calc_video_res();
 }
 
+/********************************************************************************
+* Function: video_input_loop
+* Description: Code needed to run each loop to provide the video input.
+********************************************************************************/
+void Video::video_input_loop(void)
+{
+	capture_image();
+}
+
+/********************************************************************************
+* Function: video_output_loop
+* Description: Code needed to run each loop to  provide the video output.
+********************************************************************************/
+void Video::video_output_loop(void)
+{
+	render_output();
+}
+
+/********************************************************************************
+ * Function: shutdown
+ * Description: Shutdown detection network
+ ********************************************************************************/
+void Video::shutdown(void)
+{
+	LogVerbose("video:  shutting down...\n");
+	Video::delete_input_video_stream();
+	Video::delete_output_video_stream();
+	LogVerbose("video:  shutdown complete.\n");
+}
+
 #endif // USE_JETSON

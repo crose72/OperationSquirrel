@@ -54,20 +54,6 @@ void Follow::follow_target(void)
 
     VehicleController::read_veh_controller_params("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y);
 
-    if (!Video::capture_image())
-    {
-        //break;
-    }
-
-    detect_objects();
-    get_object_info();
-    //print_object_info();
-
-    if (!Video::render_output())
-    {
-        //break;
-    }
-
     float target_velocity[3] = {0.0,0.0,0.0};
     if( numDetections > 0 )
     {
@@ -110,5 +96,6 @@ void Follow::follow_target(void)
         }
     }
 }
+
 
 #endif // USE_JETSON

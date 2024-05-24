@@ -11,7 +11,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "target_tracking.h"
+#include "object_detection.h"
 
 /********************************************************************************
  * Typedefs
@@ -37,22 +37,22 @@ int numDetections = 0;
  ********************************************************************************/
 
 /********************************************************************************
- * Function: Target
+ * Function: Detection
  * Description: Class constructor
  ********************************************************************************/
-Target::Target(void){};
+Detection::Detection(void){};
 
 /********************************************************************************
- * Function: ~Target
+ * Function: ~Detection
  * Description: Class destructor
  ********************************************************************************/
-Target::~Target(void){};
+Detection::~Detection(void){};
 
 /********************************************************************************
  * Function: create_detection_network
  * Description: Initialize the network used for object detection.
  ********************************************************************************/
-int create_detection_network(void)
+int Detection::create_detection_network(void)
 {
 	//net = detectNet::Create("SSD_Inception_V2", 0.5, 4);
 	net = detectNet::Create("SSD_Mobilenet_V2", 0.5, 4);
@@ -69,7 +69,7 @@ int create_detection_network(void)
  * Function: detect_objects
  * Description: Initialize the network used for object detection.
  ********************************************************************************/
-void detect_objects(void)
+void Detection::detect_objects(void)
 {
 	uint32_t overlay_flags = 0;
 	
@@ -89,7 +89,7 @@ void detect_objects(void)
  * Function: get_object_info
  * Description: Obtain info about detected objects.
  ********************************************************************************/
-void get_object_info(void)
+void Detection::get_object_info(void)
 {
 	if( numDetections > 0 )
 	{
@@ -107,7 +107,7 @@ void get_object_info(void)
  * Function: print_object_info
  * Description: Print info about detected objects.
  ********************************************************************************/
-void print_object_info(void)
+void Detection::print_object_info(void)
 {
 	if( numDetections > 0 )
 	{
@@ -135,7 +135,7 @@ void print_object_info(void)
  * Function: print_print_performance_statsobject_info
  * Description: Print info about detection network performance.
  ********************************************************************************/
-void print_performance_stats(void)
+void Detection::print_performance_stats(void)
 {
 	// print out timing info
 	net->PrintProfilerTimes();
@@ -145,9 +145,39 @@ void print_performance_stats(void)
  * Function: delete_tracking_net
  * Description: Delete detection network to free up resources.
  ********************************************************************************/
-void delete_tracking_net(void)
+void Detection::delete_tracking_net(void)
 {
 	SAFE_DELETE(net);
+}
+
+/********************************************************************************
+ * Function: initialize_detection_net
+ * Description: Delete detection network to free up resources.
+ ********************************************************************************/
+void Detection::initialize_detection_network(void)
+{
+    create_detection_network();
+}
+
+/********************************************************************************
+ * Function: detection_loop
+ * Description: Process video stream and output detected objects.
+ ********************************************************************************/
+void Detection::detection_loop(void)
+{
+    detect_objects();
+    get_object_info();
+}
+
+/********************************************************************************
+ * Function: shutdown
+ * Description: Shutdown detection network
+ ********************************************************************************/
+void Detection::shutdown(void)
+{
+	LogVerbose("detectnet:  shutting down...\n");
+	Detection::delete_tracking_net();
+	LogVerbose("detectnet:  shutdown complete.\n");
 }
 
 #endif // USE_JETSON

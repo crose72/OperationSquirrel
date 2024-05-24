@@ -34,7 +34,7 @@
 
 #ifdef USE_JETSON
 	#include "videoIO.h"
-	#include "target_tracking.h"
+	#include "object_detection.h"
 	#include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 #endif
 
@@ -117,7 +117,7 @@ int main(void)
 	#ifdef USE_JETSON
 		command_line_inputs();
 		Video::initialize_video_streams(cmdLine, ARG_POSITION(0));
-		create_detection_network();
+		Detection::initialize_detection_network();
 	#endif
 	
     MavCmd::set_mode_GUIDED();
@@ -131,9 +131,10 @@ int main(void)
 		MavMsg::parse_mav_msgs();
 		
 		#ifdef USE_JETSON
-		
-
+		Video::video_input_loop();
+		Detection::detection_loop();
 		Follow::follow_target();
+		Video::video_output_loop();
 		#endif	
 
 		//print_performance_stats();
@@ -149,11 +150,8 @@ int main(void)
     }
 
 	#ifdef USE_JETSON
-		LogVerbose("detectnet:  shutting down...\n");
-		Video::delete_input_video_stream();
-		Video::delete_output_video_stream();
-		delete_tracking_net();
-		LogVerbose("detectnet:  shutdown complete.\n");
+		Video::shutdown();
+		Detection::shutdown();
 	#endif
 
     MavMsg::stop_mav_comm();

@@ -3,12 +3,12 @@
 #ifdef USE_JETSON
 
 /********************************************************************************
- * @file    target_tracking.h
+ * @file    object_detection.h
  * @author  Cameron Rose
  * @date    12/27/2023
  ********************************************************************************/
-#ifndef TARGET_TRACKING_H
-#define TARGET_TRACKING_H
+#ifndef OBJECT_DETECTION_H
+#define OBJECT_DETECTION_H
 
 /********************************************************************************
  * Includes
@@ -20,6 +20,7 @@
 #include "jetson-inference/objectTracker.h"
 #include <jetson-inference/objectTrackerIOU.h>
 #include <signal.h>
+#include "videoIO.h"
 
 /********************************************************************************
  * Imported objects
@@ -39,6 +40,26 @@ extern uint32_t input_video_height;
 /********************************************************************************
  * Function prototypes
  ********************************************************************************/
+class Detection
+{
+	public:
+		Detection();
+		~Detection();
+		
+		static void initialize_detection_network(void);
+		static void detection_loop(void);
+		static void shutdown(void);
+		static int create_detection_network(void);
+		static void detect_objects(void);
+		static void get_object_info(void);
+		static void print_object_info(void);
+		static void print_performance_stats(void);
+		static void delete_tracking_net(void);
+	
+	private:
+
+};
+
 class Target
 {
 	public:
@@ -47,15 +68,13 @@ class Target
 
 		int num_targets;
 		int target_id;
+	
+	private:
+
 };
 
-int create_detection_network(void);
-void detect_objects(void);
-void get_object_info(void);
-void print_object_info(void);
-void print_performance_stats(void);
-void delete_tracking_net(void);
 
-#endif // TARGET_TRACKING_H
+
+#endif // OBJECT_DETECTION_H
 
 #endif // USE_JETSON
