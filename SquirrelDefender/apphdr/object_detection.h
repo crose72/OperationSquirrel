@@ -53,6 +53,7 @@ class Detection
 		static void detect_objects(void);
 		static void get_object_info(void);
 		static void print_object_info(void);
+		static int print_usage(void);
 		static void print_performance_stats(void);
 		static void delete_tracking_net(void);
 	

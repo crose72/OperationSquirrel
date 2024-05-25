@@ -180,4 +180,27 @@ void Detection::shutdown(void)
 	LogVerbose("detectnet:  shutdown complete.\n");
 }
 
+/********************************************************************************
+ * Function: usage
+ * Description: Display a help message.
+ ********************************************************************************/
+int Detection::print_usage(void)
+{
+	printf("usage: detectnet [--help] [--network=NETWORK] [--threshold=THRESHOLD] ...\n");
+	printf("                 input [output]\n\n");
+	printf("Locate objects in a video/image stream using an object detection DNN.\n");
+	printf("See below for additional arguments that may not be shown above.\n\n");
+	printf("positional arguments:\n");
+	printf("    input           resource URI of input stream  (see videoSource below)\n");
+	printf("    output          resource URI of output stream (see videoOutput below)\n\n");
+
+	printf("%s", detectNet::Usage());
+	printf("%s", objectTracker::Usage());
+	printf("%s", videoSource::Usage());
+	printf("%s", videoOutput::Usage());
+	printf("%s", Log::Usage());
+
+	return 0;
+}
+
 #endif // USE_JETSON
