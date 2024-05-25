@@ -54,7 +54,7 @@ class Follow
         Follow();
         ~Follow();
 
-        static void follow_target(void);
+        static void follow_target_loop(void);
         static void overtake_target(void);
 };
 

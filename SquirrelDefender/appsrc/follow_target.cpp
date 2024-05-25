@@ -49,7 +49,7 @@ Follow::~Follow(void){};
  * Description: Control vehicle to follow a designated target at a specific
  *               distance.
  ********************************************************************************/
-void Follow::follow_target(void)
+void Follow::follow_target_loop(void)
 {
 
     VehicleController::read_veh_controller_params("../params.json", Kp_x, Ki_x, Kd_x, Kp_y, Ki_y, Kd_y);
