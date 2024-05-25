@@ -2,6 +2,17 @@
 
 #ifdef USE_JETSON
 
+/********************************************************************************
+ * @file    videoIO.h
+ * @author  Cameron Rose
+ * @date    12/27/2023
+ ********************************************************************************/
+#ifndef VIDEO_IO_H
+#define VIDEO_IO_H
+
+/********************************************************************************
+ * Includes
+ ********************************************************************************/
 #include "jetson-utils/videoSource.h"
 #include "jetson-utils/videoOutput.h"
 #include "jetson-inference/detectNet.h"
@@ -10,12 +21,23 @@
 #include "object_detection.h"
 #include <signal.h>
 
+/********************************************************************************
+ * Imported objects
+ ********************************************************************************/
+
+/********************************************************************************
+ * Exported objects
+ ********************************************************************************/
 extern videoSource* input;
 extern videoOutput* output;
 extern uchar3* image;
 extern detectNet* net;
 extern uint32_t input_video_width;
 extern uint32_t input_video_height;
+
+/********************************************************************************
+ * Function prototypes
+ ********************************************************************************/
 
 class Video
 {
@@ -40,6 +62,6 @@ class Video
 
 };
 
-#else
-	//#error "Please define USE_JETSON to enable use of this code."
-#endif
+#endif // VIDEO_IO_H
+
+#endif // USE_JETSON

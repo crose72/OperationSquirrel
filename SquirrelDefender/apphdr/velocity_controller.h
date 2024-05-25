@@ -1,3 +1,5 @@
+#pragma once
+
 /********************************************************************************
  * @file    velocity_controller.h
  * @author  Cameron Rose

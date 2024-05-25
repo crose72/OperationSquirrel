@@ -1,3 +1,7 @@
+#pragma once
+
+#ifdef USE_JETSON
+
 /********************************************************************************
  * @file    follow_target.h
  * @author  Cameron Rose
@@ -55,3 +59,5 @@ class Follow
 };
 
 #endif // FOLLOW_TARGET_H
+
+#endif // USE_JETSON

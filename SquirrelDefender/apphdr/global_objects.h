@@ -1,3 +1,5 @@
+#pragma once
+
 /********************************************************************************
  * @file    global_objects.h
  * @author  Cameron Rose
@@ -14,7 +16,7 @@
 /********************************************************************************
  * Global object declarations
  ********************************************************************************/
-extern bool firstLoopAfterStartup;
+extern bool first_loop_after_start;
 
 
 #endif // GLOBAL_OBJECTS_H

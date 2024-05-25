@@ -107,7 +107,7 @@ void TimeCalc::loop_rate_controller(void)
  ********************************************************************************/
 void TimeCalc::calc_elapsed_time(void)
 {
-    if (firstLoopAfterStartup == true)
+    if (first_loop_after_start == true)
     {
         app_elapsed_time = 0.0f;
     }

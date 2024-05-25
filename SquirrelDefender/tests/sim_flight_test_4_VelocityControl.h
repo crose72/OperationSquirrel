@@ -50,7 +50,7 @@ void test_flight(void)
 
     countupTimer();
 
-    if (timerVal > 6.0 && stage == 0)
+    if (timerVal > 12.0 && stage == 0)
     {
         target_velocity[0] = 87.0;
         target_velocity[1] = 0;
@@ -59,7 +59,7 @@ void test_flight(void)
         stage = 1;
     }
 
-    if (timerVal > 12 && stage == 1)
+    if (timerVal > 18 && stage == 1)
     {
         target_velocity[0] = 0.0;
         target_velocity[1] = -87.0;
@@ -68,7 +68,7 @@ void test_flight(void)
         stage = 2;
     }
 
-    if (timerVal > 16.0 && stage == 2)
+    if (timerVal > 24.0 && stage == 2)
     {
         target_velocity[0] = -6.0;
         target_velocity[1] = 4.0;
@@ -77,7 +77,7 @@ void test_flight(void)
         stage = 3;
     }
 
-    if (timerVal > 23.0 && stage == 3)
+    if (timerVal > 30.0 && stage == 3)
     {
         target_velocity[0] = -6.0;
         target_velocity[1] = 4.0;

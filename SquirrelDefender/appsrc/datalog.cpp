@@ -53,7 +53,7 @@ std::string toString(const T& value)
  ********************************************************************************/
 void logData(void)
 {
-    if (firstLoopAfterStartup == true)
+    if (first_loop_after_start == true)
     {
         unusedDataFileName = checkAndAppendFileName(dataFileName);
     }

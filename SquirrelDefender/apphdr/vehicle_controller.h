@@ -1,3 +1,5 @@
+#pragma once
+
 /********************************************************************************
  * @file    vehicle_controller.h
  * @author  Cameron Rose

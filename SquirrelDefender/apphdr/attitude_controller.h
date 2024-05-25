@@ -1,3 +1,5 @@
+#pragma once
+
 /********************************************************************************
  * @file    attitude_controller.h
  * @author  Cameron Rose

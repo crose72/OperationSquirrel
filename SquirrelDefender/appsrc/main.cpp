@@ -40,10 +40,11 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
+bool signal_recieved = false;
+
 #ifdef USE_JETSON
 int argc;
 char** argv;
-bool signal_recieved = false;
 commandLine cmdLine(0, nullptr);
 #endif // USE_JETSON
 
@@ -101,6 +102,19 @@ void attach_sig_handler(void)
 }
 
 /********************************************************************************
+ * Function: app_first_init
+ * Description: Updates variable for rest of program to know that the first loop
+ * 				is over.
+ ********************************************************************************/
+void app_first_init(void)
+{
+	if (first_loop_after_start == true)
+	{
+		first_loop_after_start = false;
+	}
+}
+
+/********************************************************************************
  * Function: main
  * Description: Entry point for the program.  Runs the main loop.
  ********************************************************************************/
@@ -145,12 +159,7 @@ int main(void)
 		#endif // USE_JETSON	
 
         Time.loop_rate_controller();
-
-		if (firstLoopAfterStartup == true)
-		{
-		    firstLoopAfterStartup = false;
-		}
-		
+		app_first_init();
 		Time.calc_loop_start_time();
     }
 

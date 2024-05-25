@@ -1,3 +1,5 @@
+#pragma once
+
 /********************************************************************************
  * @file    mavlink_cmd_handler.h
  * @author  Cameron Rose
