@@ -2,8 +2,8 @@
 cmake_minimum_required(VERSION 2.8)
 
 # Add options to manually enable or disable features
-option(USE_JETSON "Enable Jetson Nano specific features" ON)
-option(USE_WSL "Enable WSL specific features" OFF)
+option(USE_JETSON "Enable Jetson Nano specific features" OFF)
+option(USE_WSL "Enable WSL specific features" ON)
 
 if (USE_JETSON)
     project(SquirrelDefender)
