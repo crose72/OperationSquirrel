@@ -122,7 +122,7 @@ int main(void)
 {
 	TimeCalc Time;
 
-    Time.calc_app_start_time();
+	Time.calc_app_start_time();
     
 	#ifdef USE_JETSON
 
@@ -133,9 +133,9 @@ int main(void)
 	#endif // USE_JETSON
 
 	attach_sig_handler();
-    MavMsg::start_mav_comm();
+	MavMsg::start_mav_comm();
     MavMsg::message_subscriptions();
-    MavCmd::set_mode_GUIDED();
+	MavCmd::set_mode_GUIDED();
     MavCmd::arm_vehicle();
     MavCmd::takeoff_GPS_long((float)2.0);
 

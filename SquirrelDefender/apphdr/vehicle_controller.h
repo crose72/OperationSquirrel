@@ -29,36 +29,31 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern float err_x;
-extern float err_y;
-extern float err_x_prv;
-extern float err_y_prv;
-extern float err_x_sum;
-extern float err_y_sum;
-extern float Kp_x;
-extern float Ki_x;
-extern float Kd_x;
-extern float Kp_y;
-extern float Ki_y;
-extern float Kd_y;
 
 /********************************************************************************
  * Function prototypes
  ********************************************************************************/
 class VehicleController 
 {
-public:
-    VehicleController();
-    ~VehicleController();
+    public:
+        VehicleController();
+        ~VehicleController();
 
-    static float pid_controller_2d(float Kp, float Ki, float Kd, 
-                                            float desired, float actual, float desired2, 
-                                            float actual2, float w1, float w2, int dim);
-    static void read_veh_controller_params(const std::string& filename, float& Kp_x, float& Ki_x, float& Kd_x, 
-                                          float& Kp_y, float& Ki_y, float& Kd_y);
+        enum control_dimension
+        {
+            x = 0,
+            y = 1,
+            z = 2,
+            num_dims = 3
+        };
 
-private:
-    
+        float pid_controller_3d(float Kp, float Ki, float Kd, 
+                                float err1, float err2, float err3,  
+                                float w1, float w2, float w3, control_dimension dim);
+
+    private:
+        float err_sum[3]; // Array to hold integral sums for x, y, z
+        float err_prv[3]; // Array to hold previous errors for x, y, z
 };
 
 

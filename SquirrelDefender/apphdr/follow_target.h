@@ -18,6 +18,7 @@
 #include "object_detection.h"
 #include "vehicle_controller.h"
 #include "velocity_controller.h"
+#include "parameters.h"
 
 /************************************
  * Imported objects
@@ -27,19 +28,8 @@ extern detectNet::Detection* detections;
 extern videoSource* input;
 extern uchar3* image;
 extern int numDetections;
-
-extern float err_x;
-extern float err_y;
-extern float err_x_prv;
-extern float err_y_prv;
-extern float err_x_sum;
-extern float err_y_sum;
-extern float Kp_x;
-extern float Ki_x;
-extern float Kd_x;
-extern float Kp_y;
-extern float Ki_y;
-extern float Kd_y;
+extern uint32_t input_video_width;
+extern uint32_t input_video_height;
 
 /************************************
  * Exported objects
@@ -56,6 +46,12 @@ class Follow
 
         static void follow_target_loop(void);
         static void overtake_target(void);
+    
+    private:
+        static void get_control_params(void);
+        static void get_target_desired_params(void);
+        static void calc_target_actual_params(int n);
+        static void calc_target_error(void);
 };
 
 #endif // FOLLOW_TARGET_H
