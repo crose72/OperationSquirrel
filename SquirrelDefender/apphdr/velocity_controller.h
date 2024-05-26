@@ -28,6 +28,7 @@
  ********************************************************************************/
 void cmd_position(float position_target[3]);
 void cmd_velocity(float velocity_target[3]);
+void cmd_velocity_x(float velocity_target);
 void cmd_acceleration(float acceleration_target[3]);
 float calc_yaw_target(float x, float y);
 float calc_yaw_rate_target(float x, float y);

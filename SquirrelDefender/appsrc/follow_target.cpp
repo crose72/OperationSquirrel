@@ -44,6 +44,18 @@ float w3_y = 0.0;
 float w1_z = 0.0;
 float w2_z = 0.0;
 float w3_z = 0.0;
+float Kp_x_rev = 0.0;
+float Ki_x_rev = 0.0;
+float Kd_x_rev = 0.0;
+float w1_x_rev = 0.0;
+float w2_x_rev = 0.0;
+float w3_x_rev = 0.0;
+float Kp_y_rev = 0.0;
+float Ki_y_rev = 0.0;
+float Kd_y_rev = 0.0;
+float w1_y_rev = 0.0;
+float w2_y_rev = 0.0;
+float w3_y_rev = 0.0;
 float x_desired = 0;
 float x_actual = 0.0;
 float height_desired = 0.0;
@@ -104,6 +116,22 @@ void Follow::get_control_params(void)
     w1_y = veh_params.get_float_param("Vel_PID_y", "w1");
     w2_y = veh_params.get_float_param("Vel_PID_y", "w2");
     w3_y = veh_params.get_float_param("Vel_PID_y", "w3");
+
+    // Accessing Vel_PID_x parameters for reverse movement
+    Kp_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "Kp");
+    Ki_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "Ki");
+    Kd_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "Kd");
+    w1_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "w1");
+    w2_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "w2");
+    w3_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "w3");
+
+    // Accessing Vel_PID_y parameters for reverse movment
+    Kp_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "Kp");
+    Ki_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "Ki");
+    Kd_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "Kd");
+    w1_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "w1");
+    w2_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "w2");
+    w3_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "w3");
 }
 
 /********************************************************************************
@@ -171,31 +199,41 @@ void Follow::follow_target_loop(void)
                 if (detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
                 {
                     calc_target_actual_params(n);
-                    calc_target_error();
-                    
-                    float vx_adjust = vc.pid_controller_3d(Kp_x, Ki_x, Kd_x, 
-                                                           err_x_1, err_x_2, err_x_3, 
-                                                           w1_x, w2_x, w3_x, VehicleController::control_dimension::x);
-                    float vy_adjust = -vc.pid_controller_3d(Kp_y, Ki_y, Kd_y, 
-                                                           err_y_1, err_y_2, err_y_3, 
-                                                           w1_y, w2_y, w3_y, VehicleController::control_dimension::y);
-                    
-                    if (vx_adjust < 0)
+                    calc_target_error();                    
+
+                    if (height_actual > height_desired)
                     {
-                        vx_adjust = -vx_adjust;
+                        float vx_adjust = vc.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev, 
+                                                            err_x_1, err_x_2, err_x_3, 
+                                                            w1_x_rev, w2_x_rev, w3_x_rev, VehicleController::control_dimension::x);
+                        float vy_adjust = vc.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev, 
+                                                            err_y_1, err_y_2, err_y_3, 
+                                                            w1_y_rev, w2_y_rev, w3_y_rev, VehicleController::control_dimension::y);
+                        std::cout << "Control signal x: " << vx_adjust << std::endl;
+                        std::cout << "Control signal y: " << vy_adjust << std::endl;
+                        target_velocity[0] = vx_adjust;
+                        target_velocity[1] = vy_adjust;
+                        cmd_velocity(target_velocity);
                     }
-                    if (height_actual >= height_desired)
+                    else
                     {
-                        vx_adjust = 0.0;
+                        float vx_adjust = vc.pid_controller_3d(Kp_x, Ki_x, Kd_x, 
+                                                            err_x_1, err_x_2, err_x_3, 
+                                                            w1_x, w2_x, w3_x, VehicleController::control_dimension::x);
+                        float vy_adjust = vc.pid_controller_3d(Kp_y, Ki_y, Kd_y, 
+                                                            err_y_1, err_y_2, err_y_3, 
+                                                            w1_y, w2_y, w3_y, VehicleController::control_dimension::y);
+                        std::cout << "Control signal x: " << vx_adjust << std::endl;
+                        std::cout << "Control signal y: " << vy_adjust << std::endl;
+                        target_velocity[0] = vx_adjust;
+                        target_velocity[1] = vy_adjust;
+                        cmd_velocity(target_velocity);
                     }
 
-                    std::cout << "Control signal x: " << vx_adjust << std::endl;
-                    std::cout << "Control signal y: " << vy_adjust << std::endl;
+    
 
-                    target_velocity[0] = vx_adjust;
-                    target_velocity[1] = vy_adjust;
 
-                    cmd_velocity(target_velocity);	
+                    //cmd_velocity_x(target_velocity[0]);
                 }
             }
             
