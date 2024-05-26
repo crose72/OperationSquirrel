@@ -172,10 +172,14 @@ void Follow::follow_target_loop(void)
                 {
                     calc_target_actual_params(n);
                     calc_target_error();
+                    
                     float vx_adjust = vc.pid_controller_3d(Kp_x, Ki_x, Kd_x, 
                                                            err_x_1, err_x_2, err_x_3, 
                                                            w1_x, w2_x, w3_x, VehicleController::control_dimension::x);
-                    std::cout << "Control signal x: " << vx_adjust << std::endl;
+                    float vy_adjust = -vc.pid_controller_3d(Kp_y, Ki_y, Kd_y, 
+                                                           err_y_1, err_y_2, err_y_3, 
+                                                           w1_y, w2_y, w3_y, VehicleController::control_dimension::y);
+                    
                     if (vx_adjust < 0)
                     {
                         vx_adjust = -vx_adjust;
@@ -185,12 +189,10 @@ void Follow::follow_target_loop(void)
                         vx_adjust = 0.0;
                     }
 
-                    target_velocity[0] = vx_adjust;
-
-                    float vy_adjust = -vc.pid_controller_3d(Kp_y, Ki_y, Kd_y, 
-                                                           err_y_1, err_y_2, err_y_3, 
-                                                           w1_y, w2_y, w3_y, VehicleController::control_dimension::y);
+                    std::cout << "Control signal x: " << vx_adjust << std::endl;
                     std::cout << "Control signal y: " << vy_adjust << std::endl;
+
+                    target_velocity[0] = vx_adjust;
                     target_velocity[1] = vy_adjust;
 
                     cmd_velocity(target_velocity);	
