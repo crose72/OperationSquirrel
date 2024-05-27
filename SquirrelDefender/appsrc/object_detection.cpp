@@ -54,9 +54,17 @@ Detection::~Detection(void){};
  ********************************************************************************/
 int Detection::create_detection_network(void)
 {
+	Parameters detection_params("../params.json");
+	
+	float detection_thresh = detection_params.get_float_param("Detection_tracking", "Detect_Thresh");
+	uint32_t max_batch_size = detection_params.get_uint32_param("Detection_tracking", "Max_Batch_Size");
+	uint32_t min_frames = detection_params.get_uint32_param("Detection_tracking", "Min_Frames");
+	uint32_t drop_frames = detection_params.get_uint32_param("Detection_tracking", "Drop_Frames");
+	float overlap_thresh = detection_params.get_float_param("Detection_tracking", "Overlap_Threshold");
+
 	//net = detectNet::Create("SSD_Inception_V2", 0.5, 4);
-	net = detectNet::Create("SSD_Mobilenet_V2", 0.5, 4);
-	net->SetTracker(objectTrackerIOU::Create(3, 100, 0.5f));
+	net = detectNet::Create("SSD_Mobilenet_V2", detection_thresh, max_batch_size);
+	net->SetTracker(objectTrackerIOU::Create(min_frames, drop_frames, overlap_thresh));
 	
 	if( !net )
 	{

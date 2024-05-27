@@ -21,6 +21,7 @@
 #include <jetson-inference/objectTrackerIOU.h>
 #include <signal.h>
 #include "videoIO.h"
+#include "parameters.h"
 
 /********************************************************************************
  * Imported objects

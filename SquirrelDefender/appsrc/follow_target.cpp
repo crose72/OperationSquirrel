@@ -204,13 +204,21 @@ void Follow::follow_target_loop(void)
                     if (height_actual > height_desired)
                     {
                         float vx_adjust = vc.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev, 
-                                                            err_x_1, err_x_2, err_x_3, 
+                                                            err_x_2, 0.0, 0.0, 
                                                             w1_x_rev, w2_x_rev, w3_x_rev, VehicleController::control_dimension::x);
                         float vy_adjust = vc.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev, 
                                                             err_y_1, err_y_2, err_y_3, 
                                                             w1_y_rev, w2_y_rev, w3_y_rev, VehicleController::control_dimension::y);
                         std::cout << "Control signal x: " << vx_adjust << std::endl;
                         std::cout << "Control signal y: " << vy_adjust << std::endl;
+                        if (vx_adjust > 0.0)
+                        {
+                            vx_adjust = -vx_adjust;
+                        }
+                        if (abs(vx_adjust) <= 0.5)
+                        {
+                            vy_adjust = 0.0;
+                        }
                         target_velocity[0] = vx_adjust;
                         target_velocity[1] = vy_adjust;
                         cmd_velocity(target_velocity);
