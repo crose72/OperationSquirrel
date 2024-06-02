@@ -52,6 +52,7 @@ class Follow
         static void get_target_desired_params(void);
         static void calc_target_actual_params(int n);
         static void calc_target_error(void);
+        static void calc_overlap_error(void);
 };
 
 #endif // FOLLOW_TARGET_H

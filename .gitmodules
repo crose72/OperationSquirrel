@@ -1,0 +1,3 @@
+[submodule "ThirdParty/CppUTest"]
+	path = ThirdParty/CppUTest
+	url = https://github.com/cpputest/cpputest.git

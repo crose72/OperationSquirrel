@@ -134,10 +134,10 @@ int main(void)
 
 	attach_sig_handler();
 	MavMsg::start_mav_comm();
-    MavMsg::message_subscriptions();
+	MavMsg::message_subscriptions();
 	MavCmd::set_mode_GUIDED();
-    MavCmd::arm_vehicle();
-    MavCmd::takeoff_GPS_long((float)2.0);
+	MavCmd::arm_vehicle();
+	MavCmd::takeoff_GPS_long((float)2.0);
 
     while (!signal_recieved) 
 	{

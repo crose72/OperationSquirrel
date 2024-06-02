@@ -2,8 +2,8 @@
 cmake_minimum_required(VERSION 2.8)
 
 # Add options to manually enable or disable features
-option(USE_JETSON "Enable Jetson Nano specific features" OFF)
-option(USE_WSL "Enable WSL specific features" ON)
+option(USE_JETSON "Enable Jetson Nano specific features" ON)
+option(USE_WSL "Enable WSL specific features" OFF)
 
 if (USE_JETSON)
     project(SquirrelDefender)
@@ -64,15 +64,42 @@ set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
 # List all source files with .cpp extension
 file(GLOB SOURCES ${SOURCE_DIR}/*.cpp)
 
+file(GLOB TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/UnitTests/*.cpp)
+
 # List all header files with .h extension
 file(GLOB HEADERS ${HEADER_DIR}/*.h)
 
-# Compile the main program
+# Add the external directory for CppUTest
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/CppUTest ThirdParty/CppUTest)
+enable_testing()
 
+# Create a static library for the application code
+add_library(squirrel_defender_lib STATIC ${SOURCES} ${HEADERS})
+
+# Locate the static library
+# set(STATIC_LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build) # Adjust the path if necessary
+find_library(SQUIRREL_DEFENDER_LIB NAMES squirrel_defender_lib PATHS ${STATIC_LIBRARY_DIR})
+
+# Compile the main program
 if (USE_JETSON)
     cuda_add_executable(main ${SOURCES} ${HEADERS})
     target_link_libraries(main jetson-inference)
     target_link_libraries(main jsoncpp)
 elseif(USE_WSL)
     add_executable(main ${SOURCES} ${HEADERS})
+endif()
+
+# Compile the unit_tests program
+if (USE_JETSON)
+    cuda_add_executable(unit_tests ${TEST_SOURCES} ${HEADERS})
+    target_link_libraries(unit_tests jetson-inference)
+    target_link_libraries(unit_tests jsoncpp)
+    add_test(NAME unit_tests COMMAND unit_tests)
+    target_link_libraries(unit_tests squirrel_defender_lib CppUTest CppUTestExt)
+    
+elseif(USE_WSL)
+    add_executable(unit_tests ${TEST_SOURCES} ${HEADERS})
+    add_test(NAME unit_tests COMMAND unit_tests)
+    target_link_libraries(unit_tests squirrel_defender_lib CppUTest CppUTestExt)
+
 endif()

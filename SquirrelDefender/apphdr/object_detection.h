@@ -44,8 +44,8 @@ extern uint32_t input_video_height;
 class Detection
 {
 	public:
-		Detection();
-		~Detection();
+		Detection(void);
+		~Detection(void);
 		
 		static void initialize_detection_network(void);
 		static void detection_loop(void);

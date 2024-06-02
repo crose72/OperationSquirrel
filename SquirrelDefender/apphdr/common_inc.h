@@ -45,6 +45,8 @@
 #include "global_calibrations.h"
 #include "global_types.h"
 
+#include "debug_terminal.h"
+
 // Conditional includes
 #ifdef USE_TCP
     #include <sys/socket.h>

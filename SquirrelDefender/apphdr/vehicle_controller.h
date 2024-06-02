@@ -16,12 +16,6 @@
 #include "velocity_controller.h"
 #include "attitude_controller.h"
 
-#ifdef USE_JETSON
-	#include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
-#else
-	//#error "Please define USE_JETSON to enable use of this code."
-#endif
-
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
