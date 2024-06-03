@@ -119,17 +119,15 @@ void VelocityController::cmd_velocity_NED(float velocity_target[3])
 }
 
 /********************************************************************************
- * Function: cmd_velocity_x_NED
+ * Function: cmd_velocity_xy_NED
  * Description: Move in xy plane given a vector vx,vy in the NED frame.
  ********************************************************************************/
 void VelocityController::cmd_velocity_xy_NED(float velocity_target[3])
 {
     uint16_t options = 0;
 
-    options |= POSITION_TARGET_TYPEMASK_X_IGNORE | POSITION_TARGET_TYPEMASK_Y_IGNORE | POSITION_TARGET_TYPEMASK_Z_IGNORE | 
-            POSITION_TARGET_TYPEMASK_VZ_IGNORE | 
-            POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE | 
-            POSITION_TARGET_TYPEMASK_YAW_IGNORE | POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
+    options |= POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE | 
+            POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
 
     desired_velocity_target.vx = velocity_target[0];
     desired_velocity_target.vy = velocity_target[1];
@@ -147,10 +145,8 @@ void VelocityController::cmd_velocity_x_NED(float velocity_target)
 {
     uint16_t options = 0;
 
-    options |= POSITION_TARGET_TYPEMASK_X_IGNORE | POSITION_TARGET_TYPEMASK_Y_IGNORE | POSITION_TARGET_TYPEMASK_Z_IGNORE | 
-            POSITION_TARGET_TYPEMASK_VY_IGNORE | POSITION_TARGET_TYPEMASK_VZ_IGNORE | 
-            POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE | 
-            POSITION_TARGET_TYPEMASK_YAW_IGNORE | POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
+    options |= POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE | 
+            POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
 
     desired_velocity_target.vx = velocity_target;
     desired_velocity_target.type_mask = options;
