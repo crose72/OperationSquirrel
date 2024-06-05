@@ -18,6 +18,7 @@
 #include "object_detection.h"
 #include "vehicle_controller.h"
 #include "velocity_controller.h"
+#include "attitude_controller.h"
 #include "parameters.h"
 
 /************************************

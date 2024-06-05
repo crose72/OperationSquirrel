@@ -72,6 +72,7 @@ float target_left_side = 0.0;
 float target_right_side = 0.0;
 float target_left_err = 0.0;
 float target_right_err = 0.0;
+float target_height_err_rev = 0.0;
 
 /********************************************************************************
  * Calibration definitions
@@ -197,7 +198,7 @@ void Follow::follow_target_loop(void)
 {
     VehicleController VehController;
     VelocityController VelController;
-    //Debugger Debug("/dev/pts/2");
+    Debugger Debug("/dev/pts/3");
 
     float target_velocity[3] = {0.0,0.0,0.0};
 
@@ -222,21 +223,24 @@ void Follow::follow_target_loop(void)
                                                     
                 //Debug.Print("Target too close...PID (x,y): " + std::to_string(vx_adjust) + ", " + 
                 //                                               std::to_string(vy_adjust) + "\n");
-
+                /*
                 if (vx_adjust > 0.0)
                 {
                     vx_adjust = -vx_adjust;
                 }
-                if (abs(vx_adjust) <= 0.5)
+                if (abs(vx_adjust) <= 0.01)
                 {
                     vy_adjust = 0.0;
                 }
+                */
 
-                target_velocity[0] = 0.0;
-                target_velocity[1] = 0.0;
+                target_velocity[0] = vx_adjust;
+                target_velocity[1] = vy_adjust; 
 
-                //Debug.Print("             PID final (x,y): " + std::to_string(target_velocity[0]) + ", " + 
-                //                                               std::to_string(target_velocity[1]) + "\n");
+                //attitude_yaw(vy_adjust, 0.25);
+
+                Debug.Print("Target too close...PID (x,y): " + std::to_string(target_velocity[0]) + ", " + 
+                                                               std::to_string(target_velocity[1]) + "\n");
 
                 VelController.cmd_velocity_xy_NED(target_velocity);
                 //VelController.cmd_velocity_y_NED(vy_adjust);
@@ -250,40 +254,15 @@ void Follow::follow_target_loop(void)
                                                     y_centroid_err, 0.0, 0.0, 
                                                     w1_y, w2_y, w3_y, VehicleController::control_dimension::y);
 
-                //Debug.Print("Target too far...PID (x,y): " + std::to_string(vx_adjust) + ", " + 
-                //                                             std::to_string(vy_adjust) + "\n");
+                Debug.Print("Target too far...PID (x,y): " + std::to_string(vx_adjust) + ", " + 
+                                                             std::to_string(vy_adjust) + "\n");
 
                 target_velocity[0] = vx_adjust;
                 target_velocity[1] = vy_adjust; 
 
-                VelocityController::cmd_velocity_NED(target_velocity);
-            }
-            
-            /*
-            float vx_adjust = VehController.pid_controller_3d(Kp_x, Ki_x, Kd_x, 
-                                                x_centroid_err, target_height_err, 0.0, 
-                                                w1_x, w2_x, w3_x, VehicleController::control_dimension::x);
-            float vy_adjust = VehController.pid_controller_3d(Kp_y, Ki_y, Kd_y, 
-                                                y_centroid_err, 0.0, 0.0, 
-                                                w1_y, w2_y, w3_y, VehicleController::control_dimension::y);
-            std::cout << "Control signal x: " << vx_adjust << std::endl;
-            std::cout << "Control signal y: " << vy_adjust << std::endl;
-            target_velocity[0] = vx_adjust;
-            target_velocity[1] = vy_adjust;
-
-            if (target_velocity[0] < 0)
-            {
                 VelController.cmd_velocity_x_NED(target_velocity[0]);
+                //VelController.cmd_velocity_NED(target_velocity);
             }
-            else
-            {
-                VelController.cmd_velocity_NED(target_velocity);
-            }
-            */
-
-
-
-            //VelController.cmd_velocity_NED_x(target_velocity[0]);
         }
     }
 }

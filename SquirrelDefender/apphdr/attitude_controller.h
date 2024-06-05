@@ -45,5 +45,6 @@ extern float thrust_actual;
 bool dtrmn_attitude_target_error(void);
 void brake (void);
 void move_forward (void);
+void attitude_yaw (float yaw_pos, float yaw_rate);
 
 #endif // ATTITUDE_CONTROLLER_H

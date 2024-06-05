@@ -143,3 +143,23 @@ void brake (void)
         MavCmd::send_cmd_set_attitude_target(&desired_attitude_target);
     }
 }
+
+/********************************************************************************
+ * Function: attitude_yaw
+ * Description: Command drone to yaw about the z axis.
+ ********************************************************************************/
+void attitude_yaw (float yaw_pos, float yaw_rate)
+{
+    // parameters for set_attitude_target command
+    desired_attitude_target.body_yaw_rate = yaw_rate;
+    desired_attitude_target.thrust = (float)0.5;  // Define the desired thrust magnitude (adjust as needed), Range: 0.0 (no thrust) to 1.0 (full thrust)
+    desired_attitude_target.q[0] = cos(yaw_pos); // w
+    desired_attitude_target.q[3] = sin(yaw_pos); // z
+    desired_attitude_target.q[1] = 0; // x
+    desired_attitude_target.q[2] = 0; // y
+    desired_attitude_target.target_system = TARGET_SYS_ID;
+    desired_attitude_target.target_component = TARGET_COMP_ID;
+    desired_attitude_target.type_mask = 0b00000000;
+    
+    MavCmd::send_cmd_set_attitude_target(&desired_attitude_target);
+}
