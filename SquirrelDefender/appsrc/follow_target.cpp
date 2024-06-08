@@ -3,7 +3,7 @@
 /********************************************************************************
  * @file    follow_target.cpp
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  * @brief   Follow the target and maintain a specified x, y, z offset.
  ********************************************************************************/
 
@@ -198,7 +198,7 @@ void Follow::follow_target_loop(void)
 {
     VehicleController VehController;
     VelocityController VelController;
-    Debugger Debug("/dev/pts/3");
+    DebugTerm Debug("/dev/pts/2");
 
     float target_velocity[3] = {0.0,0.0,0.0};
 
@@ -220,30 +220,14 @@ void Follow::follow_target_loop(void)
                 float vy_adjust = VehController.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev, 
                                                     y_centroid_err, 0.0, 0.0, 
                                                     w1_y_rev, w2_y_rev, 0.0, VehicleController::control_dimension::y);
-                                                    
-                //Debug.Print("Target too close...PID (x,y): " + std::to_string(vx_adjust) + ", " + 
-                //                                               std::to_string(vy_adjust) + "\n");
-                /*
-                if (vx_adjust > 0.0)
-                {
-                    vx_adjust = -vx_adjust;
-                }
-                if (abs(vx_adjust) <= 0.01)
-                {
-                    vy_adjust = 0.0;
-                }
-                */
 
                 target_velocity[0] = vx_adjust;
                 target_velocity[1] = vy_adjust; 
-
-                //attitude_yaw(vy_adjust, 0.25);
 
                 Debug.Print("Target too close...PID (x,y): " + std::to_string(target_velocity[0]) + ", " + 
                                                                std::to_string(target_velocity[1]) + "\n");
 
                 VelController.cmd_velocity_xy_NED(target_velocity);
-                //VelController.cmd_velocity_y_NED(vy_adjust);
             }
             else
             {
@@ -260,8 +244,7 @@ void Follow::follow_target_loop(void)
                 target_velocity[0] = vx_adjust;
                 target_velocity[1] = vy_adjust; 
 
-                VelController.cmd_velocity_x_NED(target_velocity[0]);
-                //VelController.cmd_velocity_NED(target_velocity);
+                VelController.cmd_velocity_NED(target_velocity);
             }
         }
     }

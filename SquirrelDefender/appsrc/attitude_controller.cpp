@@ -1,7 +1,7 @@
 /********************************************************************************
  * @file    attitude_controller.cpp
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  * @brief   Control the yaw, pitch, roll, thrust of the drone by sending the 
  *          following MAVLINK message to the drone.  Useful for trajectory
  *          planning.

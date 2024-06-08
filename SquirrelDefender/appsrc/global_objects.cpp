@@ -1,7 +1,7 @@
 /********************************************************************************
  * @file    global_objects.cpp
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  * @brief   Definitions for global objects available to every file in the 
  *          program.
  ********************************************************************************/
@@ -15,3 +15,4 @@
  * Object definitions
  ********************************************************************************/
 bool first_loop_after_start = true;
+float dt_25ms = 0.025;

@@ -5,7 +5,7 @@
 /********************************************************************************
  * @file    object_detection.h
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  ********************************************************************************/
 #ifndef OBJECT_DETECTION_H
 #define OBJECT_DETECTION_H
@@ -20,7 +20,7 @@
 #include "jetson-inference/objectTracker.h"
 #include <jetson-inference/objectTrackerIOU.h>
 #include <signal.h>
-#include "videoIO.h"
+#include "video_IO.h"
 #include "parameters.h"
 
 /********************************************************************************
@@ -39,7 +39,7 @@ extern uint32_t input_video_width;
 extern uint32_t input_video_height;
 
 /********************************************************************************
- * Function prototypes
+ * Function prototypes and Class Definitions
  ********************************************************************************/
 class Detection
 {

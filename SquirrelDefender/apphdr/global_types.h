@@ -3,7 +3,7 @@
 /********************************************************************************
  * @file    global_types.h
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  * @brief   Global typedefs to be shared throughout the program
  ********************************************************************************/
 #ifndef GLOBAL_TYPES_H

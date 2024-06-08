@@ -1,7 +1,7 @@
 /********************************************************************************
  * @file    velocity_controller.cpp
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  * @brief   Control the position, velocity, and acceleration of the drone by 
  *          sending the following MAVLINK message to the drone.  Control the
  *          vector position, velocity, acceleration, and yaw/yaw rate.
@@ -157,7 +157,7 @@ void VelocityController::cmd_velocity_x_NED(float velocity_target)
 
 /********************************************************************************
  * Function: cmd_velocity_y_NED
- * Description: Move in direction of vector vx in the NED frame.
+ * Description: Move in direction of vector vy in the NED frame.
  ********************************************************************************/
 void VelocityController::cmd_velocity_y_NED(float velocity_target)
 {

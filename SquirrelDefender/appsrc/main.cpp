@@ -1,28 +1,24 @@
 /********************************************************************************
  * @file    target_tracking.cpp
  * @author  Cameron Rose
- * @date    12/27/2023
- * @brief   All methods needed to initialize and create a detection network and 
-			choose a target.
+ * @date    6/7/2024
+ * @brief   Main source file where initializations, loops, and shutdown
+ * 			sequences are executed.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "global_objects.h"
-#include "global_calibrations.h"
-#include "serial_comm.h"
 #include "mavlink_msg_handler.h"
 #include "mavlink_cmd_handler.h"
-#include "vehicle_controller.h"
 #include "follow_target.h"
-#include "scheduler.h"
 #include "datalog.h"
 #include "time_calc.h"
+#include <mutex>
 
 #ifdef USE_JETSON
-	#include "videoIO.h"
+	#include "video_IO.h"
 	#include "object_detection.h"
 	#include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 #endif // USE_JETSON
@@ -41,11 +37,12 @@
  * Object definitions
  ********************************************************************************/
 bool signal_recieved = false;
+std::mutex mutex;
 
 #ifdef USE_JETSON
-int argc;
-char** argv;
-commandLine cmdLine(0, nullptr);
+	int argc;
+	char** argv;
+	commandLine cmdLine(0, nullptr);
 #endif // USE_JETSON
 
 /********************************************************************************

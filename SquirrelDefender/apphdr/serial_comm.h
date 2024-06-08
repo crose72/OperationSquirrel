@@ -3,7 +3,7 @@
 /********************************************************************************
  * @file    serial_comm.h
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  ********************************************************************************/
 #ifndef SERIAL_COMM_H
 #define SERIAL_COMM_H
@@ -12,6 +12,16 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <cstdio>  // for perror
+#include <cstdint> // for uint8_t, uint16_t, etc.
+#include <termios.h>
+#include <mavlink.h>
+#include <common.h>
 
 /********************************************************************************
  * Imported objects
@@ -22,9 +32,8 @@
  ********************************************************************************/
 
 /********************************************************************************
- * Function prototypes
+ * Function prototypes and Class Definitions
  ********************************************************************************/
-
  class SerialComm
  {
     public:

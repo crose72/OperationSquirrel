@@ -3,7 +3,7 @@
 /********************************************************************************
  * @file    mavlink_msg_handler.h
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  ********************************************************************************/
 #ifndef MAVLINK_MSG_HANDLER_H
 #define MAVLINK_MSG_HANDLER_H
@@ -13,8 +13,10 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "mavlink_print_info.h"
-#include "serial_comm.h"
 #include "mavlink_cmd_handler.h"
+#include "serial_comm.h"
+#include <mavlink.h>
+#include <common.h>
 
 /********************************************************************************
  * Imported objects
@@ -75,9 +77,8 @@ extern uint64_t unix_timestamp_us;
  ********************************************************************************/
 
 /********************************************************************************
- * Function prototypes
+ * Function prototypes and Class Definitions
  ********************************************************************************/
-
 class MavMsg
 {
    public:

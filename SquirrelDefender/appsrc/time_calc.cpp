@@ -1,7 +1,7 @@
 /********************************************************************************
  * @file    time_calc.cpp
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  * @brief   Time calculations.
  ********************************************************************************/
 
@@ -25,7 +25,7 @@ float app_elapsed_time = 0.0f;
 const float time_step = 0.025f;
 std::chrono::time_point<std::chrono::steady_clock> start_time = std::chrono::steady_clock::now();
 std::chrono::time_point<std::chrono::steady_clock> current_time = std::chrono::steady_clock::now();
-std::chrono::duration<float, std::milli> elapsed_time(0.0f);
+std::chrono::duration<float, std::milli> elapsed_time((float)0.0);
 
 /********************************************************************************
  * Calibration definitions

@@ -3,7 +3,7 @@
 /********************************************************************************
  * @file    attitude_controller.h
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  ********************************************************************************/
 #ifndef ATTITUDE_CONTROLLER_H
 #define ATTITUDE_CONTROLLER_H
@@ -40,7 +40,7 @@ extern float thrust_actual;
  ********************************************************************************/
 
 /********************************************************************************
- * Function prototypes
+ * Function prototypes and Class Definitions
  ********************************************************************************/
 bool dtrmn_attitude_target_error(void);
 void brake (void);

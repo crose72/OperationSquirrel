@@ -1,7 +1,7 @@
 /********************************************************************************
  * @file    serial_port_handler.cpp
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  * @brief   Configure and enable serial ports for simulated and real serial
  *          data.  TCP is used for SITL and UART is used for the hardware drone.
  ********************************************************************************/
