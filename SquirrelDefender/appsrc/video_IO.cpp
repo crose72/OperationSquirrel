@@ -5,7 +5,7 @@
  * @author  Cameron Rose
  * @date    5/22/2024
  * @brief   Configure and start video streams, and output video for other
-			software components.
+            software components.
  ********************************************************************************/
 
 /********************************************************************************
@@ -54,7 +54,7 @@ Video::~Video(void){}
 * Function: create_input_video_stream
 * Description: Create an input video stream from the attached cameras.
 ********************************************************************************/
-int Video::create_input_video_stream(const commandLine& cmdLine, int positionArg)
+bool Video::create_input_video_stream(const commandLine& cmdLine, int positionArg)
 {
 	/*
 	 * create input stream
@@ -72,11 +72,13 @@ int Video::create_input_video_stream(const commandLine& cmdLine, int positionArg
     
 	input = videoSource::Create(options);*/
 	
-	if( !input )
+	if(!input)
 	{
 		LogError("detectnet:  failed to create input stream\n");
-		return 1;
+		return false;
 	}
+
+    return true;
 }
 
 /********************************************************************************
@@ -84,18 +86,20 @@ int Video::create_input_video_stream(const commandLine& cmdLine, int positionArg
 * Description: Create an output video stream from the input video stream
 *			   for displaying and passing to other software components.
 ********************************************************************************/
-int Video::create_output_video_stream(const commandLine& cmdLine, int positionArg)
+bool Video::create_output_video_stream(const commandLine& cmdLine, int positionArg)
 {
 	/*
 	 * create output stream
 	 */
 	output = videoOutput::Create(cmdLine, positionArg);
 	
-	if( !output )
+	if(!output)
 	{
 		LogError("detectnet:  failed to create output stream\n");	
-		return 1;
+		return false;
 	}
+
+    return true;
 }
 
 /********************************************************************************
@@ -175,11 +179,17 @@ void Video::delete_output_video_stream(void)
 * Function: initialize_video_streams
 * Description: Code to initialize video streams to run onces at the start of the program.
 ********************************************************************************/
-void Video::initialize_video_streams(const commandLine& cmdLine, int positionArg)
+bool Video::initialize_video_streams(const commandLine& cmdLine, int positionArg)
 {
-	create_input_video_stream(cmdLine, ARG_POSITION(0));
-	create_output_video_stream(cmdLine, ARG_POSITION(1));
-	calc_video_res();
+    if (!create_input_video_stream(cmdLine, ARG_POSITION(0)) || 
+        !create_output_video_stream(cmdLine, ARG_POSITION(1)))
+    {
+        return false;
+    }
+           
+    calc_video_res();
+
+    return true;
 }
 
 /********************************************************************************

@@ -89,14 +89,9 @@ bool SystemController::system_init(void)
     #ifdef USE_JETSON
 
         command_line_inputs();
-        Video::initialize_video_streams(cmdLine, ARG_POSITION(0));
 
-        /*if (!Video::initialize_video_streams(cmdLine, ARG_POSITION(0)))
-        {
-            return false;
-        }*/
-       
-        if (!Detection::initialize_detection_network())
+        if (!Video::initialize_video_streams(cmdLine, ARG_POSITION(0)) || 
+            !Detection::initialize_detection_network())
         {
             return false;
         }

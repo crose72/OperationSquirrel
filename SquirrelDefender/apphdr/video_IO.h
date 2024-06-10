@@ -45,12 +45,12 @@ class Video
         Video();
         ~Video();
 
-        static void initialize_video_streams(const commandLine& cmdLine, int positionArg);
+        static bool initialize_video_streams(const commandLine& cmdLine, int positionArg);
+        static bool create_input_video_stream(const commandLine& cmdLine, int positionArg);
+        static bool create_output_video_stream(const commandLine& cmdLine, int positionArg);
         static void video_input_loop(void);
         static void video_output_loop(void);
         static void shutdown(void);
-        static int create_input_video_stream(const commandLine& cmdLine, int positionArg);
-        static int create_output_video_stream(const commandLine& cmdLine, int positionArg);
         static bool capture_image(void);
         static bool render_output(void);
         static void calc_video_res(void);
