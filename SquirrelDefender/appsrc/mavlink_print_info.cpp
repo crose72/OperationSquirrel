@@ -671,4 +671,333 @@ void print_command_ack(mavlink_command_ack_t &command_ack)
         default:
             printf("Unkown result\n");
     }
+    
+    DebugTerm Debug("/dev/pts/3");
+    
+    Debug.Print("Command ACK received:\n");
+    Debug.Print("\tCommand: ");
+
+    switch (command_ack.command)
+    {
+        case MAV_CMD_NAV_WAYPOINT:
+            Debug.Print("MAV_CMD_NAV_WAYPOINT\n");
+            break;
+        case MAV_CMD_NAV_LOITER_UNLIM:
+            Debug.Print("MAV_CMD_NAV_LOITER_UNLIM\n");
+            break;
+        case MAV_CMD_NAV_LOITER_TURNS:
+            Debug.Print("MAV_CMD_NAV_LOITER_TURNS\n");
+            break;
+        case MAV_CMD_NAV_LOITER_TIME:
+            Debug.Print("MAV_CMD_NAV_LOITER_TIME\n");
+            break;
+        case MAV_CMD_NAV_RETURN_TO_LAUNCH:
+            Debug.Print("MAV_CMD_NAV_RETURN_TO_LAUNCH\n");
+            break;
+        case MAV_CMD_NAV_LAND:
+            Debug.Print("MAV_CMD_NAV_LAND\n");
+            break;
+        case MAV_CMD_NAV_TAKEOFF:
+            Debug.Print("MAV_CMD_NAV_TAKEOFF\n");
+            break;
+        case MAV_CMD_NAV_LAND_LOCAL:
+            Debug.Print("MAV_CMD_NAV_LAND_LOCAL\n");
+            break;
+        case MAV_CMD_NAV_TAKEOFF_LOCAL:
+            Debug.Print("MAV_CMD_NAV_TAKEOFF_LOCAL\n");
+            break;
+        case MAV_CMD_NAV_FOLLOW:
+            Debug.Print("MAV_CMD_NAV_FOLLOW\n");
+            break;
+        case MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT:
+            Debug.Print("MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT\n");
+            break;
+        case MAV_CMD_NAV_LOITER_TO_ALT:
+            Debug.Print("MAV_CMD_NAV_LOITER_TO_ALT\n");
+            break;
+        case MAV_CMD_DO_FOLLOW:
+            Debug.Print("MAV_CMD_DO_FOLLOW\n");
+            break;
+        case MAV_CMD_DO_FOLLOW_REPOSITION:
+            Debug.Print("MAV_CMD_DO_FOLLOW_REPOSITION\n");
+            break;
+        case MAV_CMD_DO_ORBIT:
+            Debug.Print("MAV_CMD_DO_ORBIT\n");
+            break;
+        case MAV_CMD_NAV_ROI:
+            Debug.Print("MAV_CMD_NAV_ROI\n");
+            break;
+        case MAV_CMD_NAV_PATHPLANNING:
+            Debug.Print("MAV_CMD_NAV_PATHPLANNING\n");
+            break;
+        case MAV_CMD_NAV_SPLINE_WAYPOINT:
+            Debug.Print("MAV_CMD_NAV_SPLINE_WAYPOINT\n");
+            break;
+        case MAV_CMD_NAV_VTOL_TAKEOFF:
+            Debug.Print("MAV_CMD_NAV_VTOL_TAKEOFF\n");
+            break;
+        case MAV_CMD_NAV_VTOL_LAND:
+            Debug.Print("MAV_CMD_NAV_VTOL_LAND\n");
+            break;
+        case MAV_CMD_NAV_GUIDED_ENABLE:
+            Debug.Print("MAV_CMD_NAV_GUIDED_ENABLE\n");
+            break;
+        case MAV_CMD_NAV_DELAY:
+            Debug.Print("MAV_CMD_NAV_DELAY\n");
+            break;
+        case MAV_CMD_NAV_PAYLOAD_PLACE:
+            Debug.Print("MAV_CMD_NAV_PAYLOAD_PLACE\n");
+            break;
+        case MAV_CMD_NAV_LAST:
+            Debug.Print("MAV_CMD_NAV_LAST\n");
+            break;
+        case MAV_CMD_CONDITION_DELAY:
+            Debug.Print("MAV_CMD_CONDITION_DELAY\n");
+            break;
+        case MAV_CMD_CONDITION_CHANGE_ALT:
+            Debug.Print("MAV_CMD_CONDITION_CHANGE_ALT\n");
+            break;
+        case MAV_CMD_CONDITION_DISTANCE:
+            Debug.Print("MAV_CMD_CONDITION_DISTANCE\n");
+            break;
+        case MAV_CMD_CONDITION_YAW:
+            Debug.Print("MAV_CMD_CONDITION_YAW\n");
+            break;
+        case MAV_CMD_CONDITION_LAST:
+            Debug.Print("MAV_CMD_CONDITION_LAST\n");
+            break;
+        case MAV_CMD_DO_SET_MODE:
+            Debug.Print("MAV_CMD_DO_SET_MODE\n");
+            break;
+        case MAV_CMD_DO_JUMP:
+            Debug.Print("MAV_CMD_DO_JUMP\n");
+            break;
+        case MAV_CMD_DO_CHANGE_SPEED:
+            Debug.Print("MAV_CMD_DO_CHANGE_SPEED\n");
+            break;
+        case MAV_CMD_DO_SET_HOME:
+            Debug.Print("MAV_CMD_DO_SET_HOME\n");
+            break;
+        case MAV_CMD_DO_SET_PARAMETER:
+            Debug.Print("MAV_CMD_DO_SET_PARAMETER\n");
+            break;
+        case MAV_CMD_DO_SET_RELAY:
+            Debug.Print("MAV_CMD_DO_SET_RELAY\n");
+            break;
+        case MAV_CMD_DO_REPEAT_RELAY:
+            Debug.Print("MAV_CMD_DO_REPEAT_RELAY\n");
+            break;
+        case MAV_CMD_DO_SET_SERVO:
+            Debug.Print("MAV_CMD_DO_SET_SERVO\n");
+            break;
+        case MAV_CMD_DO_REPEAT_SERVO:
+            Debug.Print("MAV_CMD_DO_REPEAT_SERVO\n");
+            break;
+        case MAV_CMD_DO_FLIGHTTERMINATION:
+            Debug.Print("MAV_CMD_DO_FLIGHTTERMINATION\n");
+            break;
+        case MAV_CMD_DO_CHANGE_ALTITUDE:
+            Debug.Print("MAV_CMD_DO_CHANGE_ALTITUDE\n");
+            break;
+        case MAV_CMD_DO_SET_ACTUATOR:
+            Debug.Print("MAV_CMD_DO_SET_ACTUATOR\n");
+            break;
+        case MAV_CMD_DO_LAND_START:
+            Debug.Print("MAV_CMD_DO_LAND_START\n");
+            break;
+        case MAV_CMD_DO_RALLY_LAND:
+            Debug.Print("MAV_CMD_DO_RALLY_LAND\n");
+            break;
+        case MAV_CMD_DO_GO_AROUND:
+            Debug.Print("MAV_CMD_DO_GO_AROUND\n");
+            break;
+        case MAV_CMD_DO_REPOSITION:
+            Debug.Print("MAV_CMD_DO_REPOSITION\n");
+            break;
+        case MAV_CMD_DO_PAUSE_CONTINUE:
+            Debug.Print("MAV_CMD_DO_PAUSE_CONTINUE\n");
+            break;
+        case MAV_CMD_DO_SET_REVERSE:
+            Debug.Print("MAV_CMD_DO_SET_REVERSE\n");
+            break;
+        case MAV_CMD_DO_SET_ROI_LOCATION:
+            Debug.Print("MAV_CMD_DO_SET_ROI_LOCATION\n");
+            break;
+        case MAV_CMD_DO_SET_ROI_WPNEXT_OFFSET:
+            Debug.Print("MAV_CMD_DO_SET_ROI_WPNEXT_OFFSET\n");
+            break;
+        case MAV_CMD_DO_SET_ROI_NONE:
+            Debug.Print("MAV_CMD_DO_SET_ROI_NONE\n");
+            break;
+        case MAV_CMD_DO_SET_ROI_SYSID:
+            Debug.Print("MAV_CMD_DO_SET_ROI_SYSID\n");
+            break;
+        case MAV_CMD_DO_CONTROL_VIDEO:
+            Debug.Print("MAV_CMD_DO_CONTROL_VIDEO\n");
+            break;
+        case MAV_CMD_DO_SET_ROI:
+            Debug.Print("MAV_CMD_DO_SET_ROI\n");
+            break;
+        case MAV_CMD_DO_DIGICAM_CONFIGURE:
+            Debug.Print("MAV_CMD_DO_DIGICAM_CONFIGURE\n");
+            break;
+        case MAV_CMD_DO_DIGICAM_CONTROL:
+            Debug.Print("MAV_CMD_DO_DIGICAM_CONTROL\n");
+            break;
+        case MAV_CMD_DO_MOUNT_CONFIGURE:
+            Debug.Print("MAV_CMD_DO_MOUNT_CONFIGURE\n");
+            break;
+        case MAV_CMD_DO_MOUNT_CONTROL:
+            Debug.Print("MAV_CMD_DO_MOUNT_CONTROL\n");
+            break;
+        case MAV_CMD_DO_SET_CAM_TRIGG_DIST:
+            Debug.Print("MAV_CMD_DO_SET_CAM_TRIGG_DIST\n");
+            break;
+        case MAV_CMD_DO_FENCE_ENABLE:
+            Debug.Print("MAV_CMD_DO_FENCE_ENABLE\n");
+            break;
+        case MAV_CMD_DO_PARACHUTE:
+            Debug.Print("MAV_CMD_DO_PARACHUTE\n");
+            break;
+        case MAV_CMD_DO_MOTOR_TEST:
+            Debug.Print("MAV_CMD_DO_MOTOR_TEST\n");
+            break;
+        case MAV_CMD_DO_INVERTED_FLIGHT:
+            Debug.Print("MAV_CMD_DO_INVERTED_FLIGHT\n");
+            break;
+        case MAV_CMD_DO_GRIPPER:
+            Debug.Print("MAV_CMD_DO_GRIPPER\n");
+            break;
+        case MAV_CMD_DO_AUTOTUNE_ENABLE:
+            Debug.Print("MAV_CMD_DO_AUTOTUNE_ENABLE\n");
+            break;
+        case MAV_CMD_NAV_SET_YAW_SPEED:
+            Debug.Print("MAV_CMD_NAV_SET_YAW_SPEED\n");
+            break;
+        case MAV_CMD_DO_SET_CAM_TRIGG_INTERVAL:
+            Debug.Print("MAV_CMD_DO_SET_CAM_TRIGG_INTERVAL\n");
+            break;
+        case MAV_CMD_DO_MOUNT_CONTROL_QUAT:
+            Debug.Print("MAV_CMD_DO_MOUNT_CONTROL_QUAT\n");
+            break;
+        case MAV_CMD_DO_GUIDED_MASTER:
+            Debug.Print("MAV_CMD_DO_GUIDED_MASTER\n");
+            break;
+        case MAV_CMD_DO_GUIDED_LIMITS:
+            Debug.Print("MAV_CMD_DO_GUIDED_LIMITS\n");
+            break;
+        case MAV_CMD_DO_ENGINE_CONTROL:
+            Debug.Print("MAV_CMD_DO_ENGINE_CONTROL\n");
+            break;
+        case MAV_CMD_DO_SET_MISSION_CURRENT:
+            Debug.Print("MAV_CMD_DO_SET_MISSION_CURRENT\n");
+            break;
+        case MAV_CMD_DO_LAST:
+            Debug.Print("MAV_CMD_DO_LAST\n");
+            break;
+        case MAV_CMD_PREFLIGHT_CALIBRATION:
+            Debug.Print("MAV_CMD_PREFLIGHT_CALIBRATION\n");
+            break;
+        case MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS:
+            Debug.Print("MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS\n");
+            break;
+        case MAV_CMD_PREFLIGHT_UAVCAN:
+            Debug.Print("MAV_CMD_PREFLIGHT_UAVCAN\n");
+            break;
+        case MAV_CMD_PREFLIGHT_STORAGE:
+            Debug.Print("MAV_CMD_PREFLIGHT_STORAGE\n");
+            break;
+        case MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN:
+            Debug.Print("MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN\n");
+            break;
+        case MAV_CMD_OVERRIDE_GOTO:
+            Debug.Print("MAV_CMD_OVERRIDE_GOTO\n");
+            break;
+        case MAV_CMD_OBLIQUE_SURVEY:
+            Debug.Print("MAV_CMD_OBLIQUE_SURVEY\n");
+            break;
+        case MAV_CMD_MISSION_START:
+            Debug.Print("MAV_CMD_MISSION_START\n");
+            break;
+        case MAV_CMD_ACTUATOR_TEST:
+            Debug.Print("MAV_CMD_ACTUATOR_TEST\n");
+            break;
+        case MAV_CMD_CONFIGURE_ACTUATOR:
+            Debug.Print("MAV_CMD_CONFIGURE_ACTUATOR\n");
+            break;
+        case MAV_CMD_COMPONENT_ARM_DISARM:
+            Debug.Print("MAV_CMD_COMPONENT_ARM_DISARM\n");
+            break;
+        case MAV_CMD_RUN_PREARM_CHECKS:
+            Debug.Print("MAV_CMD_RUN_PREARM_CHECKS\n");
+            break;
+        case MAV_CMD_ILLUMINATOR_ON_OFF:
+            Debug.Print("MAV_CMD_ILLUMINATOR_ON_OFF\n");
+            break;
+        case MAV_CMD_GET_HOME_POSITION:
+            Debug.Print("MAV_CMD_GET_HOME_POSITION\n");
+            break;
+        case MAV_CMD_INJECT_FAILURE:
+            Debug.Print("MAV_CMD_INJECT_FAILURE\n");
+            break;
+        case MAV_CMD_START_RX_PAIR:
+            Debug.Print("MAV_CMD_START_RX_PAIR\n");
+            break;
+        case MAV_CMD_GET_MESSAGE_INTERVAL:
+            Debug.Print("MAV_CMD_GET_MESSAGE_INTERVAL\n");
+            break;
+        case MAV_CMD_SET_MESSAGE_INTERVAL:
+            Debug.Print("MAV_CMD_SET_MESSAGE_INTERVAL\n");
+            break;
+        case MAV_CMD_REQUEST_MESSAGE:
+            Debug.Print("MAV_CMD_REQUEST_MESSAGE\n");
+            break;
+        case MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES:
+            Debug.Print("MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES\n");
+            break;
+        case MAV_CMD_SET_CAMERA_MODE:
+            Debug.Print("MAV_CMD_SET_CAMERA_MODE\n");
+            break;
+        default:
+            Debug.Print("Unknown command\n");
+            break;
+    }
+
+    Debug.Print("\tResult: ");
+
+    switch (command_ack.result)
+    {
+        case 0:
+            Debug.Print("MAV_RESULT_ACCEPTED\n");
+            break;
+        case 1:
+            Debug.Print("MAV_RESULT_TEMPORARILY_REJECTED\n");
+            break;
+        case 2:
+            Debug.Print("MAV_RESULT_DENIED\n");
+            break;
+        case 3:
+            Debug.Print("MAV_RESULT_UNSUPPORTED\n");
+            break;
+        case 4:
+            Debug.Print("MAV_RESULT_FAILED\n");
+            break;
+        case 5:
+            Debug.Print("MAV_RESULT_IN_PROGRESS\n");
+            break;
+        case 6:
+            Debug.Print("MAV_RESULT_CANCELLED\n");
+            break;
+        case 7:
+            Debug.Print("MAV_RESULT_COMMAND_LONG_ONLY\n");
+            break;
+        case 8:
+            Debug.Print("MAV_RESULT_COMMAND_INT_ONLY\n");
+            break;
+        case 9:
+            Debug.Print("MAV_RESULT_COMMAND_COMMAND_UNSUPPORTED_MAV_FRAME\n");
+            break;
+        default:
+            Debug.Print("Unkown result\n");
+    }
 }

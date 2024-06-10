@@ -84,7 +84,7 @@ SystemController::~SystemController(void){}
  * Function: system_init
  * Description: All init functions are called here.
  ********************************************************************************/
-bool SystemController::system_init(void)
+int SystemController::system_init(void)
 {
     #ifdef USE_JETSON
 
@@ -93,22 +93,23 @@ bool SystemController::system_init(void)
         if (!Video::initialize_video_streams(cmdLine, ARG_POSITION(0)) || 
             !Detection::initialize_detection_network())
         {
-            return false;
+            return 1;
         }
 
     #endif // USE_JETSON
 
-    MavMsg::start_mav_comm();
-    /*if (!MavMsg::start_mav_comm()) 
+    if (!MavMsg::start_mav_comm()) 
     {
         std::cerr << "Failed to start MAVLink communication" << std::endl;
-        return false;
-    }*/
+        return 1;
+    }
 
     MavMsg::message_subscriptions();
     MavCmd::set_mode_GUIDED();
     MavCmd::arm_vehicle();
     MavCmd::takeoff_GPS_long((float)2.0);
+    
+    return 0;
 }
 
 /********************************************************************************

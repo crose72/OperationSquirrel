@@ -96,7 +96,10 @@ int main(void)
 
 	Time.calc_app_start_time();
     
-    SystemController::system_init();
+    if(SystemController::system_init() != 0)
+    {
+        return SystemController::system_init();
+    }
 
     while (!signal_recieved) 
 	{

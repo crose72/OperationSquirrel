@@ -31,9 +31,9 @@ class SystemController
         SystemController();
         ~SystemController();
 
-        static bool system_init(void);
-        static void system_shutdown(void);
+        static int system_init(void);
         static int system_state(void);
+        static void system_shutdown(void);
 
     private:
     
