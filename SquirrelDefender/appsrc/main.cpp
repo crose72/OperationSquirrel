@@ -10,6 +10,7 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
+#include "system_controller.h"
 #include "mavlink_msg_handler.h"
 #include "mavlink_cmd_handler.h"
 #include "follow_target.h"
@@ -39,12 +40,6 @@
 bool signal_recieved = false;
 std::mutex mutex;
 
-#ifdef USE_JETSON
-	int argc;
-	char** argv;
-	commandLine cmdLine(0, nullptr);
-#endif // USE_JETSON
-
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
@@ -52,26 +47,6 @@ std::mutex mutex;
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-
-/********************************************************************************
- * Function: command_line_inputs
- * Description: Get command line inputs.
- ********************************************************************************/
-#ifdef USE_JETSON
-
-int command_line_inputs(void)
-{
-	commandLine cmdLine(argc, argv);
-
-	if( cmdLine.GetFlag("help") )
-	{
-		return Detection::print_usage();
-	}
-	
-	return 1;
-}
-
-#endif // USE_JETSON
 
 /********************************************************************************
  * Function: sig_handler
@@ -121,20 +96,7 @@ int main(void)
 
 	Time.calc_app_start_time();
     
-	#ifdef USE_JETSON
-
-		command_line_inputs();
-		Video::initialize_video_streams(cmdLine, ARG_POSITION(0));
-		Detection::initialize_detection_network();
-		
-	#endif // USE_JETSON
-
-	attach_sig_handler();
-	MavMsg::start_mav_comm();
-	MavMsg::message_subscriptions();
-	MavCmd::set_mode_GUIDED();
-	MavCmd::arm_vehicle();
-	MavCmd::takeoff_GPS_long((float)2.0);
+    SystemController::system_init();
 
     while (!signal_recieved) 
 	{

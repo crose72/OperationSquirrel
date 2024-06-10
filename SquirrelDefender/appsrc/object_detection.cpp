@@ -52,7 +52,7 @@ Detection::~Detection(void){};
  * Function: create_detection_network
  * Description: Initialize the network used for object detection.
  ********************************************************************************/
-int Detection::create_detection_network(void)
+bool Detection::create_detection_network(void)
 {
 	Parameters detection_params("../params.json");
 	
@@ -66,11 +66,13 @@ int Detection::create_detection_network(void)
 	net = detectNet::Create("SSD_Mobilenet_V2", detection_thresh, max_batch_size);
 	net->SetTracker(objectTrackerIOU::Create(min_frames, drop_frames, overlap_thresh));
 	
-	if( !net )
+	if(!net)
 	{
 		LogError("detectnet:  failed to load detectNet model\n");
-		return 1;
+		return false;
 	}
+
+    return true;
 }
 
 /********************************************************************************
@@ -161,9 +163,16 @@ void Detection::delete_tracking_net(void)
  * Function: initialize_detection_net
  * Description: Delete detection network to free up resources.
  ********************************************************************************/
-void Detection::initialize_detection_network(void)
+bool Detection::initialize_detection_network(void)
 {
-    create_detection_network();
+    //create_detection_network();
+    if (!create_detection_network())
+    {
+        std::cerr << "Failed to create detection network" << std::endl;
+        return false;
+    }
+
+    return true;
 }
 
 /********************************************************************************

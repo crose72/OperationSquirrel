@@ -47,10 +47,10 @@ class Detection
 		Detection(void);
 		~Detection(void);
 		
-		static void initialize_detection_network(void);
+		static bool initialize_detection_network(void);
+		static bool create_detection_network(void);
 		static void detection_loop(void);
 		static void shutdown(void);
-		static int create_detection_network(void);
 		static void detect_objects(void);
 		static void get_object_info(void);
 		static void print_object_info(void);
