@@ -5,7 +5,7 @@
 * @author  Cameron Rose
 * @date    6/7/2023
 * @brief   Provide utilities for accessing various parameters from a json or
-* 			other type of file.
+*           other type of file.
 ********************************************************************************/
 
 /********************************************************************************
@@ -39,14 +39,14 @@
 ********************************************************************************/
 Parameters::Parameters(const std::string& filename) 
 {
-	std::ifstream configFile(filename);
+    std::ifstream configFile(filename);
 
-	if (!configFile.is_open()) 
-	{
-		std::cerr << "Unable to open file: " << filename << std::endl;
-		return;
-	}
-	configFile >> root;
+    if (!configFile.is_open()) 
+    {
+        std::cerr << "Unable to open file: " << filename << std::endl;
+        return;
+    }
+    configFile >> root;
 }
 
 /********************************************************************************
@@ -61,7 +61,7 @@ Parameters::~Parameters(void){};
 ********************************************************************************/
 float Parameters::get_float_param(const std::string& group, const std::string& key) const 
 {
-	return root[group][key].asFloat();
+    return root[group][key].asFloat();
 }
 
 /********************************************************************************
@@ -70,7 +70,7 @@ float Parameters::get_float_param(const std::string& group, const std::string& k
 ********************************************************************************/
 uint32_t Parameters::get_uint32_param(const std::string& group, const std::string& key) const 
 {
-	return root[group][key].asUInt();
+    return root[group][key].asUInt();
 }
 
 /********************************************************************************
@@ -79,7 +79,7 @@ uint32_t Parameters::get_uint32_param(const std::string& group, const std::strin
 ********************************************************************************/
 bool Parameters::get_bool_param(const std::string& group, const std::string& key) const 
 {
-	return root[group][key].asBool();
+    return root[group][key].asBool();
 }
 
 #endif // USE_JETSON

@@ -1,9 +1,42 @@
-# Require CMake 2.8 or greater
-cmake_minimum_required(VERSION 2.8)
+# Require CMake 3.1 or greater for IN_LIST support, 2.8 is for detectnet
+cmake_minimum_required(VERSION 3.1)
 
-# Add options to manually enable or disable features
+# Options to enable or disable features.  Set these first.
 option(USE_JETSON "Enable Jetson Nano specific features" ON)
 option(USE_WSL "Enable WSL specific features" OFF)
+
+# Set the policy for IN_LIST support
+if(POLICY CMP0057)
+  cmake_policy(SET CMP0057 NEW)
+endif()
+
+# Define valid build types
+set(VALID_BUILD_TYPES Debug Release)
+
+# Set default build type to Release if not specified
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type (Debug or Release)" FORCE)
+endif()
+
+# Validate CMAKE_BUILD_TYPE
+if(NOT CMAKE_BUILD_TYPE IN_LIST VALID_BUILD_TYPES)
+  message(FATAL_ERROR "Invalid build type: ${CMAKE_BUILD_TYPE}. Choose either Debug or Release.")
+endif()
+
+# Print the current build type
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+
+# Optional: Set specific compiler flags for each build type
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+
+# Define a macro for the build type
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-DDEBUG_BUILD)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+    add_definitions(-DRELEASE_BUILD)
+endif()
+
 
 if (USE_JETSON)
     project(SquirrelDefender)
@@ -12,7 +45,7 @@ if (USE_JETSON)
     add_definitions(-DUSE_JETSON)
     add_definitions(-DUSE_UART)
 elseif(USE_WSL)
-    project(SquirrelDefender C CXX)
+    project(SquirrelDefender)
     option(USE_UART "Use UART functionality for Jetson Nano -> SITL or Jetson Nano -> real drone" OFF)
     option(USE_TCP "Use TCP functionality for WSL -> WSL SITL" ON)
     add_definitions(-DUSE_WSL)

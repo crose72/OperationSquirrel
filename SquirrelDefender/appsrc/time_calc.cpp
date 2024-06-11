@@ -126,6 +126,6 @@ void TimeCalc::calc_elapsed_time(void)
         app_elapsed_time = (std::floor(app_elapsed_time_tmp * 1000.0f) / 1000.0f - time_step);
 
         // Print program run time
-        // printf("Elapsed Time: %0.3f\n", app_elapsed_time);
+        // PrintPass::c_printf("Elapsed Time: %0.3f\n", app_elapsed_time);
     }
 }

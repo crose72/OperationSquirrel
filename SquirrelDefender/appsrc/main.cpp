@@ -56,7 +56,7 @@ void sig_handler(int signo)
 {
 	if( signo == SIGINT )
 	{
-		printf("received SIGINT\n");
+		PrintPass::c_printf("received SIGINT\n");
 		signal_recieved = true;
 	}
 }
@@ -69,7 +69,7 @@ void attach_sig_handler(void)
 {
     if (signal(SIGINT, sig_handler) == SIG_ERR)
     {
-        printf("can't catch SIGINT\n");
+        PrintPass::c_printf("can't catch SIGINT\n");
     }
 }
 

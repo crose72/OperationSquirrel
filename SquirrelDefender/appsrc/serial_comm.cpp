@@ -19,7 +19,7 @@
 #elif USE_TCP
     struct sockaddr_in sim_addr;
 #else
-    #error "Please define either USE_UART or USE_TCP to enable the corresponding functionality."
+    #error "Please define USE_UART or USE_TCP."
 #endif
 
 /********************************************************************************
@@ -33,7 +33,7 @@
     #define SIM_IP "127.0.0.1" // IP address of SITL simulation
     #define SIM_PORT 5762      // Port number used by SITL simulation
 #else
-    #error "Please define either USE_UART or USE_TCP to enable the corresponding functionality."
+    #error "Please define USE_UART or USE_TCP."
 #endif
 
 /********************************************************************************
@@ -46,7 +46,7 @@
     int tcp_socket_fd; // TCP socket file descriptor
     int sock;
 #else
-    #error "Please define either USE_UART or USE_TCP to enable the corresponding functionality."
+    #error "Please define USE_UART or USE_TCP."
 #endif
 
 /********************************************************************************
@@ -126,12 +126,12 @@ bool SerialComm::start_uart_comm(void)
         fcntl(sock, F_SETFL, flags | O_NONBLOCK);
 
         tcp_socket_fd = sock; // Ensure the global file descriptor is set
-        printf("tcp_socket_fd initialized: %d\n", tcp_socket_fd); // Debug log
+        PrintPass::c_printf("tcp_socket_fd initialized: %d\n", tcp_socket_fd); // Debug log
 
         return true;
 
     #else
-        #error "Please define either USE_UART or USE_TCP to enable the corresponding functionality."
+        #error "Please define USE_UART or USE_TCP."
     #endif
 }
 
@@ -178,7 +178,7 @@ void SerialComm::write_uart(mavlink_message_t &msg)
 
         clear_buffer(buffer, len);
     #else
-        #error "Please define either USE_UART or USE_TCP to enable the corresponding functionality."
+        #error "Please define USE_UART or USE_TCP."
     #endif
 
 }
@@ -205,12 +205,12 @@ uint8_t SerialComm::read_uart(void)
         ssize_t n = recv(sock, &byte, sizeof(byte), 0);
         if (n < 0) 
         {
-            //fprintf(stderr, "Error reading from port\n");
+            fprintf(stderr, "Error reading from TCP port\n");
         }
 
         return byte;
     #else
-        #error "Please define either USE_UART or USE_TCP to enable the corresponding functionality."
+        #error "Please define USE_UART or USE_TCP."
     #endif
 
 }
@@ -226,7 +226,7 @@ void SerialComm::stop_uart_comm(void)
     #elif USE_TCP
         close(sock);
     #else
-        #error "Please define either USE_UART or USE_TCP to enable the corresponding functionality."
+        #error "Please define USE_UART or USE_TCP."
     #endif
 }
 
@@ -250,12 +250,12 @@ int SerialComm::bytes_available(void)
 
         if (ioctl(tcp_socket_fd, FIONREAD, &bytes) == -1)
         {
-            printf("ioctl\n");
+            PrintPass::c_printf("ioctl\n");
             return -1;
         }
         return bytes;
     #else
-        #error "Please define either USE_UART or USE_TCP to enable the corresponding functionality."
+        #error "Please define USE_UART or USE_TCP."
     #endif
 
 }

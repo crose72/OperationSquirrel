@@ -168,7 +168,7 @@ bool Detection::initialize_detection_network(void)
     //create_detection_network();
     if (!create_detection_network())
     {
-        std::cerr << "Failed to create detection network" << std::endl;
+        PrintPass::c_fprintf("Failed to create detection network");
         return false;
     }
 
@@ -202,19 +202,19 @@ void Detection::shutdown(void)
  ********************************************************************************/
 int Detection::print_usage(void)
 {
-	printf("usage: detectnet [--help] [--network=NETWORK] [--threshold=THRESHOLD] ...\n");
-	printf("                 input [output]\n\n");
-	printf("Locate objects in a video/image stream using an object detection DNN.\n");
-	printf("See below for additional arguments that may not be shown above.\n\n");
-	printf("positional arguments:\n");
-	printf("    input           resource URI of input stream  (see videoSource below)\n");
-	printf("    output          resource URI of output stream (see videoOutput below)\n\n");
+	PrintPass::c_printf("usage: detectnet [--help] [--network=NETWORK] [--threshold=THRESHOLD] ...\n");
+	PrintPass::c_printf("                 input [output]\n\n");
+	PrintPass::c_printf("Locate objects in a video/image stream using an object detection DNN.\n");
+	PrintPass::c_printf("See below for additional arguments that may not be shown above.\n\n");
+	PrintPass::c_printf("positional arguments:\n");
+	PrintPass::c_printf("    input           resource URI of input stream  (see videoSource below)\n");
+	PrintPass::c_printf("    output          resource URI of output stream (see videoOutput below)\n\n");
 
-	printf("%s", detectNet::Usage());
-	printf("%s", objectTracker::Usage());
-	printf("%s", videoSource::Usage());
-	printf("%s", videoOutput::Usage());
-	printf("%s", Log::Usage());
+	PrintPass::c_printf("%s", detectNet::Usage());
+	PrintPass::c_printf("%s", objectTracker::Usage());
+	PrintPass::c_printf("%s", videoSource::Usage());
+	PrintPass::c_printf("%s", videoOutput::Usage());
+	PrintPass::c_printf("%s", Log::Usage());
 
 	return 0;
 }

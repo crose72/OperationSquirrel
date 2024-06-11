@@ -480,7 +480,7 @@ void MavMsg::parse_mav_msgs(void)
                     MavMsg::proc_mav_command_ack_msg(&msg, true);
                     break;
                 default:
-                    printf("Received message with ID: %d\n", (int)msg.msgid);
+                    PrintPass::c_printf("Received message with ID: %d\n", (int)msg.msgid);
             }
         }
     }

@@ -198,7 +198,7 @@ void Follow::follow_target_loop(void)
 {
     VehicleController VehController;
     VelocityController VelController;
-    DebugTerm Debug("/dev/pts/2");
+    DebugTerm FollowData("/dev/pts/7");
 
     float target_velocity[3] = {0.0,0.0,0.0};
 
@@ -224,8 +224,8 @@ void Follow::follow_target_loop(void)
                 target_velocity[0] = vx_adjust;
                 target_velocity[1] = vy_adjust; 
 
-                Debug.Print("Target too close...PID (x,y): " + std::to_string(target_velocity[0]) + ", " + 
-                                                               std::to_string(target_velocity[1]) + "\n");
+                FollowData.cpp_cout("Target too close...PID (x,y): " + std::to_string(target_velocity[0]) + ", " + 
+                                                               std::to_string(target_velocity[1]));
 
                 VelController.cmd_velocity_xy_NED(target_velocity);
             }
@@ -238,8 +238,8 @@ void Follow::follow_target_loop(void)
                                                     y_centroid_err, 0.0, 0.0, 
                                                     w1_y, w2_y, w3_y, VehicleController::control_dimension::y);
 
-                Debug.Print("Target too far...PID (x,y): " + std::to_string(vx_adjust) + ", " + 
-                                                             std::to_string(vy_adjust) + "\n");
+                FollowData.cpp_cout("Target too far...PID (x,y): " + std::to_string(vx_adjust) + ", " + 
+                                                             std::to_string(vy_adjust));
 
                 target_velocity[0] = vx_adjust;
                 target_velocity[1] = vy_adjust; 

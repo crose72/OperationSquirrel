@@ -100,7 +100,7 @@ int SystemController::system_init(void)
 
     if (!MavMsg::start_mav_comm()) 
     {
-        std::cerr << "Failed to start MAVLink communication" << std::endl;
+        PrintPass::c_fprintf("Failed to start MAVLink communication");
         return 1;
     }
 
