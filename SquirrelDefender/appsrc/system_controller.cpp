@@ -19,6 +19,7 @@
     #include "video_IO.h"
     #include "object_detection.h"
     #include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
+    #include "follow_target.h"
 #endif // USE_JETSON
 
 /********************************************************************************
@@ -91,20 +92,20 @@ int SystemController::system_init(void)
         command_line_inputs();
 
         if (!Video::initialize_video_streams(cmdLine, ARG_POSITION(0)) || 
-            !Detection::initialize_detection_network())
+            !Detection::initialize_detection_network() ||
+            !Follow::follow_target_init())
         {
             return 1;
         }
 
     #endif // USE_JETSON
 
-    if (!MavMsg::start_mav_comm()) 
+    if (!MavMsg::mav_comm_init()) 
     {
-        PrintPass::c_fprintf("Failed to start MAVLink communication");
+        PrintPass::c_fprintf("Failed to initialize MAVLink communication");
         return 1;
     }
 
-    MavMsg::message_subscriptions();
     MavCmd::set_mode_GUIDED();
     MavCmd::arm_vehicle();
     MavCmd::takeoff_GPS_long((float)2.0);
@@ -125,7 +126,7 @@ void SystemController::system_shutdown(void)
 
     #endif // USE_JETSON
 
-    MavMsg::stop_mav_comm();
+    MavMsg::mav_comm_shutdown();
 }
 
 /********************************************************************************

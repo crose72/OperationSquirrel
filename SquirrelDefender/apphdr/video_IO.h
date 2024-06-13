@@ -16,6 +16,7 @@
 #include "common_inc.h"
 #include "jetson-utils/videoSource.h"
 #include "jetson-utils/videoOutput.h"
+#include "jetson-utils/gstCamera.h"
 #include "jetson-inference/detectNet.h"
 #include "jetson-inference/objectTracker.h"
 #include <jetson-inference/objectTrackerIOU.h>
@@ -48,8 +49,7 @@ class Video
         static bool initialize_video_streams(const commandLine& cmdLine, int positionArg);
         static bool create_input_video_stream(const commandLine& cmdLine, int positionArg);
         static bool create_output_video_stream(const commandLine& cmdLine, int positionArg);
-        static void video_input_loop(void);
-        static void video_output_loop(void);
+        static void video_proc_loop(void);
         static void shutdown(void);
         static bool capture_image(void);
         static bool render_output(void);
@@ -58,7 +58,8 @@ class Video
         static void delete_output_video_stream(void);
 
     private:
-
+        static gboolean static_bus_callback(GstBus* bus, GstMessage* message, gpointer data);
+        gboolean bus_callback(GstBus* bus, GstMessage* message, gpointer data) ; // Used to access a gstreamer pipeline
 
 };
 

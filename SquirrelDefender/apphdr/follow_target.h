@@ -46,14 +46,14 @@ class Follow
         ~Follow();
 
         static void follow_target_loop(void);
-        static void overtake_target(void);
+        static bool follow_target_init(void);
     
     private:
         static void get_control_params(void);
-        static void get_target_desired_params(void);
-        static void calc_target_actual_params(int n);
-        static void calc_target_error(void);
-        static void calc_overlap_error(void);
+        static void get_desired_target_size(void);
+        static void calc_target_size(int n);
+        static void calc_follow_error(void);
+        static void overtake_target(void);
 };
 
 #endif // FOLLOW_TARGET_H

@@ -67,6 +67,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/calibration)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/experimental)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/plugins)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/tracking)
+include_directories(/usr/include/gstreamer-1.0/)
+include_directories(/usr/include/glib-2.0/)
+include_directories(/usr/lib/aarch64-linux-gnu/glib-2.0/include/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/mavlink/v2.0/common)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
@@ -83,6 +86,18 @@ if (USE_JETSON)
     
     # CUDA is required
     find_package(CUDA REQUIRED)
+
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(GST REQUIRED gstreamer-1.0)
+    pkg_check_modules(GLIB REQUIRED glib-2.0)
+    pkg_check_modules(GOBJECT REQUIRED gobject-2.0)
+    pkg_check_modules(GST_APP REQUIRED gstreamer-app-1.0)
+
+    # Include directories for GStreamer and GLib
+    include_directories(${GST_INCLUDE_DIRS})
+    include_directories(${GLIB_INCLUDE_DIRS})
+    include_directories(${GOBJECT_INCLUDE_DIRS})
+    include_directories(${GST_APP_INCLUDE_DIRS})
     
     # Add directory for libnvbuf-utils to program
     link_directories(/usr/lib/aarch64-linux-gnu/tegra)
@@ -118,6 +133,7 @@ if (USE_JETSON)
     cuda_add_executable(main ${SOURCES} ${HEADERS})
     target_link_libraries(main jetson-inference)
     target_link_libraries(main jsoncpp)
+    target_link_libraries(main ${GST_LIBRARIES} ${GLIB_LIBRARIES} ${GOBJECT_LIBRARIES} ${GST_APP_LIBRARIES})
 elseif(USE_WSL)
     add_executable(main ${SOURCES} ${HEADERS})
 endif()
