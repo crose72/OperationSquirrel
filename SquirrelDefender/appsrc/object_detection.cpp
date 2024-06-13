@@ -196,7 +196,7 @@ void Detection::detection_loop(void)
  * Function: initialize_detection_net
  * Description: Delete detection network to free up resources.
  ********************************************************************************/
-bool Detection::initialize_detection_network(void)
+bool Detection::detection_net_init(void)
 {
     if (!create_detection_network())
     {

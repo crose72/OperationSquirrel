@@ -21,10 +21,11 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-float app_elapsed_time = 0.0f;
-const float time_step = 0.025f;
-std::chrono::time_point<std::chrono::steady_clock> start_time = std::chrono::steady_clock::now();
-std::chrono::time_point<std::chrono::steady_clock> current_time = std::chrono::steady_clock::now();
+float app_elapsed_time = (float)0.0;
+const float time_step = (float)0.025;
+std::chrono::time_point<std::chrono::steady_clock> start_time;
+std::chrono::time_point<std::chrono::steady_clock> current_time;
+std::chrono::time_point<std::chrono::steady_clock> app_end_time;
 std::chrono::duration<float, std::milli> elapsed_time((float)0.0);
 
 /********************************************************************************
@@ -62,7 +63,7 @@ void TimeCalc::calc_app_start_time(void)
  ********************************************************************************/
 void TimeCalc::calc_app_end_time(void)
 {
-    std::chrono::time_point<std::chrono::steady_clock> app_end_time = std::chrono::steady_clock::now();
+    app_end_time = std::chrono::steady_clock::now();
 }
 
 /********************************************************************************

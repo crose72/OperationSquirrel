@@ -91,8 +91,8 @@ int SystemController::system_init(void)
 
         command_line_inputs();
 
-        if (!Video::initialize_video_streams(cmdLine, ARG_POSITION(0)) || 
-            !Detection::initialize_detection_network() ||
+        if (!Video::video_init(cmdLine, ARG_POSITION(0)) || 
+            !Detection::detection_net_init() ||
             !Follow::follow_target_init())
         {
             return 1;
@@ -102,7 +102,6 @@ int SystemController::system_init(void)
 
     if (!MavMsg::mav_comm_init()) 
     {
-        PrintPass::c_fprintf("Failed to initialize MAVLink communication");
         return 1;
     }
 
@@ -111,6 +110,15 @@ int SystemController::system_init(void)
     MavCmd::takeoff_GPS_long((float)2.0);
     
     return 0;
+}
+
+/********************************************************************************
+ * Function: system_state
+ * Description: Determine system state,.
+ ********************************************************************************/
+int SystemController::system_state(void)
+{
+
 }
 
 /********************************************************************************
@@ -127,13 +135,4 @@ void SystemController::system_shutdown(void)
     #endif // USE_JETSON
 
     MavMsg::mav_comm_shutdown();
-}
-
-/********************************************************************************
- * Function: system_state
- * Description: Determine system state,.
- ********************************************************************************/
-int SystemController::system_state(void)
-{
-
 }

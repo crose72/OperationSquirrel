@@ -259,11 +259,11 @@ void Video::video_proc_loop(void)
 }
 
 /********************************************************************************
-* Function: initialize_video_streams
+* Function: video_init
 * Description: Code to initialize video streams to run onces at the start of the 
 *              program.
 ********************************************************************************/
-bool Video::initialize_video_streams(const commandLine& cmdLine, int positionArg)
+bool Video::video_init(const commandLine& cmdLine, int positionArg)
 {
     if (!create_input_video_stream(cmdLine, ARG_POSITION(0)) || 
         !create_output_video_stream(cmdLine, ARG_POSITION(1)))

@@ -46,7 +46,7 @@ class Video
         Video();
         ~Video();
 
-        static bool initialize_video_streams(const commandLine& cmdLine, int positionArg);
+        static bool video_init(const commandLine& cmdLine, int positionArg);
         static bool create_input_video_stream(const commandLine& cmdLine, int positionArg);
         static bool create_output_video_stream(const commandLine& cmdLine, int positionArg);
         static void video_proc_loop(void);

@@ -498,6 +498,7 @@ bool MavMsg::mav_comm_init(void)
     if (!start_mav_comm() || 
         !start_message_subscriptions())
     {
+        PrintPass::c_fprintf("Failed to initialize MAVLink communication");
         return false;
     }
 
