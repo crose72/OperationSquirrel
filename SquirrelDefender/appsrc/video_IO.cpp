@@ -24,13 +24,15 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
+bool valid_image_rcvd;
 videoSource* input;
 videoOutput* output;
 uchar3* image;
 uint32_t input_video_width;
 uint32_t input_video_height;
-GstElement* pipeline = nullptr;
-GstBus* bus = nullptr;
+GstElement* pipeline;
+GstBus* bus;
+
 
 /********************************************************************************
  * Calibration definitions
@@ -110,16 +112,27 @@ bool Video::create_output_video_stream(const commandLine& cmdLine, int positionA
 ********************************************************************************/
 bool Video::capture_image(void)
 {
-	image = NULL; // is this needed between loops?
+    DebugTerm VideoDebug("/dev/pts/6");
+
+	image = NULL;
 	int status = 0;
 	
-	if( !input->Capture(&image, &status) )
+	if(!input->Capture(&image, &status))
 	{
-		if( status != videoSource::TIMEOUT )
+		if(status != videoSource::TIMEOUT)
 		{
 			return false;
 		}
 	}
+
+    if (image == NULL)
+    {
+        valid_image_rcvd = false;
+        return false; // Return false if the image is not valid
+    }
+
+    valid_image_rcvd = true;
+
 	return true;
 }
 
@@ -238,33 +251,14 @@ gboolean Video::bus_callback(GstBus* bus, GstMessage* message, gpointer data)
 }
 
 /********************************************************************************
-* Function: video_proc_loop
-* Description: Main video processing loop.
-********************************************************************************/
-void Video::video_proc_loop(void)
-{
-    capture_image();
-    render_output();
-    
-    /* Code for trying to access the gstreamer pipeline state */
-    /*
-    GstMessage* msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE, 
-                                                     (GstMessageType)(GST_MESSAGE_STATE_CHANGED | GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
-    if (msg != nullptr) 
-    {
-        static_bus_callback(bus, msg, this);
-        gst_message_unref(msg);
-    }
-    */
-}
-
-/********************************************************************************
 * Function: video_init
 * Description: Code to initialize video streams to run onces at the start of the 
 *              program.
 ********************************************************************************/
 bool Video::video_init(const commandLine& cmdLine, int positionArg)
 {
+    valid_image_rcvd = true;
+
     if (!create_input_video_stream(cmdLine, ARG_POSITION(0)) || 
         !create_output_video_stream(cmdLine, ARG_POSITION(1)))
     {
@@ -295,6 +289,27 @@ bool Video::video_init(const commandLine& cmdLine, int positionArg)
     */
    
     return true;
+}
+
+/********************************************************************************
+* Function: video_proc_loop
+* Description: Main video processing loop.
+********************************************************************************/
+void Video::video_proc_loop(void)
+{  
+    capture_image();
+    render_output();
+    
+    /* Code for trying to access the gstreamer pipeline state */
+    /*
+    GstMessage* msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE, 
+                                                     (GstMessageType)(GST_MESSAGE_STATE_CHANGED | GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+    if (msg != nullptr) 
+    {
+        static_bus_callback(bus, msg, this);
+        gst_message_unref(msg);
+    }
+    */
 }
 
 /********************************************************************************

@@ -30,6 +30,7 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
+extern bool valid_image_rcvd;
 extern videoSource* input;
 extern videoOutput* output;
 extern uchar3* image;

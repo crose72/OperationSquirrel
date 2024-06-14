@@ -27,7 +27,6 @@
 extern detectNet* net;
 extern detectNet::Detection* detections;
 extern videoSource* input;
-extern uchar3* image;
 extern int numDetections;
 extern uint32_t input_video_width;
 extern uint32_t input_video_height;
