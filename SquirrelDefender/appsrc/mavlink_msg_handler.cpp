@@ -386,12 +386,13 @@ void MavMsg::proc_mav_distance_sensor_msg(const mavlink_message_t *msg, bool pri
 }
 
 /********************************************************************************
- * Function: message_subscriptions
+ * Function: start_message_subscriptions
  * Description: Handle all message subscriptions.  Any messages subscribed to
  *              is requested by the companion computer from the autopilot.
  ********************************************************************************/
-void MavMsg::message_subscriptions(void)
+bool MavMsg::start_message_subscriptions(void)
 {
+    // What happens when we subscribe to a message and the request is denied?  How do we handle that?
     MavMsg::subscribe(MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_DEFAULT);
     MavMsg::subscribe(MAVLINK_MSG_ID_GLOBAL_POSITION_INT, MESSAGE_RATE_40Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_DEFAULT);
@@ -408,6 +409,8 @@ void MavMsg::message_subscriptions(void)
     MavMsg::subscribe(MAVLINK_MSG_ID_STATUSTEXT, MESSAGE_RATE_DEFAULT);
     MavMsg::subscribe(MAVLINK_MSG_ID_PARAM_VALUE, MESSAGE_RATE_DEFAULT);
     MavMsg::subscribe(MAVLINK_MSG_ID_AUTOPILOT_VERSION, MESSAGE_RATE_DEFAULT);
+
+    return true;
 }
 
 /********************************************************************************
@@ -484,4 +487,38 @@ void MavMsg::parse_mav_msgs(void)
             }
         }
     }
+}
+
+/********************************************************************************
+ * Function: mav_comm_init
+ * Description: Code to run once at the beginning of the program.
+ ********************************************************************************/
+bool MavMsg::mav_comm_init(void)
+{
+    if (!start_mav_comm() || 
+        !start_message_subscriptions())
+    {
+        PrintPass::c_fprintf("Failed to initialize MAVLink communication");
+        return false;
+    }
+
+    return true;
+}
+
+/********************************************************************************
+ * Function: mav_comm_loop
+ * Description: Code to to execute each loop of the program.
+ ********************************************************************************/
+void MavMsg::mav_comm_loop(void)
+{
+    parse_mav_msgs();
+}
+
+/********************************************************************************
+ * Function: mav_comm_shutdown
+ * Description: Code run at the end of the program.
+ ********************************************************************************/
+void MavMsg::mav_comm_shutdown(void)
+{
+    stop_mav_comm();
 }

@@ -15,13 +15,12 @@
 #include "mavlink_cmd_handler.h"
 #include "follow_target.h"
 #include "datalog.h"
-#include "time_calc.h"
 #include <mutex>
 
 #ifdef USE_JETSON
 	#include "video_IO.h"
 	#include "object_detection.h"
-	#include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
+	#include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 #endif // USE_JETSON
 
 #include "sim_flight_test_4_VelocityControl.h"
@@ -104,7 +103,7 @@ int main(void)
 	{
         std::lock_guard<std::mutex> lock(mutex);
 		MainAppTime.calc_elapsed_time();
-		MavMsg::parse_mav_msgs();
+		MavMsg::mav_comm_loop();
 		
 		#ifdef USE_JETSON
 
@@ -132,7 +131,7 @@ int main(void)
 
 	#endif // USE_JETSON
 
-    MavMsg::stop_mav_comm();
+    MavMsg::mav_comm_shutdown();
 
     return 0;
 }
