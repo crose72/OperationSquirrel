@@ -120,6 +120,44 @@ int SystemController::system_init(void)
 }
 
 /********************************************************************************
+ * Function: dtrmn_system_state
+ * Description: Determine system state,.
+ ********************************************************************************/
+int SystemController::dtrmn_system_state(void)
+{
+    // Initialize system status on startup
+    if (first_loop_after_start)
+    {
+        system_status = SYSTEM_STATE::DEFAULT;
+    }
+    else
+    {
+        // Switch case determines how we transition from one state to another
+        switch (system_status)
+        {
+            case SYSTEM_STATE::DEFAULT:
+                if (systems_initialized)
+                {
+                    system_status = SYSTEM_STATE::INIT;
+                }
+                break;
+            case SYSTEM_STATE::INIT:
+
+                break;
+            case SYSTEM_STATE::PRE_ARM_GOOD:
+
+                break;
+            case SYSTEM_STATE::IN_FLIGHT_GOOD:
+
+                break;
+            case SYSTEM_STATE::IN_FLIGHT_ERROR:
+
+                break;
+        }
+    }
+}
+
+/********************************************************************************
  * Function: system_shutdown
  * Description: All shutdown functions are called here.
  ********************************************************************************/
@@ -132,14 +170,5 @@ void SystemController::system_shutdown(void)
 
     #endif // USE_JETSON
 
-    MavMsg::stop_mav_comm();
-}
-
-/********************************************************************************
- * Function: system_state
- * Description: Determine system state,.
- ********************************************************************************/
-int SystemController::system_state(void)
-{
-
+    MavMsg::mav_comm_shutdown();
 }
