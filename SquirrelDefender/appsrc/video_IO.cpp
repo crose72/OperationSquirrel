@@ -234,8 +234,6 @@ bool Video::video_init(const commandLine& cmdLine, int positionArg)
 /********************************************************************************
 * Function: video_proc_loop
 * Description: Main video processing loop.
-<<<<<<< HEAD
-=======
 ********************************************************************************/
 void Video::video_proc_loop(void)
 {  
@@ -245,7 +243,6 @@ void Video::video_proc_loop(void)
 /********************************************************************************
 * Function: video_output_loop
 * Description: Code needed to run each loop to  provide the video output.
->>>>>>> dev_tmp
 ********************************************************************************/
 void Video::video_proc_loop(void)
 {  
