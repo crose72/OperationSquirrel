@@ -29,6 +29,7 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
+extern bool valid_image_rcvd;
 extern videoSource* input;
 extern videoOutput* output;
 extern uchar3* image;
@@ -45,11 +46,11 @@ class Video
         Video();
         ~Video();
 
-        static bool initialize_video_streams(const commandLine& cmdLine, int positionArg);
+        static bool video_init(const commandLine& cmdLine, int positionArg);
         static bool create_input_video_stream(const commandLine& cmdLine, int positionArg);
         static bool create_output_video_stream(const commandLine& cmdLine, int positionArg);
-        static void video_input_loop(void);
-        static void video_output_loop(void);
+        static void video_proc_loop(void);
+		static void video_output_loop(void);
         static void shutdown(void);
         static bool capture_image(void);
         static bool render_output(void);

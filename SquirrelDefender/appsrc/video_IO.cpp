@@ -24,6 +24,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
+bool valid_image_rcvd;
 videoSource* input;
 videoOutput* output;
 uchar3* image;
@@ -118,6 +119,15 @@ bool Video::capture_image(void)
 			return false;
 		}
 	}
+
+    if (image == NULL)
+    {
+        valid_image_rcvd = false;
+        return false; // Return false if the image is not valid
+    }
+
+    valid_image_rcvd = true;
+
 	return true;
 }
 
@@ -176,11 +186,15 @@ void Video::delete_output_video_stream(void)
 }
 
 /********************************************************************************
-* Function: initialize_video_streams
-* Description: Code to initialize video streams to run onces at the start of the program.
+/********************************************************************************
+* Function: video_init
+* Description: Code to initialize video streams to run onces at the start of the 
+*              program.
 ********************************************************************************/
-bool Video::initialize_video_streams(const commandLine& cmdLine, int positionArg)
+bool Video::video_init(const commandLine& cmdLine, int positionArg)
 {
+    valid_image_rcvd = true;
+
     if (!create_input_video_stream(cmdLine, ARG_POSITION(0)) || 
         !create_output_video_stream(cmdLine, ARG_POSITION(1)))
     {
@@ -193,12 +207,12 @@ bool Video::initialize_video_streams(const commandLine& cmdLine, int positionArg
 }
 
 /********************************************************************************
-* Function: video_input_loop
-* Description: Code needed to run each loop to provide the video input.
+* Function: video_proc_loop
+* Description: Main video processing loop.
 ********************************************************************************/
-void Video::video_input_loop(void)
-{
-	capture_image();
+void Video::video_proc_loop(void)
+{  
+    capture_image();
 }
 
 /********************************************************************************

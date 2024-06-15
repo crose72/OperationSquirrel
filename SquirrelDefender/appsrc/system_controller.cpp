@@ -86,7 +86,7 @@ SystemController::~SystemController(void){}
 
 /********************************************************************************
  * Function: system_init
- * Description: All init functions are called here.
+ * Description: Return 0 if all system init tasks have successfully completed.
  ********************************************************************************/
 int SystemController::system_init(void)
 {
@@ -96,7 +96,7 @@ int SystemController::system_init(void)
 
         command_line_inputs();
 
-        if (!Video::initialize_video_streams(cmdLine, ARG_POSITION(0)) || 
+        if (!Video::video_init(cmdLine, ARG_POSITION(0)) || 
             !Detection::detection_net_init() ||
             !Follow::follow_target_init())
         {

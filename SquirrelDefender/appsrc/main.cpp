@@ -107,7 +107,7 @@ int main(void)
 		
 		#ifdef USE_JETSON
 
-			Video::video_input_loop();
+			Video::video_proc_loop();
 			Detection::detection_loop();
 			Follow::follow_target_loop();
 			Video::video_output_loop();
