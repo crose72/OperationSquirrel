@@ -160,43 +160,6 @@ void Detection::delete_tracking_net(void)
 }
 
 /********************************************************************************
- * Function: initialize_detection_net
- * Description: Delete detection network to free up resources.
- ********************************************************************************/
-bool Detection::initialize_detection_network(void)
-{
-    //create_detection_network();
-    if (!create_detection_network())
-    {
-        PrintPass::c_fprintf("Failed to create detection network");
-        return false;
-    }
-
-    return true;
-}
-
-/********************************************************************************
- * Function: detection_loop
- * Description: Process video stream and output detected objects.
- ********************************************************************************/
-void Detection::detection_loop(void)
-{
-    detect_objects();
-    get_object_info();
-}
-
-/********************************************************************************
- * Function: shutdown
- * Description: Shutdown detection network
- ********************************************************************************/
-void Detection::shutdown(void)
-{
-	LogVerbose("detectnet:  shutting down...\n");
-	Detection::delete_tracking_net();
-	LogVerbose("detectnet:  shutdown complete.\n");
-}
-
-/********************************************************************************
  * Function: usage
  * Description: Display a help message.
  ********************************************************************************/
@@ -217,6 +180,42 @@ int Detection::print_usage(void)
 	PrintPass::c_printf("%s", Log::Usage());
 
 	return 0;
+}
+
+/********************************************************************************
+ * Function: detection_loop
+ * Description: Process video stream and output detected objects.
+ ********************************************************************************/
+void Detection::detection_loop(void)
+{
+    detect_objects();
+    get_object_info();
+}
+
+/********************************************************************************
+ * Function: initialize_detection_net
+ * Description: Delete detection network to free up resources.
+ ********************************************************************************/
+bool Detection::detection_net_init(void)
+{
+    if (!create_detection_network())
+    {
+        PrintPass::c_fprintf("Failed to create detection network");
+        return false;
+    }
+
+    return true;
+}
+
+/********************************************************************************
+ * Function: shutdown
+ * Description: Shutdown detection network
+ ********************************************************************************/
+void Detection::shutdown(void)
+{
+	LogVerbose("detectnet:  shutting down...\n");
+	Detection::delete_tracking_net();
+	LogVerbose("detectnet:  shutdown complete.\n");
 }
 
 #endif // USE_JETSON

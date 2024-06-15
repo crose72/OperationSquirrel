@@ -97,7 +97,7 @@ int SystemController::system_init(void)
         command_line_inputs();
 
         if (!Video::initialize_video_streams(cmdLine, ARG_POSITION(0)) || 
-            !Detection::initialize_detection_network() ||
+            !Detection::detection_net_init() ||
             !Follow::follow_target_init())
         {
             return 1;
