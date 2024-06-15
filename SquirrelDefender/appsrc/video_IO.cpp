@@ -206,27 +206,6 @@ bool Video::video_init(const commandLine& cmdLine, int positionArg)
     }
            
     calc_video_res();
-
-    /* Access the pipeline from the gstCamera instance */
-    /*
-    DebugTerm GstInfo("/dev/pts/5");
-    gstCamera* camera = dynamic_cast<gstCamera*>(input);
-    if (camera) 
-    {
-        GstInfo.cpp_cout("Cast input to gstCamera");
-        pipeline = camera->GetPipeline();
-        if (pipeline) 
-        {
-            GstInfo.cpp_cout("Grabbed pipeline");
-            bus = gst_element_get_bus(pipeline);
-            if (bus)
-            {
-                gst_bus_add_watch(bus, static_bus_callback, pipeline);
-                GstInfo.cpp_cout("Bus watch added");
-            }
-        }
-    }
-    */
    
     return true;
 }
@@ -244,21 +223,9 @@ void Video::video_proc_loop(void)
 * Function: video_output_loop
 * Description: Code needed to run each loop to  provide the video output.
 ********************************************************************************/
-void Video::video_proc_loop(void)
+void Video::video_output_loop(void)
 {  
-    capture_image();
     render_output();
-    
-    /* Code for trying to access the gstreamer pipeline state */
-    /*
-    GstMessage* msg = gst_bus_timed_pop_filtered(bus, GST_CLOCK_TIME_NONE, 
-                                                     (GstMessageType)(GST_MESSAGE_STATE_CHANGED | GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
-    if (msg != nullptr) 
-    {
-        static_bus_callback(bus, msg, this);
-        gst_message_unref(msg);
-    }
-    */
 }
 
 /********************************************************************************

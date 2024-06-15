@@ -110,6 +110,7 @@ int main(void)
 			Video::video_proc_loop();
 			Detection::detection_loop();
 			Follow::follow_target_loop();
+            Video::video_output_loop();
 
 		#elif USE_WSL
 
