@@ -37,6 +37,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
+TimeCalc MainAppTime;
 bool signal_recieved = false;
 std::mutex mutex;
 
@@ -92,9 +93,7 @@ void app_first_init(void)
  ********************************************************************************/
 int main(void)
 {
-	TimeCalc Time;
-
-	Time.calc_app_start_time();
+	MainAppTime.calc_app_start_time();
     
     if(SystemController::system_init() != 0)
     {
@@ -104,7 +103,7 @@ int main(void)
     while (!signal_recieved) 
 	{
         std::lock_guard<std::mutex> lock(mutex);
-		Time.calc_elapsed_time();
+		MainAppTime.calc_elapsed_time();
 		MavMsg::parse_mav_msgs();
 		
 		#ifdef USE_JETSON
@@ -120,9 +119,10 @@ int main(void)
 
 		#endif // USE_JETSON	
 
-        Time.loop_rate_controller();
 		app_first_init();
-		Time.calc_loop_start_time();
+
+		MainAppTime.loop_rate_controller();
+        MainAppTime.calc_loop_start_time();
     }
 
 	#ifdef USE_JETSON
