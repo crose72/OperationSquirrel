@@ -23,60 +23,55 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-float err_x = 0.0;
-float err_y = 0.0;
-float err_x_prv = 0.0;
-float err_y_prv = 0.0;
-float err_x_sum = 0.0;
-float err_y_sum = 0.0;
-float Kp_x = 0.0;
-float Ki_x = 0.0;
-float Kd_x = 0.0;
-float Kp_y = 0.0;
-float Ki_y = 0.0;
-float Kd_y = 0.0;
-float w1_x = 0.0;
-float w2_x = 0.0;
-float w3_x = 0.0;
-float w1_y = 0.0;
-float w2_y = 0.0;
-float w3_y = 0.0;
-float w1_z = 0.0;
-float w2_z = 0.0;
-float w3_z = 0.0;
-float Kp_x_rev = 0.0;
-float Ki_x_rev = 0.0;
-float Kd_x_rev = 0.0;
-float w1_x_rev = 0.0;
-float w2_x_rev = 0.0;
-float w3_x_rev = 0.0;
-float Kp_y_rev = 0.0;
-float Ki_y_rev = 0.0;
-float Kd_y_rev = 0.0;
-float w1_y_rev = 0.0;
-float w2_y_rev = 0.0;
-float w3_y_rev = 0.0;
-float x_desired = 0;
-float x_actual = 0.0;
-float height_desired = 0.0;
-float height_actual = 0.0;
-float y_desired = 0;
-float y_actual = 0.0;
-float width_desired = 0.0;
-float width_actual = 0.0;
-float x_centroid_err = 0.0;
-float target_height_err = 0.0;
-float err_x_3 = 0.0;
-float y_centroid_err = 0.0;
-float target_left_side = 0.0;
-float target_right_side = 0.0;
-float target_left_err = 0.0;
-float target_right_err = 0.0;
-float target_height_err_rev = 0.0;
+DebugTerm FollowData("/dev/pts/7");
+
+float x_actual;
+float height_actual;
+float y_actual;
+float width_actual;
+float x_centroid_err;
+float target_height_err;
+float y_centroid_err;
+float target_left_side;
+float target_right_side;
+float target_left_err;
+float target_right_err;
+float target_height_err_rev;
 
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
+float Kp_x;
+float Ki_x;
+float Kd_x;
+float Kp_y;
+float Ki_y;
+float Kd_y;
+float w1_x;
+float w2_x;
+float w3_x;
+float w1_y;
+float w2_y;
+float w3_y;
+float w1_z;
+float w2_z;
+float w3_z;
+float Kp_x_rev;
+float Ki_x_rev;
+float Kd_x_rev;
+float w1_x_rev;
+float w2_x_rev;
+float w3_x_rev;
+float Kp_y_rev;
+float Ki_y_rev;
+float Kd_y_rev;
+float w1_y_rev;
+float w2_y_rev;
+float w3_y_rev;
+float x_desired;
+float height_desired;
+float y_desired;
+float width_desired;
 
 /********************************************************************************
  * Function definitions
@@ -135,10 +130,10 @@ void Follow::get_control_params(void)
 }
 
 /********************************************************************************
- * Function: get_target_desired_params
+ * Function: get_desired_target_size
  * Description: Read follow target parameters from a json or other file type.
  ********************************************************************************/
-void Follow::get_target_desired_params(void)
+void Follow::get_desired_target_size(void)
 {
     Parameters target_params("../params.json");
 
@@ -149,10 +144,10 @@ void Follow::get_target_desired_params(void)
 }
 
 /********************************************************************************
- * Function: calc_target_actual_params
+ * Function: calc_target_size
  * Description: Calculate the parameters of a target.
  ********************************************************************************/
-void Follow::calc_target_actual_params(int n)
+void Follow::calc_target_size(int n)
 {
     x_actual = detections[n].Height()/2.0 + detections[n].Top;
     height_actual = detections[n].Height();
@@ -163,36 +158,82 @@ void Follow::calc_target_actual_params(int n)
 }
 
 /********************************************************************************
- * Function: calc_target_error
- * Description: Calculate the error of a target's position.
+ * Function: calc_follow_error
+ * Description: Calculate the error of a target's position based 
  ********************************************************************************/
-void Follow::calc_target_error(void)
+void Follow::calc_follow_error(void)
 {
     float bounding_box_left_side = 320.0;
     float bounding_box_right_side = 960.0;
 
     target_left_err = (bounding_box_left_side - target_left_side);
     target_right_err = (bounding_box_right_side - target_right_side);
-
     x_centroid_err = x_desired - x_actual;
     target_height_err = height_desired - height_actual;
     y_centroid_err = y_actual - y_desired;
 }
 
 /********************************************************************************
- * Function: calc_reverse_control_error
- * Description: Calculate the error of control parameters for reverse motion.
+ * Function: follow_target_init
+ * Description: Initialize all follow target variables.  Run once at the start
+ *              of the program.
  ********************************************************************************/
-void Follow::calc_overlap_error(void)
+bool Follow::follow_target_init(void)
 {
-    // Do nothing
+    Kp_x = 0.0;
+    Ki_x = 0.0;
+    Kd_x = 0.0;
+    Kp_y = 0.0;
+    Ki_y = 0.0;
+    Kd_y = 0.0;
+    w1_x = 0.0;
+    w2_x = 0.0;
+    w3_x = 0.0;
+    w1_y = 0.0;
+    w2_y = 0.0;
+    w3_y = 0.0;
+    w1_z = 0.0;
+    w2_z = 0.0;
+    w3_z = 0.0;
+    Kp_x_rev = 0.0;
+    Ki_x_rev = 0.0;
+    Kd_x_rev = 0.0;
+    w1_x_rev = 0.0;
+    w2_x_rev = 0.0;
+    w3_x_rev = 0.0;
+    Kp_y_rev = 0.0;
+    Ki_y_rev = 0.0;
+    Kd_y_rev = 0.0;
+    w1_y_rev = 0.0;
+    w2_y_rev = 0.0;
+    w3_y_rev = 0.0;
+    x_desired = 0;
+    x_actual = 0.0;
+    height_desired = 0.0;
+    height_actual = 0.0;
+    y_desired = 0;
+    y_actual = 0.0;
+    width_desired = 0.0;
+    width_actual = 0.0;
+    x_centroid_err = 0.0;
+    target_height_err = 0.0;
+    y_centroid_err = 0.0;
+    target_left_side = 0.0;
+    target_right_side = 0.0;
+    target_left_err = 0.0;
+    target_right_err = 0.0;
+    target_height_err_rev = 0.0;
+
+    get_control_params();
+    get_desired_target_size();
+
+    return true;
 }
 
-
 /********************************************************************************
- * Function: follow_target
+ * Function: follow_target_loop
  * Description: Control vehicle to follow a designated target at a specific
- *               distance.
+ *              distance.
  ********************************************************************************/
 void Follow::follow_target_loop(void)
 {
@@ -203,23 +244,25 @@ void Follow::follow_target_loop(void)
     float target_velocity[3] = {0.0,0.0,0.0};
 
     get_control_params();
-    get_target_desired_params();
+    get_desired_target_size();
 
     for( int n=0; n < numDetections; n++ )
     {		
         if (detections[n].TrackID >= 0 && detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
         {
-            calc_target_actual_params(n);
-            calc_target_error();        
+            calc_target_size(n);
+            calc_follow_error();        
             
             if (height_actual > height_desired)
             {
-                float vx_adjust = VehController.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev, 
+                PID pid_rev;
+
+                float vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev, 
                                                     target_height_err, 0.0, 0.0, 
-                                                    w1_x_rev, w2_x_rev, 0.0, VehicleController::control_dimension::x);
-                float vy_adjust = VehController.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev, 
+                                                    w1_x_rev, w2_x_rev, 0.0, CONTROL_DIM::X);
+                float vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev, 
                                                     y_centroid_err, 0.0, 0.0, 
-                                                    w1_y_rev, w2_y_rev, 0.0, VehicleController::control_dimension::y);
+                                                    w1_y_rev, w2_y_rev, 0.0, CONTROL_DIM::Y);
 
                 target_velocity[0] = vx_adjust;
                 target_velocity[1] = vy_adjust; 
@@ -231,12 +274,14 @@ void Follow::follow_target_loop(void)
             }
             else
             {
-                float vx_adjust = VehController.pid_controller_3d(Kp_x, Ki_x, Kd_x, 
+                PID pid_forwd;
+                
+                float vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x, 
                                                     x_centroid_err, target_height_err, 0.0, 
-                                                    w1_x, w2_x, w3_x, VehicleController::control_dimension::x);
-                float vy_adjust = VehController.pid_controller_3d(Kp_y, Ki_y, Kd_y, 
+                                                    w1_x, w2_x, w3_x, CONTROL_DIM::X);
+                float vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y, 
                                                     y_centroid_err, 0.0, 0.0, 
-                                                    w1_y, w2_y, w3_y, VehicleController::control_dimension::y);
+                                                    w1_y, w2_y, w3_y, CONTROL_DIM::Y);
 
                 FollowData.cpp_cout("Target too far...PID (x,y): " + std::to_string(vx_adjust) + ", " + 
                                                              std::to_string(vy_adjust));
