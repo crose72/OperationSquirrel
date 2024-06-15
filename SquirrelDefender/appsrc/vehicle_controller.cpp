@@ -34,43 +34,67 @@
  ********************************************************************************/
 
 /********************************************************************************
- * Function: VehicleController
- * Description: Class constructor
- ********************************************************************************/
-VehicleController::VehicleController() 
-{
-    for (int i = 0; i < control_dimension::num_dims; ++i) 
-	{
-        err_sum[i] = 0.0;
-        err_prv[i] = 0.0;
-    }
-}
+* Function: VehicleController
+* Description: Constructor of the VehicleController class.
+********************************************************************************/
+VehicleController::VehicleController(void){}
 
 /********************************************************************************
- * Function: ~VehicleController
- * Description: Class destructor
- ********************************************************************************/
+* Function: VehicleController
+* Description: Constructor of the VehicleController class.
+********************************************************************************/
 VehicleController::~VehicleController(void){}
 
 /********************************************************************************
- * Function: pid_controller_2d
- * Description: PID controller with up to 2 parameters to control.
+ * Function: cmd_position_NED
+ * Description: Move to an x,y,z coordinate in the NED frame.
  ********************************************************************************/
-float VehicleController::pid_controller_3d(float Kp, float Ki, float Kd, 
-                                        float err1, float err2, float err3, 
-                                        float w1, float w2, float w3, control_dimension dim)
+void VehicleController::cmd_position_NED(float position_target[3]) 
 {
-	float err = (err1 * w1) + (err2 * w2) + (err3 * w3);
-	float err_sum_local = 0.0;
-	float err_prv_local = 0.0;
-	
-	float proportional_term = Kp * err;
-	float integral_term =  Ki * (err_sum[dim] + err * dt_25ms);
-	float derivative_term = Kd * (err - err_prv[dim]) / dt_25ms;
-	float control = proportional_term + integral_term + derivative_term;
-	
-	err_sum[dim] = err_sum[dim] + err * dt_25ms;
-	err_prv[dim] = err;
-	
-	return control;
+    VelocityController::cmd_position_NED(position_target);
+}
+
+/********************************************************************************
+ * Function: cmd_velocity_NED
+ * Description: Move in direction of vector vx,vy,vz in the NED frame.
+ ********************************************************************************/
+void VehicleController::cmd_velocity_NED(float velocity_target[3]) 
+{
+    VelocityController::cmd_velocity_NED(velocity_target);
+}
+
+/********************************************************************************
+ * Function: cmd_velocity_xy_NED
+ * Description: Move in xy plane given a vector vx,vy in the NED frame.
+ ********************************************************************************/
+void VehicleController::cmd_velocity_xy_NED(float velocity_target[3]) 
+{
+    VelocityController::cmd_velocity_xy_NED(velocity_target);
+}
+
+/********************************************************************************
+ * Function: cmd_velocity_x_NED
+ * Description: Move in direction of vector vx in the NED frame.
+ ********************************************************************************/
+void VehicleController::cmd_velocity_x_NED(float velocity_target) 
+{
+    VelocityController::cmd_velocity_x_NED(velocity_target);
+}
+
+/********************************************************************************
+ * Function: cmd_velocity_y_NED
+ * Description: Move in direction of vector vy in the NED frame.
+ ********************************************************************************/
+void VehicleController::cmd_velocity_y_NED(float velocity_target) 
+{
+    VelocityController::cmd_velocity_y_NED(velocity_target);
+}
+
+/********************************************************************************
+ * Function: cmd_acceleration_NED
+ * Description: Move in direction of vector ax,ay,az in the NED frame.
+ ********************************************************************************/
+void VehicleController::cmd_acceleration_NED(float acceleration_target[3]) 
+{
+    VelocityController::cmd_acceleration_NED(acceleration_target);
 }
