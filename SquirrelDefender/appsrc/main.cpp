@@ -130,7 +130,7 @@ int main(void)
 
 	#endif // USE_JETSON
 
-    MavMsg::stop_mav_comm();
+    MavMsg::mav_comm_shutdown();
 
     return 0;
 }

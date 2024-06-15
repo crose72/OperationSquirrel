@@ -1,36 +1,22 @@
 #pragma once
 
-#ifdef USE_JETSON
-
 /********************************************************************************
- * @file    follow_target.h
+ * @file    pid_controller.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef FOLLOW_TARGET_H
-#define FOLLOW_TARGET_H
+#ifndef PID_CONTROLLER_H
+#define PID_CONTROLLER_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "video_IO.h"
-#include "object_detection.h"
-#include "vehicle_controller.h"
-#include "velocity_controller.h"
-#include "attitude_controller.h"
-#include "pid_controller.h"
-#include "parameters.h"
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern detectNet* net;
-extern detectNet::Detection* detections;
-extern videoSource* input;
-extern int numDetections;
-extern uint32_t input_video_width;
-extern uint32_t input_video_height;
+extern float dt_25ms;
 
 /********************************************************************************
  * Exported objects
@@ -39,23 +25,20 @@ extern uint32_t input_video_height;
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class Follow
+class PID 
 {
     public:
-        Follow();
-        ~Follow();
+        PID();
+        ~PID();
 
-        static void follow_target_loop(void);
-        static bool follow_target_init(void);
-    
+        float pid_controller_3d(float Kp, float Ki, float Kd, 
+                                float err1, float err2, float err3,  
+                                float w1, float w2, float w3, CONTROL_DIM dim);
+
     private:
-        static void get_control_params(void);
-        static void get_desired_target_size(void);
-        static void calc_target_size(int n);
-        static void calc_follow_error(void);
-        static void overtake_target(void);
+        float err_sum[3]; // Array to hold integral sums for x, y, z
+        float err_prv[3]; // Array to hold previous errors for x, y, z
 };
 
-#endif // FOLLOW_TARGET_H
 
-#endif // USE_JETSON
+#endif // PID_CONTROLLER_H

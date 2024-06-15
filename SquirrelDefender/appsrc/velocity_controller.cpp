@@ -57,16 +57,16 @@ mavlink_set_position_target_local_ned_t desired_acceleration_target;
  ********************************************************************************/
 
 /********************************************************************************
- * Function: VelocityController
- * Description: Class contructor.
- ********************************************************************************/
-VelocityController::VelocityController(void){};
+* Function: VelocityController
+* Description: Constructor of the VelocityController class.
+********************************************************************************/
+VelocityController::VelocityController(void){}
 
 /********************************************************************************
- * Function: ~VelocityController
- * Description: Class destructor.
- ********************************************************************************/
-VelocityController::~VelocityController(void){};
+* Function: VelocityController
+* Description: Constructor of the VelocityController class.
+********************************************************************************/
+VelocityController::~VelocityController(void){}
 
 /********************************************************************************
  * Function: cmd_position_NED

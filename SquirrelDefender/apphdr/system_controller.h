@@ -32,7 +32,7 @@ class SystemController
         ~SystemController();
 
         static int system_init(void);
-        static int system_state(void);
+        static int dtrmn_system_state(void);
         static void system_shutdown(void);
 
     private:

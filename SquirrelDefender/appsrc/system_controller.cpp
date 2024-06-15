@@ -41,6 +41,9 @@
     
 #endif // USE_JETSON
 
+bool systems_initialized;
+SYSTEM_STATE system_status;
+
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
@@ -83,10 +86,12 @@ SystemController::~SystemController(void){}
 
 /********************************************************************************
  * Function: system_init
- * Description: All init functions are called here.
+ * Description: Return 0 if all system init tasks have successfully completed.
  ********************************************************************************/
 int SystemController::system_init(void)
 {
+    systems_initialized = false;
+
     #ifdef USE_JETSON
 
         command_line_inputs();
@@ -105,6 +110,8 @@ int SystemController::system_init(void)
         return 1;
     }
 
+    systems_initialized = true;
+
     MavCmd::set_mode_GUIDED();
     MavCmd::arm_vehicle();
     MavCmd::takeoff_GPS_long((float)2.0);
@@ -113,12 +120,41 @@ int SystemController::system_init(void)
 }
 
 /********************************************************************************
- * Function: system_state
+ * Function: dtrmn_system_state
  * Description: Determine system state,.
  ********************************************************************************/
-int SystemController::system_state(void)
+int SystemController::dtrmn_system_state(void)
 {
+    // Initialize system status on startup
+    if (first_loop_after_start)
+    {
+        system_status = SYSTEM_STATE::DEFAULT;
+    }
+    else
+    {
+        // Switch case determines how we transition from one state to another
+        switch (system_status)
+        {
+            case SYSTEM_STATE::DEFAULT:
+                if (systems_initialized)
+                {
+                    system_status = SYSTEM_STATE::INIT;
+                }
+                break;
+            case SYSTEM_STATE::INIT:
 
+                break;
+            case SYSTEM_STATE::PRE_ARM_GOOD:
+
+                break;
+            case SYSTEM_STATE::IN_FLIGHT_GOOD:
+
+                break;
+            case SYSTEM_STATE::IN_FLIGHT_ERROR:
+
+                break;
+        }
+    }
 }
 
 /********************************************************************************

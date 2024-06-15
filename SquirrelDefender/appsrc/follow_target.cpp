@@ -237,8 +237,7 @@ bool Follow::follow_target_init(void)
  ********************************************************************************/
 void Follow::follow_target_loop(void)
 {
-    VehicleController VehController;
-    VelocityController VelController;
+    DebugTerm FollowData("/dev/pts/7");
 
     float target_velocity[3] = {0.0,0.0,0.0};
 
@@ -254,12 +253,14 @@ void Follow::follow_target_loop(void)
             
             if (height_actual > height_desired)
             {
-                float vx_adjust = VehController.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev, 
+                PID pid_rev;
+
+                float vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev, 
                                                     target_height_err, 0.0, 0.0, 
-                                                    w1_x_rev, w2_x_rev, 0.0, VehicleController::control_dimension::x);
-                float vy_adjust = VehController.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev, 
+                                                    w1_x_rev, w2_x_rev, 0.0, CONTROL_DIM::X);
+                float vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev, 
                                                     y_centroid_err, 0.0, 0.0, 
-                                                    w1_y_rev, w2_y_rev, 0.0, VehicleController::control_dimension::y);
+                                                    w1_y_rev, w2_y_rev, 0.0, CONTROL_DIM::Y);
 
                 target_velocity[0] = vx_adjust;
                 target_velocity[1] = vy_adjust; 
@@ -267,16 +268,18 @@ void Follow::follow_target_loop(void)
                 FollowData.cpp_cout("Target too close...PID (x,y): " + std::to_string(target_velocity[0]) + ", " + 
                                                                std::to_string(target_velocity[1]));
 
-                VelController.cmd_velocity_xy_NED(target_velocity);
+                VehicleController::cmd_velocity_xy_NED(target_velocity);
             }
             else
             {
-                float vx_adjust = VehController.pid_controller_3d(Kp_x, Ki_x, Kd_x, 
+                PID pid_forwd;
+                
+                float vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x, 
                                                     x_centroid_err, target_height_err, 0.0, 
-                                                    w1_x, w2_x, w3_x, VehicleController::control_dimension::x);
-                float vy_adjust = VehController.pid_controller_3d(Kp_y, Ki_y, Kd_y, 
+                                                    w1_x, w2_x, w3_x, CONTROL_DIM::X);
+                float vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y, 
                                                     y_centroid_err, 0.0, 0.0, 
-                                                    w1_y, w2_y, w3_y, VehicleController::control_dimension::y);
+                                                    w1_y, w2_y, w3_y, CONTROL_DIM::Y);
 
                 FollowData.cpp_cout("Target too far...PID (x,y): " + std::to_string(vx_adjust) + ", " + 
                                                              std::to_string(vy_adjust));
@@ -284,7 +287,7 @@ void Follow::follow_target_loop(void)
                 target_velocity[0] = vx_adjust;
                 target_velocity[1] = vy_adjust; 
 
-                VelController.cmd_velocity_NED(target_velocity);
+                VehicleController::cmd_velocity_NED(target_velocity);
             }
         }
     }

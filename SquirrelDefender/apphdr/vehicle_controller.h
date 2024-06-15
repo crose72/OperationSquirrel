@@ -13,6 +13,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "mavlink_cmd_handler.h"
+#include "mavlink_msg_handler.h"
 #include "velocity_controller.h"
 #include "attitude_controller.h"
 
@@ -30,25 +31,17 @@ extern float dt_25ms;
  ********************************************************************************/
 class VehicleController 
 {
+    VehicleController();
+    ~VehicleController();
+    
     public:
-        VehicleController();
-        ~VehicleController();
-
-        enum control_dimension
-        {
-            x = 0,
-            y = 1,
-            z = 2,
-            num_dims = 3
-        };
-
-        float pid_controller_3d(float Kp, float Ki, float Kd, 
-                                float err1, float err2, float err3,  
-                                float w1, float w2, float w3, control_dimension dim);
-
-    private:
-        float err_sum[3]; // Array to hold integral sums for x, y, z
-        float err_prv[3]; // Array to hold previous errors for x, y, z
+        static void cmd_position_NED(float position_target[3]);
+        static void cmd_velocity_NED(float velocity_target[3]);
+        static void cmd_acceleration_NED(float acceleration_target[3]);
+        static void cmd_velocity_x_NED(float velocity_target);
+        static void cmd_velocity_y_NED(float velocity_target);
+        static void cmd_velocity_z_NED(float velocity_target);
+        static void cmd_velocity_xy_NED(float velocity_target[3]);
 };
 
 
