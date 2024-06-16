@@ -23,6 +23,39 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
+DebugTerm MavCmdAck("/dev/pts/3");
+DebugTerm SysStatInfo("/dev/pts/5");
+
+uint16_t mav_veh_command_id; /*<  Command ID (of acknowledged command).*/
+uint8_t mav_veh_command_result; /*<  Result of command.*/
+uint8_t mav_veh_command_progress; /*< [%] The progress percentage when result is MAV_RESULT_IN_PROGRESS. Values: [0-100], 
+                                    or UINT8_MAX if the progress is unknown.*/
+int32_t mav_veh_command_result_param2; /*<  Additional result information. Can be set with a command-specific enum containing 
+                                        command-specific error reasons for why the command might be denied. If used, the associated 
+                                        enum must be documented in the corresponding MAV_CMD (this enum should have a 0 value to indicate 
+                                        "unused" or "unknown").*/
+uint8_t mav_veh_command_target_system; /*<  System ID of the target recipient. This is the ID of the system that sent the command for 
+                                            which this COMMAND_ACK is an acknowledgement.*/
+uint8_t mav_veh_command_target_component; /*<  Component ID of the target recipient. This is the ID of the system that sent the command for 
+                                            which this COMMAND_ACK is an acknowledgement.*/
+
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_present; /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled; /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health; /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error. Value of 1: healthy.*/
+uint16_t mav_veh_sys_stat_load; /*< [d%] Maximum usage in percent of the mainloop time. Values: [0-1000] - should always be below 1000*/
+uint16_t mav_veh_sys_stat_voltage_battery; /*< [mV] Battery voltage, UINT16_MAX: Voltage not sent by autopilot*/
+int16_t  mav_veh_sys_stat_current_battery; /*< [cA] Battery current, -1: Current not sent by autopilot*/
+uint16_t mav_veh_sys_stat_drop_rate_comm; /*< [c%] Communication drop rate, (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)*/
+uint16_t mav_veh_sys_stat_errors_comm; /*<  Communication errors (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)*/
+uint16_t mav_veh_sys_stat_errors_count1; /*<  Autopilot-specific errors*/
+uint16_t mav_veh_sys_stat_errors_count2; /*<  Autopilot-specific errors*/
+uint16_t mav_veh_sys_stat_errors_count3; /*<  Autopilot-specific errors*/
+uint16_t mav_veh_sys_stat_errors_count4; /*<  Autopilot-specific errors*/
+int8_t   mav_veh_sys_stat_battery_remaining; /*< [%] Battery energy remaining, -1: Battery remaining energy not sent by autopilot*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd; /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd; /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd; /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error. Value of 1: healthy.*/
+
 int32_t mav_veh_lat = 0; /*< [degE7] Latitude, expressed*/
 int32_t mav_veh_lon = 0; /*< [degE7] Longitude, expressed*/
 int32_t mav_veh_alt = 0; /*< [mm] Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.*/
@@ -46,24 +79,22 @@ int16_t mav_veh_imu_zgyro = 0; /*< [mrad/s] Angular speed around Z axis*/
 int16_t mav_veh_imu_xmag = 0; /*< [mgauss] X Magnetic field*/
 int16_t mav_veh_imu_ymag = 0; /*< [mgauss] Y Magnetic field*/
 int16_t mav_veh_imu_zmag = 0; /*< [mgauss] Z Magnetic field*/
-float q1_target = 0.0;
-float q2_target = 0.0;
-float q3_target = 0.0;
-float q4_target = 0.0;
-float roll_rate_target = 0.0;
-float pitch_rate_target = 0.0;
-float yaw_rate_target = 0.0;
+float mav_veh_q1_target = 0.0;
+float mav_veh_q2_target = 0.0;
+float mav_veh_q3_target = 0.0;
+float mav_veh_q4_target = 0.0;
+float mav_veh_roll_rate_target = 0.0;
+float mav_veh_pitch_rate_target = 0.0;
+float mav_veh_yaw_rate_target = 0.0;
 float thrust_target = 0.0;
-float q1_actual = 0.0;
-float q2_actual = 0.0;
-float q3_actual = 0.0;
-float q4_actual = 0.0;
-float roll_rate_actual = 0.0;
-float pitch_rate_actual = 0.0;
-float yaw_rate_actual = 0.0;
-float thrust_actual = 0.0;
-uint32_t time_since_boot_ms = 0;
-uint64_t unix_timestamp_us = 0;
+float mav_veh_q1 = 0.0;
+float mav_veh_q2 = 0.0;
+float mav_veh_q3 = 0.0;
+float mav_veh_q4 = 0.0;
+float mav_veh_roll_rate = 0.0;
+float mav_veh_pitch_rate = 0.0;
+float mav_veh_yaw_rate = 0.0;
+float mav_veh_thrust = 0.0;
 
 /********************************************************************************
  * Calibration definitions
@@ -159,6 +190,42 @@ void MavMsg::proc_mav_sys_status_msg(const mavlink_message_t *msg, bool print)
     mavlink_sys_status_t sys_status;
     mavlink_msg_sys_status_decode(msg, &sys_status);
 
+    mav_veh_sys_stat_onbrd_cntrl_snsrs_present = sys_status.onboard_control_sensors_present;
+    mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled = sys_status.onboard_control_sensors_enabled;
+    mav_veh_sys_stat_onbrd_cntrl_snsrs_health = sys_status.onboard_control_sensors_health;
+    mav_veh_sys_stat_load = sys_status.load;
+    mav_veh_sys_stat_voltage_battery = sys_status.voltage_battery;
+    mav_veh_sys_stat_current_battery = sys_status.current_battery;
+    mav_veh_sys_stat_drop_rate_comm = sys_status.drop_rate_comm;
+    mav_veh_sys_stat_errors_comm = sys_status.errors_comm;
+    mav_veh_sys_stat_errors_count1 = sys_status.errors_count1;
+    mav_veh_sys_stat_errors_count2 = sys_status.errors_count2;
+    mav_veh_sys_stat_errors_count3 = sys_status.errors_count3;
+    mav_veh_sys_stat_errors_count4 = sys_status.errors_count4;
+    mav_veh_sys_stat_battery_remaining = sys_status.battery_remaining;
+    mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd = sys_status.onboard_control_sensors_present_extended;
+    mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd = sys_status.onboard_control_sensors_enabled_extended;
+    mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd = sys_status.onboard_control_sensors_health_extended;
+
+    SysStatInfo.cpp_cout("Control sensors present:" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_present));
+    SysStatInfo.cpp_cout("Control sensors enabled:\t" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled));
+    SysStatInfo.cpp_cout("Control sensors health:\t" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_health));
+    SysStatInfo.cpp_cout("Load:\t" + std::to_string(mav_veh_sys_stat_load));
+    SysStatInfo.cpp_cout("Batt V:\t" + std::to_string(mav_veh_sys_stat_voltage_battery));
+    SysStatInfo.cpp_cout("Batt I:\t" + std::to_string(mav_veh_sys_stat_current_battery));
+    SysStatInfo.cpp_cout("Comm drop rate: " + std::to_string(mav_veh_sys_stat_drop_rate_comm));
+    SysStatInfo.cpp_cout("Comm errors:\t" + std::to_string(mav_veh_sys_stat_errors_comm));
+    SysStatInfo.cpp_cout("Errors count 1:\t" + std::to_string(mav_veh_sys_stat_errors_count1));
+    SysStatInfo.cpp_cout("Errors count 2:\t" + std::to_string(mav_veh_sys_stat_errors_count2));
+    SysStatInfo.cpp_cout("Errors count 3:\t" + std::to_string(mav_veh_sys_stat_errors_count3));
+    SysStatInfo.cpp_cout("Errors count 4:\t" + std::to_string(mav_veh_sys_stat_errors_count4));
+    SysStatInfo.cpp_cout("Batt remaining:\t" + std::to_string(mav_veh_sys_stat_battery_remaining));
+    SysStatInfo.cpp_cout("Sensors present extended:\t" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd));
+    SysStatInfo.cpp_cout("Sensors enabled extended:\t" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd));
+    SysStatInfo.cpp_cout("Sensors health extended:\t" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd));
+
+    SysStatInfo.cpp_cout("PRE ARM GOOD:" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK));
+    
     if (print)
     {
         print_sys_status(sys_status);
@@ -349,6 +416,20 @@ void MavMsg::proc_mav_command_ack_msg(const mavlink_message_t *msg, bool print)
     mavlink_command_ack_t command_ack;
     mavlink_msg_command_ack_decode(msg, &command_ack);
 
+    mav_veh_command_id = command_ack.command;
+    mav_veh_command_result = command_ack.result;
+    mav_veh_command_progress = command_ack.progress;
+    mav_veh_command_result_param2 = command_ack.result_param2;
+    mav_veh_command_target_system = command_ack.target_system;
+    mav_veh_command_target_component = command_ack.target_component;
+    /*
+    MavCmdAck.cpp_cout("Command ID: " + std::to_string(mav_veh_command_id));
+    MavCmdAck.cpp_cout("Result:\t" + std::to_string(mav_veh_command_result));
+    MavCmdAck.cpp_cout("Progress:\t" + std::to_string(mav_veh_command_progress));
+    MavCmdAck.cpp_cout("Result param 2:\t" + std::to_string(mav_veh_command_result_param2));
+    MavCmdAck.cpp_cout("Target sys:\t" + std::to_string(mav_veh_command_target_system));
+    MavCmdAck.cpp_cout("Target comp:\t" + std::to_string(mav_veh_command_target_component));
+    */
     if (print)
     {
         print_command_ack(command_ack);
@@ -403,10 +484,8 @@ bool MavMsg::start_message_subscriptions(void)
     MavMsg::subscribe(MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_1Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_1Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_1Hz);
-    MavMsg::subscribe(MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_DEFAULT);
     MavMsg::subscribe(MAVLINK_MSG_ID_LOCAL_POSITION_NED, MESSAGE_RATE_1Hz);
-    MavMsg::subscribe(MAVLINK_MSG_ID_SYS_STATUS, MESSAGE_RATE_DEFAULT);
-    MavMsg::subscribe(MAVLINK_MSG_ID_STATUSTEXT, MESSAGE_RATE_DEFAULT);
+    MavMsg::subscribe(MAVLINK_MSG_ID_SYS_STATUS, MESSAGE_RATE_1Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_PARAM_VALUE, MESSAGE_RATE_DEFAULT);
     MavMsg::subscribe(MAVLINK_MSG_ID_AUTOPILOT_VERSION, MESSAGE_RATE_DEFAULT);
 

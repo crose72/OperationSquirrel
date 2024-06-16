@@ -18,22 +18,22 @@
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern float q1_target;
-extern float q2_target;
-extern float q3_target;
-extern float q4_target;
-extern float roll_rate_target;
-extern float pitch_rate_target;
-extern float yaw_rate_target;
+extern float mav_veh_q1_target;
+extern float mav_veh_q2_target;
+extern float mav_veh_q3_target;
+extern float mav_veh_q4_target;
+extern float mav_veh_roll_rate_target;
+extern float mav_veh_pitch_rate_target;
+extern float mav_veh_yaw_rate_target;
 extern float thrust_target;
-extern float q1_actual;
-extern float q2_actual;
-extern float q3_actual;
-extern float q4_actual;
-extern float roll_rate_actual;
-extern float pitch_rate_actual;
-extern float yaw_rate_actual;
-extern float thrust_actual;
+extern float mav_veh_q1;
+extern float mav_veh_q2;
+extern float mav_veh_q3;
+extern float mav_veh_q4;
+extern float mav_veh_roll_rate;
+extern float mav_veh_pitch_rate;
+extern float mav_veh_yaw_rate;
+extern float mav_veh_thrust;
 
 /********************************************************************************
  * Exported objects

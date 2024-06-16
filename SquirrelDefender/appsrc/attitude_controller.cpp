@@ -69,13 +69,13 @@ const float error_cal = 0.1;
  ********************************************************************************/
 bool dtrmn_attitude_target_error(void)
 {
-    if (std::fabs(q1_actual - q1_target) > error_cal 
-    || std::fabs(q2_actual - q2_target) > error_cal 
-    || std::fabs(q3_actual - q3_target) > error_cal 
-    || std::fabs(q4_actual - q4_target) > error_cal 
-    || std::fabs(roll_rate_actual - roll_rate_target) > error_cal 
-    || std::fabs(pitch_rate_actual - pitch_rate_target) > error_cal 
-    || std::fabs(yaw_rate_actual - yaw_rate_target) > error_cal)
+    if (std::fabs(mav_veh_q1 - mav_veh_q1_target) > error_cal 
+    || std::fabs(mav_veh_q2 - mav_veh_q2_target) > error_cal 
+    || std::fabs(mav_veh_q3 - mav_veh_q3_target) > error_cal 
+    || std::fabs(mav_veh_q4 - mav_veh_q4_target) > error_cal 
+    || std::fabs(mav_veh_roll_rate - mav_veh_roll_rate_target) > error_cal 
+    || std::fabs(mav_veh_pitch_rate - mav_veh_pitch_rate_target) > error_cal 
+    || std::fabs(mav_veh_yaw_rate - mav_veh_yaw_rate_target) > error_cal)
     {
         attitude_target_error = true;
     }

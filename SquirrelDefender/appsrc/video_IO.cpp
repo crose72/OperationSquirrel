@@ -112,7 +112,7 @@ bool Video::create_output_video_stream(const commandLine& cmdLine, int positionA
 ********************************************************************************/
 bool Video::capture_image(void)
 {
-    DebugTerm VideoDebug("/dev/pts/6");
+    DebugTerm VideoDebug("/dev/pts/3");
 
 	image = NULL;
 	int status = 0;

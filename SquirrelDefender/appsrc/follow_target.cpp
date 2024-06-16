@@ -23,7 +23,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm FollowData("/dev/pts/7");
+DebugTerm FollowData("/dev/pts/2");
 
 float x_actual;
 float height_actual;
@@ -237,8 +237,6 @@ bool Follow::follow_target_init(void)
  ********************************************************************************/
 void Follow::follow_target_loop(void)
 {
-    DebugTerm FollowData("/dev/pts/7");
-
     float target_velocity[3] = {0.0,0.0,0.0};
 
     get_control_params();

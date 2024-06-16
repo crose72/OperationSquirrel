@@ -345,7 +345,7 @@ void print_attitude_quaternion(mavlink_attitude_quaternion_t &attitude_quaternio
  ********************************************************************************/
 void print_command_ack(mavlink_command_ack_t &command_ack) 
 {
-	DebugTerm CmdAck("/dev/pts/8");
+	DebugTerm CmdAck("/dev/pts/3");
     
     CmdAck.cpp_cout("Command ACK received:");
     CmdAck.cpp_cout_oneline("\tCommand: ");
