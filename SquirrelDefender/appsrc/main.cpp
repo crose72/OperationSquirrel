@@ -18,10 +18,10 @@
 #include <mutex>
 
 #ifdef USE_JETSON
-	#include "video_IO.h"
-	#include "object_detection.h"
-	#include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
-#endif // USE_JETSON
+#include "video_IO.h"
+#include "object_detection.h"
+#include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
+#endif                         // USE_JETSON
 
 #include "sim_flight_test_4_VelocityControl.h"
 
@@ -54,11 +54,11 @@ std::mutex mutex;
  ********************************************************************************/
 void sig_handler(int signo)
 {
-	if( signo == SIGINT )
-	{
-		PrintPass::c_printf("received SIGINT\n");
-		signal_recieved = true;
-	}
+    if (signo == SIGINT)
+    {
+        PrintPass::c_printf("received SIGINT\n");
+        signal_recieved = true;
+    }
 }
 
 /********************************************************************************
@@ -80,10 +80,10 @@ void attach_sig_handler(void)
  ********************************************************************************/
 void app_first_init(void)
 {
-	if (first_loop_after_start == true)
-	{
-		first_loop_after_start = false;
-	}
+    if (first_loop_after_start == true)
+    {
+        first_loop_after_start = false;
+    }
 }
 
 /********************************************************************************
@@ -92,44 +92,46 @@ void app_first_init(void)
  ********************************************************************************/
 int main(void)
 {
-	MainAppTime.calc_app_start_time();
-    
-    if(SystemController::system_init() != 0)
+    MainAppTime.calc_app_start_time();
+
+    if (SystemController::system_init() != 0)
     {
         return SystemController::system_init();
     }
 
-    while (!signal_recieved) 
-	{
+    while (!signal_recieved)
+    {
         std::lock_guard<std::mutex> lock(mutex);
-		MainAppTime.calc_elapsed_time();
-		MavMsg::mav_comm_loop();
-		
-		#ifdef USE_JETSON
+        MainAppTime.calc_elapsed_time();
+        SystemController::system_state_machine();
+        MavMsg::mav_comm_loop();
 
-			Video::video_proc_loop();
-			Detection::detection_loop();
-			Follow::follow_target_loop();
-            Video::video_output_loop();
+#ifdef USE_JETSON
 
-		#elif USE_WSL
+        Video::video_proc_loop();
+        Detection::detection_loop();
+        // Follow::follow_target_loop();
+        VehicleController::vehicle_control_loop();
+        Video::video_output_loop();
 
-			test_flight();
+#elif USE_WSL
 
-		#endif // USE_JETSON	
+        test_flight();
 
-		app_first_init();
+#endif // USE_JETSON
 
-		MainAppTime.loop_rate_controller();
+        app_first_init();
+
+        MainAppTime.loop_rate_controller();
         MainAppTime.calc_loop_start_time();
     }
 
-	#ifdef USE_JETSON
+#ifdef USE_JETSON
 
-		Video::shutdown();
-		Detection::shutdown();
+    Video::shutdown();
+    Detection::shutdown();
 
-	#endif // USE_JETSON
+#endif // USE_JETSON
 
     MavMsg::mav_comm_shutdown();
 

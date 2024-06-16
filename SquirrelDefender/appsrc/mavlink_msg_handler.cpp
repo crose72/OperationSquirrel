@@ -25,60 +25,71 @@
  ********************************************************************************/
 DebugTerm MavCmdAck("/dev/pts/3");
 DebugTerm SysStatInfo("/dev/pts/5");
+DebugTerm HeartbeatInfo("/dev/pts/3");
 
-uint16_t mav_veh_command_id; /*<  Command ID (of acknowledged command).*/
-uint8_t mav_veh_command_result; /*<  Result of command.*/
-uint8_t mav_veh_command_progress; /*< [%] The progress percentage when result is MAV_RESULT_IN_PROGRESS. Values: [0-100], 
-                                    or UINT8_MAX if the progress is unknown.*/
-int32_t mav_veh_command_result_param2; /*<  Additional result information. Can be set with a command-specific enum containing 
-                                        command-specific error reasons for why the command might be denied. If used, the associated 
-                                        enum must be documented in the corresponding MAV_CMD (this enum should have a 0 value to indicate 
-                                        "unused" or "unknown").*/
-uint8_t mav_veh_command_target_system; /*<  System ID of the target recipient. This is the ID of the system that sent the command for 
+uint16_t mav_veh_command_id = 0;              /*<  Command ID (of acknowledged command).*/
+uint8_t mav_veh_command_result = 0;           /*<  Result of command.*/
+uint8_t mav_veh_command_progress = 0;         /*< [%] The progress percentage when result is MAV_RESULT_IN_PROGRESS. Values: [0-100],
+                                            or UINT8_MAX if the progress is unknown.*/
+int32_t mav_veh_command_result_param2 = 0;    /*<  Additional result information. Can be set with a command-specific enum containing
+                                           command-specific error reasons for why the command might be denied. If used, the associated
+                                           enum must be documented in the corresponding MAV_CMD (this enum should have a 0 value to indicate
+                                           "unused" or "unknown").*/
+uint8_t mav_veh_command_target_system = 0;    /*<  System ID of the target recipient. This is the ID of the system that sent the command for
+                                               which this COMMAND_ACK is an acknowledgement.*/
+uint8_t mav_veh_command_target_component = 0; /*<  Component ID of the target recipient. This is the ID of the system that sent the command for
                                             which this COMMAND_ACK is an acknowledgement.*/
-uint8_t mav_veh_command_target_component; /*<  Component ID of the target recipient. This is the ID of the system that sent the command for 
-                                            which this COMMAND_ACK is an acknowledgement.*/
 
-uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_present; /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
-uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled; /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
-uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health; /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error. Value of 1: healthy.*/
-uint16_t mav_veh_sys_stat_load; /*< [d%] Maximum usage in percent of the mainloop time. Values: [0-1000] - should always be below 1000*/
-uint16_t mav_veh_sys_stat_voltage_battery; /*< [mV] Battery voltage, UINT16_MAX: Voltage not sent by autopilot*/
-int16_t  mav_veh_sys_stat_current_battery; /*< [cA] Battery current, -1: Current not sent by autopilot*/
-uint16_t mav_veh_sys_stat_drop_rate_comm; /*< [c%] Communication drop rate, (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)*/
-uint16_t mav_veh_sys_stat_errors_comm; /*<  Communication errors (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)*/
-uint16_t mav_veh_sys_stat_errors_count1; /*<  Autopilot-specific errors*/
-uint16_t mav_veh_sys_stat_errors_count2; /*<  Autopilot-specific errors*/
-uint16_t mav_veh_sys_stat_errors_count3; /*<  Autopilot-specific errors*/
-uint16_t mav_veh_sys_stat_errors_count4; /*<  Autopilot-specific errors*/
-int8_t   mav_veh_sys_stat_battery_remaining; /*< [%] Battery energy remaining, -1: Battery remaining energy not sent by autopilot*/
-uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd; /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
-uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd; /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
-uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd; /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error. Value of 1: healthy.*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_present = 0;      /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled = 0;      /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health = 0;       /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error.
+                                                              Value of 1: healthy.*/
+uint16_t mav_veh_sys_stat_load = 0;                           /*< [d%] Maximum usage in percent of the mainloop time. Values: [0-1000] - should always be below 1000*/
+uint16_t mav_veh_sys_stat_voltage_battery = 0;                /*< [mV] Battery voltage, UINT16_MAX: Voltage not sent by autopilot*/
+int16_t mav_veh_sys_stat_current_battery = 0;                 /*< [cA] Battery current, -1: Current not sent by autopilot*/
+uint16_t mav_veh_sys_stat_drop_rate_comm = 0;                 /*< [c%] Communication drop rate, (UART, I2C, SPI, CAN), dropped packets on all links
+                                                            (packets that were corrupted on reception on the MAV)*/
+uint16_t mav_veh_sys_stat_errors_comm = 0;                    /*<  Communication errors (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)*/
+uint16_t mav_veh_sys_stat_errors_count1 = 0;                  /*<  Autopilot-specific errors*/
+uint16_t mav_veh_sys_stat_errors_count2 = 0;                  /*<  Autopilot-specific errors*/
+uint16_t mav_veh_sys_stat_errors_count3 = 0;                  /*<  Autopilot-specific errors*/
+uint16_t mav_veh_sys_stat_errors_count4 = 0;                  /*<  Autopilot-specific errors*/
+int8_t mav_veh_sys_stat_battery_remaining = 0;                /*< [%] Battery energy remaining, -1: Battery remaining energy not sent by autopilot*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd = 0;  /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd = 0;  /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd = 0; /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error.
+                                                            Value of 1: healthy.*/
+uint32_t mav_veh_custom_mode = 0;                             /*<  A bitfield for use for autopilot-specific flags*/
+uint8_t mav_veh_type = 0;                                     /*<  Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the
+                                                            component type (e.g. camera, gimbal, etc.). This should be used in preference to component id for identifying the component type.*/
+uint8_t mav_veh_autopilot_type = 0;                           /*<  Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.*/
+uint8_t mav_veh_base_mode = 0;                                /*<  System mode bitmap.*/
+uint8_t mav_veh_state = 0;                                    /*<  System status flag.*/
+uint8_t mav_veh_mavlink_version = 0;                          /*<  MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version*/
 
-int32_t mav_veh_lat = 0; /*< [degE7] Latitude, expressed*/
-int32_t mav_veh_lon = 0; /*< [degE7] Longitude, expressed*/
-int32_t mav_veh_alt = 0; /*< [mm] Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.*/
-int32_t mav_rel_alt = 0; /*< [mm] Altitude above ground*/
-int16_t mav_veh_gps_vx = 0; /*< [cm/s] Ground X Speed (Latitude, positive north)*/
-int16_t mav_veh_gps_vy = 0; /*< [cm/s] Ground Y Speed (Longitude, positive east)*/
-int16_t mav_veh_gps_vz = 0; /*< [cm/s] Ground Z Speed (Altitude, positive down)*/
-uint16_t mav_veh_gps_hdg = 0; /*< [cdeg] Vehicle heading (yaw angle), 0.0..359.99 degrees. If unknown, set to: UINT16_MAX*/
-float mav_veh_roll = 0.0; /*< [rad] Roll angle (-pi..+pi)*/
-float mav_veh_pitch = 0.0; /*< [rad] Pitch angle (-pi..+pi)*/
-float mav_veh_yaw = 0.0; /*< [rad] Yaw angle (-pi..+pi)*/
-float mav_veh_rollspeed = 0.0; /*< [rad/s] Roll angular speed*/
+int32_t mav_veh_lat = 0;        /*< [degE7] Latitude, expressed*/
+int32_t mav_veh_lon = 0;        /*< [degE7] Longitude, expressed*/
+int32_t mav_veh_alt = 0;        /*< [mm] Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.*/
+int32_t mav_rel_alt = 0;        /*< [mm] Altitude above ground*/
+int16_t mav_veh_gps_vx = 0;     /*< [cm/s] Ground X Speed (Latitude, positive north)*/
+int16_t mav_veh_gps_vy = 0;     /*< [cm/s] Ground Y Speed (Longitude, positive east)*/
+int16_t mav_veh_gps_vz = 0;     /*< [cm/s] Ground Z Speed (Altitude, positive down)*/
+uint16_t mav_veh_gps_hdg = 0;   /*< [cdeg] Vehicle heading (yaw angle), 0.0..359.99 degrees. If unknown, set to: UINT16_MAX*/
+float mav_veh_roll = 0.0;       /*< [rad] Roll angle (-pi..+pi)*/
+float mav_veh_pitch = 0.0;      /*< [rad] Pitch angle (-pi..+pi)*/
+float mav_veh_yaw = 0.0;        /*< [rad] Yaw angle (-pi..+pi)*/
+float mav_veh_rollspeed = 0.0;  /*< [rad/s] Roll angular speed*/
 float mav_veh_pitchspeed = 0.0; /*< [rad/s] Pitch angular speed*/
-float mav_veh_yawspeed = 0.0; /*< [rad/s] Yaw angular speed*/
-int16_t mav_veh_imu_ax = 0; /*< [mG] X acceleration*/
-int16_t mav_veh_imu_ay = 0; /*< [mG] Y acceleration*/
-int16_t mav_veh_imu_az = 0; /*< [mG] Z acceleration*/
-int16_t mav_veh_imu_xgyro = 0; /*< [mrad/s] Angular speed around X axis*/
-int16_t mav_veh_imu_ygyro = 0; /*< [mrad/s] Angular speed around Y axis*/
-int16_t mav_veh_imu_zgyro = 0; /*< [mrad/s] Angular speed around Z axis*/
-int16_t mav_veh_imu_xmag = 0; /*< [mgauss] X Magnetic field*/
-int16_t mav_veh_imu_ymag = 0; /*< [mgauss] Y Magnetic field*/
-int16_t mav_veh_imu_zmag = 0; /*< [mgauss] Z Magnetic field*/
+float mav_veh_yawspeed = 0.0;   /*< [rad/s] Yaw angular speed*/
+int16_t mav_veh_imu_ax = 0;     /*< [mG] X acceleration*/
+int16_t mav_veh_imu_ay = 0;     /*< [mG] Y acceleration*/
+int16_t mav_veh_imu_az = 0;     /*< [mG] Z acceleration*/
+int16_t mav_veh_imu_xgyro = 0;  /*< [mrad/s] Angular speed around X axis*/
+int16_t mav_veh_imu_ygyro = 0;  /*< [mrad/s] Angular speed around Y axis*/
+int16_t mav_veh_imu_zgyro = 0;  /*< [mrad/s] Angular speed around Z axis*/
+int16_t mav_veh_imu_xmag = 0;   /*< [mgauss] X Magnetic field*/
+int16_t mav_veh_imu_ymag = 0;   /*< [mgauss] Y Magnetic field*/
+int16_t mav_veh_imu_zmag = 0;   /*< [mgauss] Z Magnetic field*/
 float mav_veh_q1_target = 0.0;
 float mav_veh_q2_target = 0.0;
 float mav_veh_q3_target = 0.0;
@@ -104,7 +115,7 @@ float mav_veh_thrust = 0.0;
  * Function definitions
  ********************************************************************************/
 
- /********************************************************************************
+/********************************************************************************
  * Function: MavMsg
  * Description: Class constructor
  ********************************************************************************/
@@ -118,7 +129,7 @@ MavMsg::~MavMsg(){};
 
 /********************************************************************************
  * Function: subscribe
- * Description: Subscribe to mavlink messages and specify 
+ * Description: Subscribe to mavlink messages and specify
  *              the desired to receive the message at.
  ********************************************************************************/
 void MavMsg::subscribe(uint16_t msg_id, float msg_interval)
@@ -127,27 +138,41 @@ void MavMsg::subscribe(uint16_t msg_id, float msg_interval)
     req_mav_msg(msg_id);
 }
 
- /********************************************************************************
+/********************************************************************************
  * Function: proc_heartbeat
  * Description: Decode heartbeat message and pass along the desired information.
  ********************************************************************************/
- void MavMsg::proc_mav_heartbeat_msg(const mavlink_message_t *msg, bool print)
- {
+void MavMsg::proc_mav_heartbeat_msg(const mavlink_message_t *msg, bool print)
+{
     mavlink_heartbeat_t heartbeat;
     mavlink_msg_heartbeat_decode(msg, &heartbeat);
+
+    mav_veh_type = heartbeat.type;
+    mav_veh_autopilot_type = heartbeat.autopilot;
+    mav_veh_base_mode = heartbeat.base_mode;
+    mav_veh_custom_mode = heartbeat.custom_mode;
+    mav_veh_state = heartbeat.system_status;
+    mav_veh_mavlink_version = heartbeat.mavlink_version;
+
+    HeartbeatInfo.cpp_cout("Heartbeat type:" + std::to_string(mav_veh_type));
+    HeartbeatInfo.cpp_cout("Autopilot type:" + std::to_string(mav_veh_autopilot_type));
+    HeartbeatInfo.cpp_cout("Base mode:" + std::to_string(mav_veh_base_mode));
+    HeartbeatInfo.cpp_cout("Custom mode:" + std::to_string(mav_veh_custom_mode));
+    HeartbeatInfo.cpp_cout("Mav state:" + std::to_string(mav_veh_state));
+    HeartbeatInfo.cpp_cout("Mavlink version:" + std::to_string(mav_veh_mavlink_version));
 
     if (print)
     {
         print_heartbeat(heartbeat);
     }
- }
+}
 
- /********************************************************************************
+/********************************************************************************
  * Function: proc_mav_gps_int
  * Description: Decode gps message and pass along the desired information.
  ********************************************************************************/
- void MavMsg::proc_mav_gps_int_msg(const mavlink_message_t *msg, bool print)
- {
+void MavMsg::proc_mav_gps_int_msg(const mavlink_message_t *msg, bool print)
+{
     mavlink_global_position_int_t global_pos_int;
     mavlink_msg_global_position_int_decode(msg, &global_pos_int);
 
@@ -155,18 +180,18 @@ void MavMsg::subscribe(uint16_t msg_id, float msg_interval)
     mav_veh_lon = global_pos_int.lon;
     mav_veh_alt = global_pos_int.alt;
     mav_rel_alt = global_pos_int.relative_alt;
-    mav_veh_gps_vx  = global_pos_int.vx;
-    mav_veh_gps_vy  = global_pos_int.vy;
-    mav_veh_gps_vz  = global_pos_int.vz;
+    mav_veh_gps_vx = global_pos_int.vx;
+    mav_veh_gps_vy = global_pos_int.vy;
+    mav_veh_gps_vz = global_pos_int.vz;
     mav_veh_gps_hdg = global_pos_int.hdg;
-    
-    if(print)
+
+    if (print)
     {
         print_global_position_int(global_pos_int);
-    }  
- }
+    }
+}
 
- /********************************************************************************
+/********************************************************************************
  * Function: proc_mav_system_time_msg
  * Description: Decode system time message and optionally print the information.
  ********************************************************************************/
@@ -225,7 +250,7 @@ void MavMsg::proc_mav_sys_status_msg(const mavlink_message_t *msg, bool print)
     SysStatInfo.cpp_cout("Sensors health extended:\t" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd));
 
     SysStatInfo.cpp_cout("PRE ARM GOOD:" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK));
-    
+
     if (print)
     {
         print_sys_status(sys_status);
@@ -474,7 +499,7 @@ void MavMsg::proc_mav_distance_sensor_msg(const mavlink_message_t *msg, bool pri
 bool MavMsg::start_message_subscriptions(void)
 {
     // What happens when we subscribe to a message and the request is denied?  How do we handle that?
-    MavMsg::subscribe(MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_DEFAULT);
+    MavMsg::subscribe(MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_1Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_GLOBAL_POSITION_INT, MESSAGE_RATE_40Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_DEFAULT);
     MavMsg::subscribe(MAVLINK_MSG_ID_SCALED_IMU, MESSAGE_RATE_40Hz);
@@ -494,75 +519,75 @@ bool MavMsg::start_message_subscriptions(void)
 
 /********************************************************************************
  * Function: parse_mav_msgs
- * Description: Read the serial port and unpack specific messages if its 
+ * Description: Read the serial port and unpack specific messages if its
  *              specific mavlink message ID has been received.
  ********************************************************************************/
 void MavMsg::parse_mav_msgs(void)
 {
-    mavlink_message_t msg; // initialize the Mavlink message buffer
+    mavlink_message_t msg;        // initialize the Mavlink message buffer
     mavlink_status_t status = {}; // Initialize the Mavlink status
     uint8_t byte;
-    
+
     int n = SerialComm::bytes_available();
-    for(int i = n; i > 0; i--)
+    for (int i = n; i > 0; i--)
     {
         byte = MavMsg::read_mav_msg();
 
         // Parse the byte and check if a message has been received
-        if (mavlink_parse_char(MAVLINK_COMM_0, byte, &msg, &status)) 
+        if (mavlink_parse_char(MAVLINK_COMM_0, byte, &msg, &status))
         {
-            switch (msg.msgid) 
+            switch (msg.msgid)
             {
-                case MAVLINK_MSG_ID_HEARTBEAT:
-                    MavMsg::proc_mav_heartbeat_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
-                    MavMsg::proc_mav_gps_int_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_SYSTEM_TIME:
-                    MavMsg::proc_mav_system_time_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_SCALED_IMU:
-                    MavMsg::proc_mav_scaled_imu_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_OPTICAL_FLOW:
-                    MavMsg::proc_mav_optical_flow_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_DISTANCE_SENSOR:
-                    MavMsg::proc_mav_distance_sensor_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_ATTITUDE:
-                    MavMsg::proc_mav_attitude_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_ATTITUDE_TARGET:
-                    MavMsg::proc_mav_attitude_target_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_ATTITUDE_QUATERNION:
-                    MavMsg::proc_mav_attitude_quaternion_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_AUTOPILOT_VERSION:
-                    MavMsg::proc_mav_autopilot_version_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED:
-                    MavMsg::proc_mav_position_target_local_ned_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED:
-                    MavMsg::proc_mav_set_position_target_local_ned_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_SYS_STATUS:
-                    MavMsg::proc_mav_sys_status_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_STATUSTEXT:
-                    MavMsg::proc_mav_statustext_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_PARAM_VALUE:
-                    MavMsg::proc_mav_param_value_msg(&msg, true);
-                    break;
-                case MAVLINK_MSG_ID_COMMAND_ACK:
-                    MavMsg::proc_mav_command_ack_msg(&msg, true);
-                    break;
-                default:
-                    PrintPass::c_printf("Received message with ID: %d\n", (int)msg.msgid);
+            case MAVLINK_MSG_ID_HEARTBEAT:
+                MavMsg::proc_mav_heartbeat_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
+                MavMsg::proc_mav_gps_int_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_SYSTEM_TIME:
+                MavMsg::proc_mav_system_time_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_SCALED_IMU:
+                MavMsg::proc_mav_scaled_imu_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_OPTICAL_FLOW:
+                MavMsg::proc_mav_optical_flow_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_DISTANCE_SENSOR:
+                MavMsg::proc_mav_distance_sensor_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_ATTITUDE:
+                MavMsg::proc_mav_attitude_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_ATTITUDE_TARGET:
+                MavMsg::proc_mav_attitude_target_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_ATTITUDE_QUATERNION:
+                MavMsg::proc_mav_attitude_quaternion_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_AUTOPILOT_VERSION:
+                MavMsg::proc_mav_autopilot_version_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED:
+                MavMsg::proc_mav_position_target_local_ned_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED:
+                MavMsg::proc_mav_set_position_target_local_ned_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_SYS_STATUS:
+                MavMsg::proc_mav_sys_status_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_STATUSTEXT:
+                MavMsg::proc_mav_statustext_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_PARAM_VALUE:
+                MavMsg::proc_mav_param_value_msg(&msg, true);
+                break;
+            case MAVLINK_MSG_ID_COMMAND_ACK:
+                MavMsg::proc_mav_command_ack_msg(&msg, true);
+                break;
+            default:
+                PrintPass::c_printf("Received message with ID: %d\n", (int)msg.msgid);
             }
         }
     }
@@ -574,7 +599,7 @@ void MavMsg::parse_mav_msgs(void)
  ********************************************************************************/
 bool MavMsg::mav_comm_init(void)
 {
-    if (!start_mav_comm() || 
+    if (!start_mav_comm() ||
         !start_message_subscriptions())
     {
         PrintPass::c_fprintf("Failed to initialize MAVLink communication");

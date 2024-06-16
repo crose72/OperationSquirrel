@@ -12,31 +12,34 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
+#include "mavlink_msg_handler.h"
+#include "video_IO.h"
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
+extern bool valid_image_rcvd;
 extern float dt_25ms;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
+extern SYSTEM_STATE system_state;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class SystemController 
+class SystemController
 {
-    public:
-        SystemController();
-        ~SystemController();
+public:
+    SystemController();
+    ~SystemController();
 
-        static int system_init(void);
-        static int dtrmn_system_state(void);
-        static void system_shutdown(void);
+    static int system_init(void);
+    static int system_state_machine(void);
+    static void system_shutdown(void);
 
-    private:
-    
+private:
 };
 
 #endif // SYSTEM_CONTROLLER_H

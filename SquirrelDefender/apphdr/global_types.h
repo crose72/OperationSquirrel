@@ -22,6 +22,7 @@ enum SYSTEM_STATE
     DEFAULT,
     INIT,
     PRE_ARM_GOOD,
+    STANDBY,
     IN_FLIGHT_GOOD,
     IN_FLIGHT_ERROR
 };
@@ -35,4 +36,3 @@ enum CONTROL_DIM
 };
 
 #endif // GLOBAL_TYPES_H
-

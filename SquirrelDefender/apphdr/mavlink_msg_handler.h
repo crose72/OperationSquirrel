@@ -29,6 +29,40 @@ extern const int32_t MESSAGE_RATE_DEFAULT;
 extern const int32_t MESSAGE_RATE_1Hz;
 extern const int32_t MESSAGE_RATE_40Hz;
 
+/********************************************************************************
+ * Exported objects
+ ********************************************************************************/
+extern uint16_t mav_veh_command_id;
+extern uint8_t mav_veh_command_result;
+extern uint8_t mav_veh_command_progress;
+extern int32_t mav_veh_command_result_param2;
+extern uint8_t mav_veh_command_target_system;
+extern uint8_t mav_veh_command_target_component;
+
+extern uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_present;
+extern uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled;
+extern uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health;
+extern uint16_t mav_veh_sys_stat_load;
+extern uint16_t mav_veh_sys_stat_voltage_battery;
+extern int16_t  mav_veh_sys_stat_current_battery;
+extern uint16_t mav_veh_sys_stat_drop_rate_comm;
+extern uint16_t mav_veh_sys_stat_errors_comm;
+extern uint16_t mav_veh_sys_stat_errors_count1;
+extern uint16_t mav_veh_sys_stat_errors_count2;
+extern uint16_t mav_veh_sys_stat_errors_count3;
+extern uint16_t mav_veh_sys_stat_errors_count4;
+extern int8_t   mav_veh_sys_stat_battery_remaining;
+extern uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd;
+extern uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd;
+extern uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd;
+
+extern uint32_t mav_veh_custom_mode;
+extern uint8_t mav_veh_type;
+extern uint8_t mav_veh_autopilot_type;
+extern uint8_t mav_veh_base_mode;
+extern uint8_t mav_veh_state;
+extern uint8_t mav_veh_mavlink_version; 
+
 extern int32_t mav_veh_lat;
 extern int32_t mav_veh_lon;
 extern int32_t mav_veh_alt;
@@ -37,6 +71,7 @@ extern int16_t mav_veh_gps_vx;
 extern int16_t mav_veh_gps_vy;
 extern int16_t mav_veh_gps_vz;
 extern uint16_t mav_veh_gps_hdg;
+
 extern float mav_veh_roll;
 extern float mav_veh_pitch;
 extern float mav_veh_yaw;
@@ -69,11 +104,6 @@ extern float mav_veh_roll_rate;
 extern float mav_veh_pitch_rate;
 extern float mav_veh_yaw_rate;
 extern float mav_veh_thrust;
-
-/********************************************************************************
- * Exported objects
- ********************************************************************************/
-
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
