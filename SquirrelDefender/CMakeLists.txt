@@ -128,14 +128,14 @@ add_library(squirrel_defender_lib STATIC ${SOURCES} ${HEADERS})
 # set(STATIC_LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build) # Adjust the path if necessary
 find_library(SQUIRREL_DEFENDER_LIB NAMES squirrel_defender_lib PATHS ${STATIC_LIBRARY_DIR})
 
-# Compile the main program
+# Compile the squirreldefender program
 if (USE_JETSON)
-    cuda_add_executable(main ${SOURCES} ${HEADERS})
-    target_link_libraries(main jetson-inference)
-    target_link_libraries(main jsoncpp)
-    target_link_libraries(main ${GST_LIBRARIES} ${GLIB_LIBRARIES} ${GOBJECT_LIBRARIES} ${GST_APP_LIBRARIES})
+    cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
+    target_link_libraries(squirreldefender jetson-inference)
+    target_link_libraries(squirreldefender jsoncpp)
+    target_link_libraries(squirreldefender ${GST_LIBRARIES} ${GLIB_LIBRARIES} ${GOBJECT_LIBRARIES} ${GST_APP_LIBRARIES})
 elseif(USE_WSL)
-    add_executable(main ${SOURCES} ${HEADERS})
+    add_executable(squirreldefender ${SOURCES} ${HEADERS})
 endif()
 
 # Compile the unit_tests program
