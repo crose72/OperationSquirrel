@@ -24,6 +24,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
+DebugTerm VehStateInfo("/dev/pts/6");
 
 /********************************************************************************
  * Calibration definitions
@@ -100,6 +101,29 @@ void VehicleController::cmd_acceleration_NED(float acceleration_target[3])
 }
 
 /********************************************************************************
+ * Function: follow_target
+ * Description: Move in direction of vector ax,ay,az in the NED frame.
+ ********************************************************************************/
+void VehicleController::follow_mode(void)
+{
+    float target_velocity[3] = {0.0, 0.0, 0.0};
+
+    Follow::follow_control_loop();
+
+    target_velocity[0] = vx_adjust;
+    target_velocity[1] = vy_adjust;
+
+    if (target_too_close)
+    {
+        VehicleController::cmd_velocity_xy_NED(target_velocity);
+    }
+    else
+    {
+        VehicleController::cmd_velocity_NED(target_velocity);
+    }
+}
+
+/********************************************************************************
  * Function: vehicle_control_init
  * Description: Initial setup of vehicle controller.
  ********************************************************************************/
@@ -127,7 +151,7 @@ void VehicleController::vehicle_control_loop(void)
     }
     else if (system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
     {
-        Follow::follow_target_loop();
+        follow_mode();
     }
 }
 

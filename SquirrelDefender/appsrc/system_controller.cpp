@@ -151,13 +151,13 @@ int SystemController::system_state_machine(void)
             {
                 system_state = SYSTEM_STATE::STANDBY;
             }
-            else if (mav_veh_rel_alt > 100 && mav_type_is_quad && mav_veh_state == MAV_STATE_ACTIVE)
+            else if (mav_veh_rel_alt > 1000 && mav_type_is_quad && mav_veh_state == MAV_STATE_ACTIVE)
             {
                 system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
             }
             break;
         case SYSTEM_STATE::STANDBY:
-            if (mav_veh_rel_alt > 100 && mav_veh_state == MAV_STATE_ACTIVE)
+            if (mav_veh_rel_alt > 1000 && mav_veh_state == MAV_STATE_ACTIVE)
             {
                 system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
             }

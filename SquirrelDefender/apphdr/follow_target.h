@@ -25,9 +25,9 @@
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern detectNet* net;
-extern detectNet::Detection* detections;
-extern videoSource* input;
+extern detectNet *net;
+extern detectNet::Detection *detections;
+extern videoSource *input;
 extern int numDetections;
 extern uint32_t input_video_width;
 extern uint32_t input_video_height;
@@ -35,26 +35,32 @@ extern uint32_t input_video_height;
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
+extern bool target_too_close;
+extern bool target_identified;
+extern float vx_adjust;
+extern float vy_adjust;
+extern float vz_adjust;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
 class Follow
 {
-    public:
-        Follow();
-        ~Follow();
+public:
+    Follow();
+    ~Follow();
 
-        static void follow_target_loop(void);
-        static bool follow_target_init(void);
-    
-    private:
-    	static int dtrmn_target_ID(void);
-        static void get_control_params(void);
-        static void get_desired_target_size(void);
-        static void calc_target_size(int n);
-        static void calc_follow_error(void);
-        static void overtake_target(void);
+    static void follow_control_loop(void);
+    static bool follow_target_init(void);
+
+    static int dtrmn_target_ID(void);
+    static void get_control_params(void);
+    static void get_desired_target_size(void);
+    static void calc_target_size(int n);
+    static void calc_follow_error(void);
+    static void overtake_target(void);
+
+private:
 };
 
 #endif // FOLLOW_TARGET_H
