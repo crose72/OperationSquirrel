@@ -174,6 +174,23 @@ void Follow::calc_follow_error(void)
 }
 
 /********************************************************************************
+ * Function: dtrmn_target_ID
+ * Description: Determine which detected object to follow.
+ ********************************************************************************/
+int Follow::dtrmn_target_ID(void)
+{
+    for (int n = 0; n < numDetections; n++)
+    {
+        if (detections[n].TrackID >= 0 && detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
+        {
+            return n;
+        }
+    }
+
+    return -1;
+}
+
+/********************************************************************************
  * Function: follow_target_init
  * Description: Initialize all follow target variables.  Run once at the start
  *              of the program.
@@ -238,55 +255,54 @@ bool Follow::follow_target_init(void)
 void Follow::follow_target_loop(void)
 {
     float target_velocity[3] = {0.0, 0.0, 0.0};
+    int target_ID = -1;
 
     get_control_params();
     get_desired_target_size();
+    target_ID = dtrmn_target_ID();
 
-    for (int n = 0; n < numDetections; n++)
+    if (target_ID >= 0)
     {
-        if (detections[n].TrackID >= 0 && detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
+        calc_target_size(target_ID);
+        calc_follow_error();
+
+        if (height_actual > height_desired)
         {
-            calc_target_size(n);
-            calc_follow_error();
+            PID pid_rev;
 
-            if (height_actual > height_desired)
-            {
-                PID pid_rev;
+            float vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev,
+                                                        target_height_err, 0.0, 0.0,
+                                                        w1_x_rev, w2_x_rev, 0.0, CONTROL_DIM::X);
+            float vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev,
+                                                        y_centroid_err, 0.0, 0.0,
+                                                        w1_y_rev, w2_y_rev, 0.0, CONTROL_DIM::Y);
 
-                float vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                                            target_height_err, 0.0, 0.0,
-                                                            w1_x_rev, w2_x_rev, 0.0, CONTROL_DIM::X);
-                float vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                                            y_centroid_err, 0.0, 0.0,
-                                                            w1_y_rev, w2_y_rev, 0.0, CONTROL_DIM::Y);
+            target_velocity[0] = vx_adjust;
+            target_velocity[1] = vy_adjust;
 
-                target_velocity[0] = vx_adjust;
-                target_velocity[1] = vy_adjust;
+            FollowData.cpp_cout("Target too close...PID (x,y): " + std::to_string(target_velocity[0]) + ", " +
+                                std::to_string(target_velocity[1]));
 
-                // FollowData.cpp_cout("Target too close...PID (x,y): " + std::to_string(target_velocity[0]) + ", " +
-                //                     std::to_string(target_velocity[1]));
+            VehicleController::cmd_velocity_xy_NED(target_velocity);
+        }
+        else
+        {
+            PID pid_forwd;
 
-                VehicleController::cmd_velocity_xy_NED(target_velocity);
-            }
-            else
-            {
-                PID pid_forwd;
+            float vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
+                                                          x_centroid_err, target_height_err, 0.0,
+                                                          w1_x, w2_x, w3_x, CONTROL_DIM::X);
+            float vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
+                                                          y_centroid_err, 0.0, 0.0,
+                                                          w1_y, w2_y, w3_y, CONTROL_DIM::Y);
 
-                float vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
-                                                              x_centroid_err, target_height_err, 0.0,
-                                                              w1_x, w2_x, w3_x, CONTROL_DIM::X);
-                float vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
-                                                              y_centroid_err, 0.0, 0.0,
-                                                              w1_y, w2_y, w3_y, CONTROL_DIM::Y);
+            FollowData.cpp_cout("Target too far...PID (x,y): " + std::to_string(vx_adjust) + ", " +
+                                std::to_string(vy_adjust));
 
-                // FollowData.cpp_cout("Target too far...PID (x,y): " + std::to_string(vx_adjust) + ", " +
-                //                     std::to_string(vy_adjust));
+            target_velocity[0] = vx_adjust;
+            target_velocity[1] = vy_adjust;
 
-                target_velocity[0] = vx_adjust;
-                target_velocity[1] = vy_adjust;
-
-                VehicleController::cmd_velocity_NED(target_velocity);
-            }
+            VehicleController::cmd_velocity_NED(target_velocity);
         }
     }
 }

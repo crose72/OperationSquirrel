@@ -49,6 +49,7 @@ class Follow
         static bool follow_target_init(void);
     
     private:
+    	static int dtrmn_target_ID(void);
         static void get_control_params(void);
         static void get_desired_target_size(void);
         static void calc_target_size(int n);
