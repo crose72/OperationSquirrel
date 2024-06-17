@@ -33,7 +33,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm SysStat("/dev/pts/3");
+DebugTerm SysStat("/dev/pts/2");
 #ifdef USE_JETSON
 
 int argc;
@@ -129,6 +129,8 @@ int SystemController::system_state_machine(void)
     }
     else
     {
+        bool mav_type_is_quad = (mav_veh_type == MAV_TYPE_QUADROTOR && mav_veh_autopilot_type == MAV_AUTOPILOT_ARDUPILOTMEGA);
+
         // Switch case determines how we transition from one state to another
         switch (system_state)
         {
@@ -145,13 +147,17 @@ int SystemController::system_state_machine(void)
             }
             break;
         case SYSTEM_STATE::PRE_ARM_GOOD:
-            if (mav_veh_type == MAV_TYPE_QUADROTOR && mav_veh_autopilot_type == MAV_AUTOPILOT_ARDUPILOTMEGA && mav_veh_state == MAV_STATE_STANDBY)
+            if (mav_type_is_quad && mav_veh_state == MAV_STATE_STANDBY)
             {
                 system_state = SYSTEM_STATE::STANDBY;
             }
+            else if (mav_veh_rel_alt > 100 && mav_type_is_quad && mav_veh_state == MAV_STATE_ACTIVE)
+            {
+                system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
+            }
             break;
         case SYSTEM_STATE::STANDBY:
-            if (mav_rel_alt > 120)
+            if (mav_veh_rel_alt > 100 && mav_veh_state == MAV_STATE_ACTIVE)
             {
                 system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
             }

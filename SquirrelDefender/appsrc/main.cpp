@@ -110,7 +110,6 @@ int main(void)
 
         Video::video_proc_loop();
         Detection::detection_loop();
-        // Follow::follow_target_loop();
         VehicleController::vehicle_control_loop();
         Video::video_output_loop();
 

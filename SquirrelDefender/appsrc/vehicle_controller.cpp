@@ -117,13 +117,17 @@ void VehicleController::vehicle_control_loop(void)
     {
         MavCmd::set_mode_GUIDED();
     }
-    if (system_state == SYSTEM_STATE::PRE_ARM_GOOD)
+    else if (system_state == SYSTEM_STATE::PRE_ARM_GOOD)
     {
         MavCmd::arm_vehicle();
     }
-    if (system_state == SYSTEM_STATE::STANDBY)
+    else if (system_state == SYSTEM_STATE::STANDBY)
     {
         MavCmd::takeoff_GPS_long((float)2.0);
+    }
+    else if (system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
+    {
+        Follow::follow_target_loop();
     }
 }
 

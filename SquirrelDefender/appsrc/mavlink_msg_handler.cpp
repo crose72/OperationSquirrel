@@ -24,7 +24,7 @@
  * Object definitions
  ********************************************************************************/
 DebugTerm MavCmdAck("/dev/pts/3");
-DebugTerm SysStatInfo("/dev/pts/5");
+DebugTerm SysStatInfo("/dev/pts/3");
 DebugTerm HeartbeatInfo("/dev/pts/3");
 
 uint16_t mav_veh_command_id = 0;              /*<  Command ID (of acknowledged command).*/
@@ -70,7 +70,7 @@ uint8_t mav_veh_mavlink_version = 0;                          /*<  MAVLink versi
 int32_t mav_veh_lat = 0;        /*< [degE7] Latitude, expressed*/
 int32_t mav_veh_lon = 0;        /*< [degE7] Longitude, expressed*/
 int32_t mav_veh_alt = 0;        /*< [mm] Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.*/
-int32_t mav_rel_alt = 0;        /*< [mm] Altitude above ground*/
+int32_t mav_veh_rel_alt = 0;    /*< [mm] Altitude above ground*/
 int16_t mav_veh_gps_vx = 0;     /*< [cm/s] Ground X Speed (Latitude, positive north)*/
 int16_t mav_veh_gps_vy = 0;     /*< [cm/s] Ground Y Speed (Longitude, positive east)*/
 int16_t mav_veh_gps_vz = 0;     /*< [cm/s] Ground Z Speed (Altitude, positive down)*/
@@ -179,7 +179,7 @@ void MavMsg::proc_mav_gps_int_msg(const mavlink_message_t *msg, bool print)
     mav_veh_lat = global_pos_int.lat;
     mav_veh_lon = global_pos_int.lon;
     mav_veh_alt = global_pos_int.alt;
-    mav_rel_alt = global_pos_int.relative_alt;
+    mav_veh_rel_alt = global_pos_int.relative_alt;
     mav_veh_gps_vx = global_pos_int.vx;
     mav_veh_gps_vy = global_pos_int.vy;
     mav_veh_gps_vz = global_pos_int.vz;

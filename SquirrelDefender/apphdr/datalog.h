@@ -26,7 +26,7 @@ extern float app_elapsed_time;
 extern int32_t mav_veh_lat;
 extern int32_t mav_veh_lon;
 extern int32_t mav_veh_alt;
-extern int32_t mav_rel_alt;
+extern int32_t mav_veh_rel_alt;
 extern int16_t mav_veh_gps_vx;
 extern int16_t mav_veh_gps_vy;
 extern int16_t mav_veh_gps_vz;

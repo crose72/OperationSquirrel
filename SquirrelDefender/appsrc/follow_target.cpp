@@ -23,7 +23,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm FollowData("/dev/pts/2");
+DebugTerm FollowData("/dev/pts/6");
 
 float x_actual;
 float height_actual;
@@ -137,8 +137,8 @@ void Follow::get_desired_target_size(void)
 {
     Parameters target_params("../params.json");
 
-    x_desired = static_cast<float>(input_video_height)/2.0;
-    y_desired = static_cast<float>(input_video_width)/2.0;
+    x_desired = static_cast<float>(input_video_height) / 2.0;
+    y_desired = static_cast<float>(input_video_width) / 2.0;
     height_desired = target_params.get_float_param("Target", "Desired_Height");
     width_desired = target_params.get_float_param("Target", "Desired_Width");
 }
@@ -149,9 +149,9 @@ void Follow::get_desired_target_size(void)
  ********************************************************************************/
 void Follow::calc_target_size(int n)
 {
-    x_actual = detections[n].Height()/2.0 + detections[n].Top;
+    x_actual = detections[n].Height() / 2.0 + detections[n].Top;
     height_actual = detections[n].Height();
-    y_actual = detections[n].Width()/2.0 + detections[n].Left;
+    y_actual = detections[n].Width() / 2.0 + detections[n].Left;
     width_actual = detections[n].Width();
     target_left_side = detections[n].Left;
     target_right_side = detections[n].Right;
@@ -159,7 +159,7 @@ void Follow::calc_target_size(int n)
 
 /********************************************************************************
  * Function: calc_follow_error
- * Description: Calculate the error of a target's position based 
+ * Description: Calculate the error of a target's position based
  ********************************************************************************/
 void Follow::calc_follow_error(void)
 {
@@ -237,53 +237,53 @@ bool Follow::follow_target_init(void)
  ********************************************************************************/
 void Follow::follow_target_loop(void)
 {
-    float target_velocity[3] = {0.0,0.0,0.0};
+    float target_velocity[3] = {0.0, 0.0, 0.0};
 
     get_control_params();
     get_desired_target_size();
 
-    for( int n=0; n < numDetections; n++ )
-    {		
+    for (int n = 0; n < numDetections; n++)
+    {
         if (detections[n].TrackID >= 0 && detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
         {
             calc_target_size(n);
-            calc_follow_error();        
-            
+            calc_follow_error();
+
             if (height_actual > height_desired)
             {
                 PID pid_rev;
 
-                float vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev, 
-                                                    target_height_err, 0.0, 0.0, 
-                                                    w1_x_rev, w2_x_rev, 0.0, CONTROL_DIM::X);
-                float vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev, 
-                                                    y_centroid_err, 0.0, 0.0, 
-                                                    w1_y_rev, w2_y_rev, 0.0, CONTROL_DIM::Y);
+                float vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev,
+                                                            target_height_err, 0.0, 0.0,
+                                                            w1_x_rev, w2_x_rev, 0.0, CONTROL_DIM::X);
+                float vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev,
+                                                            y_centroid_err, 0.0, 0.0,
+                                                            w1_y_rev, w2_y_rev, 0.0, CONTROL_DIM::Y);
 
                 target_velocity[0] = vx_adjust;
-                target_velocity[1] = vy_adjust; 
+                target_velocity[1] = vy_adjust;
 
-                FollowData.cpp_cout("Target too close...PID (x,y): " + std::to_string(target_velocity[0]) + ", " + 
-                                                               std::to_string(target_velocity[1]));
+                // FollowData.cpp_cout("Target too close...PID (x,y): " + std::to_string(target_velocity[0]) + ", " +
+                //                     std::to_string(target_velocity[1]));
 
                 VehicleController::cmd_velocity_xy_NED(target_velocity);
             }
             else
             {
                 PID pid_forwd;
-                
-                float vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x, 
-                                                    x_centroid_err, target_height_err, 0.0, 
-                                                    w1_x, w2_x, w3_x, CONTROL_DIM::X);
-                float vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y, 
-                                                    y_centroid_err, 0.0, 0.0, 
-                                                    w1_y, w2_y, w3_y, CONTROL_DIM::Y);
 
-                FollowData.cpp_cout("Target too far...PID (x,y): " + std::to_string(vx_adjust) + ", " + 
-                                                             std::to_string(vy_adjust));
+                float vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
+                                                              x_centroid_err, target_height_err, 0.0,
+                                                              w1_x, w2_x, w3_x, CONTROL_DIM::X);
+                float vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
+                                                              y_centroid_err, 0.0, 0.0,
+                                                              w1_y, w2_y, w3_y, CONTROL_DIM::Y);
+
+                // FollowData.cpp_cout("Target too far...PID (x,y): " + std::to_string(vx_adjust) + ", " +
+                //                     std::to_string(vy_adjust));
 
                 target_velocity[0] = vx_adjust;
-                target_velocity[1] = vy_adjust; 
+                target_velocity[1] = vy_adjust;
 
                 VehicleController::cmd_velocity_NED(target_velocity);
             }
