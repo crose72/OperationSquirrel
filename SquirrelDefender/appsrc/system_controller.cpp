@@ -34,14 +34,6 @@
  * Object definitions
  ********************************************************************************/
 DebugTerm SysStat("/dev/pts/2");
-#ifdef USE_JETSON
-
-int argc;
-char **argv;
-commandLine cmdLine(0, nullptr);
-
-#endif // USE_JETSON
-
 bool systems_initialized;
 SYSTEM_STATE system_state;
 
@@ -52,26 +44,6 @@ SYSTEM_STATE system_state;
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-
-#ifdef USE_JETSON
-
-/********************************************************************************
- * Function: command_line_inputs
- * Description: Get command line inputs.
- ********************************************************************************/
-int command_line_inputs(void)
-{
-    commandLine cmdLine(argc, argv);
-
-    if (cmdLine.GetFlag("help"))
-    {
-        return Detection::print_usage();
-    }
-
-    return 1;
-}
-
-#endif // USE_JETSON
 
 /********************************************************************************
  * Function: SystemController
@@ -95,9 +67,7 @@ int SystemController::system_init(void)
 
 #ifdef USE_JETSON
 
-    command_line_inputs();
-
-    if (!Video::video_init(cmdLine, ARG_POSITION(0)) ||
+    if (!Video::video_init() ||
         !Detection::detection_net_init() ||
         !Follow::follow_target_init())
     {
