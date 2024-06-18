@@ -28,161 +28,179 @@
 
 #include <signal.h>
 
-
 bool signal_recieved = false;
 
 void sig_handler(int signo)
 {
-	if( signo == SIGINT )
-	{
-		LogVerbose("received SIGINT\n");
-		signal_recieved = true;
-	}
+    if (signo == SIGINT)
+    {
+        LogVerbose("received SIGINT\n");
+        signal_recieved = true;
+    }
 }
 
 int usage()
 {
-	printf("usage: detectnet [--help] [--network=NETWORK] [--threshold=THRESHOLD] ...\n");
-	printf("                 input [output]\n\n");
-	printf("Locate objects in a video/image stream using an object detection DNN.\n");
-	printf("See below for additional arguments that may not be shown above.\n\n");
-	printf("positional arguments:\n");
-	printf("    input           resource URI of input stream  (see videoSource below)\n");
-	printf("    output          resource URI of output stream (see videoOutput below)\n\n");
+    printf("usage: detectnet [--help] [--network=NETWORK] [--threshold=THRESHOLD] ...\n");
+    printf("                 input [output]\n\n");
+    printf("Locate objects in a video/image stream using an object detection DNN.\n");
+    printf("See below for additional arguments that may not be shown above.\n\n");
+    printf("positional arguments:\n");
+    printf("    input           resource URI of input stream  (see videoSource below)\n");
+    printf("    output          resource URI of output stream (see videoOutput below)\n\n");
 
-	printf("%s", detectNet::Usage());
-	printf("%s", objectTracker::Usage());
-	printf("%s", videoSource::Usage());
-	printf("%s", videoOutput::Usage());
-	printf("%s", Log::Usage());
+    printf("%s", detectNet::Usage());
+    printf("%s", objectTracker::Usage());
+    printf("%s", videoSource::Usage());
+    printf("%s", videoOutput::Usage());
+    printf("%s", Log::Usage());
 
-	return 0;
+    return 0;
 }
 
-
-int main( int argc, char** argv )
+int main(int argc, char **argv)
 {
-	/*
-	 * parse command line
-	 */
-	commandLine cmdLine(argc, argv);
+    /*
+     * parse command line
+     */
+    commandLine cmdLine(argc, argv);
 
-	if( cmdLine.GetFlag("help") )
-		return usage();
+    if (cmdLine.GetFlag("help"))
+        return usage();
 
+    /*
+     * attach signal handler
+     */
+    if (signal(SIGINT, sig_handler) == SIG_ERR)
+        LogError("can't catch SIGINT\n");
 
-	/*
-	 * attach signal handler
-	 */
-	if( signal(SIGINT, sig_handler) == SIG_ERR )
-		LogError("can't catch SIGINT\n");
+    /*
+     * create input stream
+     */
+    videoOptions options1;
 
+    options1.resource = URI("csi://0");
+    options1.resource.protocol = "csi";
+    options1.resource.location = "0";
+    options1.deviceType = videoOptions::DeviceType::DEVICE_CSI;
+    options1.ioType = videoOptions::IoType::INPUT;
+    options1.width = 1280;
+    options1.height = 720;
+    options1.frameRate = 30;
+    options1.numBuffers = 4;
+    options1.zeroCopy = true;
+    options1.flipMethod = videoOptions::FlipMethod::FLIP_NONE;
 
-	/*
-	 * create input stream
-	 */
-	videoSource* input = videoSource::Create(cmdLine, ARG_POSITION(0));
+    videoSource *input = videoSource::Create(options1);
 
-	if( !input )
-	{
-		LogError("detectnet:  failed to create input stream\n");
-		return 1;
-	}
+    if (!input)
+    {
+        LogError("detectnet:  failed to create input stream\n");
+        return 1;
+    }
 
+    /*
+     * create output stream
+     */
+    videoOptions options2;
 
-	/*
-	 * create output stream
-	 */
-	videoOutput* output = videoOutput::Create(cmdLine, ARG_POSITION(1));
-	
-	if( !output )
-	{
-		LogError("detectnet:  failed to create output stream\n");	
-		return 1;
-	}
-	
+    options2.resource = "display://0"; // Specify the display URI
+    options2.resource.protocol = "display";
+    options2.resource.location = "0";
+    options2.deviceType = videoOptions::DeviceType::DEVICE_DISPLAY;
+    options2.ioType = videoOptions::IoType::OUTPUT;
+    options2.width = 1920;
+    options2.height = 1080;
+    options2.frameRate = 30; // Adjust as needed
+    options2.numBuffers = 4;
+    options2.zeroCopy = true;
 
-	/*
-	 * create detection network
-	 */
-	detectNet* net = detectNet::Create(cmdLine);
-	
-	if( !net )
-	{
-		LogError("detectnet:  failed to load detectNet model\n");
-		return 1;
-	}
+    videoOutput *output = videoOutput::Create(options2);
 
-	// parse overlay flags
-	const uint32_t overlayFlags = detectNet::OverlayFlagsFromStr(cmdLine.GetString("overlay", "box,labels,conf"));
-	
+    if (!output)
+    {
+        LogError("detectnet:  failed to create output stream\n");
+        return 1;
+    }
 
-	/*
-	 * processing loop
-	 */
-	while( !signal_recieved )
-	{
-		// capture next image
-		uchar3* image = NULL;
-		int status = 0;
-		
-		if( !input->Capture(&image, &status) )
-		{
-			if( status == videoSource::TIMEOUT )
-				continue;
-			
-			break; // EOS
-		}
+    /*
+     * create detection network
+     */
+    detectNet *net = detectNet::Create(cmdLine);
 
-		// detect objects in the frame
-		detectNet::Detection* detections = NULL;
-	
-		const int numDetections = net->Detect(image, input->GetWidth(), input->GetHeight(), &detections, overlayFlags);
-		
-		if( numDetections > 0 )
-		{
-			LogVerbose("%i objects detected\n", numDetections);
-		
-			for( int n=0; n < numDetections; n++ )
-			{
-				LogVerbose("\ndetected obj %i  class #%u (%s)  confidence=%f\n", n, detections[n].ClassID, net->GetClassDesc(detections[n].ClassID), detections[n].Confidence);
-				LogVerbose("bounding box %i  (%.2f, %.2f)  (%.2f, %.2f)  w=%.2f  h=%.2f\n", n, detections[n].Left, detections[n].Top, detections[n].Right, detections[n].Bottom, detections[n].Width(), detections[n].Height()); 
-			
-				if( detections[n].TrackID >= 0 ) // is this a tracked object?
-					LogVerbose("tracking  ID %i  status=%i  frames=%i  lost=%i\n", detections[n].TrackID, detections[n].TrackStatus, detections[n].TrackFrames, detections[n].TrackLost);
-			}
-		}	
+    if (!net)
+    {
+        LogError("detectnet:  failed to load detectNet model\n");
+        return 1;
+    }
 
-		// render outputs
-		if( output != NULL )
-		{
-			output->Render(image, input->GetWidth(), input->GetHeight());
+    // parse overlay flags
+    const uint32_t overlayFlags = detectNet::OverlayFlagsFromStr(cmdLine.GetString("overlay", "box,labels,conf"));
 
-			// update the status bar
-			char str[256];
-			sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(net->GetPrecision()), net->GetNetworkFPS());
-			output->SetStatus(str);
+    /*
+     * processing loop
+     */
+    while (!signal_recieved)
+    {
+        // capture next image
+        uchar3 *image = NULL;
+        int status = 0;
 
-			// check if the user quit
-			if( !output->IsStreaming() )
-				break;
-		}
+        if (!input->Capture(&image, &status))
+        {
+            if (status == videoSource::TIMEOUT)
+                continue;
 
-		// print out timing info
-		net->PrintProfilerTimes();
-	}
-	
+            break; // EOS
+        }
 
-	/*
-	 * destroy resources
-	 */
-	LogVerbose("detectnet:  shutting down...\n");
-	
-	SAFE_DELETE(input);
-	SAFE_DELETE(output);
-	SAFE_DELETE(net);
+        // detect objects in the frame
+        detectNet::Detection *detections = NULL;
 
-	LogVerbose("detectnet:  shutdown complete.\n");
-	return 0;
+        const int numDetections = net->Detect(image, input->GetWidth(), input->GetHeight(), &detections, overlayFlags);
+
+        if (numDetections > 0)
+        {
+            LogVerbose("%i objects detected\n", numDetections);
+
+            for (int n = 0; n < numDetections; n++)
+            {
+                LogVerbose("\ndetected obj %i  class #%u (%s)  confidence=%f\n", n, detections[n].ClassID, net->GetClassDesc(detections[n].ClassID), detections[n].Confidence);
+                LogVerbose("bounding box %i  (%.2f, %.2f)  (%.2f, %.2f)  w=%.2f  h=%.2f\n", n, detections[n].Left, detections[n].Top, detections[n].Right, detections[n].Bottom, detections[n].Width(), detections[n].Height());
+
+                if (detections[n].TrackID >= 0) // is this a tracked object?
+                    LogVerbose("tracking  ID %i  status=%i  frames=%i  lost=%i\n", detections[n].TrackID, detections[n].TrackStatus, detections[n].TrackFrames, detections[n].TrackLost);
+            }
+        }
+
+        // render outputs
+        if (output != NULL)
+        {
+            output->Render(image, input->GetWidth(), input->GetHeight());
+
+            // update the status bar
+            char str[256];
+            sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(net->GetPrecision()), net->GetNetworkFPS());
+            output->SetStatus(str);
+
+            // check if the user quit
+            if (!output->IsStreaming())
+                break;
+        }
+
+        // print out timing info
+        net->PrintProfilerTimes();
+    }
+
+    /*
+     * destroy resources
+     */
+    LogVerbose("detectnet:  shutting down...\n");
+
+    SAFE_DELETE(input);
+    SAFE_DELETE(output);
+    SAFE_DELETE(net);
+
+    LogVerbose("detectnet:  shutdown complete.\n");
+    return 0;
 }
-
