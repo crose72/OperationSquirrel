@@ -1,7 +1,10 @@
 # Require CMake 3.1 or greater for IN_LIST support, 2.8 is for detectnet
 cmake_minimum_required(VERSION 3.1)
 
-# Options to enable or disable features.  Set these first.
+# Project definition
+project(SquirrelDefender)
+
+# Options to enable or disable features
 option(USE_JETSON "Enable Jetson Nano specific features" ON)
 option(USE_WSL "Enable WSL specific features" OFF)
 
@@ -37,44 +40,111 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_definitions(-DRELEASE_BUILD)
 endif()
 
-
+# Conditional configurations for Jetson or WSL
 if (USE_JETSON)
-    project(SquirrelDefender)
     option(USE_UART "Use UART functionality for Jetson Nano -> SITL or Jetson Nano -> real drone" ON)
     option(USE_TCP "Use TCP functionality for WSL -> WSL SITL" OFF)
     add_definitions(-DUSE_JETSON)
     add_definitions(-DUSE_UART)
 elseif(USE_WSL)
-    project(SquirrelDefender)
     option(USE_UART "Use UART functionality for Jetson Nano -> SITL or Jetson Nano -> real drone" OFF)
     option(USE_TCP "Use TCP functionality for WSL -> WSL SITL" ON)
     add_definitions(-DUSE_WSL)
     add_definitions(-DUSE_TCP)
 endif()
 
-# Configuration flags
-if (USE_TCP)
-    add_definitions(-DUSE_TCP)
-endif()
+# Custom header includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
-if (USE_UART)
-    add_definitions(-DUSE_UART)
-endif()
+# Mavlink includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/mavlink/v2.0/common)
 
-# Include the "c" folder and its subfolders
+# Catch2 includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/catch2)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/catch2/benchmark)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/catch2/benchmark/detail)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/catch2/generators)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/catch2/interfaces)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/catch2/internal)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/catch2/matchers)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/catch2/matchers/internal)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/catch2/reporters)
+
+# Dynalo includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/dynalo)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/dynalo/detail)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/dynalo/detail/linux)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/dynalo/detail/macos)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/dynalo/detail/windows)
+
+# jetson-inference and utils includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/jetson-inference)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/jetson-utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/calibration)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/experimental)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/plugins)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/tracking)
+
+# NaturalSort includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/NaturalSort)
+
+# ORB_SLAM3 includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/ORB_SLAM3)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/ORB_SLAM3/CameraModels)
+
+# Pangolin includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/compat)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/console)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/display)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/factory)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/geometry)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/gl)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/gl/compat)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/handler)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/image)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/log)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/plot)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/plot/loaders)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/scene)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/tools)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/utils/posix)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/utils/xml)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/var)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/video)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/video/drivers)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/pangolin/windowing)
+
+# Sigslot includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/sigslot)
+
+# Thirdparty includes for ORB_SLAM3
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/Thirdparty)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/Thirdparty/DBoW2)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/Thirdparty/DBoW2/DBoW2)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/Thirdparty/DBoW2/DUtils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/Thirdparty/g2o)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/Thirdparty/g2o/g2o)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/Thirdparty/g2o/g2o/core)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/Thirdparty/g2o/g2o/solvers)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/Thirdparty/g2o/g2o/stuff)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/Thirdparty/g2o/g2o/types)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/Thirdparty/Sophus)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/Thirdparty/Sophus/sophus)
+
+# Tinyobject includes
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/tinyobj)
+
+# Gstreamer includes
 include_directories(/usr/include/gstreamer-1.0/)
 include_directories(/usr/include/glib-2.0/)
 include_directories(/usr/lib/aarch64-linux-gnu/glib-2.0/include/)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/mavlink/v2.0/common)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
+# Jetson-specific configurations
 if (USE_JETSON)
     # Import jetson-inference and jetson-utils packages
     find_package(jetson-utils REQUIRED)
@@ -97,21 +167,18 @@ if (USE_JETSON)
     include_directories(${GLIB_INCLUDE_DIRS})
     include_directories(${GOBJECT_INCLUDE_DIRS})
     include_directories(${GST_APP_INCLUDE_DIRS})
-    
-    # Add directory for libnvbuf-utils to program
     link_directories(/usr/lib/aarch64-linux-gnu/tegra)
+
+    # All .so files contained locally
     link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 endif()
 
-# Set the source directory
+# Set the source and header directories
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/appsrc)
-
-# Set the header directory
 set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
 
 # List all source files with .cpp extension
 file(GLOB SOURCES ${SOURCE_DIR}/*.cpp)
-
 file(GLOB TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/UnitTests/*.cpp)
 
 # List all header files with .h extension
@@ -121,44 +188,43 @@ file(GLOB HEADERS ${HEADER_DIR}/*.h)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/CppUTest ThirdParty/CppUTest)
 enable_testing()
 
-# Create a static library for the application code
+# Create a static library for the squirreldefender code
 add_library(squirrel_defender_lib STATIC ${SOURCES} ${HEADERS})
 
 # Locate the static library
-# set(STATIC_LIBRARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/build) # Adjust the path if necessary
 find_library(SQUIRREL_DEFENDER_LIB NAMES squirrel_defender_lib PATHS ${STATIC_LIBRARY_DIR})
 
 # Compile the squirreldefender program
 if (USE_JETSON)
     cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
     target_link_libraries(squirreldefender
-    jetson-inference
-    jetson-utils
-    jsoncpp
-    g2o
-    ORB_SLAM3
-    pango_core
-    pango_windowing
-    pango_display
-    pango_geometry
-    pango_glgeometry
-    pango_image
-    pango_opengl
-    pango_packetstream
-    pango_plot
-    pango_python
-    pango_scene
-    pango_tools
-    pango_vars
-    pango_video
-    DBoW2
-    libCatch2.a
-    libCatch2Main.a
-    tinyobj
-    ${GST_LIBRARIES} 
-    ${GLIB_LIBRARIES} 
-    ${GOBJECT_LIBRARIES} 
-    ${GST_APP_LIBRARIES})
+        jetson-inference
+        jetson-utils
+        jsoncpp
+        g2o
+        ORB_SLAM3
+        pango_core
+        pango_windowing
+        pango_display
+        pango_geometry
+        pango_glgeometry
+        pango_image
+        pango_opengl
+        pango_packetstream
+        pango_plot
+        pango_python
+        pango_scene
+        pango_tools
+        pango_vars
+        pango_video
+        DBoW2
+        libCatch2.a
+        libCatch2Main.a
+        tinyobj
+        ${GST_LIBRARIES} 
+        ${GLIB_LIBRARIES} 
+        ${GOBJECT_LIBRARIES} 
+        ${GST_APP_LIBRARIES})
 elseif(USE_WSL)
     add_executable(squirreldefender ${SOURCES} ${HEADERS})
 endif()
@@ -166,14 +232,11 @@ endif()
 # Compile the unit_tests program
 if (USE_JETSON)
     cuda_add_executable(unit_tests ${TEST_SOURCES} ${HEADERS})
-    target_link_libraries(unit_tests jetson-inference)
-    target_link_libraries(unit_tests jsoncpp)
+    target_link_libraries(unit_tests jetson-inference jsoncpp)
     add_test(NAME unit_tests COMMAND unit_tests)
     target_link_libraries(unit_tests squirrel_defender_lib CppUTest CppUTestExt)
-    
 elseif(USE_WSL)
     add_executable(unit_tests ${TEST_SOURCES} ${HEADERS})
     add_test(NAME unit_tests COMMAND unit_tests)
     target_link_libraries(unit_tests squirrel_defender_lib CppUTest CppUTestExt)
-
 endif()
