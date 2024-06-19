@@ -118,9 +118,9 @@ bool Video::create_output_video_stream(const commandLine &cmdLine, int positionA
     options.resource.location = "0";
     options.deviceType = videoOptions::DeviceType::DEVICE_DISPLAY;
     options.ioType = videoOptions::IoType::OUTPUT;
-    options.width = 1920;
-    options.height = 1080;
-    options.frameRate = 30; // Adjust as needed
+    options.width = 1280;
+    options.height = 720;
+    options.frameRate = 30;
     options.numBuffers = 4;
     options.zeroCopy = true;
 
@@ -155,6 +155,7 @@ bool Video::capture_image(void)
         }
     }
 
+    // Checking for valid image, Capture may return true while image may still be NULL
     if (image == NULL)
     {
         valid_image_rcvd = false;
@@ -172,7 +173,7 @@ bool Video::capture_image(void)
  ********************************************************************************/
 bool Video::render_output(void)
 {
-    // render outputs
+    // render output to the display
     if (output != NULL)
     {
         output->Render(image, input->GetWidth(), input->GetHeight());

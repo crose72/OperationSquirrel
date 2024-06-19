@@ -24,9 +24,9 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-detectNet *net = NULL;
-detectNet::Detection *detections = NULL;
-int numDetections = 0;
+detectNet *net;
+detectNet::Detection *detections;
+int numDetections;
 
 /********************************************************************************
  * Calibration definitions
@@ -207,6 +207,10 @@ void Detection::detection_loop(void)
  ********************************************************************************/
 bool Detection::detection_net_init(void)
 {
+    net = NULL;
+    detections = NULL;
+    numDetections = 0;
+
     if (!create_detection_network())
     {
         PrintPass::c_fprintf("Failed to create detection network");

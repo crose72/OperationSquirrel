@@ -25,7 +25,6 @@ timer_t timerID;
 struct sigaction sa;
 struct sigevent sev;
 struct itimerspec its;
-bool stopProgram = false;
 
 /********************************************************************************
  * Calibration definitions

@@ -27,85 +27,90 @@ DebugTerm MavCmdAck("/dev/pts/3");
 DebugTerm SysStatInfo("/dev/pts/3");
 DebugTerm HeartbeatInfo("/dev/pts/3");
 
-uint16_t mav_veh_command_id = 0;              /*<  Command ID (of acknowledged command).*/
-uint8_t mav_veh_command_result = 0;           /*<  Result of command.*/
-uint8_t mav_veh_command_progress = 0;         /*< [%] The progress percentage when result is MAV_RESULT_IN_PROGRESS. Values: [0-100],
+uint16_t mav_veh_command_id;              /*<  Command ID (of acknowledged command).*/
+uint8_t mav_veh_command_result;           /*<  Result of command.*/
+uint8_t mav_veh_command_progress;         /*< [%] The progress percentage when result is MAV_RESULT_IN_PROGRESS. Values: [0-100],
                                             or UINT8_MAX if the progress is unknown.*/
-int32_t mav_veh_command_result_param2 = 0;    /*<  Additional result information. Can be set with a command-specific enum containing
+int32_t mav_veh_command_result_param2;    /*<  Additional result information. Can be set with a command-specific enum containing
                                            command-specific error reasons for why the command might be denied. If used, the associated
                                            enum must be documented in the corresponding MAV_CMD (this enum should have a 0 value to indicate
                                            "unused" or "unknown").*/
-uint8_t mav_veh_command_target_system = 0;    /*<  System ID of the target recipient. This is the ID of the system that sent the command for
+uint8_t mav_veh_command_target_system;    /*<  System ID of the target recipient. This is the ID of the system that sent the command for
                                                which this COMMAND_ACK is an acknowledgement.*/
-uint8_t mav_veh_command_target_component = 0; /*<  Component ID of the target recipient. This is the ID of the system that sent the command for
+uint8_t mav_veh_command_target_component; /*<  Component ID of the target recipient. This is the ID of the system that sent the command for
                                             which this COMMAND_ACK is an acknowledgement.*/
 
-uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_present = 0;      /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
-uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled = 0;      /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
-uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health = 0;       /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error.
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_present;      /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled;      /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health;       /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error.
                                                               Value of 1: healthy.*/
-uint16_t mav_veh_sys_stat_load = 0;                           /*< [d%] Maximum usage in percent of the mainloop time. Values: [0-1000] - should always be below 1000*/
-uint16_t mav_veh_sys_stat_voltage_battery = 0;                /*< [mV] Battery voltage, UINT16_MAX: Voltage not sent by autopilot*/
-int16_t mav_veh_sys_stat_current_battery = 0;                 /*< [cA] Battery current, -1: Current not sent by autopilot*/
-uint16_t mav_veh_sys_stat_drop_rate_comm = 0;                 /*< [c%] Communication drop rate, (UART, I2C, SPI, CAN), dropped packets on all links
+uint16_t mav_veh_sys_stat_load;                           /*< [d%] Maximum usage in percent of the mainloop time. Values: [0-1000] - should always be below 1000*/
+uint16_t mav_veh_sys_stat_voltage_battery;                /*< [mV] Battery voltage, UINT16_MAX: Voltage not sent by autopilot*/
+int16_t mav_veh_sys_stat_current_battery;                 /*< [cA] Battery current, -1: Current not sent by autopilot*/
+uint16_t mav_veh_sys_stat_drop_rate_comm;                 /*< [c%] Communication drop rate, (UART, I2C, SPI, CAN), dropped packets on all links
                                                             (packets that were corrupted on reception on the MAV)*/
-uint16_t mav_veh_sys_stat_errors_comm = 0;                    /*<  Communication errors (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)*/
-uint16_t mav_veh_sys_stat_errors_count1 = 0;                  /*<  Autopilot-specific errors*/
-uint16_t mav_veh_sys_stat_errors_count2 = 0;                  /*<  Autopilot-specific errors*/
-uint16_t mav_veh_sys_stat_errors_count3 = 0;                  /*<  Autopilot-specific errors*/
-uint16_t mav_veh_sys_stat_errors_count4 = 0;                  /*<  Autopilot-specific errors*/
-int8_t mav_veh_sys_stat_battery_remaining = 0;                /*< [%] Battery energy remaining, -1: Battery remaining energy not sent by autopilot*/
-uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd = 0;  /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
-uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd = 0;  /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
-uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd = 0; /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error.
+uint16_t mav_veh_sys_stat_errors_comm;                    /*<  Communication errors (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)*/
+uint16_t mav_veh_sys_stat_errors_count1;                  /*<  Autopilot-specific errors*/
+uint16_t mav_veh_sys_stat_errors_count2;                  /*<  Autopilot-specific errors*/
+uint16_t mav_veh_sys_stat_errors_count3;                  /*<  Autopilot-specific errors*/
+uint16_t mav_veh_sys_stat_errors_count4;                  /*<  Autopilot-specific errors*/
+int8_t mav_veh_sys_stat_battery_remaining;                /*< [%] Battery energy remaining, -1: Battery remaining energy not sent by autopilot*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd;  /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd;  /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
+uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd; /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error.
                                                             Value of 1: healthy.*/
-uint32_t mav_veh_custom_mode = 0;                             /*<  A bitfield for use for autopilot-specific flags*/
-uint8_t mav_veh_type = 0;                                     /*<  Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the
+uint32_t mav_veh_custom_mode;                             /*<  A bitfield for use for autopilot-specific flags*/
+uint8_t mav_veh_type;                                     /*<  Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the
                                                             component type (e.g. camera, gimbal, etc.). This should be used in preference to component id for identifying the component type.*/
-uint8_t mav_veh_autopilot_type = 0;                           /*<  Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.*/
-uint8_t mav_veh_base_mode = 0;                                /*<  System mode bitmap.*/
-uint8_t mav_veh_state = 0;                                    /*<  System status flag.*/
-uint8_t mav_veh_mavlink_version = 0;                          /*<  MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version*/
+uint8_t mav_veh_autopilot_type;                           /*<  Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.*/
+uint8_t mav_veh_base_mode;                                /*<  System mode bitmap.*/
+uint8_t mav_veh_state;                                    /*<  System status flag.*/
+uint8_t mav_veh_mavlink_version;                          /*<  MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version*/
 
-int32_t mav_veh_lat = 0;        /*< [degE7] Latitude, expressed*/
-int32_t mav_veh_lon = 0;        /*< [degE7] Longitude, expressed*/
-int32_t mav_veh_alt = 0;        /*< [mm] Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.*/
-int32_t mav_veh_rel_alt = 0;    /*< [mm] Altitude above ground*/
-int16_t mav_veh_gps_vx = 0;     /*< [cm/s] Ground X Speed (Latitude, positive north)*/
-int16_t mav_veh_gps_vy = 0;     /*< [cm/s] Ground Y Speed (Longitude, positive east)*/
-int16_t mav_veh_gps_vz = 0;     /*< [cm/s] Ground Z Speed (Altitude, positive down)*/
-uint16_t mav_veh_gps_hdg = 0;   /*< [cdeg] Vehicle heading (yaw angle), 0.0..359.99 degrees. If unknown, set to: UINT16_MAX*/
-float mav_veh_roll = 0.0;       /*< [rad] Roll angle (-pi..+pi)*/
-float mav_veh_pitch = 0.0;      /*< [rad] Pitch angle (-pi..+pi)*/
-float mav_veh_yaw = 0.0;        /*< [rad] Yaw angle (-pi..+pi)*/
-float mav_veh_rollspeed = 0.0;  /*< [rad/s] Roll angular speed*/
-float mav_veh_pitchspeed = 0.0; /*< [rad/s] Pitch angular speed*/
-float mav_veh_yawspeed = 0.0;   /*< [rad/s] Yaw angular speed*/
-int16_t mav_veh_imu_ax = 0;     /*< [mG] X acceleration*/
-int16_t mav_veh_imu_ay = 0;     /*< [mG] Y acceleration*/
-int16_t mav_veh_imu_az = 0;     /*< [mG] Z acceleration*/
-int16_t mav_veh_imu_xgyro = 0;  /*< [mrad/s] Angular speed around X axis*/
-int16_t mav_veh_imu_ygyro = 0;  /*< [mrad/s] Angular speed around Y axis*/
-int16_t mav_veh_imu_zgyro = 0;  /*< [mrad/s] Angular speed around Z axis*/
-int16_t mav_veh_imu_xmag = 0;   /*< [mgauss] X Magnetic field*/
-int16_t mav_veh_imu_ymag = 0;   /*< [mgauss] Y Magnetic field*/
-int16_t mav_veh_imu_zmag = 0;   /*< [mgauss] Z Magnetic field*/
-float mav_veh_q1_target = 0.0;
-float mav_veh_q2_target = 0.0;
-float mav_veh_q3_target = 0.0;
-float mav_veh_q4_target = 0.0;
-float mav_veh_roll_rate_target = 0.0;
-float mav_veh_pitch_rate_target = 0.0;
-float mav_veh_yaw_rate_target = 0.0;
-float thrust_target = 0.0;
-float mav_veh_q1 = 0.0;
-float mav_veh_q2 = 0.0;
-float mav_veh_q3 = 0.0;
-float mav_veh_q4 = 0.0;
-float mav_veh_roll_rate = 0.0;
-float mav_veh_pitch_rate = 0.0;
-float mav_veh_yaw_rate = 0.0;
-float mav_veh_thrust = 0.0;
+int32_t mav_veh_lat;      /*< [degE7] Latitude, expressed*/
+int32_t mav_veh_lon;      /*< [degE7] Longitude, expressed*/
+int32_t mav_veh_alt;      /*< [mm] Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.*/
+int32_t mav_veh_rel_alt;  /*< [mm] Altitude above ground*/
+int16_t mav_veh_gps_vx;   /*< [cm/s] Ground X Speed (Latitude, positive north)*/
+int16_t mav_veh_gps_vy;   /*< [cm/s] Ground Y Speed (Longitude, positive east)*/
+int16_t mav_veh_gps_vz;   /*< [cm/s] Ground Z Speed (Altitude, positive down)*/
+uint16_t mav_veh_gps_hdg; /*< [cdeg] Vehicle heading (yaw angle), 0.0..359.99 degrees. If unknown, set to: UINT16_MAX*/
+
+float mav_veh_roll;       /*< [rad] Roll angle (-pi..+pi)*/
+float mav_veh_pitch;      /*< [rad] Pitch angle (-pi..+pi)*/
+float mav_veh_yaw;        /*< [rad] Yaw angle (-pi..+pi)*/
+float mav_veh_rollspeed;  /*< [rad/s] Roll angular speed*/
+float mav_veh_pitchspeed; /*< [rad/s] Pitch angular speed*/
+float mav_veh_yawspeed;   /*< [rad/s] Yaw angular speed*/
+
+int16_t mav_veh_imu_ax;    /*< [mG] X acceleration*/
+int16_t mav_veh_imu_ay;    /*< [mG] Y acceleration*/
+int16_t mav_veh_imu_az;    /*< [mG] Z acceleration*/
+int16_t mav_veh_imu_xgyro; /*< [mrad/s] Angular speed around X axis*/
+int16_t mav_veh_imu_ygyro; /*< [mrad/s] Angular speed around Y axis*/
+int16_t mav_veh_imu_zgyro; /*< [mrad/s] Angular speed around Z axis*/
+int16_t mav_veh_imu_xmag;  /*< [mgauss] X Magnetic field*/
+int16_t mav_veh_imu_ymag;  /*< [mgauss] Y Magnetic field*/
+int16_t mav_veh_imu_zmag;  /*< [mgauss] Z Magnetic field*/
+
+float mav_veh_q1_target;         /*<  Quaternion component 1, w (1 in null-rotation)*/
+float mav_veh_q2_target;         /*<  Quaternion component 2, x (0 in null-rotation)*/
+float mav_veh_q3_target;         /*<  Quaternion component 3, y (0 in null-rotation)*/
+float mav_veh_q4_target;         /*<  Quaternion component 4, z (0 in null-rotation)*/
+float mav_veh_roll_rate_target;  /*< [rad/s] Roll angular speed*/
+float mav_veh_pitch_rate_target; /*< [rad/s] Pitch angular speed*/
+float mav_veh_yaw_rate_target;   /*< [rad/s] Yaw angular speed*/
+float mav_veh_thrust_target;     /*<  Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)*/
+uint8_t attitude_target_mask;    /*<  Bitmap to indicate which dimensions should be ignored by the vehicle.*/
+
+float mav_veh_q1_actual;         /*<  Quaternion component 1, w (1 in null-rotation)*/
+float mav_veh_q2_actual;         /*<  Quaternion component 2, x (0 in null-rotation)*/
+float mav_veh_q3_actual;         /*<  Quaternion component 3, y (0 in null-rotation)*/
+float mav_veh_q4_actual;         /*<  Quaternion component 4, z (0 in null-rotation)*/
+float mav_veh_roll_rate_actual;  /*< [rad/s] Roll angular speed*/
+float mav_veh_pitch_rate_actual; /*< [rad/s] Pitch angular speed*/
+float mav_veh_yaw_rate_actual;   /*< [rad/s] Yaw angular speed*/
+float mav_veh_thrust_actual;     /*<  Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)*/
 
 /********************************************************************************
  * Calibration definitions
@@ -599,6 +604,83 @@ void MavMsg::parse_mav_msgs(void)
  ********************************************************************************/
 bool MavMsg::mav_comm_init(void)
 {
+    uint16_t mav_veh_command_id = 0;
+    uint8_t mav_veh_command_result = 0;
+    uint8_t mav_veh_command_progress = 0;
+    int32_t mav_veh_command_result_param2 = 0;
+    uint8_t mav_veh_command_target_system = 0;
+    uint8_t mav_veh_command_target_component = 0;
+    uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_present = 0;
+    uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled = 0;
+    uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health = 0;
+
+    uint16_t mav_veh_sys_stat_load = 0;
+    uint16_t mav_veh_sys_stat_voltage_battery = 0;
+    int16_t mav_veh_sys_stat_current_battery = 0;
+    uint16_t mav_veh_sys_stat_drop_rate_comm = 0;
+
+    uint16_t mav_veh_sys_stat_errors_comm = 0;
+    uint16_t mav_veh_sys_stat_errors_count1 = 0;
+    uint16_t mav_veh_sys_stat_errors_count2 = 0;
+    uint16_t mav_veh_sys_stat_errors_count3 = 0;
+    uint16_t mav_veh_sys_stat_errors_count4 = 0;
+    int8_t mav_veh_sys_stat_battery_remaining = 0;
+    uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd = 0;
+    uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd = 0;
+    uint32_t mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd = 0;
+
+    uint32_t mav_veh_custom_mode = 0;
+    uint8_t mav_veh_type = 0;
+    uint8_t mav_veh_autopilot_type = 0;
+    uint8_t mav_veh_base_mode = 0;
+    uint8_t mav_veh_state = 0;
+    uint8_t mav_veh_mavlink_version = 0;
+
+    int32_t mav_veh_lat = 0;
+    int32_t mav_veh_lon = 0;
+    int32_t mav_veh_alt = 0;
+    int32_t mav_veh_rel_alt = 0;
+    int16_t mav_veh_gps_vx = 0;
+    int16_t mav_veh_gps_vy = 0;
+    int16_t mav_veh_gps_vz = 0;
+    uint16_t mav_veh_gps_hdg = 0;
+
+    float mav_veh_roll = 0.0;
+    float mav_veh_pitch = 0.0;
+    float mav_veh_yaw = 0.0;
+    float mav_veh_rollspeed = 0.0;
+    float mav_veh_pitchspeed = 0.0;
+    float mav_veh_yawspeed = 0.0;
+
+    int16_t mav_veh_imu_ax = 0;
+    int16_t mav_veh_imu_ay = 0;
+    int16_t mav_veh_imu_az = 0;
+    int16_t mav_veh_imu_xgyro = 0;
+    int16_t mav_veh_imu_ygyro = 0;
+    int16_t mav_veh_imu_zgyro = 0;
+    int16_t mav_veh_imu_xmag = 0;
+    int16_t mav_veh_imu_ymag = 0;
+    int16_t mav_veh_imu_zmag = 0;
+
+    float mav_veh_q1_target = 0.0;
+    float mav_veh_q2_target = 0.0;
+    float mav_veh_q3_target = 0.0;
+    float mav_veh_q4_target = 0.0;
+    float mav_veh_roll_rate_target = 0.0;
+    float mav_veh_pitch_rate_target = 0.0;
+    float mav_veh_yaw_rate_target = 0.0;
+    float mav_veh_thrust_target = 0.0;
+    uint8_t attitude_target_mask;
+
+    float mav_veh_q1_actual = 0.0;
+    float mav_veh_q2_actual = 0.0;
+    float mav_veh_q3_actual = 0.0;
+    float mav_veh_q4_actual = 0.0;
+    float mav_veh_roll_rate_actual = 0.0;
+    float mav_veh_pitch_rate_actual = 0.0;
+    float mav_veh_yaw_rate_actual = 0.0;
+    float mav_veh_thrust_actual = 0.0;
+
     if (!start_mav_comm() ||
         !start_message_subscriptions())
     {

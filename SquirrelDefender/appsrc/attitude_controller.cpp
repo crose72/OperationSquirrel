@@ -2,10 +2,10 @@
  * @file    attitude_controller.cpp
  * @author  Cameron Rose
  * @date    6/7/2023
- * @brief   Control the yaw, pitch, roll, thrust of the drone by sending the 
+ * @brief   Control the yaw, pitch, roll, thrust of the drone by sending the
  *          following MAVLINK message to the drone.  Useful for trajectory
  *          planning.
- * 
+ *
             SET_ATTITUDE_TARGET ( #82 )
             [Message] Sets a desired vehicle attitude. Used by an external controller to command the vehicle (manual controller or other system).
 
@@ -32,7 +32,6 @@
             64	    ATTITUDE_TARGET_TYPEMASK_THROTTLE_IGNORE	    Ignore throttle
             128	    ATTITUDE_TARGET_TYPEMASK_ATTITUDE_IGNORE	    Ignore attitude
  ********************************************************************************/
-
 
 /********************************************************************************
  * Includes
@@ -69,13 +68,13 @@ const float error_cal = 0.1;
  ********************************************************************************/
 bool dtrmn_attitude_target_error(void)
 {
-    if (std::fabs(mav_veh_q1 - mav_veh_q1_target) > error_cal 
-    || std::fabs(mav_veh_q2 - mav_veh_q2_target) > error_cal 
-    || std::fabs(mav_veh_q3 - mav_veh_q3_target) > error_cal 
-    || std::fabs(mav_veh_q4 - mav_veh_q4_target) > error_cal 
-    || std::fabs(mav_veh_roll_rate - mav_veh_roll_rate_target) > error_cal 
-    || std::fabs(mav_veh_pitch_rate - mav_veh_pitch_rate_target) > error_cal 
-    || std::fabs(mav_veh_yaw_rate - mav_veh_yaw_rate_target) > error_cal)
+    if (std::fabs(mav_veh_q1_actual - mav_veh_q1_target) > error_cal ||
+        std::fabs(mav_veh_q2_actual - mav_veh_q2_target) > error_cal ||
+        std::fabs(mav_veh_q3_actual - mav_veh_q3_target) > error_cal ||
+        std::fabs(mav_veh_q4_actual - mav_veh_q4_target) > error_cal ||
+        std::fabs(mav_veh_roll_rate_actual - mav_veh_roll_rate_target) > error_cal ||
+        std::fabs(mav_veh_pitch_rate_actual - mav_veh_pitch_rate_target) > error_cal ||
+        std::fabs(mav_veh_yaw_rate_actual - mav_veh_yaw_rate_target) > error_cal)
     {
         attitude_target_error = true;
     }
@@ -90,15 +89,15 @@ bool dtrmn_attitude_target_error(void)
  * Function: move_forward
  * Description: Command drone to move forward until otherwise directed
  ********************************************************************************/
-void move_forward (void)
+void move_forward(void)
 {
     // parameters for set_attitude_target command
     desired_attitude_target.time_boot_ms = 0;
     desired_attitude_target.body_roll_rate = 0.0;
     desired_attitude_target.body_pitch_rate = -2.0;
-    desired_attitude_target.body_yaw_rate = 0.0; 
-    desired_attitude_target.thrust = (float)0.5;  // Define the desired thrust magnitude (adjust as needed), Range: 0.0 (no thrust) to 1.0 (full thrust)
-    desired_attitude_target.q[0] = (float)1.0; // real part, i, j, k
+    desired_attitude_target.body_yaw_rate = 0.0;
+    desired_attitude_target.thrust = (float)0.5; // Define the desired thrust magnitude (adjust as needed), Range: 0.0 (no thrust) to 1.0 (full thrust)
+    desired_attitude_target.q[0] = (float)1.0;   // real part, i, j, k
     desired_attitude_target.q[1] = (float)0.0;
     desired_attitude_target.q[2] = (float)0.0;
     desired_attitude_target.q[3] = (float)0.0;
@@ -119,15 +118,15 @@ void move_forward (void)
  * Function: brake
  * Description: Command drone to air brake
  ********************************************************************************/
-void brake (void)
+void brake(void)
 {
     // parameters for set_attitude_target command
     desired_attitude_target.time_boot_ms = 0;
     desired_attitude_target.body_roll_rate = 0.0;
     desired_attitude_target.body_pitch_rate = 2.0;
-    desired_attitude_target.body_yaw_rate = 0.0; 
-    desired_attitude_target.thrust = (float)0.5;  // Define the desired thrust magnitude (adjust as needed), Range: 0.0 (no thrust) to 1.0 (full thrust)
-    desired_attitude_target.q[0] = (float)1.0; // real part, i, j, k
+    desired_attitude_target.body_yaw_rate = 0.0;
+    desired_attitude_target.thrust = (float)0.5; // Define the desired thrust magnitude (adjust as needed), Range: 0.0 (no thrust) to 1.0 (full thrust)
+    desired_attitude_target.q[0] = (float)1.0;   // real part, i, j, k
     desired_attitude_target.q[1] = (float)0.0;
     desired_attitude_target.q[2] = (float)0.0;
     desired_attitude_target.q[3] = (float)0.0;
@@ -148,18 +147,18 @@ void brake (void)
  * Function: attitude_yaw
  * Description: Command drone to yaw about the z axis.
  ********************************************************************************/
-void attitude_yaw (float yaw_pos, float yaw_rate)
+void attitude_yaw(float yaw_pos, float yaw_rate)
 {
     // parameters for set_attitude_target command
     desired_attitude_target.body_yaw_rate = yaw_rate;
-    desired_attitude_target.thrust = (float)0.5;  // Define the desired thrust magnitude (adjust as needed), Range: 0.0 (no thrust) to 1.0 (full thrust)
+    desired_attitude_target.thrust = (float)0.5; // Define the desired thrust magnitude (adjust as needed), Range: 0.0 (no thrust) to 1.0 (full thrust)
     desired_attitude_target.q[0] = cos(yaw_pos); // w
     desired_attitude_target.q[3] = sin(yaw_pos); // z
-    desired_attitude_target.q[1] = 0; // x
-    desired_attitude_target.q[2] = 0; // y
+    desired_attitude_target.q[1] = 0;            // x
+    desired_attitude_target.q[2] = 0;            // y
     desired_attitude_target.target_system = TARGET_SYS_ID;
     desired_attitude_target.target_component = TARGET_COMP_ID;
     desired_attitude_target.type_mask = 0b00000000;
-    
+
     MavCmd::send_cmd_set_attitude_target(&desired_attitude_target);
 }
