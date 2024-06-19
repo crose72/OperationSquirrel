@@ -72,7 +72,6 @@ include_directories(/usr/include/glib-2.0/)
 include_directories(/usr/lib/aarch64-linux-gnu/glib-2.0/include/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/mavlink/v2.0/common)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
@@ -101,6 +100,7 @@ if (USE_JETSON)
     
     # Add directory for libnvbuf-utils to program
     link_directories(/usr/lib/aarch64-linux-gnu/tegra)
+    link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 endif()
 
 # Set the source directory
@@ -131,9 +131,34 @@ find_library(SQUIRREL_DEFENDER_LIB NAMES squirrel_defender_lib PATHS ${STATIC_LI
 # Compile the squirreldefender program
 if (USE_JETSON)
     cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
-    target_link_libraries(squirreldefender jetson-inference)
-    target_link_libraries(squirreldefender jsoncpp)
-    target_link_libraries(squirreldefender ${GST_LIBRARIES} ${GLIB_LIBRARIES} ${GOBJECT_LIBRARIES} ${GST_APP_LIBRARIES})
+    target_link_libraries(squirreldefender
+    jetson-inference
+    jetson-utils
+    jsoncpp
+    g2o
+    ORB_SLAM3
+    pango_core
+    pango_windowing
+    pango_display
+    pango_geometry
+    pango_glgeometry
+    pango_image
+    pango_opengl
+    pango_packetstream
+    pango_plot
+    pango_python
+    pango_scene
+    pango_tools
+    pango_vars
+    pango_video
+    DBoW2
+    libCatch2.a
+    libCatch2Main.a
+    tinyobj
+    ${GST_LIBRARIES} 
+    ${GLIB_LIBRARIES} 
+    ${GOBJECT_LIBRARIES} 
+    ${GST_APP_LIBRARIES})
 elseif(USE_WSL)
     add_executable(squirreldefender ${SOURCES} ${HEADERS})
 endif()

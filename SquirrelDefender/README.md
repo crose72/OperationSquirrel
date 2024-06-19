@@ -10,6 +10,12 @@ This folder contains the code for the Squirrel Defender and most of its dependen
 5. Execute `sudo ./squirreldefender` to run the program
 6. Execute `./unit_tests` to run the unit tests
 
+## Notes
+- Followed the instructions here to update the linker path (it didn't work after only doing this though) https://stackoverflow.com/questions/480764/linux-error-while-loading-shared-libraries-cannot-open-shared-object-file-no-s 
+- Copied all .so files from `SquirrelDefender/lib/` to `/usr/local/lib/` on the jetson
+- Copied all folders from `SquirrelDefender/inc/` to `/usr/local/include/` on the jetson
+- Updated the shared library cache with `sudo ldconfig -v`
+
 ## CMakeLists explanation
 
 - Enable either USE_JETSON or USE_WSL by turning them ON or OFF (only one at a time)
