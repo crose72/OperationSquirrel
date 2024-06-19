@@ -37,7 +37,7 @@
  * Object definitions
  ********************************************************************************/
 TimeCalc MainAppTime;
-bool signal_recieved = false;
+bool stop_program = false;
 std::mutex mutex;
 
 /********************************************************************************
@@ -56,8 +56,8 @@ void sig_handler(int signo)
 {
     if (signo == SIGINT)
     {
-        PrintPass::c_printf("received SIGINT\n");
-        signal_recieved = true;
+        stop_program = true;
+        PrintPass::c_fprintf("received SIGINT\n");
     }
 }
 
@@ -69,7 +69,7 @@ void attach_sig_handler(void)
 {
     if (signal(SIGINT, sig_handler) == SIG_ERR)
     {
-        PrintPass::c_printf("can't catch SIGINT\n");
+        PrintPass::c_fprintf("can't catch SIGINT");
     }
 }
 
@@ -99,7 +99,7 @@ int main(void)
         return SystemController::system_init();
     }
 
-    while (!signal_recieved)
+    while (!stop_program)
     {
         std::lock_guard<std::mutex> lock(mutex);
         MainAppTime.calc_elapsed_time();

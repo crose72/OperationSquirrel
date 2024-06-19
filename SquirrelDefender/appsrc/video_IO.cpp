@@ -79,18 +79,9 @@ Video::~Video(void) {}
  ********************************************************************************/
 bool Video::create_input_video_stream(const commandLine &cmdLine, int positionArg)
 {
-    input = videoSource::Create(cmdLine, positionArg);
-    /*videoOptions options;
-
-    // Set the video options
-    options.resource = URI("csi://0");
-    options.width = 1280;
-    options.height = 720;
-    options.frameRate = 30;
-    options.numBuffers = 4;
-    options.flipMethod = videoOptions::FlipMethod::FLIP_ROTATE_180;*/
-    /*
     videoOptions options;
+
+    options.resource = URI("csi://0");
     options.resource.protocol = "csi";
     options.resource.location = "0";
     options.deviceType = videoOptions::DeviceType::DEVICE_CSI;
@@ -102,7 +93,7 @@ bool Video::create_input_video_stream(const commandLine &cmdLine, int positionAr
     options.zeroCopy = true;
     options.flipMethod = videoOptions::FlipMethod::FLIP_NONE;
 
-    input = videoSource::Create(options);*/
+    input = videoSource::Create(options);
 
     if (!input)
     {
@@ -120,15 +111,29 @@ bool Video::create_input_video_stream(const commandLine &cmdLine, int positionAr
  ********************************************************************************/
 bool Video::create_output_video_stream(const commandLine &cmdLine, int positionArg)
 {
-    /*
-     * create output stream
-     */
-    output = videoOutput::Create(cmdLine, positionArg);
+    videoOptions options;
+
+    options.resource = "display://0"; // Specify the display URI
+    options.resource.protocol = "display";
+    options.resource.location = "0";
+    options.deviceType = videoOptions::DeviceType::DEVICE_DISPLAY;
+    options.ioType = videoOptions::IoType::OUTPUT;
+    options.width = 1920;
+    options.height = 1080;
+    options.frameRate = 30; // Adjust as needed
+    options.numBuffers = 4;
+    options.zeroCopy = true;
+
+    output = videoOutput::Create(options);
 
     if (!output)
     {
         LogError("detectnet:  failed to create output stream\n");
         return false;
+    }
+
+    if (!output->Open())
+    {
     }
 
     return true;
@@ -140,9 +145,6 @@ bool Video::create_output_video_stream(const commandLine &cmdLine, int positionA
  ********************************************************************************/
 bool Video::capture_image(void)
 {
-    DebugTerm VideoDebug("/dev/pts/3");
-
-    image = NULL;
     int status = 0;
 
     if (!input->Capture(&image, &status))
@@ -225,8 +227,8 @@ void Video::delete_output_video_stream(void)
  ********************************************************************************/
 bool Video::video_init(void)
 {
-    command_line_inputs();
     valid_image_rcvd = false;
+    image = NULL;
 
     if (!create_input_video_stream(cmdLine, ARG_POSITION(0)) ||
         !create_output_video_stream(cmdLine, ARG_POSITION(1)))
