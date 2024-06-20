@@ -1,0 +1,2333 @@
+Vehicle: Copter
+Board: MatekF405-TE
+Branch: upstream/Copter-4.5
+Selected Features:
+Enable EKF3
+Enable Baro Temperature Calibration
+Enable MSP Barometric Sensor
+Enable SPL06 Barometric Sensor
+Enable SMBUS BatteryMonitor
+Enable Synthetic Current Monitor
+Enable Camera Trigger support
+Enable Camera Trigger via Relay support
+Enable Camera Trigger via Servo support
+Enable AK09916 compasses
+Enable BMM150 compasses
+Enable HMC5843 compasses
+Enable AK09916 on ICM20948 compasses
+Enable IST8308 compasses
+Enable LIS3MDL compasses
+Enable MMC3416 compasses
+Enable QMC5883L compasses
+Enable RM3100 compasses
+Enable Mode Brake
+Enable Mode Flip
+Enable Mode Turtle
+Enable @MISSION/ filesystem
+Enable @PARAM/ filesystem
+Enable @ROMFS/ filesystem
+Enable @SYS/ filesystem
+Enable NMEA GPS
+Enable u-blox GPS
+Enable sending of old BATTERY2 message
+Enable old REQUEST_AUTOPILOT_CAPABILITIES command
+Enable handling of DeviceOp mavlink messages
+Enable handling of Serial Control mavlink messages
+Enable handling of ServoRelay mavlink messages
+Enable old MAVLink FencePoint protocol
+Enable MSP Telemetry and MSP OSD
+Enable MSP Compass
+Enable MSP DisplayPort OSD (aka CANVAS MODE)
+Enable MSP GPS
+Enable MSP Rangefinder
+Enable MAVLink LED Control
+Enable NeoPixel
+Enable ProfiLED
+Enable MAVLink Play Tune
+Enable ToneAlarm on PWM
+Enable OSD
+Enable OSD param
+Enable Scrolling Sidebars
+Enable "tumble" compass calibration
+Enable Logging
+Enable formatting of microSD cards
+Enable Landing Gear
+Enable Relay support
+Enable Servo/Relay Event support
+Enable CRSF RC Protocol
+Enable Ghost RC Protocol
+Enable IBus RC Protocol
+Enable Serial RC Protocol support
+Enable SBUS Protocol
+Enable SRXL RC Protocol
+Enable SRXL2 RC Protocol
+Enable ST24 Protocol
+Enable SUMD RC Protocol
+Enable Rangefinders
+Enable Rangefinder - Analog
+Enable Rangefinder - Benewake -TF02
+Enable Rangefinder - Benewake - TF03
+Enable Rangefinder - Benewake - TFMini
+Enable Rangefinder - Benewake - TFMiniPlus
+Enable Rangefinder - BLPing
+Enable Rangefinder - GYUS42V2
+Enable Rangefinder - HC_SR04
+Enable Rangefinder - Lanbao
+Enable Rangefinder - LeddarOne
+Enable Rangefinder - LeddarVU8
+Enable Rangefinder - Lightware (serial)
+Enable Rangefinder - Lightware (i2c)
+Enable Rangefinder - MAVLink
+Enable Rangefinder - MaxBotix (serial)
+Enable Rangefinder - MaxSonarI2CXL
+Enable Rangefinder - NMEA
+Enable Rangefinder - PulsedLightLRF
+Enable Rangefinder - PWM
+Enable Rangefinder - TeraRangerI2C
+Enable Rangefinder - TeraRanger Serial
+Enable Rangefinder - USD1 (SERIAL)
+Enable Rangefinder - VL53L0X
+Enable Rangefinder - VL53L1X
+Enable Rangefinder - Wasp
+Enable Avoidance
+Enable Geofence
+Enable Airspeed Sensors
+Enable Optical Flow
+Enable Optical flow CXOF Sensor
+Enable RPM sensors
+Enable RPM ESC Telemetry sensors
+Enable RPM Harmonic Notch sensors
+Enable RPM Pin-based sensors
+Enable CRSF Telemetry
+Enable CRSF Text Param Selection
+Enable FrSky Telemetry
+Enable FrSkyD Telemetry
+Enable FrSkySPort Telemetry
+Enable FrSkySPort PassThrough Telemetry
+Enable Ghost Telemetry
+Enable Spektrum Telemetry
+HEXA
+OCTA
+QUADS(BI,TRI also)
+Enable SmartAudio VTX Contol
+Enable IRC Tramp VTX Control
+Enable VideoTX control
+
+Waiting for build to start...
+
+Setting vehicle to: Copter
+Running waf configure
+Setting top to                           : /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src 
+Setting out to                           : /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230 
+Autoconfiguration                        : enabled 
+Checking for program 'python'            : /usr/bin/python3 
+Checking for python version >= 3.6.9     : 3.10.12 
+Setting board to                         : MatekF405-TE 
+Using toolchain                          : arm-none-eabi 
+Checking for 'g++' (C++ compiler)        : /home/custom/bin/arm-none-eabi-g++ 
+Checking for 'gcc' (C compiler)          : /home/custom/bin/arm-none-eabi-gcc 
+Checking for c flags '-MMD'              : yes 
+Checking for cxx flags '-MMD'            : yes 
+CXX Compiler                             : g++ 10.2.1 
+Checking for program 'make'              : /usr/bin/make 
+Checking for program 'arm-none-eabi-objcopy' : /home/custom/gcc/bin/arm-none-eabi-objcopy 
+Including /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/libraries/AP_HAL_ChibiOS/hwdef/include/minimize_fpv_osd.inc
+Including /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/libraries/AP_HAL_ChibiOS/hwdef/include/minimize_common.inc
+Removing HAL_MSP_GPS_ENABLED
+Including /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/libraries/AP_HAL_ChibiOS/hwdef/include/save_some_flash.inc
+Including /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/libraries/AP_HAL_ChibiOS/hwdef/include/no_bootloader_DFU.inc
+Removing HAL_EXTERNAL_AHRS_ENABLED
+Removing AP_EXTERNAL_AHRS_MICROSTRAIN5_ENABLED
+Removing AP_EXTERNAL_AHRS_MICROSTRAIN7_ENABLED
+Removing AP_EXTERNAL_AHRS_VECTORNAV_ENABLED
+Removing HAL_NAVEKF2_AVAILABLE
+Removing HAL_NAVEKF3_AVAILABLE
+Removing EK3_FEATURE_EXTERNAL_NAV
+Removing EK3_FEATURE_DRAG_FUSION
+Removing HAL_INS_TEMPERATURE_CAL_ENABLE
+Removing HAL_VISUALODOM_ENABLED
+Removing HAL_PERIPH_SUPPORT_LONG_CAN_PRINTF
+Removing AP_FETTEC_ONEWIRE_ENABLED
+Removing AP_DRONECAN_HIMARK_SERVO_SUPPORT
+Removing AP_DRONECAN_HOBBYWING_ESC_SUPPORT
+Removing AP_KDECAN_ENABLED
+Removing AP_ROBOTISSERVO_ENABLED
+Removing AP_SBUSOUTPUT_ENABLED
+Removing AP_VOLZ_ENABLED
+Removing AP_DRONECAN_VOLZ_FEEDBACK_ENABLED
+Removing AP_AIRSPEED_ASP5033_ENABLED
+Removing AP_AIRSPEED_ANALOG_ENABLED
+Removing AP_AIRSPEED_DLVR_ENABLED
+Removing AP_AIRSPEED_DRONECAN_ENABLED
+Removing AP_AIRSPEED_MS4525_ENABLED
+Removing AP_AIRSPEED_MS5525_ENABLED
+Removing AP_AIRSPEED_MSP_ENABLED
+Removing AP_AIRSPEED_NMEA_ENABLED
+Removing AP_AIRSPEED_SDP3X_ENABLED
+Removing AP_TEMPCALIBRATION_ENABLED
+Removing HAL_BARO_WIND_COMP_ENABLED
+Removing AP_BARO_BMP085_ENABLED
+Removing AP_BARO_BMP280_ENABLED
+Removing AP_BARO_BMP388_ENABLED
+Removing AP_BARO_DPS280_ENABLED
+Removing AP_BARO_DRONECAN_ENABLED
+Removing AP_BARO_DUMMY_ENABLED
+Removing AP_BARO_EXTERNALAHRS_ENABLED
+Removing AP_BARO_FBM320_ENABLED
+Removing AP_BARO_ICM20789_ENABLED
+Removing AP_BARO_ICP101XX_ENABLED
+Removing AP_BARO_ICP201XX_ENABLED
+Removing AP_BARO_KELLERLD_ENABLED
+Removing AP_BARO_LPS2XH_ENABLED
+Removing AP_BARO_MS56XX_ENABLED
+Removing AP_BARO_MSP_ENABLED
+Removing AP_BARO_SPL06_ENABLED
+Removing AP_BATTERY_ESC_TELEM_OUTBOUND_ENABLED
+Removing AP_BATTERY_FUELFLOW_ENABLED
+Removing AP_BATTERY_FUELLEVEL_ANALOG_ENABLED
+Removing AP_BATTERY_FUELLEVEL_PWM_ENABLED
+Removing AP_BATTERY_INA2XX_ENABLED
+Removing AP_BATTERY_SMBUS_ENABLED
+Removing AP_BATTERY_SYNTHETIC_CURRENT_ENABLED
+Removing AP_BATTERY_WATT_MAX_ENABLED
+Removing AP_CAMERA_ENABLED
+Removing AP_CAMERA_SEND_FOV_STATUS_ENABLED
+Removing AP_CAMERA_MAVLINK_ENABLED
+Removing AP_CAMERA_MAVLINKCAMV2_ENABLED
+Removing AP_CAMERA_MOUNT_ENABLED
+Removing AP_CAMERA_RELAY_ENABLED
+Removing AP_CAMERA_SERVO_ENABLED
+Removing AP_CAMERA_SOLOGIMBAL_ENABLED
+Removing HAL_RUNCAM_ENABLED
+Removing AP_COMPASS_AK09916_ENABLED
+Removing AP_COMPASS_AK8963_ENABLED
+Removing AP_COMPASS_BMM150_ENABLED
+Removing AP_COMPASS_DRONECAN_ENABLED
+Removing AP_COMPASS_EXTERNALAHRS_ENABLED
+Removing AP_COMPASS_HMC5843_ENABLED
+Removing AP_COMPASS_ICM20948_ENABLED
+Removing AP_COMPASS_IST8308_ENABLED
+Removing AP_COMPASS_LIS3MDL_ENABLED
+Removing AP_COMPASS_LSM303D_ENABLED
+Removing AP_COMPASS_LSM9DS1_ENABLED
+Removing AP_COMPASS_MAG3110_ENABLED
+Removing AP_COMPASS_MMC3416_ENABLED
+Removing AP_COMPASS_MMC5XX3_ENABLED
+Removing AP_COMPASS_QMC5883L_ENABLED
+Removing AP_COMPASS_RM3100_ENABLED
+Removing AC_PAYLOAD_PLACE_ENABLED
+Removing MODE_BRAKE_ENABLED
+Removing MODE_FLIP_ENABLED
+Removing MODE_FLOWHOLD_ENABLED
+Removing MODE_FOLLOW_ENABLED
+Removing MODE_GUIDED_NOGPS_ENABLED
+Removing MODE_SPORT_ENABLED
+Removing MODE_SYSTEMID_ENABLED
+Removing MODE_TURTLE_ENABLED
+Removing MODE_ZIGZAG_ENABLED
+Removing AP_CRASHDUMP_ENABLED
+Removing AP_INERTIALSENSOR_KILL_IMU_ENABLED
+Removing HAL_PICCOLO_CAN_ENABLE
+Removing HAL_TORQEEDO_ENABLED
+Removing FORCE_APJ_DEFAULT_PARAMETERS
+Removing AP_FILESYSTEM_MISSION_ENABLED
+Removing AP_FILESYSTEM_PARAM_ENABLED
+Removing AP_FILESYSTEM_ROMFS_ENABLED
+Removing AP_FILESYSTEM_SYS_ENABLED
+Removing AP_DRONECAN_SEND_GPS
+Removing AP_GPS_ERB_ENABLED
+Removing AP_GPS_GSOF_ENABLED
+Removing AP_GPS_MAV_ENABLED
+Removing AP_GPS_NMEA_ENABLED
+Removing AP_GPS_NMEA_UNICORE_ENABLED
+Removing AP_GPS_NOVA_ENABLED
+Removing AP_GPS_SBF_ENABLED
+Removing AP_GPS_SBP_ENABLED
+Removing AP_GPS_SBP2_ENABLED
+Removing AP_GPS_SIRF_ENABLED
+Removing AP_GPS_UBLOX_ENABLED
+Removing HAL_GENERATOR_ENABLED
+Removing AP_GENERATOR_IE_2400_ENABLED
+Removing AP_GENERATOR_IE_650_800_ENABLED
+Removing AP_GENERATOR_RICHENPOWER_ENABLED
+Removing HAL_MOUNT_ALEXMOS_ENABLED
+Removing HAL_MOUNT_GREMSY_ENABLED
+Removing HAL_MOUNT_ENABLED
+Removing HAL_MOUNT_SERVO_ENABLED
+Removing HAL_MOUNT_SIYI_ENABLED
+Removing HAL_SOLO_GIMBAL_ENABLED
+Removing HAL_MOUNT_STORM32MAVLINK_ENABLED
+Removing HAL_MOUNT_STORM32SERIAL_ENABLED
+Removing HAL_MOUNT_VIEWPRO_ENABLED
+Removing HAL_MOUNT_XACTI_ENABLED
+Removing HAL_EFI_ENABLED
+Removing AP_EFI_CURRAWONG_ECU_ENABLED
+Removing AP_EFI_DRONECAN_ENABLED
+Removing AP_EFI_SERIAL_HIRTH_ENABLED
+Removing AP_EFI_SERIAL_LUTAN_ENABLED
+Removing AP_EFI_MAV_ENABLED
+Removing AP_EFI_SERIAL_MS_ENABLED
+Removing AP_EFI_NWPWU_ENABLED
+Removing AP_ICENGINE_ENABLED
+Removing HAL_ADSB_ENABLED
+Removing HAL_ADSB_SAGETECH_ENABLED
+Removing HAL_ADSB_SAGETECH_MXS_ENABLED
+Removing HAL_ADSB_UAVIONIX_MAVLINK_ENABLED
+Removing HAL_ADSB_UCP_ENABLED
+Removing AP_AIS_ENABLED
+Removing AP_OPENDRONEID_ENABLED
+Removing AP_MAVLINK_AUTOPILOT_VERSION_REQUEST_ENABLED
+Removing AP_MAVLINK_BATTERY2_ENABLED
+Removing AP_MAVLINK_MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES_ENABLED
+Removing AP_MAVLINK_MSG_DEVICE_OP_ENABLED
+Removing AP_MAVLINK_MSG_MISSION_REQUEST_ENABLED
+Removing AP_MAVLINK_MSG_MOUNT_CONFIGURE_ENABLED
+Removing AP_MAVLINK_MSG_MOUNT_CONTROL_ENABLED
+Removing AP_MAVLINK_MSG_RELAY_STATUS_ENABLED
+Removing AP_MAVLINK_MSG_SERIAL_CONTROL_ENABLED
+Removing AP_MAVLINK_SERVO_RELAY_ENABLED
+Removing AC_POLYFENCE_FENCE_POINT_PROTOCOL_SUPPORT
+Removing HAL_HIGH_LATENCY2_ENABLED
+Removing AP_MAVLINK_RALLY_POINT_PROTOCOL_ENABLED
+Removing HAL_MSP_ENABLED
+Removing AP_COMPASS_MSP_ENABLED
+Removing HAL_WITH_MSP_DISPLAYPORT
+Removing HAL_MSP_GPS_ENABLED
+Removing HAL_MSP_OPTICALFLOW_ENABLED
+Removing HAL_MSP_RANGEFINDER_ENABLED
+Removing HAL_MSP_SENSORS_ENABLED
+Removing AP_MISSION_NAV_PAYLOAD_PLACE_ENABLED
+Removing AP_NETWORKING_BACKEND_PPP
+Removing AP_NOTIFY_MAVLINK_LED_CONTROL_SUPPORT_ENABLED
+Removing AP_NOTIFY_NCP5623_ENABLED
+Removing AP_NOTIFY_NEOPIXEL_ENABLED
+Removing AP_NOTIFY_PROFILED_ENABLED
+Removing AP_NOTIFY_PROFILED_SPI_ENABLED
+Removing AP_NOTIFY_MAVLINK_PLAY_TUNE_SUPPORT_ENABLED
+Removing AP_NOTIFY_TONEALARM_ENABLED
+Removing OSD_ENABLED
+Removing OSD_PARAM_ENABLED
+Removing HAL_OSD_SIDEBAR_ENABLE
+Removing HAL_PLUSCODE_ENABLE
+Removing AP_BOOTLOADER_FLASHING_ENABLED
+Removing HAL_BUTTON_ENABLED
+Removing COMPASS_CAL_ENABLED
+Removing HAL_DISPLAY_ENABLED
+Removing AP_DRONECAN_SERIAL_ENABLED
+Removing HAL_GYROFFT_ENABLED
+Removing HAL_LOGGING_ENABLED
+Removing HAL_NMEA_OUTPUT_ENABLED
+Removing AP_SCRIPTING_ENABLED
+Removing AP_FILESYSTEM_FORMAT_ENABLED
+Removing AP_SDCARD_STORAGE_ENABLED
+Removing AP_CAN_SLCAN_ENABLED
+Removing AP_GRIPPER_ENABLED
+Removing AP_LANDINGGEAR_ENABLED
+Removing AP_RELAY_ENABLED
+Removing AP_SERVORELAYEVENTS_ENABLED
+Removing HAL_SPRAYER_ENABLED
+Removing AP_WINCH_ENABLED
+Removing AP_ADVANCEDFAILSAFE_ENABLED
+Removing AP_TUNING_ENABLED
+Removing HAL_LANDING_DEEPSTALL_ENABLED
+Removing AP_PLANE_BLACKBOX_LOGGING
+Removing QAUTOTUNE_ENABLED
+Removing HAL_QUADPLANE_ENABLED
+Removing HAL_SOARING_ENABLED
+Removing AC_PRECLAND_ENABLED
+Removing AC_PRECLAND_COMPANION_ENABLED
+Removing AC_PRECLAND_IRLOCK_ENABLED
+Removing HAL_PROXIMITY_ENABLED
+Removing AP_PROXIMITY_CYGBOT_ENABLED
+Removing AP_PROXIMITY_DRONECAN_ENABLED
+Removing AP_PROXIMITY_LIGHTWARE_SF40C_ENABLED
+Removing AP_PROXIMITY_LIGHTWARE_SF45B_ENABLED
+Removing AP_PROXIMITY_MAV_ENABLED
+Removing AP_PROXIMITY_RANGEFINDER_ENABLED
+Removing AP_PROXIMITY_RPLIDARA2_ENABLED
+Removing AP_PROXIMITY_TERARANGERTOWER_ENABLED
+Removing AP_PROXIMITY_TERARANGERTOWEREVO_ENABLED
+Removing AP_RCPROTOCOL_CRSF_ENABLED
+Removing AP_RCPROTOCOL_GHST_ENABLED
+Removing AP_RCPROTOCOL_IBUS_ENABLED
+Removing AP_RCPROTOCOL_PPMSUM_ENABLED
+Removing AP_RCPROTOCOL_ENABLED
+Removing AP_RCPROTOCOL_SBUS_ENABLED
+Removing AP_RCPROTOCOL_SRXL_ENABLED
+Removing AP_RCPROTOCOL_SRXL2_ENABLED
+Removing AP_RCPROTOCOL_ST24_ENABLED
+Removing AP_RCPROTOCOL_SUMD_ENABLED
+Removing AP_RANGEFINDER_ENABLED
+Removing AP_RANGEFINDER_ANALOG_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_CAN_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_TF02_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_TF03_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_TFMINI_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_TFMINIPLUS_ENABLED
+Removing AP_RANGEFINDER_BLPING_ENABLED
+Removing AP_RANGEFINDER_DRONECAN_ENABLED
+Removing AP_RANGEFINDER_GYUS42V2_ENABLED
+Removing AP_RANGEFINDER_HC_SR04_ENABLED
+Removing AP_RANGEFINDER_JRE_SERIAL_ENABLED
+Removing AP_RANGEFINDER_LANBAO_ENABLED
+Removing AP_RANGEFINDER_LEDDARONE_ENABLED
+Removing AP_RANGEFINDER_LEDDARVU8_ENABLED
+Removing AP_RANGEFINDER_LIGHTWARE_SERIAL_ENABLED
+Removing AP_RANGEFINDER_LUA_ENABLED
+Removing AP_RANGEFINDER_LWI2C_ENABLED
+Removing AP_RANGEFINDER_MAVLINK_ENABLED
+Removing AP_RANGEFINDER_MAXBOTIX_SERIAL_ENABLED
+Removing AP_RANGEFINDER_MAXSONARI2CXL_ENABLED
+Removing AP_RANGEFINDER_NMEA_ENABLED
+Removing AP_RANGEFINDER_NOOPLOOP_ENABLED
+Removing AP_RANGEFINDER_NRA24_CAN_ENABLED
+Removing AP_RANGEFINDER_PULSEDLIGHTLRF_ENABLED
+Removing AP_RANGEFINDER_PWM_ENABLED
+Removing AP_RANGEFINDER_TOFSENSEF_I2C_ENABLED
+Removing AP_RANGEFINDER_TOFSENSEP_CAN_ENABLED
+Removing AP_RANGEFINDER_TRI2C_ENABLED
+Removing AP_RANGEFINDER_TERARANGER_SERIAL_ENABLED
+Removing AP_RANGEFINDER_USD1_CAN_ENABLED
+Removing AP_RANGEFINDER_USD1_SERIAL_ENABLED
+Removing AP_RANGEFINDER_VL53L0X_ENABLED
+Removing AP_RANGEFINDER_VL53L1X_ENABLED
+Removing AP_RANGEFINDER_WASP_ENABLED
+Removing AC_AVOID_ENABLED
+Removing AC_OAPATHPLANNER_ENABLED
+Removing AP_FENCE_ENABLED
+Removing HAL_PARACHUTE_ENABLED
+Removing HAL_RALLY_ENABLED
+Removing AP_AIRSPEED_ENABLED
+Removing AP_BEACON_ENABLED
+Removing GPS_MOVING_BASELINE
+Removing AP_SERIALMANAGER_IMUOUT_ENABLED
+Removing AP_OPTICALFLOW_ENABLED
+Removing AP_OPTICALFLOW_CXOF_ENABLED
+Removing AP_OPTICALFLOW_HEREFLOW_ENABLED
+Removing AP_OPTICALFLOW_MAV_ENABLED
+Removing AP_OPTICALFLOW_ONBOARD_ENABLED
+Removing AP_OPTICALFLOW_PIXART_ENABLED
+Removing AP_OPTICALFLOW_PX4FLOW_ENABLED
+Removing AP_OPTICALFLOW_UPFLOW_ENABLED
+Removing AP_RPM_ENABLED
+Removing AP_RPM_EFI_ENABLED
+Removing AP_RPM_ESC_TELEM_ENABLED
+Removing AP_RPM_GENERATOR_ENABLED
+Removing AP_RPM_HARMONICNOTCH_ENABLED
+Removing AP_RPM_PIN_ENABLED
+Removing AP_TEMPERATURE_SENSOR_ENABLED
+Removing AP_TEMPERATURE_SENSOR_MCP9600_ENABLED
+Removing AP_TEMPERATURE_SENSOR_TSYS01_ENABLED
+Removing AP_TEMPERATURE_SENSOR_TSYS03_ENABLED
+Removing AP_RC_CHANNEL_AUX_FUNCTION_STRINGS_ENABLED
+Removing HAL_CRSF_TELEM_ENABLED
+Removing HAL_CRSF_TELEM_TEXT_SELECTION_ENABLED
+Removing AP_FRSKY_TELEM_ENABLED
+Removing AP_FRSKY_D_TELEM_ENABLED
+Removing AP_FRSKY_SPORT_TELEM_ENABLED
+Removing AP_FRSKY_SPORT_PASSTHROUGH_ENABLED
+Removing AP_GHST_TELEM_ENABLED
+Removing HAL_HOTT_TELEM_ENABLED
+Removing AP_LTM_TELEM_ENABLED
+Removing HAL_SPEKTRUM_TELEM_ENABLED
+Removing AP_MOTORS_FRAME_DECA_ENABLED
+Removing AP_MOTORS_FRAME_DODECAHEXA_ENABLED
+Removing AP_MOTORS_FRAME_HEXA_ENABLED
+Removing AP_MOTORS_FRAME_OCTA_ENABLED
+Removing AP_MOTORS_FRAME_OCTAQUAD_ENABLED
+Removing AP_MOTORS_FRAME_QUAD_ENABLED
+Removing AP_MOTORS_FRAME_Y6_ENABLED
+Removing AP_SMARTAUDIO_ENABLED
+Removing AP_TRAMP_ENABLED
+Removing AP_VIDEOTX_ENABLED
+Setup for MCU STM32F405xx
+No default parameter file found
+Writing hwdef setup in /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/hwdef.h
+Writing DMA map
+Setting up as normal
+Generating ldscript.ld
+Checking for env.py
+env set ENABLE_DFU_BOOT=0
+env set WITH_FATFS=1
+env set PROCESS_STACK=0x1C00
+env set MAIN_STACK=0x600
+env set IOMCU_FW=0
+env set PERIPH_FW=0
+env set BOARD_FLASH_SIZE=1024
+env set EXT_FLASH_SIZE_MB=0
+env set INT_FLASH_PRIMARY=False
+env set ENABLE_CRASHDUMP=False
+env set CPU_FLAGS=['-mcpu=cortex-m4', '-mfpu=fpv4-sp-d16', '-mfloat-abi=hard', '-DARM_MATH_CM4', '-u_printf_float']
+env set CORTEX=cortex-m4
+env set APJ_BOARD_ID=1054
+env set APJ_BOARD_TYPE=STM32F405xx
+env set USBID=0x1209/0x5741
+env set FLASH_RESERVE_START_KB=64
+env set EXT_FLASH_RESERVE_START_KB=0
+env set FLASH_TOTAL=983040
+env set HAS_EXTERNAL_FLASH_SECTIONS=0
+env set CHIBIOS_BUILD_FLAGS=USE_FATFS=yes CHIBIOS_STARTUP_MK=os/common/startup/ARMCMx/compilers/GCC/mk/startup_stm32f4xx.mk CHIBIOS_PLATFORM_MK=os/hal/ports/STM32/STM32F4xx/platform.mk MCU=cortex-m4 ENV_UDEFS=-DCHPRINTF_USE_FLOAT=1
+Enabling ChibiOS asserts                     : no 
+Disabling Watchdog                           : no 
+Enabling malloc guard                        : no 
+Enabling ChibiOS thread statistics           : no 
+Enabling -Werror                             : yes 
+Checking for intelhex module:                : OK 
+Enabled OpenDroneID                          : no 
+Enabled firmware ID checking                 : no 
+GPS Debug Logging                            : no 
+Enabled custom controller                    : no 
+Checking for HAVE_CMATH_ISFINITE             : yes 
+Checking for HAVE_CMATH_ISINF                : yes 
+Checking for HAVE_CMATH_ISNAN                : yes 
+Checking for NEED_CMATH_ISFINITE_STD_NAMESPACE : yes 
+Checking for NEED_CMATH_ISINF_STD_NAMESPACE    : yes 
+Checking for NEED_CMATH_ISNAN_STD_NAMESPACE    : yes 
+Checking for header endian.h                   : not found 
+Checking for header byteswap.h                 : not found 
+Checking for HAVE_MEMRCHR                      : no 
+Configured VSCode Intellisense:                : no 
+DC_DSDL compiler                               : /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/DroneCAN/dronecan_dsdlc/dronecan_dsdlc.py 
+Source is git repository                       : yes 
+Update submodules                              : yes 
+Checking for program 'git'                     : /usr/bin/git 
+Gtest                                          : STM32 boards currently don't support compiling gtest 
+Checking for program 'arm-none-eabi-size'      : /home/custom/gcc/bin/arm-none-eabi-size 
+Benchmarks                                     : disabled 
+Unit tests                                     : disabled 
+Scripting                                      : maybe 
+Scripting runtime checks                       : enabled 
+Debug build                                    : disabled 
+Coverage build                                 : disabled 
+Force 32-bit build                             : disabled 
+Checking for program 'rsync'                   : /usr/bin/rsync 
+'configure' finished successfully (0.702s)
+Running clean
+'clean' finished successfully (1.012s)
+Running build
+Waf: Entering directory `/mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE'
+Including /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/libraries/AP_HAL_ChibiOS/hwdef/include/minimize_fpv_osd.inc
+Including /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/libraries/AP_HAL_ChibiOS/hwdef/include/minimize_common.inc
+Removing HAL_MSP_GPS_ENABLED
+Including /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/libraries/AP_HAL_ChibiOS/hwdef/include/save_some_flash.inc
+Including /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/libraries/AP_HAL_ChibiOS/hwdef/include/no_bootloader_DFU.inc
+Removing HAL_EXTERNAL_AHRS_ENABLED
+Removing AP_EXTERNAL_AHRS_MICROSTRAIN5_ENABLED
+Removing AP_EXTERNAL_AHRS_MICROSTRAIN7_ENABLED
+Removing AP_EXTERNAL_AHRS_VECTORNAV_ENABLED
+Removing HAL_NAVEKF2_AVAILABLE
+Removing HAL_NAVEKF3_AVAILABLE
+Removing EK3_FEATURE_EXTERNAL_NAV
+Removing EK3_FEATURE_DRAG_FUSION
+Removing HAL_INS_TEMPERATURE_CAL_ENABLE
+Removing HAL_VISUALODOM_ENABLED
+Removing HAL_PERIPH_SUPPORT_LONG_CAN_PRINTF
+Removing AP_FETTEC_ONEWIRE_ENABLED
+Removing AP_DRONECAN_HIMARK_SERVO_SUPPORT
+Removing AP_DRONECAN_HOBBYWING_ESC_SUPPORT
+Removing AP_KDECAN_ENABLED
+Removing AP_ROBOTISSERVO_ENABLED
+Removing AP_SBUSOUTPUT_ENABLED
+Removing AP_VOLZ_ENABLED
+Removing AP_DRONECAN_VOLZ_FEEDBACK_ENABLED
+Removing AP_AIRSPEED_ASP5033_ENABLED
+Removing AP_AIRSPEED_ANALOG_ENABLED
+Removing AP_AIRSPEED_DLVR_ENABLED
+Removing AP_AIRSPEED_DRONECAN_ENABLED
+Removing AP_AIRSPEED_MS4525_ENABLED
+Removing AP_AIRSPEED_MS5525_ENABLED
+Removing AP_AIRSPEED_MSP_ENABLED
+Removing AP_AIRSPEED_NMEA_ENABLED
+Removing AP_AIRSPEED_SDP3X_ENABLED
+Removing AP_TEMPCALIBRATION_ENABLED
+Removing HAL_BARO_WIND_COMP_ENABLED
+Removing AP_BARO_BMP085_ENABLED
+Removing AP_BARO_BMP280_ENABLED
+Removing AP_BARO_BMP388_ENABLED
+Removing AP_BARO_DPS280_ENABLED
+Removing AP_BARO_DRONECAN_ENABLED
+Removing AP_BARO_DUMMY_ENABLED
+Removing AP_BARO_EXTERNALAHRS_ENABLED
+Removing AP_BARO_FBM320_ENABLED
+Removing AP_BARO_ICM20789_ENABLED
+Removing AP_BARO_ICP101XX_ENABLED
+Removing AP_BARO_ICP201XX_ENABLED
+Removing AP_BARO_KELLERLD_ENABLED
+Removing AP_BARO_LPS2XH_ENABLED
+Removing AP_BARO_MS56XX_ENABLED
+Removing AP_BARO_MSP_ENABLED
+Removing AP_BARO_SPL06_ENABLED
+Removing AP_BATTERY_ESC_TELEM_OUTBOUND_ENABLED
+Removing AP_BATTERY_FUELFLOW_ENABLED
+Removing AP_BATTERY_FUELLEVEL_ANALOG_ENABLED
+Removing AP_BATTERY_FUELLEVEL_PWM_ENABLED
+Removing AP_BATTERY_INA2XX_ENABLED
+Removing AP_BATTERY_SMBUS_ENABLED
+Removing AP_BATTERY_SYNTHETIC_CURRENT_ENABLED
+Removing AP_BATTERY_WATT_MAX_ENABLED
+Removing AP_CAMERA_ENABLED
+Removing AP_CAMERA_SEND_FOV_STATUS_ENABLED
+Removing AP_CAMERA_MAVLINK_ENABLED
+Removing AP_CAMERA_MAVLINKCAMV2_ENABLED
+Removing AP_CAMERA_MOUNT_ENABLED
+Removing AP_CAMERA_RELAY_ENABLED
+Removing AP_CAMERA_SERVO_ENABLED
+Removing AP_CAMERA_SOLOGIMBAL_ENABLED
+Removing HAL_RUNCAM_ENABLED
+Removing AP_COMPASS_AK09916_ENABLED
+Removing AP_COMPASS_AK8963_ENABLED
+Removing AP_COMPASS_BMM150_ENABLED
+Removing AP_COMPASS_DRONECAN_ENABLED
+Removing AP_COMPASS_EXTERNALAHRS_ENABLED
+Removing AP_COMPASS_HMC5843_ENABLED
+Removing AP_COMPASS_ICM20948_ENABLED
+Removing AP_COMPASS_IST8308_ENABLED
+Removing AP_COMPASS_LIS3MDL_ENABLED
+Removing AP_COMPASS_LSM303D_ENABLED
+Removing AP_COMPASS_LSM9DS1_ENABLED
+Removing AP_COMPASS_MAG3110_ENABLED
+Removing AP_COMPASS_MMC3416_ENABLED
+Removing AP_COMPASS_MMC5XX3_ENABLED
+Removing AP_COMPASS_QMC5883L_ENABLED
+Removing AP_COMPASS_RM3100_ENABLED
+Removing AC_PAYLOAD_PLACE_ENABLED
+Removing MODE_BRAKE_ENABLED
+Removing MODE_FLIP_ENABLED
+Removing MODE_FLOWHOLD_ENABLED
+Removing MODE_FOLLOW_ENABLED
+Removing MODE_GUIDED_NOGPS_ENABLED
+Removing MODE_SPORT_ENABLED
+Removing MODE_SYSTEMID_ENABLED
+Removing MODE_TURTLE_ENABLED
+Removing MODE_ZIGZAG_ENABLED
+Removing AP_CRASHDUMP_ENABLED
+Removing AP_INERTIALSENSOR_KILL_IMU_ENABLED
+Removing HAL_PICCOLO_CAN_ENABLE
+Removing HAL_TORQEEDO_ENABLED
+Removing FORCE_APJ_DEFAULT_PARAMETERS
+Removing AP_FILESYSTEM_MISSION_ENABLED
+Removing AP_FILESYSTEM_PARAM_ENABLED
+Removing AP_FILESYSTEM_ROMFS_ENABLED
+Removing AP_FILESYSTEM_SYS_ENABLED
+Removing AP_DRONECAN_SEND_GPS
+Removing AP_GPS_ERB_ENABLED
+Removing AP_GPS_GSOF_ENABLED
+Removing AP_GPS_MAV_ENABLED
+Removing AP_GPS_NMEA_ENABLED
+Removing AP_GPS_NMEA_UNICORE_ENABLED
+Removing AP_GPS_NOVA_ENABLED
+Removing AP_GPS_SBF_ENABLED
+Removing AP_GPS_SBP_ENABLED
+Removing AP_GPS_SBP2_ENABLED
+Removing AP_GPS_SIRF_ENABLED
+Removing AP_GPS_UBLOX_ENABLED
+Removing HAL_GENERATOR_ENABLED
+Removing AP_GENERATOR_IE_2400_ENABLED
+Removing AP_GENERATOR_IE_650_800_ENABLED
+Removing AP_GENERATOR_RICHENPOWER_ENABLED
+Removing HAL_MOUNT_ALEXMOS_ENABLED
+Removing HAL_MOUNT_GREMSY_ENABLED
+Removing HAL_MOUNT_ENABLED
+Removing HAL_MOUNT_SERVO_ENABLED
+Removing HAL_MOUNT_SIYI_ENABLED
+Removing HAL_SOLO_GIMBAL_ENABLED
+Removing HAL_MOUNT_STORM32MAVLINK_ENABLED
+Removing HAL_MOUNT_STORM32SERIAL_ENABLED
+Removing HAL_MOUNT_VIEWPRO_ENABLED
+Removing HAL_MOUNT_XACTI_ENABLED
+Removing HAL_EFI_ENABLED
+Removing AP_EFI_CURRAWONG_ECU_ENABLED
+Removing AP_EFI_DRONECAN_ENABLED
+Removing AP_EFI_SERIAL_HIRTH_ENABLED
+Removing AP_EFI_SERIAL_LUTAN_ENABLED
+Removing AP_EFI_MAV_ENABLED
+Removing AP_EFI_SERIAL_MS_ENABLED
+Removing AP_EFI_NWPWU_ENABLED
+Removing AP_ICENGINE_ENABLED
+Removing HAL_ADSB_ENABLED
+Removing HAL_ADSB_SAGETECH_ENABLED
+Removing HAL_ADSB_SAGETECH_MXS_ENABLED
+Removing HAL_ADSB_UAVIONIX_MAVLINK_ENABLED
+Removing HAL_ADSB_UCP_ENABLED
+Removing AP_AIS_ENABLED
+Removing AP_OPENDRONEID_ENABLED
+Removing AP_MAVLINK_AUTOPILOT_VERSION_REQUEST_ENABLED
+Removing AP_MAVLINK_BATTERY2_ENABLED
+Removing AP_MAVLINK_MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES_ENABLED
+Removing AP_MAVLINK_MSG_DEVICE_OP_ENABLED
+Removing AP_MAVLINK_MSG_MISSION_REQUEST_ENABLED
+Removing AP_MAVLINK_MSG_MOUNT_CONFIGURE_ENABLED
+Removing AP_MAVLINK_MSG_MOUNT_CONTROL_ENABLED
+Removing AP_MAVLINK_MSG_RELAY_STATUS_ENABLED
+Removing AP_MAVLINK_MSG_SERIAL_CONTROL_ENABLED
+Removing AP_MAVLINK_SERVO_RELAY_ENABLED
+Removing AC_POLYFENCE_FENCE_POINT_PROTOCOL_SUPPORT
+Removing HAL_HIGH_LATENCY2_ENABLED
+Removing AP_MAVLINK_RALLY_POINT_PROTOCOL_ENABLED
+Removing HAL_MSP_ENABLED
+Removing AP_COMPASS_MSP_ENABLED
+Removing HAL_WITH_MSP_DISPLAYPORT
+Removing HAL_MSP_GPS_ENABLED
+Removing HAL_MSP_OPTICALFLOW_ENABLED
+Removing HAL_MSP_RANGEFINDER_ENABLED
+Removing HAL_MSP_SENSORS_ENABLED
+Removing AP_MISSION_NAV_PAYLOAD_PLACE_ENABLED
+Removing AP_NETWORKING_BACKEND_PPP
+Removing AP_NOTIFY_MAVLINK_LED_CONTROL_SUPPORT_ENABLED
+Removing AP_NOTIFY_NCP5623_ENABLED
+Removing AP_NOTIFY_NEOPIXEL_ENABLED
+Removing AP_NOTIFY_PROFILED_ENABLED
+Removing AP_NOTIFY_PROFILED_SPI_ENABLED
+Removing AP_NOTIFY_MAVLINK_PLAY_TUNE_SUPPORT_ENABLED
+Removing AP_NOTIFY_TONEALARM_ENABLED
+Removing OSD_ENABLED
+Removing OSD_PARAM_ENABLED
+Removing HAL_OSD_SIDEBAR_ENABLE
+Removing HAL_PLUSCODE_ENABLE
+Removing AP_BOOTLOADER_FLASHING_ENABLED
+Removing HAL_BUTTON_ENABLED
+Removing COMPASS_CAL_ENABLED
+Removing HAL_DISPLAY_ENABLED
+Removing AP_DRONECAN_SERIAL_ENABLED
+Removing HAL_GYROFFT_ENABLED
+Removing HAL_LOGGING_ENABLED
+Removing HAL_NMEA_OUTPUT_ENABLED
+Removing AP_SCRIPTING_ENABLED
+Removing AP_FILESYSTEM_FORMAT_ENABLED
+Removing AP_SDCARD_STORAGE_ENABLED
+Removing AP_CAN_SLCAN_ENABLED
+Removing AP_GRIPPER_ENABLED
+Removing AP_LANDINGGEAR_ENABLED
+Removing AP_RELAY_ENABLED
+Removing AP_SERVORELAYEVENTS_ENABLED
+Removing HAL_SPRAYER_ENABLED
+Removing AP_WINCH_ENABLED
+Removing AP_ADVANCEDFAILSAFE_ENABLED
+Removing AP_TUNING_ENABLED
+Removing HAL_LANDING_DEEPSTALL_ENABLED
+Removing AP_PLANE_BLACKBOX_LOGGING
+Removing QAUTOTUNE_ENABLED
+Removing HAL_QUADPLANE_ENABLED
+Removing HAL_SOARING_ENABLED
+Removing AC_PRECLAND_ENABLED
+Removing AC_PRECLAND_COMPANION_ENABLED
+Removing AC_PRECLAND_IRLOCK_ENABLED
+Removing HAL_PROXIMITY_ENABLED
+Removing AP_PROXIMITY_CYGBOT_ENABLED
+Removing AP_PROXIMITY_DRONECAN_ENABLED
+Removing AP_PROXIMITY_LIGHTWARE_SF40C_ENABLED
+Removing AP_PROXIMITY_LIGHTWARE_SF45B_ENABLED
+Removing AP_PROXIMITY_MAV_ENABLED
+Removing AP_PROXIMITY_RANGEFINDER_ENABLED
+Removing AP_PROXIMITY_RPLIDARA2_ENABLED
+Removing AP_PROXIMITY_TERARANGERTOWER_ENABLED
+Removing AP_PROXIMITY_TERARANGERTOWEREVO_ENABLED
+Removing AP_RCPROTOCOL_CRSF_ENABLED
+Removing AP_RCPROTOCOL_GHST_ENABLED
+Removing AP_RCPROTOCOL_IBUS_ENABLED
+Removing AP_RCPROTOCOL_PPMSUM_ENABLED
+Removing AP_RCPROTOCOL_ENABLED
+Removing AP_RCPROTOCOL_SBUS_ENABLED
+Removing AP_RCPROTOCOL_SRXL_ENABLED
+Removing AP_RCPROTOCOL_SRXL2_ENABLED
+Removing AP_RCPROTOCOL_ST24_ENABLED
+Removing AP_RCPROTOCOL_SUMD_ENABLED
+Removing AP_RANGEFINDER_ENABLED
+Removing AP_RANGEFINDER_ANALOG_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_CAN_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_TF02_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_TF03_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_TFMINI_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_TFMINIPLUS_ENABLED
+Removing AP_RANGEFINDER_BLPING_ENABLED
+Removing AP_RANGEFINDER_DRONECAN_ENABLED
+Removing AP_RANGEFINDER_GYUS42V2_ENABLED
+Removing AP_RANGEFINDER_HC_SR04_ENABLED
+Removing AP_RANGEFINDER_JRE_SERIAL_ENABLED
+Removing AP_RANGEFINDER_LANBAO_ENABLED
+Removing AP_RANGEFINDER_LEDDARONE_ENABLED
+Removing AP_RANGEFINDER_LEDDARVU8_ENABLED
+Removing AP_RANGEFINDER_LIGHTWARE_SERIAL_ENABLED
+Removing AP_RANGEFINDER_LUA_ENABLED
+Removing AP_RANGEFINDER_LWI2C_ENABLED
+Removing AP_RANGEFINDER_MAVLINK_ENABLED
+Removing AP_RANGEFINDER_MAXBOTIX_SERIAL_ENABLED
+Removing AP_RANGEFINDER_MAXSONARI2CXL_ENABLED
+Removing AP_RANGEFINDER_NMEA_ENABLED
+Removing AP_RANGEFINDER_NOOPLOOP_ENABLED
+Removing AP_RANGEFINDER_NRA24_CAN_ENABLED
+Removing AP_RANGEFINDER_PULSEDLIGHTLRF_ENABLED
+Removing AP_RANGEFINDER_PWM_ENABLED
+Removing AP_RANGEFINDER_TOFSENSEF_I2C_ENABLED
+Removing AP_RANGEFINDER_TOFSENSEP_CAN_ENABLED
+Removing AP_RANGEFINDER_TRI2C_ENABLED
+Removing AP_RANGEFINDER_TERARANGER_SERIAL_ENABLED
+Removing AP_RANGEFINDER_USD1_CAN_ENABLED
+Removing AP_RANGEFINDER_USD1_SERIAL_ENABLED
+Removing AP_RANGEFINDER_VL53L0X_ENABLED
+Removing AP_RANGEFINDER_VL53L1X_ENABLED
+Removing AP_RANGEFINDER_WASP_ENABLED
+Removing AC_AVOID_ENABLED
+Removing AC_OAPATHPLANNER_ENABLED
+Removing AP_FENCE_ENABLED
+Removing HAL_PARACHUTE_ENABLED
+Removing HAL_RALLY_ENABLED
+Removing AP_AIRSPEED_ENABLED
+Removing AP_BEACON_ENABLED
+Removing GPS_MOVING_BASELINE
+Removing AP_SERIALMANAGER_IMUOUT_ENABLED
+Removing AP_OPTICALFLOW_ENABLED
+Removing AP_OPTICALFLOW_CXOF_ENABLED
+Removing AP_OPTICALFLOW_HEREFLOW_ENABLED
+Removing AP_OPTICALFLOW_MAV_ENABLED
+Removing AP_OPTICALFLOW_ONBOARD_ENABLED
+Removing AP_OPTICALFLOW_PIXART_ENABLED
+Removing AP_OPTICALFLOW_PX4FLOW_ENABLED
+Removing AP_OPTICALFLOW_UPFLOW_ENABLED
+Removing AP_RPM_ENABLED
+Removing AP_RPM_EFI_ENABLED
+Removing AP_RPM_ESC_TELEM_ENABLED
+Removing AP_RPM_GENERATOR_ENABLED
+Removing AP_RPM_HARMONICNOTCH_ENABLED
+Removing AP_RPM_PIN_ENABLED
+Removing AP_TEMPERATURE_SENSOR_ENABLED
+Removing AP_TEMPERATURE_SENSOR_MCP9600_ENABLED
+Removing AP_TEMPERATURE_SENSOR_TSYS01_ENABLED
+Removing AP_TEMPERATURE_SENSOR_TSYS03_ENABLED
+Removing AP_RC_CHANNEL_AUX_FUNCTION_STRINGS_ENABLED
+Removing HAL_CRSF_TELEM_ENABLED
+Removing HAL_CRSF_TELEM_TEXT_SELECTION_ENABLED
+Removing AP_FRSKY_TELEM_ENABLED
+Removing AP_FRSKY_D_TELEM_ENABLED
+Removing AP_FRSKY_SPORT_TELEM_ENABLED
+Removing AP_FRSKY_SPORT_PASSTHROUGH_ENABLED
+Removing AP_GHST_TELEM_ENABLED
+Removing HAL_HOTT_TELEM_ENABLED
+Removing AP_LTM_TELEM_ENABLED
+Removing HAL_SPEKTRUM_TELEM_ENABLED
+Removing AP_MOTORS_FRAME_DECA_ENABLED
+Removing AP_MOTORS_FRAME_DODECAHEXA_ENABLED
+Removing AP_MOTORS_FRAME_HEXA_ENABLED
+Removing AP_MOTORS_FRAME_OCTA_ENABLED
+Removing AP_MOTORS_FRAME_OCTAQUAD_ENABLED
+Removing AP_MOTORS_FRAME_QUAD_ENABLED
+Removing AP_MOTORS_FRAME_Y6_ENABLED
+Removing AP_SMARTAUDIO_ENABLED
+Removing AP_TRAMP_ENABLED
+Removing AP_VIDEOTX_ENABLED
+Setup for MCU STM32F405xx
+No default parameter file found
+Writing hwdef setup in /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/hwdef.h
+Writing DMA map
+Setting up as normal
+Generating ldscript.ld
+Checking for env.py
+No env.py found
+Generating hwdef.h
+Embedding file font0.bin:libraries/AP_OSD/fonts/font0.bin
+Embedding file hwdef.dat:/mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/hw.dat
+[ 3/10] Creating ../MatekF405-TE/hwdef.h
+[ 4/10] Creating ../MatekF405-TE/modules/ChibiOS/include_dirs
+[ 5/10] Compiling libraries/AP_Scripting/generator/src/main.c
+[ 6/10] Processing modules/mavlink/message_definitions/v1.0/all.xml
+[ 7/10] Creating ../MatekF405-TE/ap_version.h
+[ 8/10] Creating ../MatekF405-TE/chibios_flags.h
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/all.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/all.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/ardupilotmega.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/ardupilotmega.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/ASLUAV.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/ASLUAV.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/common.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/common.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/development.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/development.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/icarous.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/icarous.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/minimal.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/minimal.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/python_array_test.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/python_array_test.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/standard.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/standard.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/test.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/test.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/ualberta.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/ualberta.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/uAvionix.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/uAvionix.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/loweheiser.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/loweheiser.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/storm32.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/storm32.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/AVSSUAS.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/AVSSUAS.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/cubepilot.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/cubepilot.xml
+Validation skipped for /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/csAirLink.xml.
+Parsing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/modules/mavlink/message_definitions/v1.0/csAirLink.xml
+Merged enum MAV_CMD
+Merged enum MAV_CMD
+Merged enum MAV_CMD
+Merged enum MAV_CMD
+Merged enum MAV_CMD
+Found 337 MAVLink message types in 17 XML files
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/all
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/ardupilotmega
+[ 9/10] Processing /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/AP_Scripting/lua_generated_bindings.cpp,/mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/AP_Scripting/lua_generated_bindings.h: libraries/AP_Scripting/generator/description/bindings.desc ../MatekF405-TE/gen-bindings -> ../MatekF405-TE/libraries/AP_Scripting/lua_generated_bindings.cpp ../MatekF405-TE/libraries/AP_Scripting/lua_generated_bindings.h
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/ASLUAV
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/common
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/development
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/icarous
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/minimal
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/python_array_test
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/standard
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/test
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/ualberta
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/uAvionix
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/loweheiser
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/storm32
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/AVSSUAS
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/cubepilot
+Generating C implementation in directory /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0/csAirLink
+Copying fixed headers for protocol 2.0 to /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/libraries/GCS_MAVLink/include/mavlink/v2.0
+Including /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/libraries/AP_HAL_ChibiOS/hwdef/include/minimize_fpv_osd.inc
+Including /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/libraries/AP_HAL_ChibiOS/hwdef/include/minimize_common.inc
+Removing HAL_MSP_GPS_ENABLED
+Including /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/libraries/AP_HAL_ChibiOS/hwdef/include/save_some_flash.inc
+Including /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/build_src/libraries/AP_HAL_ChibiOS/hwdef/include/no_bootloader_DFU.inc
+Removing HAL_EXTERNAL_AHRS_ENABLED
+Removing AP_EXTERNAL_AHRS_MICROSTRAIN5_ENABLED
+Removing AP_EXTERNAL_AHRS_MICROSTRAIN7_ENABLED
+Removing AP_EXTERNAL_AHRS_VECTORNAV_ENABLED
+Removing HAL_NAVEKF2_AVAILABLE
+Removing HAL_NAVEKF3_AVAILABLE
+Removing EK3_FEATURE_EXTERNAL_NAV
+Removing EK3_FEATURE_DRAG_FUSION
+Removing HAL_INS_TEMPERATURE_CAL_ENABLE
+Removing HAL_VISUALODOM_ENABLED
+Removing HAL_PERIPH_SUPPORT_LONG_CAN_PRINTF
+Removing AP_FETTEC_ONEWIRE_ENABLED
+Removing AP_DRONECAN_HIMARK_SERVO_SUPPORT
+Removing AP_DRONECAN_HOBBYWING_ESC_SUPPORT
+Removing AP_KDECAN_ENABLED
+Removing AP_ROBOTISSERVO_ENABLED
+Removing AP_SBUSOUTPUT_ENABLED
+Removing AP_VOLZ_ENABLED
+Removing AP_DRONECAN_VOLZ_FEEDBACK_ENABLED
+Removing AP_AIRSPEED_ASP5033_ENABLED
+Removing AP_AIRSPEED_ANALOG_ENABLED
+Removing AP_AIRSPEED_DLVR_ENABLED
+Removing AP_AIRSPEED_DRONECAN_ENABLED
+Removing AP_AIRSPEED_MS4525_ENABLED
+Removing AP_AIRSPEED_MS5525_ENABLED
+Removing AP_AIRSPEED_MSP_ENABLED
+Removing AP_AIRSPEED_NMEA_ENABLED
+Removing AP_AIRSPEED_SDP3X_ENABLED
+Removing AP_TEMPCALIBRATION_ENABLED
+Removing HAL_BARO_WIND_COMP_ENABLED
+Removing AP_BARO_BMP085_ENABLED
+Removing AP_BARO_BMP280_ENABLED
+Removing AP_BARO_BMP388_ENABLED
+Removing AP_BARO_DPS280_ENABLED
+Removing AP_BARO_DRONECAN_ENABLED
+Removing AP_BARO_DUMMY_ENABLED
+Removing AP_BARO_EXTERNALAHRS_ENABLED
+Removing AP_BARO_FBM320_ENABLED
+Removing AP_BARO_ICM20789_ENABLED
+Removing AP_BARO_ICP101XX_ENABLED
+Removing AP_BARO_ICP201XX_ENABLED
+Removing AP_BARO_KELLERLD_ENABLED
+Removing AP_BARO_LPS2XH_ENABLED
+Removing AP_BARO_MS56XX_ENABLED
+Removing AP_BARO_MSP_ENABLED
+Removing AP_BARO_SPL06_ENABLED
+Removing AP_BATTERY_ESC_TELEM_OUTBOUND_ENABLED
+Removing AP_BATTERY_FUELFLOW_ENABLED
+Removing AP_BATTERY_FUELLEVEL_ANALOG_ENABLED
+Removing AP_BATTERY_FUELLEVEL_PWM_ENABLED
+Removing AP_BATTERY_INA2XX_ENABLED
+Removing AP_BATTERY_SMBUS_ENABLED
+Removing AP_BATTERY_SYNTHETIC_CURRENT_ENABLED
+Removing AP_BATTERY_WATT_MAX_ENABLED
+Removing AP_CAMERA_ENABLED
+Removing AP_CAMERA_SEND_FOV_STATUS_ENABLED
+Removing AP_CAMERA_MAVLINK_ENABLED
+Removing AP_CAMERA_MAVLINKCAMV2_ENABLED
+Removing AP_CAMERA_MOUNT_ENABLED
+Removing AP_CAMERA_RELAY_ENABLED
+Removing AP_CAMERA_SERVO_ENABLED
+Removing AP_CAMERA_SOLOGIMBAL_ENABLED
+Removing HAL_RUNCAM_ENABLED
+Removing AP_COMPASS_AK09916_ENABLED
+Removing AP_COMPASS_AK8963_ENABLED
+Removing AP_COMPASS_BMM150_ENABLED
+Removing AP_COMPASS_DRONECAN_ENABLED
+Removing AP_COMPASS_EXTERNALAHRS_ENABLED
+Removing AP_COMPASS_HMC5843_ENABLED
+Removing AP_COMPASS_ICM20948_ENABLED
+Removing AP_COMPASS_IST8308_ENABLED
+Removing AP_COMPASS_LIS3MDL_ENABLED
+Removing AP_COMPASS_LSM303D_ENABLED
+Removing AP_COMPASS_LSM9DS1_ENABLED
+Removing AP_COMPASS_MAG3110_ENABLED
+Removing AP_COMPASS_MMC3416_ENABLED
+Removing AP_COMPASS_MMC5XX3_ENABLED
+Removing AP_COMPASS_QMC5883L_ENABLED
+Removing AP_COMPASS_RM3100_ENABLED
+Removing AC_PAYLOAD_PLACE_ENABLED
+Removing MODE_BRAKE_ENABLED
+Removing MODE_FLIP_ENABLED
+Removing MODE_FLOWHOLD_ENABLED
+Removing MODE_FOLLOW_ENABLED
+Removing MODE_GUIDED_NOGPS_ENABLED
+Removing MODE_SPORT_ENABLED
+Removing MODE_SYSTEMID_ENABLED
+Removing MODE_TURTLE_ENABLED
+Removing MODE_ZIGZAG_ENABLED
+Removing AP_CRASHDUMP_ENABLED
+Removing AP_INERTIALSENSOR_KILL_IMU_ENABLED
+Removing HAL_PICCOLO_CAN_ENABLE
+Removing HAL_TORQEEDO_ENABLED
+Removing FORCE_APJ_DEFAULT_PARAMETERS
+Removing AP_FILESYSTEM_MISSION_ENABLED
+Removing AP_FILESYSTEM_PARAM_ENABLED
+Removing AP_FILESYSTEM_ROMFS_ENABLED
+Removing AP_FILESYSTEM_SYS_ENABLED
+Removing AP_DRONECAN_SEND_GPS
+Removing AP_GPS_ERB_ENABLED
+Removing AP_GPS_GSOF_ENABLED
+Removing AP_GPS_MAV_ENABLED
+Removing AP_GPS_NMEA_ENABLED
+Removing AP_GPS_NMEA_UNICORE_ENABLED
+Removing AP_GPS_NOVA_ENABLED
+Removing AP_GPS_SBF_ENABLED
+Removing AP_GPS_SBP_ENABLED
+Removing AP_GPS_SBP2_ENABLED
+Removing AP_GPS_SIRF_ENABLED
+Removing AP_GPS_UBLOX_ENABLED
+Removing HAL_GENERATOR_ENABLED
+Removing AP_GENERATOR_IE_2400_ENABLED
+Removing AP_GENERATOR_IE_650_800_ENABLED
+Removing AP_GENERATOR_RICHENPOWER_ENABLED
+Removing HAL_MOUNT_ALEXMOS_ENABLED
+Removing HAL_MOUNT_GREMSY_ENABLED
+Removing HAL_MOUNT_ENABLED
+Removing HAL_MOUNT_SERVO_ENABLED
+Removing HAL_MOUNT_SIYI_ENABLED
+Removing HAL_SOLO_GIMBAL_ENABLED
+Removing HAL_MOUNT_STORM32MAVLINK_ENABLED
+Removing HAL_MOUNT_STORM32SERIAL_ENABLED
+Removing HAL_MOUNT_VIEWPRO_ENABLED
+Removing HAL_MOUNT_XACTI_ENABLED
+Removing HAL_EFI_ENABLED
+Removing AP_EFI_CURRAWONG_ECU_ENABLED
+Removing AP_EFI_DRONECAN_ENABLED
+Removing AP_EFI_SERIAL_HIRTH_ENABLED
+Removing AP_EFI_SERIAL_LUTAN_ENABLED
+Removing AP_EFI_MAV_ENABLED
+Removing AP_EFI_SERIAL_MS_ENABLED
+Removing AP_EFI_NWPWU_ENABLED
+Removing AP_ICENGINE_ENABLED
+Removing HAL_ADSB_ENABLED
+Removing HAL_ADSB_SAGETECH_ENABLED
+Removing HAL_ADSB_SAGETECH_MXS_ENABLED
+Removing HAL_ADSB_UAVIONIX_MAVLINK_ENABLED
+Removing HAL_ADSB_UCP_ENABLED
+Removing AP_AIS_ENABLED
+Removing AP_OPENDRONEID_ENABLED
+Removing AP_MAVLINK_AUTOPILOT_VERSION_REQUEST_ENABLED
+Removing AP_MAVLINK_BATTERY2_ENABLED
+Removing AP_MAVLINK_MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES_ENABLED
+Removing AP_MAVLINK_MSG_DEVICE_OP_ENABLED
+Removing AP_MAVLINK_MSG_MISSION_REQUEST_ENABLED
+Removing AP_MAVLINK_MSG_MOUNT_CONFIGURE_ENABLED
+Removing AP_MAVLINK_MSG_MOUNT_CONTROL_ENABLED
+Removing AP_MAVLINK_MSG_RELAY_STATUS_ENABLED
+Removing AP_MAVLINK_MSG_SERIAL_CONTROL_ENABLED
+Removing AP_MAVLINK_SERVO_RELAY_ENABLED
+Removing AC_POLYFENCE_FENCE_POINT_PROTOCOL_SUPPORT
+Removing HAL_HIGH_LATENCY2_ENABLED
+Removing AP_MAVLINK_RALLY_POINT_PROTOCOL_ENABLED
+Removing HAL_MSP_ENABLED
+Removing AP_COMPASS_MSP_ENABLED
+Removing HAL_WITH_MSP_DISPLAYPORT
+Removing HAL_MSP_GPS_ENABLED
+Removing HAL_MSP_OPTICALFLOW_ENABLED
+Removing HAL_MSP_RANGEFINDER_ENABLED
+Removing HAL_MSP_SENSORS_ENABLED
+Removing AP_MISSION_NAV_PAYLOAD_PLACE_ENABLED
+Removing AP_NETWORKING_BACKEND_PPP
+Removing AP_NOTIFY_MAVLINK_LED_CONTROL_SUPPORT_ENABLED
+Removing AP_NOTIFY_NCP5623_ENABLED
+Removing AP_NOTIFY_NEOPIXEL_ENABLED
+Removing AP_NOTIFY_PROFILED_ENABLED
+Removing AP_NOTIFY_PROFILED_SPI_ENABLED
+Removing AP_NOTIFY_MAVLINK_PLAY_TUNE_SUPPORT_ENABLED
+Removing AP_NOTIFY_TONEALARM_ENABLED
+Removing OSD_ENABLED
+Removing OSD_PARAM_ENABLED
+Removing HAL_OSD_SIDEBAR_ENABLE
+Removing HAL_PLUSCODE_ENABLE
+Removing AP_BOOTLOADER_FLASHING_ENABLED
+Removing HAL_BUTTON_ENABLED
+Removing COMPASS_CAL_ENABLED
+Removing HAL_DISPLAY_ENABLED
+Removing AP_DRONECAN_SERIAL_ENABLED
+Removing HAL_GYROFFT_ENABLED
+Removing HAL_LOGGING_ENABLED
+Removing HAL_NMEA_OUTPUT_ENABLED
+Removing AP_SCRIPTING_ENABLED
+Removing AP_FILESYSTEM_FORMAT_ENABLED
+Removing AP_SDCARD_STORAGE_ENABLED
+Removing AP_CAN_SLCAN_ENABLED
+Removing AP_GRIPPER_ENABLED
+Removing AP_LANDINGGEAR_ENABLED
+Removing AP_RELAY_ENABLED
+Removing AP_SERVORELAYEVENTS_ENABLED
+Removing HAL_SPRAYER_ENABLED
+Removing AP_WINCH_ENABLED
+Removing AP_ADVANCEDFAILSAFE_ENABLED
+Removing AP_TUNING_ENABLED
+Removing HAL_LANDING_DEEPSTALL_ENABLED
+Removing AP_PLANE_BLACKBOX_LOGGING
+Removing QAUTOTUNE_ENABLED
+Removing HAL_QUADPLANE_ENABLED
+Removing HAL_SOARING_ENABLED
+Removing AC_PRECLAND_ENABLED
+Removing AC_PRECLAND_COMPANION_ENABLED
+Removing AC_PRECLAND_IRLOCK_ENABLED
+Removing HAL_PROXIMITY_ENABLED
+Removing AP_PROXIMITY_CYGBOT_ENABLED
+Removing AP_PROXIMITY_DRONECAN_ENABLED
+Removing AP_PROXIMITY_LIGHTWARE_SF40C_ENABLED
+Removing AP_PROXIMITY_LIGHTWARE_SF45B_ENABLED
+Removing AP_PROXIMITY_MAV_ENABLED
+Removing AP_PROXIMITY_RANGEFINDER_ENABLED
+Removing AP_PROXIMITY_RPLIDARA2_ENABLED
+Removing AP_PROXIMITY_TERARANGERTOWER_ENABLED
+Removing AP_PROXIMITY_TERARANGERTOWEREVO_ENABLED
+Removing AP_RCPROTOCOL_CRSF_ENABLED
+Removing AP_RCPROTOCOL_GHST_ENABLED
+Removing AP_RCPROTOCOL_IBUS_ENABLED
+Removing AP_RCPROTOCOL_PPMSUM_ENABLED
+Removing AP_RCPROTOCOL_ENABLED
+Removing AP_RCPROTOCOL_SBUS_ENABLED
+Removing AP_RCPROTOCOL_SRXL_ENABLED
+Removing AP_RCPROTOCOL_SRXL2_ENABLED
+Removing AP_RCPROTOCOL_ST24_ENABLED
+Removing AP_RCPROTOCOL_SUMD_ENABLED
+Removing AP_RANGEFINDER_ENABLED
+Removing AP_RANGEFINDER_ANALOG_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_CAN_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_TF02_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_TF03_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_TFMINI_ENABLED
+Removing AP_RANGEFINDER_BENEWAKE_TFMINIPLUS_ENABLED
+Removing AP_RANGEFINDER_BLPING_ENABLED
+Removing AP_RANGEFINDER_DRONECAN_ENABLED
+Removing AP_RANGEFINDER_GYUS42V2_ENABLED
+Removing AP_RANGEFINDER_HC_SR04_ENABLED
+Removing AP_RANGEFINDER_JRE_SERIAL_ENABLED
+Removing AP_RANGEFINDER_LANBAO_ENABLED
+Removing AP_RANGEFINDER_LEDDARONE_ENABLED
+Removing AP_RANGEFINDER_LEDDARVU8_ENABLED
+Removing AP_RANGEFINDER_LIGHTWARE_SERIAL_ENABLED
+Removing AP_RANGEFINDER_LUA_ENABLED
+Removing AP_RANGEFINDER_LWI2C_ENABLED
+Removing AP_RANGEFINDER_MAVLINK_ENABLED
+Removing AP_RANGEFINDER_MAXBOTIX_SERIAL_ENABLED
+Removing AP_RANGEFINDER_MAXSONARI2CXL_ENABLED
+Removing AP_RANGEFINDER_NMEA_ENABLED
+Removing AP_RANGEFINDER_NOOPLOOP_ENABLED
+Removing AP_RANGEFINDER_NRA24_CAN_ENABLED
+Removing AP_RANGEFINDER_PULSEDLIGHTLRF_ENABLED
+Removing AP_RANGEFINDER_PWM_ENABLED
+Removing AP_RANGEFINDER_TOFSENSEF_I2C_ENABLED
+Removing AP_RANGEFINDER_TOFSENSEP_CAN_ENABLED
+Removing AP_RANGEFINDER_TRI2C_ENABLED
+Removing AP_RANGEFINDER_TERARANGER_SERIAL_ENABLED
+Removing AP_RANGEFINDER_USD1_CAN_ENABLED
+Removing AP_RANGEFINDER_USD1_SERIAL_ENABLED
+Removing AP_RANGEFINDER_VL53L0X_ENABLED
+Removing AP_RANGEFINDER_VL53L1X_ENABLED
+Removing AP_RANGEFINDER_WASP_ENABLED
+Removing AC_AVOID_ENABLED
+Removing AC_OAPATHPLANNER_ENABLED
+Removing AP_FENCE_ENABLED
+Removing HAL_PARACHUTE_ENABLED
+Removing HAL_RALLY_ENABLED
+Removing AP_AIRSPEED_ENABLED
+Removing AP_BEACON_ENABLED
+Removing GPS_MOVING_BASELINE
+Removing AP_SERIALMANAGER_IMUOUT_ENABLED
+Removing AP_OPTICALFLOW_ENABLED
+Removing AP_OPTICALFLOW_CXOF_ENABLED
+Removing AP_OPTICALFLOW_HEREFLOW_ENABLED
+Removing AP_OPTICALFLOW_MAV_ENABLED
+Removing AP_OPTICALFLOW_ONBOARD_ENABLED
+Removing AP_OPTICALFLOW_PIXART_ENABLED
+Removing AP_OPTICALFLOW_PX4FLOW_ENABLED
+Removing AP_OPTICALFLOW_UPFLOW_ENABLED
+Removing AP_RPM_ENABLED
+Removing AP_RPM_EFI_ENABLED
+Removing AP_RPM_ESC_TELEM_ENABLED
+Removing AP_RPM_GENERATOR_ENABLED
+Removing AP_RPM_HARMONICNOTCH_ENABLED
+Removing AP_RPM_PIN_ENABLED
+Removing AP_TEMPERATURE_SENSOR_ENABLED
+Removing AP_TEMPERATURE_SENSOR_MCP9600_ENABLED
+Removing AP_TEMPERATURE_SENSOR_TSYS01_ENABLED
+Removing AP_TEMPERATURE_SENSOR_TSYS03_ENABLED
+Removing AP_RC_CHANNEL_AUX_FUNCTION_STRINGS_ENABLED
+Removing HAL_CRSF_TELEM_ENABLED
+Removing HAL_CRSF_TELEM_TEXT_SELECTION_ENABLED
+Removing AP_FRSKY_TELEM_ENABLED
+Removing AP_FRSKY_D_TELEM_ENABLED
+Removing AP_FRSKY_SPORT_TELEM_ENABLED
+Removing AP_FRSKY_SPORT_PASSTHROUGH_ENABLED
+Removing AP_GHST_TELEM_ENABLED
+Removing HAL_HOTT_TELEM_ENABLED
+Removing AP_LTM_TELEM_ENABLED
+Removing HAL_SPEKTRUM_TELEM_ENABLED
+Removing AP_MOTORS_FRAME_DECA_ENABLED
+Removing AP_MOTORS_FRAME_DODECAHEXA_ENABLED
+Removing AP_MOTORS_FRAME_HEXA_ENABLED
+Removing AP_MOTORS_FRAME_OCTA_ENABLED
+Removing AP_MOTORS_FRAME_OCTAQUAD_ENABLED
+Removing AP_MOTORS_FRAME_QUAD_ENABLED
+Removing AP_MOTORS_FRAME_Y6_ENABLED
+Removing AP_SMARTAUDIO_ENABLED
+Removing AP_TRAMP_ENABLED
+Removing AP_VIDEOTX_ENABLED
+Setup for MCU STM32F405xx
+No default parameter file found
+Writing hwdef setup in /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE/hwdef.h
+Writing DMA map
+Setting up as normal
+No change in hwdef.h
+Generating ldscript.ld
+
+[10/10] Linking ../MatekF405-TE/modules/ChibiOS/libch.a
+[1/111] ChibiOS: Compiling crt0_v7m.S
+[2/111] ChibiOS: Compiling vectors.S
+[3/111] ChibiOS: Compiling chcoreasm.S
+[4/111] ChibiOS: Compiling ff.c
+[5/111] ChibiOS: Compiling ffunicode.c
+[6/111] ChibiOS: Compiling chcore.c
+[7/111] ChibiOS: Compiling crt1.c
+[8/111] ChibiOS: Compiling bufstreams.c
+[9/111] ChibiOS: Compiling chprintf.c
+[10/111] ChibiOS: Compiling chscanf.c
+[11/111] ChibiOS: Compiling memstreams.c
+[12/111] ChibiOS: Compiling nullstreams.c
+[13/111] ChibiOS: Compiling osal.c
+[14/111] ChibiOS: Compiling hal_adc_lld.c
+[15/111] ChibiOS: Compiling hal_can_lld.c
+[16/111] ChibiOS: Compiling hal_crypto_lld.c
+[17/111] ChibiOS: Compiling hal_dac_lld.c
+[18/111] ChibiOS: Compiling stm32_dma.c
+[19/111] ChibiOS: Compiling stm32_exti.c
+[20/111] ChibiOS: Compiling hal_pal_lld.c
+[21/111] ChibiOS: Compiling hal_i2c_lld.c
+[22/111] ChibiOS: Compiling hal_mac_lld.c
+[23/111] ChibiOS: Compiling hal_usb_lld.c
+[24/111] ChibiOS: Compiling hal_wspi_lld.c
+[25/111] ChibiOS: Compiling hal_rtc_lld.c
+[26/111] ChibiOS: Compiling hal_sdc_lld.c
+[27/111] ChibiOS: Compiling hal_i2s_lld.c
+[28/111] ChibiOS: Compiling hal_spi_lld.c
+[29/111] ChibiOS: Compiling hal_st_lld.c
+[30/111] ChibiOS: Compiling hal_eicu_lld.c
+[31/111] ChibiOS: Compiling hal_gpt_lld.c
+[32/111] ChibiOS: Compiling hal_icu_lld.c
+[33/111] ChibiOS: Compiling hal_pwm_lld.c
+[34/111] ChibiOS: Compiling hal_serial_lld.c
+[35/111] ChibiOS: Compiling hal_uart_lld.c
+[36/111] ChibiOS: Compiling hal_wdg_lld.c
+[37/111] ChibiOS: Compiling hal_efl_lld.c
+[38/111] ChibiOS: Compiling hal_lld.c
+[39/111] ChibiOS: Compiling stm32_isr.c
+[40/111] ChibiOS: Compiling nvic.c
+[41/111] ChibiOS: Compiling hal.c
+[42/111] ChibiOS: Compiling hal_adc.c
+[43/111] ChibiOS: Compiling hal_buffers.c
+[44/111] ChibiOS: Compiling hal_can.c
+[45/111] ChibiOS: Compiling hal_crypto.c
+[46/111] ChibiOS: Compiling hal_dac.c
+[47/111] ChibiOS: Compiling hal_efl.c
+[48/111] ChibiOS: Compiling hal_eicu.c
+[49/111] ChibiOS: Compiling hal_flash.c
+[50/111] ChibiOS: Compiling hal_gpt.c
+[51/111] ChibiOS: Compiling hal_i2c.c
+[52/111] ChibiOS: Compiling hal_i2s.c
+[53/111] ChibiOS: Compiling hal_icu.c
+[54/111] ChibiOS: Compiling hal_mac.c
+[55/111] ChibiOS: Compiling hal_mmc_spi.c
+[56/111] ChibiOS: Compiling hal_mmcsd.c
+[57/111] ChibiOS: Compiling hal_pal.c
+[58/111] ChibiOS: Compiling hal_pwm.c
+[59/111] ChibiOS: Compiling hal_queues.c
+[60/111] ChibiOS: Compiling hal_rtc.c
+[61/111] ChibiOS: Compiling hal_sdc.c
+[62/111] ChibiOS: Compiling hal_serial.c
+[63/111] ChibiOS: Compiling hal_serial_usb.c
+[64/111] ChibiOS: Compiling hal_sio.c
+[65/111] ChibiOS: Compiling hal_spi.c
+[66/111] ChibiOS: Compiling hal_st.c
+[67/111] ChibiOS: Compiling hal_trng.c
+[68/111] ChibiOS: Compiling hal_uart.c
+[69/111] ChibiOS: Compiling hal_usb.c
+[70/111] ChibiOS: Compiling hal_wdg.c
+[71/111] ChibiOS: Compiling hal_wspi.c
+[72/111] ChibiOS: Compiling chdelegates.c
+[73/111] ChibiOS: Compiling chfactory.c
+[74/111] ChibiOS: Compiling chmboxes.c
+[75/111] ChibiOS: Compiling chmemcore.c
+[76/111] ChibiOS: Compiling chmemheaps.c
+[77/111] ChibiOS: Compiling chmempools.c
+[78/111] ChibiOS: Compiling chobjcaches.c
+[79/111] ChibiOS: Compiling chpipes.c
+[80/111] ChibiOS: Compiling chcond.c
+[81/111] ChibiOS: Compiling chdebug.c
+[82/111] ChibiOS: Compiling chdynamic.c
+[83/111] ChibiOS: Compiling chevents.c
+[84/111] ChibiOS: Compiling chinstances.c
+[85/111] ChibiOS: Compiling chmsg.c
+[86/111] ChibiOS: Compiling chmtx.c
+[87/111] ChibiOS: Compiling chregistry.c
+[88/111] ChibiOS: Compiling chrfcu.c
+[89/111] ChibiOS: Compiling chschd.c
+[90/111] ChibiOS: Compiling chsem.c
+[91/111] ChibiOS: Compiling chstats.c
+[92/111] ChibiOS: Compiling chsys.c
+[93/111] ChibiOS: Compiling chthreads.c
+[94/111] ChibiOS: Compiling chtm.c
+[95/111] ChibiOS: Compiling chtrace.c
+[96/111] ChibiOS: Compiling chvt.c
+[98/111] ChibiOS: Compiling fatfs_syscall.c
+[97/111] ChibiOS: Compiling fatfs_diskio.c
+[99/111] ChibiOS: Compiling syscalls.c
+[100/111] ChibiOS: Compiling stubs.c
+[101/111] ChibiOS: Compiling board.c
+[102/111] ChibiOS: Compiling usbcfg.c
+[103/111] ChibiOS: Compiling usbcfg_dualcdc.c
+[104/111] ChibiOS: Compiling usbcfg_common.c
+[105/111] ChibiOS: Compiling flash.c
+[106/111] ChibiOS: Compiling malloc.c
+[107/111] ChibiOS: Compiling hrt.c
+[108/111] ChibiOS: Compiling stm32_util.c
+[109/111] ChibiOS: Compiling bouncebuffer.c
+[110/111] ChibiOS: Compiling watchdog.c
+[111/111] ChibiOS: Compiling ch.cpp
+
+ChibiOS: Done!
+
+arm-none-eabi-ar: creating modules/ChibiOS/libch.a
+
+[  11/1002] Compiling libraries/AC_AttitudeControl/ControlMonitor.cpp
+[  12/1002] Compiling libraries/AC_AttitudeControl/AC_AttitudeControl_Multi_6DoF.cpp
+[  13/1002] Compiling libraries/AC_AttitudeControl/AC_CommandModel.cpp
+[  14/1002] Compiling libraries/AC_AttitudeControl/AC_AttitudeControl_Sub.cpp
+[  15/1002] Compiling libraries/AC_AttitudeControl/AC_AttitudeControl_Heli.cpp
+[  16/1002] Compiling libraries/AC_AttitudeControl/AC_AttitudeControl_Multi.cpp
+[  17/1002] Compiling libraries/AC_AttitudeControl/AC_AttitudeControl_TS.cpp
+[  18/1002] Compiling libraries/AC_AutoTune/AC_AutoTune_Multi.cpp
+[  19/1002] Compiling libraries/AC_AutoTune/AC_AutoTune_FreqResp.cpp
+[  20/1002] Compiling libraries/AC_AutoTune/AC_AutoTune_Heli.cpp
+[  21/1002] Compiling libraries/AC_Autorotation/AC_Autorotation.cpp
+[  22/1002] Compiling libraries/AC_Avoidance/AC_Avoidance_Logging.cpp
+[  23/1002] Compiling libraries/AC_Avoidance/AP_OADijkstra.cpp
+[  24/1002] Compiling libraries/AC_Avoidance/AP_OAPathPlanner.cpp
+[  25/1002] Compiling libraries/AC_Avoidance/AP_OAVisGraph.cpp
+[  26/1002] Compiling libraries/AC_InputManager/AC_InputManager_Heli.cpp
+[  27/1002] Compiling libraries/AC_InputManager/AC_InputManager.cpp
+[  28/1002] Compiling libraries/AC_PID/AC_HELI_PID.cpp
+[  29/1002] Compiling libraries/AC_PID/AC_P.cpp
+[  30/1002] Compiling libraries/AC_PID/AC_PI.cpp
+[  31/1002] Compiling libraries/AC_PID/AC_PID.cpp
+[  32/1002] Compiling libraries/AC_PID/AC_PID_2D.cpp
+[  33/1002] Compiling libraries/AC_PID/AC_PID_Basic.cpp
+[  34/1002] Compiling libraries/AC_PID/AC_PI_2D.cpp
+[  35/1002] Compiling libraries/AC_PID/AC_P_1D.cpp
+[  36/1002] Compiling libraries/AC_PID/AC_P_2D.cpp
+[  37/1002] Compiling libraries/AC_PrecLand/AC_PrecLand_Companion.cpp
+[  38/1002] Compiling libraries/AC_PrecLand/AC_PrecLand_IRLock.cpp
+[  39/1002] Compiling libraries/AC_PrecLand/AC_PrecLand_SITL.cpp
+[  40/1002] Compiling libraries/AC_PrecLand/AC_PrecLand_SITL_Gazebo.cpp
+[  41/1002] Compiling libraries/AC_PrecLand/PosVelEKF.cpp
+[  42/1002] Compiling libraries/AC_PrecLand/AC_PrecLand_StateMachine.cpp
+[  43/1002] Compiling libraries/AC_Sprayer/AC_Sprayer.cpp
+[  44/1002] Compiling libraries/AC_WPNav/AC_Circle.cpp
+[  45/1002] Compiling libraries/AC_WPNav/AC_WPNav.cpp
+[  46/1002] Compiling libraries/AC_WPNav/AC_WPNav_OA.cpp
+[  47/1002] Compiling libraries/AP_ADC/AP_ADC_ADS1115.cpp
+[  48/1002] Compiling libraries/AP_ADSB/AP_ADSB_Backend.cpp
+[  49/1002] Compiling libraries/AP_ADSB/AP_ADSB_Sagetech.cpp
+[  50/1002] Compiling libraries/AP_ADSB/AP_ADSB_uAvionix_MAVLink.cpp
+[  51/1002] Compiling libraries/AP_ADSB/AP_ADSB_uAvionix_UCP.cpp
+[  52/1002] Compiling libraries/AP_AHRS/AP_AHRS_External.cpp
+[  53/1002] Compiling libraries/AP_AHRS/AP_AHRS_Logging.cpp
+[  54/1002] Compiling libraries/AP_AHRS/AP_AHRS_SIM.cpp
+[  55/1002] Compiling libraries/AP_AHRS/AP_AHRS_View.cpp
+[  56/1002] Compiling libraries/AP_AccelCal/AP_AccelCal.cpp
+[  57/1002] Compiling libraries/AP_AccelCal/AccelCalibrator.cpp
+[  58/1002] Compiling libraries/AP_AdvancedFailsafe/AP_AdvancedFailsafe.cpp
+[  59/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_ASP5033.cpp
+[  60/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_Backend.cpp
+[  61/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_DLVR.cpp
+[  62/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_DroneCAN.cpp
+[  63/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_External.cpp
+[  64/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_Health.cpp
+[  65/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_MS4525.cpp
+[  66/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_MS5525.cpp
+[  67/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_MSP.cpp
+[  68/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_SDP3X.cpp
+[  69/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_SITL.cpp
+[  70/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_analog.cpp
+[  71/1002] Compiling libraries/AP_Airspeed/Airspeed_Calibration.cpp
+[  72/1002] Compiling libraries/AP_Baro/AP_Baro_SPL06.cpp
+[  73/1002] Compiling libraries/AP_Baro/AP_Baro_DroneCAN.cpp
+[  74/1002] Compiling libraries/AP_Baro/AP_Baro_Wind.cpp
+[  75/1002] Compiling libraries/AP_Baro/AP_Baro_BMP085.cpp
+[  76/1002] Compiling libraries/AP_Baro/AP_Baro_DPS280.cpp
+[  77/1002] Compiling libraries/AP_Baro/AP_Baro_BMP280.cpp
+[  78/1002] Compiling libraries/AP_Baro/AP_Baro_ICP101XX.cpp
+[  79/1002] Compiling libraries/AP_Baro/AP_Baro_Logging.cpp
+[  80/1002] Compiling libraries/AP_Baro/AP_Baro_Backend.cpp
+[  81/1002] Compiling libraries/AP_Baro/AP_Baro_FBM320.cpp
+[  82/1002] Compiling libraries/AP_Baro/AP_Baro_HIL.cpp
+[  83/1002] Compiling libraries/AP_Baro/AP_Baro_Dummy.cpp
+[  84/1002] Compiling libraries/AP_Baro/AP_Baro_ExternalAHRS.cpp
+[  85/1002] Compiling libraries/AP_Baro/AP_Baro_KellerLD.cpp
+[  86/1002] Compiling libraries/AP_Baro/AP_Baro_ICP201XX.cpp
+[  87/1002] Compiling libraries/AP_Baro/AP_Baro_MS5611.cpp
+[  88/1002] Compiling libraries/AP_Baro/AP_Baro_BMP388.cpp
+[  89/1002] Compiling libraries/AP_Baro/AP_Baro_ICM20789.cpp
+[  90/1002] Compiling libraries/AP_Baro/AP_Baro_LPS2XH.cpp
+[  91/1002] Compiling libraries/AP_Baro/AP_Baro_MSP.cpp
+[  92/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_SMBus.cpp
+[  93/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_EFI.cpp
+[  94/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_SMBus_Generic.cpp
+[  95/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_FuelFlow.cpp
+[  96/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_ESC.cpp
+[  97/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_FuelLevel_Analog.cpp
+[  98/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Synthetic_Current.cpp
+[  99/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_SMBus_SUI.cpp
+[ 100/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_INA2xx.cpp
+[ 101/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Logging.cpp
+[ 102/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_LTC2946.cpp
+[ 103/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_INA239.cpp
+[ 104/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Scripting.cpp
+[ 105/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Sum.cpp
+[ 106/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_FuelLevel_PWM.cpp
+[ 107/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp
+[ 108/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_AD7091R5.cpp
+[ 109/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_SMBus_Solo.cpp
+[ 110/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Torqeedo.cpp
+[ 111/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Backend.cpp
+[ 112/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Bebop.cpp
+[ 113/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_SMBus_Rotoye.cpp
+[ 114/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_DroneCAN.cpp
+[ 115/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Generator.cpp
+[ 116/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_SMBus_NeoDesign.cpp
+[ 117/1002] Compiling libraries/AP_Beacon/AP_Beacon.cpp
+[ 118/1002] Compiling libraries/AP_Beacon/AP_Beacon_SITL.cpp
+[ 119/1002] Compiling libraries/AP_Beacon/AP_Beacon_Backend.cpp
+[ 120/1002] Compiling libraries/AP_Beacon/AP_Beacon_Marvelmind.cpp
+[ 121/1002] Compiling libraries/AP_Beacon/AP_Beacon_Pozyx.cpp
+[ 122/1002] Compiling libraries/AP_Beacon/AP_Beacon_Nooploop.cpp
+[ 123/1002] Compiling libraries/AP_BoardConfig/IMU_heater.cpp
+[ 124/1002] Compiling libraries/AP_BoardConfig/board_drivers.cpp
+[ 125/1002] Compiling libraries/AP_Button/AP_Button.cpp
+[ 126/1002] Compiling libraries/AP_CANManager/AP_CANDriver.cpp
+[ 127/1002] Compiling libraries/AP_CANManager/AP_SLCANIface.cpp
+[ 128/1002] Compiling libraries/AP_CANManager/AP_CANIfaceParams.cpp
+[ 129/1002] Compiling libraries/AP_CANManager/AP_CANSensor.cpp
+[ 130/1002] Compiling libraries/AP_CANManager/AP_CANManager.cpp
+[ 131/1002] Compiling libraries/AP_Camera/AP_Camera_MAVLink.cpp
+[ 132/1002] Compiling libraries/AP_Camera/AP_RunCam.cpp
+[ 133/1002] Compiling libraries/AP_Camera/AP_Camera.cpp
+[ 134/1002] Compiling libraries/AP_Camera/AP_Camera_Logging.cpp
+[ 135/1002] Compiling libraries/AP_Camera/AP_Camera_Backend.cpp
+[ 136/1002] Compiling libraries/AP_Camera/AP_Camera_Scripting.cpp
+[ 137/1002] Compiling libraries/AP_Camera/AP_Camera_SoloGimbal.cpp
+[ 138/1002] Compiling libraries/AP_Camera/AP_Camera_MAVLinkCamV2.cpp
+[ 139/1002] Compiling libraries/AP_Camera/AP_Camera_Params.cpp
+[ 140/1002] Compiling libraries/AP_Camera/AP_Camera_Relay.cpp
+[ 141/1002] Compiling libraries/AP_Camera/AP_Camera_Servo.cpp
+[ 142/1002] Compiling libraries/AP_Camera/AP_Camera_Mount.cpp
+[ 143/1002] Compiling libraries/AP_CheckFirmware/AP_CheckFirmware.cpp
+[ 144/1002] Compiling libraries/AP_CheckFirmware/AP_CheckFirmware_secure_command.cpp
+[ 145/1002] Compiling libraries/AP_CheckFirmware/monocypher.cpp
+[ 146/1002] Compiling libraries/AP_Common/float16.cpp
+[ 147/1002] Compiling libraries/AP_Common/c++.cpp
+[ 148/1002] Compiling libraries/AP_Common/AP_FWVersion.cpp
+[ 149/1002] Compiling libraries/AP_Common/ExpandingString.cpp
+[ 150/1002] Compiling libraries/AP_Common/time.cpp
+[ 151/1002] Compiling libraries/AP_Common/AP_ExpandingArray.cpp
+[ 152/1002] Compiling libraries/AP_Common/sorting.cpp
+[ 153/1002] Compiling libraries/AP_Common/AP_Common.cpp
+[ 154/1002] Compiling libraries/AP_Common/MultiHeap.cpp
+[ 155/1002] Compiling libraries/AP_Common/Location.cpp
+[ 156/1002] Compiling libraries/AP_Common/NMEA.cpp
+[ 157/1002] Compiling libraries/AP_Compass/AP_Compass_RM3100.cpp
+[ 158/1002] Compiling libraries/AP_Compass/AP_Compass_AK09916.cpp
+[ 159/1002] Compiling libraries/AP_Compass/AP_Compass_SITL.cpp
+[ 160/1002] Compiling libraries/AP_Compass/CompassCalibrator.cpp
+[ 161/1002] Compiling libraries/AP_Compass/Compass_learn.cpp
+[ 162/1002] Compiling libraries/AP_Compass/Compass_PerMotor.cpp
+[ 163/1002] Compiling libraries/AP_Compass/AP_Compass_QMC5883P.cpp
+[ 164/1002] Compiling libraries/AP_Compass/AP_Compass_IST8310.cpp
+[ 165/1002] Compiling libraries/AP_Compass/AP_Compass_MAG3110.cpp
+[ 166/1002] Compiling libraries/AP_Compass/AP_Compass_LSM9DS1.cpp
+[ 167/1002] Compiling libraries/AP_Compass/AP_Compass_LSM303D.cpp
+[ 168/1002] Compiling libraries/AP_Compass/AP_Compass_LIS3MDL.cpp
+[ 169/1002] Compiling libraries/AP_Compass/AP_Compass_MMC3416.cpp
+[ 170/1002] Compiling libraries/AP_Compass/AP_Compass_BMM150.cpp
+[ 171/1002] Compiling libraries/AP_Compass/AP_Compass_MMC5xx3.cpp
+[ 172/1002] Compiling libraries/AP_Compass/AP_Compass_AK8963.cpp
+[ 173/1002] Compiling libraries/AP_Compass/AP_Compass_QMC5883L.cpp
+[ 174/1002] Compiling libraries/AP_Compass/AP_Compass_HMC5843.cpp
+[ 175/1002] Compiling libraries/AP_Compass/AP_Compass_MSP.cpp
+[ 176/1002] Compiling libraries/AP_Compass/AP_Compass_IST8308.cpp
+[ 177/1002] Compiling libraries/AP_Compass/AP_Compass_Calibration.cpp
+[ 178/1002] Compiling libraries/AP_Compass/AP_Compass_Backend.cpp
+[ 179/1002] Compiling libraries/AP_Compass/AP_Compass_ExternalAHRS.cpp
+[ 180/1002] Compiling libraries/AP_Compass/AP_Compass_DroneCAN.cpp
+[ 181/1002] Compiling libraries/AP_DAL/AP_DAL_InertialSensor.cpp
+[ 182/1002] Compiling libraries/AP_DAL/AP_DAL_Airspeed.cpp
+[ 183/1002] Compiling libraries/AP_DAL/AP_DAL_Baro.cpp
+[ 184/1002] Compiling libraries/AP_DAL/AP_DAL_GPS.cpp
+[ 185/1002] Compiling libraries/AP_DAL/AP_DAL_Compass.cpp
+[ 186/1002] Compiling libraries/AP_Declination/AP_Declination.cpp
+[ 187/1002] Compiling libraries/AP_Declination/tables.cpp
+[ 188/1002] Compiling libraries/AP_Devo_Telem/AP_Devo_Telem.cpp
+[ 189/1002] Compiling libraries/AP_EFI/AP_EFI_Currawong_ECU.cpp
+[ 190/1002] Compiling libraries/AP_EFI/AP_EFI_MAV.cpp
+[ 191/1002] Compiling libraries/AP_EFI/AP_EFI_DroneCAN.cpp
+[ 192/1002] Compiling libraries/AP_EFI/AP_EFI_NWPMU.cpp
+[ 193/1002] Compiling libraries/AP_EFI/AP_EFI_ThrottleLinearisation.cpp
+[ 194/1002] Compiling libraries/AP_EFI/AP_EFI_Backend.cpp
+[ 195/1002] Compiling libraries/AP_EFI/AP_EFI_Scripting.cpp
+[ 196/1002] Compiling libraries/AP_EFI/AP_EFI_Serial_MS.cpp
+[ 197/1002] Compiling libraries/AP_EFI/AP_EFI.cpp
+[ 198/1002] Compiling libraries/AP_EFI/AP_EFI_Serial_Lutan.cpp
+[ 199/1002] Compiling libraries/AP_EFI/AP_EFI_Serial_Hirth.cpp
+[ 200/1002] Compiling libraries/AP_ESC_Telem/AP_ESC_Telem.cpp
+[ 201/1002] Compiling libraries/AP_ESC_Telem/AP_ESC_Telem_SITL.cpp
+[ 202/1002] Compiling libraries/AP_ExternalAHRS/AP_ExternalAHRS_backend.cpp
+[ 203/1002] Compiling libraries/AP_ExternalAHRS/AP_ExternalAHRS_VectorNav.cpp
+[ 204/1002] Compiling libraries/AP_ExternalAHRS/MicroStrain_common.cpp
+[ 205/1002] Compiling libraries/AP_ExternalAHRS/AP_ExternalAHRS_MicroStrain7.cpp
+[ 206/1002] Compiling libraries/AP_ExternalAHRS/AP_ExternalAHRS_MicroStrain5.cpp
+[ 207/1002] Compiling libraries/AP_ExternalAHRS/AP_ExternalAHRS.cpp
+[ 208/1002] Compiling libraries/AP_ExternalControl/AP_ExternalControl.cpp
+[ 209/1002] Compiling libraries/AP_FETtecOneWire/AP_FETtecOneWire.cpp
+[ 210/1002] Compiling libraries/AP_Filesystem/AP_Filesystem_backend.cpp
+[ 211/1002] Compiling libraries/AP_Filesystem/AP_Filesystem_Sys.cpp
+[ 212/1002] Compiling libraries/AP_Filesystem/AP_Filesystem_Param.cpp
+[ 213/1002] Compiling libraries/AP_Filesystem/AP_Filesystem_ROMFS.cpp
+[ 214/1002] Compiling libraries/AP_Filesystem/AP_Filesystem.cpp
+[ 215/1002] Compiling libraries/AP_Filesystem/AP_Filesystem_ESP32.cpp
+[ 216/1002] Compiling libraries/AP_Filesystem/AP_Filesystem_FATFS.cpp
+[ 217/1002] Compiling libraries/AP_Filesystem/posix_compat.cpp
+[ 218/1002] Compiling libraries/AP_Filesystem/AP_Filesystem_Mission.cpp
+[ 219/1002] Compiling libraries/AP_FlashStorage/AP_FlashStorage.cpp
+[ 220/1002] Compiling libraries/AP_Frsky_Telem/AP_Frsky_SPort.cpp
+[ 221/1002] Compiling libraries/AP_Frsky_Telem/AP_Frsky_D.cpp
+[ 222/1002] Compiling libraries/AP_Frsky_Telem/AP_Frsky_Parameters.cpp
+[ 223/1002] Compiling libraries/AP_Frsky_Telem/AP_Frsky_Backend.cpp
+[ 224/1002] Compiling libraries/AP_Frsky_Telem/AP_Frsky_MAVliteMsgHandler.cpp
+[ 225/1002] Compiling libraries/AP_Frsky_Telem/AP_Frsky_MAVlite_MAVliteToSPort.cpp
+[ 226/1002] Compiling libraries/AP_Frsky_Telem/AP_Frsky_MAVlite_Message.cpp
+[ 227/1002] Compiling libraries/AP_Frsky_Telem/AP_Frsky_MAVlite_SPortToMAVlite.cpp
+[ 228/1002] Compiling libraries/AP_Frsky_Telem/AP_Frsky_Telem.cpp
+[ 229/1002] Compiling libraries/AP_GPS/AP_GPS.cpp
+[ 230/1002] Compiling libraries/AP_GPS/AP_GPS_ERB.cpp
+[ 231/1002] Compiling libraries/AP_GPS/GPS_Backend.cpp
+[ 232/1002] Compiling libraries/AP_GPS/AP_GPS_ExternalAHRS.cpp
+[ 233/1002] Compiling libraries/AP_GPS/RTCM3_Parser.cpp
+[ 234/1002] Compiling libraries/AP_GPS/MovingBase.cpp
+[ 235/1002] Compiling libraries/AP_GPS/AP_GPS_UBLOX.cpp
+[ 236/1002] Compiling libraries/AP_GPS/AP_GPS_SITL.cpp
+[ 237/1002] Compiling libraries/AP_GPS/AP_GPS_DroneCAN.cpp
+[ 238/1002] Compiling libraries/AP_GPS/AP_GPS_SIRF.cpp
+[ 239/1002] Compiling libraries/AP_GPS/AP_GPS_SBP.cpp
+[ 240/1002] Compiling libraries/AP_GPS/AP_GPS_MAV.cpp
+[ 241/1002] Compiling libraries/AP_GPS/AP_GPS_SBP2.cpp
+[ 242/1002] Compiling libraries/AP_GPS/AP_GPS_SBF.cpp
+[ 243/1002] Compiling libraries/AP_GPS/AP_GPS_NOVA.cpp
+[ 244/1002] Compiling libraries/AP_GPS/AP_GPS_NMEA.cpp
+[ 245/1002] Compiling libraries/AP_GPS/AP_GPS_MSP.cpp
+[ 246/1002] Compiling libraries/AP_GPS/AP_GPS_GSOF.cpp
+[ 247/1002] Compiling libraries/AP_Generator/AP_Generator_IE_FuelCell.cpp
+[ 248/1002] Compiling libraries/AP_Generator/AP_Generator_RichenPower.cpp
+[ 249/1002] Compiling libraries/AP_Generator/AP_Generator_IE_650_800.cpp
+[ 250/1002] Compiling libraries/AP_Generator/AP_Generator_IE_2400.cpp
+[ 251/1002] Compiling libraries/AP_Generator/AP_Generator.cpp
+[ 252/1002] Compiling libraries/AP_Generator/AP_Generator_Backend.cpp
+[ 253/1002] Compiling libraries/AP_Gripper/AP_Gripper_EPM.cpp
+[ 254/1002] Compiling libraries/AP_Gripper/AP_Gripper_Backend.cpp
+[ 255/1002] Compiling libraries/AP_Gripper/AP_Gripper_Servo.cpp
+[ 256/1002] Compiling libraries/AP_Gripper/AP_Gripper.cpp
+[ 257/1002] Compiling libraries/AP_Hott_Telem/AP_Hott_Telem.cpp
+[ 258/1002] Compiling libraries/AP_ICEngine/AP_ICEngine.cpp
+[ 259/1002] Compiling libraries/AP_ICEngine/AP_ICEngine_TCA9554.cpp
+[ 260/1002] Compiling libraries/AP_IOMCU/AP_IOMCU.cpp
+[ 261/1002] Compiling libraries/AP_IOMCU/fw_uploader.cpp
+[ 262/1002] Compiling libraries/AP_IRLock/AP_IRLock_SITL.cpp
+[ 263/1002] Compiling libraries/AP_IRLock/AP_IRLock_I2C.cpp
+[ 264/1002] Compiling libraries/AP_IRLock/IRLock.cpp
+[ 265/1002] Compiling libraries/AP_IRLock/AP_IRLock_SITL_Gazebo.cpp
+[ 266/1002] Compiling libraries/AP_InertialNav/AP_InertialNav.cpp
+[ 267/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_BMI055.cpp
+[ 268/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_RST.cpp
+[ 269/1002] Compiling libraries/AP_InertialSensor/AuxiliaryBus.cpp
+[ 270/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_BMI088.cpp
+[ 271/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_Invensensev2.cpp
+[ 272/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_ExternalAHRS.cpp
+[ 273/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_LSM9DS0.cpp
+[ 274/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_NONE.cpp
+[ 275/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_tempcal.cpp
+[ 276/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_BMI160.cpp
+[ 277/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_SCHA63T.cpp
+[ 278/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_L3G4200D.cpp
+[ 279/1002] Compiling libraries/AP_InertialSensor/BatchSampler.cpp
+[ 280/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_BMI270.cpp
+[ 281/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_LSM9DS1.cpp
+[ 282/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_Params.cpp
+[ 283/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_Logging.cpp
+[ 284/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_ADIS1647x.cpp
+[ 285/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_SITL.cpp
+[ 286/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_Backend.cpp
+[ 287/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_Invensense.cpp
+[ 288/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor_Invensensev3.cpp
+[ 289/1002] Compiling libraries/AP_InternalError/AP_InternalError.cpp
+[ 290/1002] Compiling libraries/AP_KDECAN/AP_KDECAN.cpp
+[ 291/1002] Compiling libraries/AP_LTM_Telem/AP_LTM_Telem.cpp
+[ 292/1002] Compiling libraries/AP_Logger/AP_Logger_W25N01GV.cpp
+[ 293/1002] Compiling libraries/AP_Logger/AP_Logger_MAVLinkLogTransfer.cpp
+[ 294/1002] Compiling libraries/AP_Logger/AP_Logger_MAVLink.cpp
+[ 295/1002] Compiling libraries/AP_Logger/AP_Logger_DataFlash.cpp
+[ 296/1002] Compiling libraries/AP_Logger/AP_Logger_Block.cpp
+[ 297/1002] Compiling libraries/AP_Logger/LogFile.cpp
+[ 298/1002] Compiling libraries/AP_MSP/msp.cpp
+[ 299/1002] Compiling libraries/AP_MSP/AP_MSP_Telem_DisplayPort.cpp
+[ 300/1002] Compiling libraries/AP_MSP/msp_sbuf.cpp
+[ 301/1002] Compiling libraries/AP_MSP/AP_MSP_Telem_DJI.cpp
+[ 302/1002] Compiling libraries/AP_MSP/AP_MSP_Telem_Generic.cpp
+[ 303/1002] Compiling libraries/AP_MSP/AP_MSP.cpp
+[ 304/1002] Compiling libraries/AP_MSP/AP_MSP_Telem_Backend.cpp
+[ 305/1002] Compiling libraries/AP_Math/SplineCurve.cpp
+[ 306/1002] Compiling libraries/AP_Math/location_double.cpp
+[ 307/1002] Compiling libraries/AP_Math/matrix3.cpp
+[ 308/1002] Compiling libraries/AP_Math/chirp.cpp
+[ 309/1002] Compiling libraries/AP_Math/spline5.cpp
+[ 310/1002] Compiling libraries/AP_Math/AP_GeodesicGrid.cpp
+[ 311/1002] Compiling libraries/AP_Math/AP_Math.cpp
+[ 312/1002] Compiling libraries/AP_Math/control.cpp
+[ 313/1002] Compiling libraries/AP_Math/location.cpp
+[ 314/1002] Compiling libraries/AP_Math/polyfit.cpp
+[ 315/1002] Compiling libraries/AP_Math/crc.cpp
+[ 316/1002] Compiling libraries/AP_Math/matrixN.cpp
+[ 317/1002] Compiling libraries/AP_Math/vector2.cpp
+[ 318/1002] Compiling libraries/AP_Math/polygon.cpp
+[ 319/1002] Compiling libraries/AP_Math/matrix_alg.cpp
+[ 320/1002] Compiling libraries/AP_Mission/AP_Mission_ChangeDetector.cpp
+[ 321/1002] Compiling libraries/AP_Mission/AP_Mission_Commands.cpp
+[ 322/1002] Compiling libraries/AP_Module/AP_Module.cpp
+[ 323/1002] Compiling libraries/AP_Motors/AP_MotorsCoax.cpp
+[ 324/1002] Compiling libraries/AP_Motors/AP_MotorsSingle.cpp
+[ 325/1002] Compiling libraries/AP_Motors/AP_MotorsHeli_Dual.cpp
+[ 326/1002] Compiling libraries/AP_Motors/AP_Motors6DOF.cpp
+[ 327/1002] Compiling libraries/AP_Motors/AP_MotorsHeli.cpp
+[ 328/1002] Compiling libraries/AP_Motors/AP_MotorsMatrix_Scripting_Dynamic.cpp
+[ 329/1002] Compiling libraries/AP_Motors/AP_MotorsHeli_Quad.cpp
+[ 330/1002] Compiling libraries/AP_Motors/AP_MotorsMatrix_6DoF_Scripting.cpp
+[ 331/1002] Compiling libraries/AP_Motors/AP_MotorsHeli_RSC.cpp
+[ 332/1002] Compiling libraries/AP_Motors/AP_MotorsTailsitter.cpp
+[ 333/1002] Compiling libraries/AP_Motors/AP_MotorsHeli_Single.cpp
+[ 334/1002] Compiling libraries/AP_Motors/AP_Motors_Class.cpp
+[ 335/1002] Compiling libraries/AP_Motors/AP_MotorsHeli_Swash.cpp
+[ 336/1002] Compiling libraries/AP_Mount/SoloGimbal_Parameters.cpp
+[ 337/1002] Compiling libraries/AP_Mount/SoloGimbal.cpp
+[ 338/1002] Compiling libraries/AP_Mount/SoloGimbalEKF.cpp
+[ 339/1002] Compiling libraries/AP_Mount/AP_Mount_SToRM32.cpp
+[ 340/1002] Compiling libraries/AP_Mount/AP_Mount_Params.cpp
+[ 341/1002] Compiling libraries/AP_Mount/AP_Mount_Xacti.cpp
+[ 342/1002] Compiling libraries/AP_Mount/AP_Mount_Viewpro.cpp
+[ 343/1002] Compiling libraries/AP_Mount/AP_Mount_Servo.cpp
+[ 344/1002] Compiling libraries/AP_Mount/AP_Mount_SToRM32_serial.cpp
+[ 345/1002] Compiling libraries/AP_Mount/AP_Mount.cpp
+[ 346/1002] Compiling libraries/AP_Mount/AP_Mount_Scripting.cpp
+[ 347/1002] Compiling libraries/AP_Mount/AP_Mount_Gremsy.cpp
+[ 348/1002] Compiling libraries/AP_Mount/AP_Mount_Siyi.cpp
+[ 349/1002] Compiling libraries/AP_Mount/AP_Mount_Alexmos.cpp
+[ 350/1002] Compiling libraries/AP_Mount/AP_Mount_Backend.cpp
+[ 351/1002] Compiling libraries/AP_Mount/AP_Mount_SoloGimbal.cpp
+[ 352/1002] Compiling libraries/AP_NMEA_Output/AP_NMEA_Output.cpp
+[ 353/1002] Compiling libraries/AP_NavEKF/EKFGSF_Logging.cpp
+[ 354/1002] Compiling libraries/AP_NavEKF/EKF_Buffer.cpp
+[ 355/1002] Compiling libraries/AP_NavEKF/AP_NavEKF_core_common.cpp
+[ 356/1002] Compiling libraries/AP_NavEKF/AP_NavEKF_Source.cpp
+[ 357/1002] Compiling libraries/AP_NavEKF/EKFGSF_yaw.cpp
+[ 358/1002] Compiling libraries/AP_NavEKF2/AP_NavEKF2_Measurements.cpp
+[ 359/1002] Compiling libraries/AP_NavEKF2/AP_NavEKF2_Outputs.cpp
+[ 360/1002] Compiling libraries/AP_NavEKF2/AP_NavEKF2_MagFusion.cpp
+[ 361/1002] Compiling libraries/AP_NavEKF2/AP_NavEKF2_VehicleStatus.cpp
+[ 362/1002] Compiling libraries/AP_NavEKF2/AP_NavEKF2_Control.cpp
+[ 363/1002] Compiling libraries/AP_NavEKF2/AP_NavEKF2_RngBcnFusion.cpp
+[ 364/1002] Compiling libraries/AP_NavEKF2/AP_NavEKF_GyroBias.cpp
+[ 365/1002] Compiling libraries/AP_NavEKF2/AP_NavEKF2_PosVelFusion.cpp
+[ 366/1002] Compiling libraries/AP_NavEKF2/AP_NavEKF2_Logging.cpp
+[ 367/1002] Compiling libraries/AP_NavEKF2/AP_NavEKF2_core.cpp
+[ 368/1002] Compiling libraries/AP_NavEKF2/AP_NavEKF2_AirDataFusion.cpp
+[ 369/1002] Compiling modules/lwip/src/netif/ppp/magic.c
+[ 370/1002] Compiling modules/lwip/src/api/netbuf.c
+[ 371/1002] Compiling modules/lwip/src/core/ipv4/ip4_addr.c
+[ 372/1002] Compiling modules/lwip/src/api/if_api.c
+[ 373/1002] Compiling modules/lwip/src/core/ipv4/acd.c
+[ 374/1002] Compiling modules/lwip/src/core/timeouts.c
+[ 375/1002] Compiling modules/lwip/src/core/memp.c
+[ 376/1002] Compiling modules/lwip/src/core/mem.c
+[ 377/1002] Compiling modules/lwip/src/core/init.c
+[ 378/1002] Compiling modules/lwip/src/core/inet_chksum.c
+[ 379/1002] Compiling modules/lwip/src/core/altcp_alloc.c
+[ 380/1002] Compiling modules/lwip/src/core/altcp_tcp.c
+[ 381/1002] Compiling modules/lwip/src/core/def.c
+[ 382/1002] Compiling modules/lwip/src/core/altcp.c
+[ 383/1002] Compiling libraries/AP_Networking/AP_Networking_tests.cpp
+[ 384/1002] Compiling modules/lwip/src/core/dns.c
+[ 385/1002] Compiling libraries/AP_Networking/AP_Networking_port.cpp
+[ 386/1002] Compiling libraries/AP_Networking/lwip_hal/arch/sys_arch.cpp
+[ 387/1002] Compiling modules/lwip/src/netif/ppp/ipcp.c
+[ 388/1002] Compiling modules/lwip/src/netif/zepif.c
+[ 389/1002] Compiling modules/lwip/src/netif/ppp/ecp.c
+[ 390/1002] Compiling libraries/AP_Networking/AP_Networking.cpp
+[ 391/1002] Compiling libraries/AP_Networking/AP_Networking_ChibiOS.cpp
+[ 392/1002] Compiling modules/lwip/src/netif/ppp/chap_ms.c
+[ 393/1002] Compiling modules/lwip/src/netif/slipif.c
+[ 394/1002] Compiling modules/lwip/src/core/ipv4/icmp.c
+[ 395/1002] Compiling modules/lwip/src/netif/ppp/pppos.c
+[ 396/1002] Compiling libraries/AP_Networking/AP_Networking_PPP.cpp
+[ 397/1002] Compiling modules/lwip/src/netif/ppp/eap.c
+[ 398/1002] Compiling modules/lwip/src/netif/ethernet.c
+[ 399/1002] Compiling modules/lwip/src/netif/ppp/chap-md5.c
+[ 400/1002] Compiling modules/lwip/src/netif/ppp/auth.c
+[ 401/1002] Compiling modules/lwip/src/netif/ppp/chap-new.c
+[ 402/1002] Compiling modules/lwip/src/netif/ppp/fsm.c
+[ 403/1002] Compiling modules/lwip/src/core/udp.c
+[ 404/1002] Compiling libraries/AP_Networking/AP_Networking_address.cpp
+[ 405/1002] Compiling modules/lwip/src/netif/ppp/ipv6cp.c
+[ 406/1002] Compiling modules/lwip/src/netif/ppp/ccp.c
+[ 407/1002] Compiling modules/lwip/src/netif/ppp/eui64.c
+[ 408/1002] Compiling modules/lwip/src/netif/lowpan6_common.c
+[ 409/1002] Compiling modules/lwip/src/netif/ppp/vj.c
+[ 410/1002] Compiling modules/lwip/src/netif/lowpan6.c
+[ 411/1002] Compiling modules/lwip/src/netif/bridgeif.c
+[ 412/1002] Compiling modules/lwip/src/netif/ppp/upap.c
+[ 413/1002] Compiling modules/lwip/src/netif/ppp/utils.c
+[ 414/1002] Compiling modules/lwip/src/netif/lowpan6_ble.c
+[ 415/1002] Compiling modules/lwip/src/netif/ppp/demand.c
+[ 416/1002] Compiling modules/lwip/src/api/netifapi.c
+[ 417/1002] Compiling modules/lwip/src/core/ipv4/autoip.c
+[ 418/1002] Compiling modules/lwip/src/core/tcp_out.c
+[ 419/1002] Compiling modules/lwip/src/core/pbuf.c
+[ 420/1002] Compiling modules/lwip/src/core/netif.c
+[ 421/1002] Compiling modules/lwip/src/core/ipv4/dhcp.c
+[ 422/1002] Compiling modules/lwip/src/netif/bridgeif_fdb.c
+[ 423/1002] Compiling modules/lwip/src/core/tcp_in.c
+[ 424/1002] Compiling modules/lwip/src/netif/ppp/pppapi.c
+[ 425/1002] Compiling modules/lwip/src/api/netdb.c
+[ 426/1002] Compiling modules/lwip/src/core/ipv4/ip4.c
+[ 427/1002] Compiling modules/lwip/src/core/tcp.c
+[ 428/1002] Compiling modules/lwip/src/netif/ppp/pppoe.c
+[ 429/1002] Compiling modules/lwip/src/api/tcpip.c
+[ 430/1002] Compiling modules/lwip/src/core/ipv4/igmp.c
+[ 431/1002] Compiling modules/lwip/src/api/sockets.c
+[ 432/1002] Compiling libraries/AP_Networking/lwip_hal/arch/evtimer.c
+[ 433/1002] Compiling modules/lwip/src/core/ipv4/ip4_frag.c
+[ 434/1002] Compiling modules/lwip/src/core/raw.c
+[ 435/1002] Compiling modules/lwip/src/core/sys.c
+[ 436/1002] Compiling modules/lwip/src/netif/ppp/pppol2tp.c
+[ 437/1002] Compiling modules/lwip/src/netif/ppp/lcp.c
+[ 438/1002] Compiling modules/lwip/src/core/ipv4/etharp.c
+[ 439/1002] Compiling modules/lwip/src/netif/ppp/pppcrypt.c
+[ 440/1002] Compiling modules/lwip/src/netif/ppp/multilink.c
+[ 441/1002] Compiling modules/lwip/src/api/api_lib.c
+[ 442/1002] Compiling modules/lwip/src/core/stats.c
+[ 443/1002] Compiling modules/lwip/src/netif/ppp/mppe.c
+[ 444/1002] Compiling modules/lwip/src/netif/ppp/ppp.c
+[ 445/1002] Compiling modules/lwip/src/api/api_msg.c
+[ 446/1002] Compiling modules/lwip/src/api/err.c
+[ 447/1002] Compiling libraries/AP_Networking/AP_Networking_macaddr.cpp
+[ 448/1002] Compiling modules/lwip/src/core/ip.c
+[ 449/1002] Compiling libraries/AP_Notify/VRBoard_LED.cpp
+[ 450/1002] Compiling libraries/AP_Notify/ToneAlarm.cpp
+[ 451/1002] Compiling libraries/AP_Notify/ProfiLED.cpp
+[ 452/1002] Compiling libraries/AP_Notify/PixRacerLED.cpp
+[ 453/1002] Compiling libraries/AP_Notify/SerialLED.cpp
+[ 454/1002] Compiling libraries/AP_Notify/ScriptingLED.cpp
+[ 455/1002] Compiling libraries/AP_Notify/SITL_SFML_LED.cpp
+[ 456/1002] Compiling libraries/AP_Notify/ToshibaLED_I2C.cpp
+[ 457/1002] Compiling libraries/AP_Notify/RCOutputRGBLed.cpp
+[ 458/1002] Compiling libraries/AP_Notify/OreoLED_I2C.cpp
+[ 459/1002] Compiling libraries/AP_Notify/PCA9685LED_I2C.cpp
+[ 460/1002] Compiling libraries/AP_Notify/RGBLed.cpp
+[ 461/1002] Compiling libraries/AP_Notify/NCP5623.cpp
+[ 462/1002] Compiling libraries/AP_Notify/NeoPixel.cpp
+[ 463/1002] Compiling libraries/AP_Notify/NavigatorLED.cpp
+[ 464/1002] Compiling libraries/AP_Notify/LP5562.cpp
+[ 465/1002] Compiling libraries/AP_Notify/Buzzer.cpp
+[ 466/1002] Compiling libraries/AP_Notify/AP_BoardLED2.cpp
+[ 467/1002] Compiling libraries/AP_Notify/ExternalLED.cpp
+[ 468/1002] Compiling libraries/AP_Notify/DiscoLED.cpp
+[ 469/1002] Compiling libraries/AP_Notify/DShotLED.cpp
+[ 470/1002] Compiling libraries/AP_Notify/Display.cpp
+[ 471/1002] Compiling libraries/AP_Notify/DiscreteRGBLed.cpp
+[ 472/1002] Compiling libraries/AP_Notify/AP_Notify.cpp
+[ 473/1002] Compiling libraries/AP_Notify/Display_SITL.cpp
+[ 474/1002] Compiling libraries/AP_Notify/Display_SH1106_I2C.cpp
+[ 475/1002] Compiling libraries/AP_Notify/AP_BoardLED.cpp
+[ 476/1002] Compiling libraries/AP_Notify/DroneCAN_RGB_LED.cpp
+[ 477/1002] Compiling libraries/AP_Notify/Display_SSD1306_I2C.cpp
+[ 478/1002] Compiling libraries/AP_Notify/IS31FL3195.cpp
+[ 479/1002] Compiling libraries/AP_Notify/Led_Sysfs.cpp
+[ 480/1002] Compiling libraries/AP_Notify/MMLPlayer.cpp
+[ 481/1002] Compiling libraries/AP_OLC/AP_OLC.cpp
+[ 482/1002] Compiling libraries/AP_OSD/AP_OSD_MSP_DisplayPort.cpp
+[ 483/1002] Compiling libraries/AP_OSD/AP_OSD_SITL.cpp
+[ 484/1002] Compiling libraries/AP_OSD/AP_OSD_Backend.cpp
+[ 485/1002] Compiling libraries/AP_OSD/AP_OSD_Setting.cpp
+[ 486/1002] Compiling libraries/AP_OSD/AP_OSD_MSP.cpp
+[ 487/1002] Compiling libraries/AP_OSD/AP_OSD_MAX7456.cpp
+[ 488/1002] Compiling libraries/AP_OSD/AP_OSD.cpp
+[ 489/1002] Compiling libraries/AP_OpenDroneID/AP_OpenDroneID_DroneCAN.cpp
+[ 490/1002] Compiling libraries/AP_OpenDroneID/AP_OpenDroneID.cpp
+[ 491/1002] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_UPFLOW.cpp
+[ 492/1002] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_MAV.cpp
+[ 493/1002] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_SITL.cpp
+[ 494/1002] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_Onboard.cpp
+[ 495/1002] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_HereFlow.cpp
+[ 496/1002] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_MSP.cpp
+[ 497/1002] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_PX4Flow.cpp
+[ 498/1002] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_Calibrator.cpp
+[ 499/1002] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_Pixart.cpp
+[ 500/1002] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_Backend.cpp
+[ 501/1002] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow_CXOF.cpp
+[ 502/1002] Compiling libraries/AP_OpticalFlow/AP_OpticalFlow.cpp
+[ 503/1002] Compiling libraries/AP_Parachute/AP_Parachute.cpp
+[ 504/1002] Compiling libraries/AP_Param/AP_Param.cpp
+[ 505/1002] Compiling libraries/AP_Param/AP_ParamT.cpp
+[ 506/1002] Compiling libraries/AP_PiccoloCAN/AP_PiccoloCAN_ECU.cpp
+[ 507/1002] Compiling libraries/AP_PiccoloCAN/AP_PiccoloCAN_Servo.cpp
+[ 508/1002] Compiling libraries/AP_PiccoloCAN/AP_PiccoloCAN.cpp
+[ 509/1002] Compiling libraries/AP_PiccoloCAN/AP_PiccoloCAN_ESC.cpp
+[ 510/1002] Compiling libraries/AP_Proximity/AP_Proximity_LightWareSF40C.cpp
+[ 511/1002] Compiling libraries/AP_Proximity/AP_Proximity_Boundary_3D.cpp
+[ 512/1002] Compiling libraries/AP_Proximity/AP_Proximity_Params.cpp
+[ 513/1002] Compiling libraries/AP_Proximity/AP_Proximity_LightWareSerial.cpp
+[ 514/1002] Compiling libraries/AP_Proximity/AP_Proximity_LightWareSF45B.cpp
+[ 515/1002] Compiling libraries/AP_Proximity/AP_Proximity_Backend_Serial.cpp
+[ 516/1002] Compiling libraries/AP_Proximity/AP_Proximity_AirSimSITL.cpp
+[ 517/1002] Compiling libraries/AP_Proximity/AP_Proximity_TeraRangerTower.cpp
+[ 518/1002] Compiling libraries/AP_Proximity/AP_Proximity_Scripting.cpp
+[ 519/1002] Compiling libraries/AP_Proximity/AP_Proximity_TeraRangerTowerEvo.cpp
+[ 520/1002] Compiling libraries/AP_Proximity/AP_Proximity.cpp
+[ 521/1002] Compiling libraries/AP_Proximity/AP_Proximity_RPLidarA2.cpp
+[ 522/1002] Compiling libraries/AP_Proximity/AP_Proximity_Cygbot_D1.cpp
+[ 523/1002] Compiling libraries/AP_Proximity/AP_Proximity_RangeFinder.cpp
+[ 524/1002] Compiling libraries/AP_Proximity/AP_Proximity_DroneCAN.cpp
+[ 525/1002] Compiling libraries/AP_Proximity/AP_Proximity_SITL.cpp
+[ 526/1002] Compiling libraries/AP_Proximity/AP_Proximity_LD06.cpp
+[ 527/1002] Compiling libraries/AP_Proximity/AP_Proximity_MR72_CAN.cpp
+[ 528/1002] Compiling libraries/AP_Proximity/AP_Proximity_MAV.cpp
+[ 529/1002] Compiling libraries/AP_RAMTRON/AP_RAMTRON.cpp
+[ 530/1002] Compiling libraries/AP_RCMapper/AP_RCMapper.cpp
+[ 531/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_DroneCAN.cpp
+[ 532/1002] Compiling libraries/AP_RCProtocol/spm_srxl.cpp
+[ 533/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_SUMD.cpp
+[ 534/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_DSM.cpp
+[ 535/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_Backend.cpp
+[ 536/1002] Compiling libraries/AP_RCProtocol/SoftSerial.cpp
+[ 537/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_ST24.cpp
+[ 538/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_SBUS.cpp
+[ 539/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_SRXL.cpp
+[ 540/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_IBUS.cpp
+[ 541/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_PPMSum.cpp
+[ 542/1002] Compiling libraries/AP_RCTelemetry/AP_GHST_Telem.cpp
+[ 543/1002] Compiling libraries/AP_RCTelemetry/AP_Spektrum_Telem.cpp
+[ 544/1002] Compiling libraries/AP_ROMFS/AP_ROMFS.cpp
+[ 545/1002] Compiling libraries/AP_ROMFS/tinfgzip.cpp
+[ 546/1002] Compiling libraries/AP_ROMFS/tinflate.cpp
+[ 547/1002] Compiling libraries/AP_RPM/RPM_EFI.cpp
+[ 548/1002] Compiling libraries/AP_RPM/RPM_Pin.cpp
+[ 549/1002] Compiling libraries/AP_RPM/RPM_SITL.cpp
+[ 550/1002] Compiling libraries/AP_RPM/RPM_Generator.cpp
+[ 551/1002] Compiling libraries/AP_RPM/AP_RPM_Params.cpp
+[ 552/1002] Compiling libraries/AP_RPM/RPM_Backend.cpp
+[ 553/1002] Compiling libraries/AP_RPM/RPM_ESC_Telem.cpp
+[ 554/1002] Compiling libraries/AP_RPM/RPM_HarmonicNotch.cpp
+[ 555/1002] Compiling libraries/AP_RPM/AP_RPM.cpp
+[ 556/1002] Compiling libraries/AP_RSSI/AP_RSSI.cpp
+[ 557/1002] Compiling libraries/AP_RTC/JitterCorrection.cpp
+[ 558/1002] Compiling libraries/AP_RTC/AP_RTC.cpp
+[ 559/1002] Compiling libraries/AP_Radio/AP_Radio_backend.cpp
+[ 560/1002] Compiling libraries/AP_Radio/AP_Radio_cc2500.cpp
+[ 561/1002] Compiling libraries/AP_Radio/driver_bk2425.cpp
+[ 562/1002] Compiling libraries/AP_Radio/driver_cc2500.cpp
+[ 563/1002] Compiling libraries/AP_Radio/AP_Radio.cpp
+[ 564/1002] Compiling libraries/AP_Radio/AP_Radio_bk2425.cpp
+[ 565/1002] Compiling libraries/AP_Radio/AP_Radio_cypress.cpp
+[ 566/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_analog.cpp
+[ 567/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_USD1_Serial.cpp
+[ 568/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_MaxsonarI2CXL.cpp
+[ 569/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Backend_CAN.cpp
+[ 570/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Backend.cpp
+[ 571/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Wasp.cpp
+[ 572/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_VL53L0X.cpp
+[ 573/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_VL53L1X.cpp
+[ 574/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_TeraRangerI2C.cpp
+[ 575/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_PulsedLightLRF.cpp
+[ 576/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_TOFSenseP_CAN.cpp
+[ 577/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_TeraRanger_Serial.cpp
+[ 578/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_USD1_CAN.cpp
+[ 579/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_SITL.cpp
+[ 580/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_TOFSenseF_I2C.cpp
+[ 581/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_NoopLoop.cpp
+[ 582/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Lanbao.cpp
+[ 583/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_HC_SR04.cpp
+[ 584/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Benewake.cpp
+[ 585/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_MSP.cpp
+[ 586/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_NRA24_CAN.cpp
+[ 587/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_LeddarVu8.cpp
+[ 588/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_PWM.cpp
+[ 589/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_JRE_Serial.cpp
+[ 590/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Lua.cpp
+[ 591/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Benewake_TFMiniPlus.cpp
+[ 592/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_LeddarOne.cpp
+[ 593/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_MaxsonarSerialLV.cpp
+[ 594/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_GYUS42v2.cpp
+[ 595/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_DroneCAN.cpp
+[ 596/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_LightWareI2C.cpp
+[ 597/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Params.cpp
+[ 598/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Backend_Serial.cpp
+[ 599/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Bebop.cpp
+[ 600/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_LightWareSerial.cpp
+[ 601/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder.cpp
+[ 602/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_BBB_PRU.cpp
+[ 603/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_Benewake_CAN.cpp
+[ 604/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_BLPing.cpp
+[ 605/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_MAVLink.cpp
+[ 606/1002] Compiling libraries/AP_RangeFinder/AP_RangeFinder_NMEA.cpp
+[ 607/1002] Compiling libraries/AP_Relay/AP_Relay_Params.cpp
+[ 608/1002] Compiling libraries/AP_RobotisServo/AP_RobotisServo.cpp
+[ 609/1002] Compiling libraries/AP_SBusOut/AP_SBusOut.cpp
+[ 610/1002] Compiling libraries/AP_Scheduler/PerfInfo.cpp
+[ 611/1002] Compiling libraries/AP_SerialLED/AP_SerialLED.cpp
+[ 612/1002] Compiling libraries/AP_SerialManager/AP_SerialManager.cpp
+[ 613/1002] Compiling libraries/AP_ServoRelayEvents/AP_ServoRelayEvents.cpp
+[ 614/1002] Compiling libraries/AP_SmartRTL/AP_SmartRTL.cpp
+[ 615/1002] Compiling libraries/AP_Stats/AP_Stats.cpp
+[ 616/1002] Compiling libraries/AP_TempCalibration/AP_TempCalibration.cpp
+[ 617/1002] Compiling libraries/AP_TemperatureSensor/AP_TemperatureSensor_Params.cpp
+[ 618/1002] Compiling libraries/AP_TemperatureSensor/AP_TemperatureSensor_Analog.cpp
+[ 619/1002] Compiling libraries/AP_TemperatureSensor/AP_TemperatureSensor_Backend.cpp
+[ 620/1002] Compiling libraries/AP_TemperatureSensor/AP_TemperatureSensor_TSYS03.cpp
+[ 621/1002] Compiling libraries/AP_TemperatureSensor/AP_TemperatureSensor_MAX31865.cpp
+[ 622/1002] Compiling libraries/AP_TemperatureSensor/AP_TemperatureSensor_TSYS01.cpp
+[ 623/1002] Compiling libraries/AP_TemperatureSensor/AP_TemperatureSensor_MCP9600.cpp
+[ 624/1002] Compiling libraries/AP_Terrain/TerrainIO.cpp
+[ 625/1002] Compiling libraries/AP_Terrain/TerrainGCS.cpp
+[ 626/1002] Compiling libraries/AP_Terrain/TerrainUtil.cpp
+[ 627/1002] Compiling libraries/AP_Terrain/TerrainMission.cpp
+[ 628/1002] Compiling libraries/AP_Torqeedo/AP_Torqeedo.cpp
+[ 629/1002] Compiling libraries/AP_Tuning/AP_Tuning.cpp
+[ 630/1002] Compiling libraries/AP_VideoTX/AP_SmartAudio.cpp
+[ 631/1002] Compiling libraries/AP_VideoTX/AP_Tramp.cpp
+[ 632/1002] Compiling libraries/AP_VideoTX/AP_VideoTX.cpp
+[ 633/1002] Compiling libraries/AP_VisualOdom/AP_VisualOdom_Backend.cpp
+[ 634/1002] Compiling libraries/AP_VisualOdom/AP_VisualOdom_IntelT265.cpp
+[ 635/1002] Compiling libraries/AP_VisualOdom/AP_VisualOdom_MAV.cpp
+[ 636/1002] Compiling libraries/AP_VisualOdom/AP_VisualOdom_Logging.cpp
+[ 637/1002] Compiling libraries/AP_VisualOdom/AP_VisualOdom.cpp
+[ 638/1002] Compiling libraries/AP_Volz_Protocol/AP_Volz_Protocol.cpp
+[ 639/1002] Compiling libraries/AP_WheelEncoder/WheelEncoder_Quadrature.cpp
+[ 640/1002] Compiling libraries/AP_WheelEncoder/WheelEncoder_Backend.cpp
+[ 641/1002] Compiling libraries/AP_WheelEncoder/AP_WheelRateControl.cpp
+[ 642/1002] Compiling libraries/AP_WheelEncoder/WheelEncoder_SITL_Quadrature.cpp
+[ 643/1002] Compiling libraries/AP_WheelEncoder/AP_WheelEncoder.cpp
+[ 644/1002] Compiling libraries/AP_Winch/AP_Winch.cpp
+[ 645/1002] Compiling libraries/AP_Winch/AP_Winch_PWM.cpp
+[ 646/1002] Compiling libraries/AP_Winch/AP_Winch_Daiwa.cpp
+[ 647/1002] Compiling libraries/AP_Winch/AP_Winch_Backend.cpp
+[ 648/1002] Compiling libraries/Filter/LowPassFilter.cpp
+[ 649/1002] Compiling libraries/Filter/HarmonicNotchFilter.cpp
+[ 650/1002] Compiling libraries/Filter/AP_NotchFilter_params.cpp
+[ 651/1002] Compiling libraries/Filter/AP_Filter.cpp
+[ 652/1002] Compiling libraries/Filter/SlewLimiter.cpp
+[ 653/1002] Compiling libraries/Filter/SlewCalculator2D.cpp
+[ 654/1002] Compiling libraries/Filter/NotchFilter.cpp
+[ 655/1002] Compiling libraries/Filter/DerivativeFilter.cpp
+[ 656/1002] Compiling libraries/Filter/AP_Filter_params.cpp
+[ 657/1002] Compiling libraries/Filter/ModeFilter.cpp
+[ 658/1002] Compiling libraries/Filter/LowPassFilter2p.cpp
+[ 659/1002] Compiling libraries/GCS_MAVLink/GCS_DeviceOp.cpp
+[ 660/1002] Compiling libraries/GCS_MAVLink/MAVLink_routing.cpp
+[ 661/1002] Compiling libraries/GCS_MAVLink/MissionItemProtocol_Fence.cpp
+[ 662/1002] Compiling libraries/GCS_MAVLink/GCS_serial_control.cpp
+[ 663/1002] Compiling libraries/GCS_MAVLink/GCS.cpp
+[ 664/1002] Compiling libraries/GCS_MAVLink/GCS_Rally.cpp
+[ 665/1002] Compiling libraries/GCS_MAVLink/GCS_FTP.cpp
+[ 666/1002] Compiling libraries/GCS_MAVLink/GCS_Param.cpp
+[ 667/1002] Compiling libraries/GCS_MAVLink/GCS_MAVLink.cpp
+[ 668/1002] Compiling libraries/GCS_MAVLink/MissionItemProtocol_Waypoints.cpp
+[ 669/1002] Compiling libraries/GCS_MAVLink/MissionItemProtocol_Rally.cpp
+[ 670/1002] Compiling libraries/GCS_MAVLink/GCS_Signing.cpp
+[ 671/1002] Compiling libraries/GCS_MAVLink/GCS_ServoRelay.cpp
+[ 672/1002] Compiling libraries/GCS_MAVLink/MissionItemProtocol.cpp
+[ 673/1002] Compiling libraries/RC_Channel/RC_Channels.cpp
+[ 674/1002] Compiling libraries/SRV_Channel/SRV_Channel.cpp
+[ 675/1002] Compiling libraries/SRV_Channel/SRV_Channels.cpp
+[ 676/1002] Compiling libraries/SRV_Channel/SRV_Channel_aux.cpp
+[ 677/1002] Compiling libraries/AP_HAL/utility/BetterStream.cpp
+[ 678/1002] Compiling libraries/AP_HAL/RCOutput.cpp
+[ 679/1002] Compiling libraries/AP_HAL/utility/RCOutput_Tap_Linux.cpp
+[ 680/1002] Compiling libraries/AP_HAL/utility/RingBuffer.cpp
+[ 681/1002] Compiling libraries/AP_HAL/Semaphores.cpp
+[ 682/1002] Compiling libraries/AP_HAL/Device.cpp
+[ 683/1002] Compiling libraries/AP_HAL/GPIO.cpp
+[ 684/1002] Compiling libraries/AP_HAL/system.cpp
+[ 685/1002] Compiling libraries/AP_HAL/utility/replace.cpp
+[ 686/1002] Compiling libraries/AP_HAL/utility/print_vprintf.cpp
+[ 687/1002] Compiling libraries/AP_HAL/DSP.cpp
+[ 688/1002] Compiling libraries/AP_HAL/HAL.cpp
+[ 689/1002] Compiling libraries/AP_HAL/utility/Socket_native.cpp
+[ 690/1002] Compiling libraries/AP_HAL/utility/st24.cpp
+[ 691/1002] Compiling libraries/AP_HAL/utility/RCOutput_Tap.cpp
+[ 692/1002] Compiling libraries/AP_HAL/utility/sumd.cpp
+[ 693/1002] Compiling libraries/AP_HAL/utility/packetise.cpp
+[ 694/1002] Compiling libraries/AP_HAL/UARTDriver.cpp
+[ 695/1002] Compiling libraries/AP_HAL/utility/utoa_invert.cpp
+[ 696/1002] Compiling libraries/AP_HAL/CANIface.cpp
+[ 697/1002] Compiling libraries/AP_HAL/utility/dsm.cpp
+[ 698/1002] Compiling libraries/AP_HAL/Scheduler.cpp
+[ 699/1002] Compiling libraries/AP_HAL/Storage.cpp
+[ 700/1002] Compiling libraries/AP_HAL/utility/srxl.cpp
+[ 701/1002] Compiling libraries/AP_HAL/utility/getopt_cpp.cpp
+[ 702/1002] Compiling libraries/AP_HAL/Util.cpp
+[ 703/1002] Compiling libraries/AP_HAL/utility/ftoa_engine.cpp
+[ 704/1002] Compiling libraries/AP_HAL/utility/Socket.cpp
+[ 705/1002] Compiling libraries/AP_HAL_Empty/HAL_Empty_Class.cpp
+[ 706/1002] Compiling libraries/AP_HAL_Empty/Semaphores.cpp
+[ 707/1002] Compiling libraries/AP_HAL_Empty/UARTDriver.cpp
+[ 708/1002] Compiling libraries/AP_HAL_Empty/GPIO.cpp
+[ 709/1002] Compiling libraries/AP_HAL_Empty/RCOutput.cpp
+[ 710/1002] Compiling libraries/AP_HAL_Empty/Storage.cpp
+[ 711/1002] Compiling libraries/AP_HAL_Empty/RCInput.cpp
+[ 712/1002] Compiling libraries/AP_HAL_Empty/AnalogIn.cpp
+[ 713/1002] Compiling libraries/AP_HAL_ChibiOS/Scheduler.cpp
+[ 714/1002] Compiling libraries/AP_HAL_ChibiOS/sdcard.cpp
+[ 715/1002] Compiling libraries/AP_HAL_ChibiOS/Util.cpp
+[ 716/1002] Compiling libraries/AP_HAL_ChibiOS/SoftSigReader.cpp
+[ 717/1002] Compiling libraries/AP_HAL_ChibiOS/stdio.cpp
+[ 718/1002] Compiling libraries/AP_HAL_ChibiOS/WSPIDevice.cpp
+[ 719/1002] Compiling libraries/AP_HAL_ChibiOS/SoftSigReaderInt.cpp
+[ 720/1002] Compiling libraries/AP_HAL_ChibiOS/CanIface.cpp
+[ 721/1002] Compiling libraries/AP_HAL_ChibiOS/RCOutput_iofirmware.cpp
+[ 722/1002] Compiling libraries/AP_HAL_ChibiOS/I2CDevice.cpp
+[ 723/1002] Compiling libraries/AP_HAL_ChibiOS/CANFDIface.cpp
+[ 724/1002] Compiling libraries/AP_HAL_ChibiOS/UARTDriver.cpp
+[ 725/1002] Compiling libraries/AP_HAL_ChibiOS/RCInput.cpp
+[ 726/1002] Compiling libraries/AP_HAL_ChibiOS/RCOutput_bdshot.cpp
+[ 727/1002] Compiling libraries/AP_HAL_ChibiOS/shared_dma.cpp
+[ 728/1002] Compiling libraries/AP_HAL_ChibiOS/DSP.cpp
+[ 729/1002] Compiling libraries/AP_HAL_ChibiOS/Semaphores.cpp
+[ 730/1002] Compiling libraries/AP_HAL_ChibiOS/RCOutput.cpp
+[ 731/1002] Compiling libraries/AP_HAL_ChibiOS/RCOutput_serial.cpp
+[ 732/1002] Compiling libraries/AP_HAL_ChibiOS/Device.cpp
+[ 733/1002] Compiling libraries/AP_HAL_ChibiOS/SPIDevice.cpp
+[ 734/1002] Compiling libraries/AP_HAL_ChibiOS/AnalogIn.cpp
+[ 735/1002] Compiling libraries/AP_Scripting/AP_Scripting_CANSensor.cpp
+[ 736/1002] Compiling libraries/AP_Scripting/AP_Scripting.cpp
+[ 737/1002] Compiling libraries/AP_Scripting/lua/src/linit.c
+[ 738/1002] Compiling libraries/AP_Scripting/lua/src/lzio.c
+[ 739/1002] Compiling libraries/AP_Scripting/lua/src/lcorolib.c
+[ 740/1002] Compiling libraries/AP_Scripting/lua/src/lundump.c
+[ 741/1002] Compiling libraries/AP_Scripting/lua/src/lmem.c
+[ 742/1002] Compiling libraries/AP_Scripting/lua/src/loadlib.c
+[ 743/1002] Compiling libraries/AP_Scripting/lua/src/lfunc.c
+[ 744/1002] Compiling libraries/AP_Scripting/lua/src/loslib.c
+[ 745/1002] Compiling libraries/AP_Scripting/lua/src/lapi.c
+[ 746/1002] Compiling libraries/AP_Scripting/lua/src/lctype.c
+[ 747/1002] Compiling libraries/AP_Scripting/lua/src/llex.c
+[ 748/1002] Compiling libraries/AP_Scripting/lua/src/lbaselib.c
+[ 749/1002] Compiling libraries/AP_Scripting/lua/src/ltable.c
+[ 750/1002] Compiling libraries/AP_Scripting/lua/src/lvm.c
+[ 751/1002] Compiling libraries/AP_Scripting/lua/src/lbitlib.c
+[ 752/1002] Compiling libraries/AP_Scripting/lua/src/lcode.c
+[ 753/1002] Compiling libraries/AP_Scripting/lua/src/ldblib.c
+[ 754/1002] Compiling libraries/AP_Scripting/lua/src/lparser.c
+[ 755/1002] Compiling libraries/AP_Scripting/lua/src/lauxlib.c
+[ 756/1002] Compiling libraries/AP_Scripting/lua/src/liolib.c
+[ 757/1002] Compiling libraries/AP_Scripting/lua/src/lobject.c
+[ 758/1002] Compiling libraries/AP_Scripting/lua/src/lmathlib.c
+[ 759/1002] Compiling libraries/AP_Scripting/lua/src/lstring.c
+[ 760/1002] Compiling libraries/AP_Scripting/lua/src/lopcodes.c
+[ 761/1002] Compiling libraries/AP_Scripting/lua/src/ldump.c
+[ 762/1002] Compiling libraries/AP_Scripting/lua/src/lstate.c
+[ 763/1002] Compiling libraries/AP_Scripting/lua/src/ltm.c
+[ 764/1002] Compiling libraries/AP_Scripting/lua/src/ldo.c
+[ 765/1002] Compiling libraries/AP_Scripting/lua/src/luac.c
+[ 766/1002] Compiling libraries/AP_Scripting/lua/src/lstrlib.c
+[ 767/1002] Compiling libraries/AP_Scripting/lua/src/lutf8lib.c
+[ 768/1002] Compiling libraries/AP_Scripting/lua/src/ltablib.c
+[ 769/1002] Compiling libraries/AP_Scripting/lua/src/ldebug.c
+[ 770/1002] Compiling libraries/AP_Scripting/lua/src/lgc.c
+[ 771/1002] Compiling libraries/AP_Scripting/lua/src/lua.c
+[ 772/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/ServoPackets.c
+[ 773/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/ESCCommands.c
+[ 774/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/ServoDefines.c
+[ 775/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/ServoCommands.c
+[ 776/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/ESCPackets.c
+[ 777/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/ESCVelocityProtocol.c
+[ 778/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/ESCDefines.c
+[ 779/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/scaledencode.c
+[ 780/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/ServoProtocol.c
+[ 781/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/ECUPackets.c
+[ 782/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/fieldencode.c
+[ 783/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/ECUDefines.c
+[ 784/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/ECUSettings.c
+[ 785/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/scaleddecode.c
+[ 786/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/fielddecode.c
+[ 787/1002] Compiling libraries/AP_PiccoloCAN/piccolo_protocol/ECUProtocol.c
+[ 788/1002] Compiling libraries/AP_ADSB/sagetech-sdk/sgEncodeDataReq.c
+[ 789/1002] Compiling libraries/AP_ADSB/sagetech-sdk/sgEncodeInstall.c
+[ 790/1002] Compiling libraries/AP_ADSB/sagetech-sdk/uint162Buf.c
+[ 791/1002] Compiling libraries/AP_ADSB/sagetech-sdk/sgDecodeFlightId.c
+[ 792/1002] Compiling libraries/AP_ADSB/sagetech-sdk/toAlt.c
+[ 793/1002] Compiling libraries/AP_ADSB/sagetech-sdk/sgDecodeInstall.c
+[ 794/1002] Compiling libraries/AP_ADSB/sagetech-sdk/sgDecodeMSR.c
+[ 795/1002] Compiling libraries/AP_ADSB/sagetech-sdk/toLatLon.c
+[ 796/1002] Compiling libraries/AP_ADSB/sagetech-sdk/calcChecksum.c
+[ 797/1002] Compiling libraries/AP_ADSB/sagetech-sdk/sgEncodeFlightId.c
+[ 798/1002] Compiling libraries/AP_ADSB/sagetech-sdk/sgEncodeOperating.c
+[ 799/1002] Compiling libraries/AP_ADSB/sagetech-sdk/toIcao.c
+[ 800/1002] Compiling libraries/AP_ADSB/sagetech-sdk/sgEncodeTargetReq.c
+[ 801/1002] Compiling libraries/AP_ADSB/sagetech-sdk/sgDecodeAck.c
+[ 802/1002] Compiling libraries/AP_ADSB/sagetech-sdk/toHeading.c
+[ 803/1002] Compiling libraries/AP_ADSB/sagetech-sdk/icao2Buf.c
+[ 804/1002] Compiling libraries/AP_ADSB/sagetech-sdk/toUint32.c
+[ 805/1002] Compiling libraries/AP_ADSB/sagetech-sdk/float2Buf.c
+[ 806/1002] Compiling libraries/AP_ADSB/sagetech-sdk/toInt32.c
+[ 807/1002] Compiling libraries/AP_ADSB/sagetech-sdk/sgEncodeGPS.c
+[ 808/1002] Compiling libraries/AP_ADSB/sagetech-sdk/uint322Buf.c
+[ 809/1002] Compiling libraries/AP_ADSB/sagetech-sdk/toGS.c
+[ 810/1002] Compiling libraries/AP_ADSB/sagetech-sdk/toTOA.c
+[ 811/1002] Compiling libraries/AP_ADSB/sagetech-sdk/toUint16.c
+[ 812/1002] Compiling libraries/AP_ADSB/sagetech-sdk/target.c
+[ 813/1002] Compiling libraries/AP_ADSB/sagetech-sdk/toVel.c
+[ 814/1002] Compiling libraries/AP_ADSB/sagetech-sdk/appendChecksum.c
+[ 815/1002] Compiling libraries/AP_ADSB/sagetech-sdk/toHeading2.c
+[ 816/1002] Compiling libraries/AP_ADSB/sagetech-sdk/charArray2Buf.c
+[ 817/1002] Compiling libraries/AP_ADSB/sagetech-sdk/toInt16.c
+[ 818/1002] Compiling libraries/AP_ADSB/sagetech-sdk/sgDecodeSVR.c
+[ 819/1002] Compiling libraries/AP_Airspeed/AP_Airspeed.cpp
+[ 820/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_Params.cpp
+[ 821/1002] Compiling libraries/AP_Airspeed/AP_Airspeed_NMEA.cpp
+[ 822/1002] Compiling libraries/AP_AHRS/AP_AHRS_DCM.cpp
+[ 823/1002] Compiling libraries/AP_AHRS/AP_AHRS_Backend.cpp
+[ 824/1002] Compiling libraries/AP_AHRS/AP_AHRS.cpp
+[ 825/1002] Compiling libraries/AP_Baro/AP_Baro_SITL.cpp
+[ 826/1002] Compiling libraries/AP_Baro/AP_Baro.cpp
+[ 827/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor_Params.cpp
+[ 828/1002] Compiling libraries/AP_BattMonitor/AP_BattMonitor.cpp
+[ 829/1002] Compiling libraries/AP_BoardConfig/AP_BoardConfig.cpp
+[ 830/1002] Compiling libraries/AP_Compass/AP_Compass.cpp
+[ 831/1002] Compiling libraries/AP_HAL/SIMState.cpp
+[ 832/1002] Compiling libraries/AP_InertialSensor/AP_InertialSensor.cpp
+[ 833/1002] Compiling libraries/AP_Math/SCurve.cpp
+[ 834/1002] Compiling libraries/AP_Math/quaternion.cpp
+[ 835/1002] Compiling libraries/AP_Math/vector3.cpp
+[ 836/1002] Compiling libraries/AP_Mission/AP_Mission.cpp
+[ 837/1002] Compiling libraries/AP_DAL/AP_DAL.cpp
+[ 838/1002] Compiling libraries/AP_DAL/AP_DAL_RangeFinder.cpp
+[ 839/1002] Compiling libraries/AP_DAL/AP_DAL_Beacon.cpp
+[ 840/1002] Compiling libraries/AP_DAL/AP_DAL_VisualOdom.cpp
+[ 841/1002] Compiling libraries/AP_NavEKF2/AP_NavEKF2_OptFlowFusion.cpp
+[ 842/1002] Compiling libraries/AP_NavEKF2/AP_NavEKF2.cpp
+[ 843/1002] Compiling libraries/AP_NavEKF3/AP_NavEKF3_PosVelFusion.cpp
+[ 844/1002] Compiling libraries/AP_NavEKF3/AP_NavEKF3_Logging.cpp
+[ 845/1002] Compiling libraries/AP_NavEKF3/AP_NavEKF3_MagFusion.cpp
+[ 846/1002] Compiling libraries/AP_NavEKF3/AP_NavEKF3.cpp
+[ 847/1002] Compiling libraries/AP_NavEKF3/AP_NavEKF3_OptFlowFusion.cpp
+[ 848/1002] Compiling libraries/AP_NavEKF3/AP_NavEKF3_RngBcnFusion.cpp
+[ 849/1002] Compiling libraries/AP_NavEKF3/AP_NavEKF3_VehicleStatus.cpp
+[ 850/1002] Compiling libraries/AP_NavEKF3/AP_NavEKF3_core.cpp
+[ 851/1002] Compiling libraries/AP_NavEKF3/AP_NavEKF3_Outputs.cpp
+[ 852/1002] Compiling libraries/AP_NavEKF3/AP_NavEKF3_GyroBias.cpp
+[ 853/1002] Compiling libraries/AP_NavEKF3/AP_NavEKF3_Control.cpp
+[ 854/1002] Compiling libraries/AP_NavEKF3/AP_NavEKF3_Measurements.cpp
+[ 855/1002] Compiling libraries/AP_NavEKF3/AP_NavEKF3_AirDataFusion.cpp
+[ 856/1002] Compiling libraries/AP_Rally/AP_Rally.cpp
+[ 857/1002] Compiling libraries/AP_Scheduler/AP_Scheduler.cpp
+[ 858/1002] Compiling libraries/AP_Terrain/AP_Terrain.cpp
+[ 859/1002] Compiling libraries/AP_Vehicle/AP_Vehicle.cpp
+[ 860/1002] Compiling libraries/AP_Logger/LoggerMessageWriter.cpp
+[ 861/1002] Compiling libraries/AP_Logger/AP_Logger_File.cpp
+[ 862/1002] Compiling libraries/AP_Logger/AP_Logger.cpp
+[ 863/1002] Compiling libraries/AP_Logger/AP_Logger_Backend.cpp
+[ 864/1002] Compiling libraries/GCS_MAVLink/GCS_Dummy.cpp
+[ 865/1002] Compiling libraries/GCS_MAVLink/GCS_Fence.cpp
+[ 866/1002] Compiling libraries/GCS_MAVLink/GCS_Common.cpp
+[ 867/1002] Compiling libraries/RC_Channel/RC_Channel.cpp
+[ 868/1002] Compiling libraries/StorageManager/StorageManager.cpp
+[ 869/1002] Compiling libraries/AP_Frsky_Telem/AP_Frsky_SPort_Passthrough.cpp
+[ 870/1002] Compiling libraries/AP_Relay/AP_Relay.cpp
+[ 871/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_SRXL2.cpp
+[ 872/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_FPort2.cpp
+[ 873/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol.cpp
+[ 874/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_FPort.cpp
+[ 875/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_CRSF.cpp
+[ 876/1002] Compiling libraries/AP_RCProtocol/AP_RCProtocol_GHST.cpp
+[ 877/1002] Compiling libraries/AP_BLHeli/AP_BLHeli.cpp
+[ 878/1002] Compiling libraries/AP_Proximity/AP_Proximity_Backend.cpp
+[ 879/1002] Compiling libraries/AP_Proximity/AP_Proximity_Utils.cpp
+[ 880/1002] Compiling libraries/AC_Fence/AC_Fence.cpp
+[ 881/1002] Compiling libraries/AC_Fence/AC_PolyFence_loader.cpp
+[ 882/1002] Compiling libraries/AC_Avoidance/AP_OADatabase.cpp
+[ 883/1002] Compiling libraries/AC_Avoidance/AC_Avoid.cpp
+[ 884/1002] Compiling libraries/AC_Avoidance/AP_OABendyRuler.cpp
+[ 885/1002] Compiling libraries/AP_LandingGear/AP_LandingGear.cpp
+[ 886/1002] Compiling libraries/AP_Filesystem/AP_Filesystem_posix.cpp
+[ 887/1002] Compiling libraries/AP_ADSB/AP_ADSB_Sagetech_MXS.cpp
+[ 888/1002] Compiling libraries/AP_ADSB/AP_ADSB.cpp
+[ 889/1002] Compiling libraries/AP_ESC_Telem/AP_ESC_Telem_Backend.cpp
+[ 890/1002] Compiling libraries/AP_GyroFFT/AP_GyroFFT.cpp
+[ 891/1002] Compiling libraries/AP_RCTelemetry/AP_CRSF_Telem.cpp
+[ 892/1002] Compiling libraries/AP_RCTelemetry/AP_RCTelemetry.cpp
+[ 893/1002] Compiling libraries/AP_ExternalAHRS/AP_ExternalAHRS_InertialLabs.cpp
+[ 894/1002] Compiling libraries/AP_TemperatureSensor/AP_TemperatureSensor.cpp
+[ 895/1002] Compiling libraries/AP_CustomRotations/AP_CustomRotations_params.cpp
+[ 896/1002] Compiling libraries/AP_CustomRotations/AP_CustomRotations.cpp
+[ 897/1002] Compiling libraries/AP_AIS/AP_AIS.cpp
+[ 898/1002] Compiling libraries/AC_AttitudeControl/AC_WeatherVane.cpp
+[ 899/1002] Compiling libraries/AC_AttitudeControl/AC_PosControl.cpp
+[ 900/1002] Compiling libraries/AC_AttitudeControl/AC_AttitudeControl.cpp
+[ 901/1002] Compiling libraries/AC_PrecLand/AC_PrecLand.cpp
+[ 902/1002] Compiling libraries/AC_WPNav/AC_Loiter.cpp
+[ 903/1002] Compiling libraries/AP_Motors/AP_Motors_Thrust_Linearization.cpp
+[ 904/1002] Compiling libraries/AP_Motors/AP_MotorsMatrix.cpp
+[ 905/1002] Compiling libraries/AP_Motors/AP_MotorsTri.cpp
+[ 906/1002] Compiling libraries/AP_Motors/AP_MotorsMulticopter.cpp
+[ 907/1002] Compiling libraries/AP_Avoidance/AP_Avoidance.cpp
+[ 908/1002] Compiling libraries/AP_Arming/AP_Arming.cpp
+[ 909/1002] Compiling libraries/AP_Follow/AP_Follow.cpp
+[ 910/1002] Compiling libraries/AP_OSD/AP_OSD_ParamScreen.cpp
+[ 911/1002] Compiling libraries/AP_OSD/AP_OSD_Screen.cpp
+[ 912/1002] Compiling libraries/AP_OSD/AP_OSD_ParamSetting.cpp
+[ 913/1002] Compiling libraries/AC_AutoTune/AC_AutoTune.cpp
+[ 914/1002] Compiling libraries/AP_HAL_ChibiOS/Storage.cpp
+[ 915/1002] Compiling libraries/AP_HAL_ChibiOS/GPIO.cpp
+[ 916/1002] Compiling libraries/AP_HAL_ChibiOS/system.cpp
+[ 917/1002] Compiling libraries/AP_HAL_ChibiOS/HAL_ChibiOS_Class.cpp
+[ 918/1002] Compiling libraries/AP_Scripting/lua_repl.cpp
+[ 919/1002] Compiling ../MatekF405-TE/libraries/AP_Scripting/lua_generated_bindings.cpp
+[ 920/1002] Compiling libraries/AP_Scripting/AP_Scripting_helpers.cpp
+[ 921/1002] Compiling libraries/AP_Scripting/lua_bindings.cpp
+[ 922/1002] Compiling libraries/AP_Scripting/lua_boxed_numerics.cpp
+[ 923/1002] Compiling libraries/AP_Scripting/lua_scripts.cpp
+[ 924/1002] Compiling ArduCopter/mode_flip.cpp
+[ 925/1002] Compiling ArduCopter/terrain.cpp
+[ 926/1002] Compiling ArduCopter/RC_Channel.cpp
+[ 927/1002] Compiling ArduCopter/mode_drift.cpp
+[ 928/1002] Compiling ArduCopter/tuning.cpp
+[ 929/1002] Compiling ArduCopter/sensors.cpp
+[ 930/1002] Compiling ArduCopter/avoidance_adsb.cpp
+[ 931/1002] Compiling ArduCopter/AP_State.cpp
+[ 932/1002] Compiling ArduCopter/heli.cpp
+[ 933/1002] Compiling ArduCopter/UserParameters.cpp
+[ 934/1002] Compiling ArduCopter/AP_Rally.cpp
+[ 935/1002] Compiling ArduCopter/afs_copter.cpp
+[ 936/1002] Compiling ArduCopter/mode_guided.cpp
+[ 937/1002] Compiling ArduCopter/mode_land.cpp
+[ 938/1002] Compiling ArduCopter/mode_autotune.cpp
+[ 939/1002] Compiling ArduCopter/mode_acro.cpp
+[ 940/1002] Compiling ArduCopter/mode_althold.cpp
+[ 941/1002] Compiling ArduCopter/autoyaw.cpp
+[ 942/1002] Compiling ArduCopter/mode_stabilize_heli.cpp
+[ 943/1002] Compiling ArduCopter/mode_autorotate.cpp
+[ 944/1002] Compiling ArduCopter/mode_sport.cpp
+[ 945/1002] Compiling ArduCopter/mode_throw.cpp
+[ 946/1002] Compiling ArduCopter/crash_check.cpp
+[ 947/1002] Compiling ArduCopter/Attitude.cpp
+[ 948/1002] Compiling ArduCopter/mode_turtle.cpp
+[ 949/1002] Compiling ArduCopter/commands.cpp
+[ 950/1002] Compiling ArduCopter/system.cpp
+[ 951/1002] Linking ../MatekF405-TE/lib/libArduCopter_libs.a
+[ 952/1002] Compiling ArduCopter/mode_systemid.cpp
+[ 953/1002] Compiling ArduCopter/mode_follow.cpp
+[ 954/1002] Compiling ArduCopter/AP_Arming.cpp
+[ 955/1002] Compiling ArduCopter/mode_rtl.cpp
+[ 956/1002] Compiling ArduCopter/landing_gear.cpp
+[ 957/1002] Compiling ArduCopter/Log.cpp
+[ 958/1002] Compiling ArduCopter/compassmot.cpp
+[ 959/1002] Compiling ArduCopter/UserCode.cpp
+[ 960/1002] Compiling ArduCopter/radio.cpp
+[ 961/1002] Compiling ArduCopter/mode_circle.cpp
+[ 962/1002] Compiling ArduCopter/motor_test.cpp
+[ 963/1002] Compiling ArduCopter/mode_guided_nogps.cpp
+[ 964/1002] Compiling ArduCopter/mode_brake.cpp
+[ 965/1002] Compiling ArduCopter/events.cpp
+[ 966/1002] Compiling ArduCopter/precision_landing.cpp
+[ 967/1002] Compiling ArduCopter/mode_avoid_adsb.cpp
+[ 968/1002] Compiling ArduCopter/mode_smart_rtl.cpp
+[ 969/1002] Compiling ArduCopter/GCS_Mavlink.cpp
+[ 970/1002] Compiling ArduCopter/failsafe.cpp
+[ 971/1002] Compiling ArduCopter/fence.cpp
+[ 972/1002] Compiling ArduCopter/Parameters.cpp
+[ 973/1002] Compiling ArduCopter/standby.cpp
+[ 974/1002] Compiling ArduCopter/mode_poshold.cpp
+[ 975/1002] Compiling ArduCopter/mode_stabilize.cpp
+[ 976/1002] Compiling ArduCopter/Copter.cpp
+[ 977/1002] Compiling ArduCopter/inertia.cpp
+[ 978/1002] Compiling ArduCopter/navigation.cpp
+[ 979/1002] Compiling ArduCopter/AP_ExternalControl_Copter.cpp
+[ 980/1002] Compiling ArduCopter/avoidance.cpp
+[ 981/1002] Compiling ArduCopter/surface_tracking.cpp
+[ 982/1002] Compiling ArduCopter/GCS_Copter.cpp
+[ 983/1002] Compiling ArduCopter/esc_calibration.cpp
+[ 984/1002] Compiling ArduCopter/motors.cpp
+[ 985/1002] Compiling ArduCopter/mode_loiter.cpp
+[ 986/1002] Compiling ArduCopter/mode_flowhold.cpp
+[ 987/1002] Compiling ArduCopter/mode_zigzag.cpp
+[ 988/1002] Compiling ArduCopter/ekf_check.cpp
+[ 989/1002] Compiling ArduCopter/takeoff_check.cpp
+[ 990/1002] Compiling ArduCopter/mode.cpp
+[ 991/1002] Compiling ArduCopter/baro_ground_effect.cpp
+[ 992/1002] Compiling ArduCopter/mode_auto.cpp
+[ 993/1002] Compiling ArduCopter/mode_acro_heli.cpp
+[ 994/1002] Compiling ArduCopter/land_detector.cpp
+[ 995/1002] Compiling ArduCopter/takeoff.cpp
+[ 996/1002] Compiling ArduCopter/toy_mode.cpp
+[ 997/1002] Linking ../MatekF405-TE/bin/arducopter
+[ 998/1002] Generating bin/arducopter.bin
+[ 999/1002] app_descriptor ../MatekF405-TE/bin/arducopter.bin
+No APP_DESCRIPTOR found
+[1000/1002] apj_gen ../MatekF405-TE/bin/arducopter.bin
+[1001/1002] bin cleanup ../MatekF405-TE/bin/arducopter.bin
+[1002/1002] Generating bin/arducopter_with_bl.hex
+Waf: Leaving directory `/mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE'
+
+BUILD SUMMARY
+Build directory: /mnt/volume_nyc3_01/custom/base/tmp/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:7abcee2c39976f8ada2185e662270230/MatekF405-TE
+Target          Text (B)  Data (B)  BSS (B)  Total Flash Used (B)  Free Flash (B)  External Flash Used (B)
+----------------------------------------------------------------------------------------------------------
+bin/arducopter    876688      2400   128760                879088          103948  Not Applicable         
+
+Build commands will be stored in ../MatekF405-TE/compile_commands.json
+'copter' finished successfully (56.299s)
+done build
+
+BUILD_FINISHED
