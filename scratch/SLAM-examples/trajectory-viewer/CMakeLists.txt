@@ -21,7 +21,7 @@ target_link_libraries(main ${Pangolin_LIBRARIES})
 
 # Link against Pangolin libraries in the "lib" folder
 target_link_libraries(main
-                      ${CMAKE_CURRENT_SOURCE_DIR}/lib/libpango_core.so
+                      libpango_core.so
                       # Add other Pangolin dependencies here
                       )
 
