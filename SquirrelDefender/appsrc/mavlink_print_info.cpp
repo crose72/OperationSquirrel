@@ -34,8 +34,10 @@
  * Function: print_heartbeat
  * Description: Print the heartbeat mavlink message.
  ********************************************************************************/
-void print_heartbeat(mavlink_heartbeat_t &heartbeat) 
+void print_heartbeat(mavlink_heartbeat_t &heartbeat, const char *term)
 {
+    DebugTerm PrintHeartbeat(term);
+
     PrintPass::c_printf("Heartbeat:\n");
     PrintPass::c_printf("\tType: %d\n", heartbeat.type);
     PrintPass::c_printf("\tAutopilot: %d\n", heartbeat.autopilot);
@@ -49,8 +51,10 @@ void print_heartbeat(mavlink_heartbeat_t &heartbeat)
  * Function: print_system_time
  * Description: Print the system time mavlink message.
  ********************************************************************************/
-void print_system_time(mavlink_system_time_t &system_time)
+void print_system_time(mavlink_system_time_t &system_time, const char *term)
 {
+    DebugTerm PrintSysTm(term);
+
     PrintPass::c_printf("System Time:\n");
     PrintPass::c_printf("\tUnix timestamp (us): %lu\n", system_time.time_unix_usec);
     PrintPass::c_printf("\tTime since boot (ms): %u\n", system_time.time_boot_ms);
@@ -60,8 +64,10 @@ void print_system_time(mavlink_system_time_t &system_time)
  * Function: print_sys_status
  * Description: Print the system status mavlink message.
  ********************************************************************************/
-void print_sys_status(mavlink_sys_status_t &sys_status) 
+void print_sys_status(mavlink_sys_status_t &sys_status, const char *term)
 {
+    DebugTerm PrintSysStat(term);
+
     PrintPass::c_printf("System status:\n");
     PrintPass::c_printf("\tOnboard control sensors present: %u\n", sys_status.onboard_control_sensors_present);
     PrintPass::c_printf("\tOnboard control sensors enabled: %u\n", sys_status.onboard_control_sensors_enabled);
@@ -82,8 +88,10 @@ void print_sys_status(mavlink_sys_status_t &sys_status)
  * Function: print_statustext
  * Description: Print the status text mavlink message.
  ********************************************************************************/
-void print_statustext(mavlink_statustext_t &statustext) 
+void print_statustext(mavlink_statustext_t &statustext, const char *term)
 {
+    DebugTerm PrintStatTxt(term);
+
     PrintPass::c_printf("STATUSTEXT message:\n");
     PrintPass::c_printf("\tSeverity: %u\n", statustext.severity);
     PrintPass::c_printf("\tText: %s\n", statustext.text);
@@ -93,8 +101,10 @@ void print_statustext(mavlink_statustext_t &statustext)
  * Function: print_param_value
  * Description: Print the value of a parameter.
  ********************************************************************************/
-void print_param_value(mavlink_param_value_t &param_value) 
+void print_param_value(mavlink_param_value_t &param_value, const char *term)
 {
+    DebugTerm PrintParamVal(term);
+
     PrintPass::c_printf("Parameter Name: %s\n", param_value.param_id);
     PrintPass::c_printf("\tValue: %.4f\n", param_value.param_value);
     PrintPass::c_printf("\tType: %d\n", param_value.param_type);
@@ -106,8 +116,10 @@ void print_param_value(mavlink_param_value_t &param_value)
  * Function: print_autopilot_version
  * Description: Print the autopilot version mavlink message.
  ********************************************************************************/
-void print_autopilot_version(mavlink_autopilot_version_t &autopilot_version) 
+void print_autopilot_version(mavlink_autopilot_version_t &autopilot_version, const char *term)
 {
+    DebugTerm PrintAutopilotVrsn(term);
+
     PrintPass::c_printf("Autopilot Version:\n");
     PrintPass::c_printf("\tCapabilities: %lu\n", autopilot_version.capabilities);
     PrintPass::c_printf("\tFlight Software Version: %lu\n", autopilot_version.flight_sw_version);
@@ -123,8 +135,10 @@ void print_autopilot_version(mavlink_autopilot_version_t &autopilot_version)
  * Function: print_gps_global_origin
  * Description: Print the gps global origin mavlink message.
  ********************************************************************************/
-void print_gps_global_origin(mavlink_gps_global_origin_t &gps_global_origin) 
+void print_gps_global_origin(mavlink_gps_global_origin_t &gps_global_origin, const char *term)
 {
+    DebugTerm PrintGlobOrig(term);
+
     PrintPass::c_printf("GPS_GLOBAL_ORIGIN message:\n");
     PrintPass::c_printf("\tLatitude: %f\n", (double)gps_global_origin.latitude);
     PrintPass::c_printf("\tLongitude: %f\n", (double)gps_global_origin.longitude);
@@ -135,8 +149,10 @@ void print_gps_global_origin(mavlink_gps_global_origin_t &gps_global_origin)
  * Function: print_home_position
  * Description: Print the home position mavlink message.
  ********************************************************************************/
-void print_home_position(mavlink_home_position_t &home_position) 
+void print_home_position(mavlink_home_position_t &home_position, const char *term)
 {
+    DebugTerm PrintHomePos(term);
+
     PrintPass::c_printf("HOME_POSITION message:\n");
     PrintPass::c_printf("\tLatitude: %f\n", (double)home_position.latitude);
     PrintPass::c_printf("\tLongitude: %f\n", (double)home_position.longitude);
@@ -147,8 +163,10 @@ void print_home_position(mavlink_home_position_t &home_position)
  * Function: print_global_position_int
  * Description: Print the global position integer mavlink message.
  ********************************************************************************/
-void print_global_position_int(mavlink_global_position_int_t &global_pos_int) 
+void print_global_position_int(mavlink_global_position_int_t &global_pos_int, const char *term)
 {
+    DebugTerm PrintGPS(term);
+
     PrintPass::c_printf("Global position:\n");
     PrintPass::c_printf("\tLatitude: %d degrees (1e-7)\n", global_pos_int.lat);
     PrintPass::c_printf("\tLongitude: %d degrees (1e-7)\n", global_pos_int.lon);
@@ -164,8 +182,10 @@ void print_global_position_int(mavlink_global_position_int_t &global_pos_int)
  * Function: print_scaled_imu
  * Description: Print the scaled imu mavlink message.
  ********************************************************************************/
-void print_scaled_imu(mavlink_scaled_imu_t &scaled_imu) 
+void print_scaled_imu(mavlink_scaled_imu_t &scaled_imu, const char *term)
 {
+    DebugTerm PrintScaledIMU(term);
+
     PrintPass::c_printf("Scaled IMU data:\n");
     PrintPass::c_printf("\tX acceleration: %d\n", scaled_imu.xacc);
     PrintPass::c_printf("\tY acceleration: %d\n", scaled_imu.yacc);
@@ -182,8 +202,10 @@ void print_scaled_imu(mavlink_scaled_imu_t &scaled_imu)
  * Function: print_optical_flow
  * Description: Print the optical flow mavlink message.
  ********************************************************************************/
-void print_optical_flow(mavlink_optical_flow_t &optical_flow) 
+void print_optical_flow(mavlink_optical_flow_t &optical_flow, const char *term)
 {
+    DebugTerm PrintOptFlow(term);
+
     PrintPass::c_printf("Optical Flow data:\n");
     PrintPass::c_printf("\tTimestamp: %llu us\n", optical_flow.time_usec);
     PrintPass::c_printf("\tSensor ID: %d\n", optical_flow.sensor_id);
@@ -201,33 +223,37 @@ void print_optical_flow(mavlink_optical_flow_t &optical_flow)
  * Function: print_distance_sensor
  * Description: Print the distance sensor mavlink message.
  ********************************************************************************/
-void print_distance_sensor(mavlink_distance_sensor_t &distance_sensor) 
+void print_distance_sensor(mavlink_distance_sensor_t &distance_sensor, const char *term)
 {
-    PrintPass::c_printf("Distance Sensor data:\n");
-    PrintPass::c_printf("\tTimestamp: %u ms\n", distance_sensor.time_boot_ms);
-    PrintPass::c_printf("\tMinimum distance: %u cm\n", distance_sensor.min_distance);
-    PrintPass::c_printf("\tMaximum distance: %u cm\n", distance_sensor.max_distance);
-    PrintPass::c_printf("\tCurrent distance reading: %u cm\n", distance_sensor.current_distance);
-    PrintPass::c_printf("\tType of distance sensor: %u\n", distance_sensor.type);
-    PrintPass::c_printf("\tOnboard ID of the sensor: %u\n", distance_sensor.id);
-    PrintPass::c_printf("\tOrientation of the sensor: %u\n", distance_sensor.orientation);
-    PrintPass::c_printf("\tMeasurement variance: %u cm^2\n", distance_sensor.covariance);
-    PrintPass::c_printf("\tHorizontal Field of View: %.2f rad\n", distance_sensor.horizontal_fov);
-    PrintPass::c_printf("\tVertical Field of View: %.2f rad\n", distance_sensor.vertical_fov);
-    PrintPass::c_printf("\tSensor orientation quaternion: [%.2f, %.2f, %.2f, %.2f]\n", 
-            distance_sensor.quaternion[0], 
-            distance_sensor.quaternion[1], 
-            distance_sensor.quaternion[2], 
-            distance_sensor.quaternion[3]);
-    PrintPass::c_printf("\tSignal quality: %u%%\n", distance_sensor.signal_quality);
+    DebugTerm DistSnsrInfo(term);
+
+    DistSnsrInfo.cpp_cout("Distance Sensor data:\n");
+    DistSnsrInfo.cpp_cout("\tTimestamp: " + std::to_string(distance_sensor.time_boot_ms) + " ms");
+    DistSnsrInfo.cpp_cout("\tMinimum distance: " + std::to_string(distance_sensor.min_distance) + "cm");
+    DistSnsrInfo.cpp_cout("\tMaximum distance: " + std::to_string(distance_sensor.max_distance) + "cm");
+    DistSnsrInfo.cpp_cout("\tCurrent distance reading: " + std::to_string(distance_sensor.current_distance) + "cm");
+    DistSnsrInfo.cpp_cout("\tType of distance sensor: " + std::to_string(distance_sensor.type));
+    DistSnsrInfo.cpp_cout("\tOnboard ID of the sensor: " + std::to_string(distance_sensor.id));
+    DistSnsrInfo.cpp_cout("\tOrientation of the sensor: " + std::to_string(distance_sensor.orientation));
+    DistSnsrInfo.cpp_cout("\tMeasurement variance: " + std::to_string(distance_sensor.covariance) + "cm^2");
+    DistSnsrInfo.cpp_cout("\tHorizontal Field of View: " + std::to_string(distance_sensor.horizontal_fov) + "rad");
+    DistSnsrInfo.cpp_cout("\tVertical Field of View: " + std::to_string(distance_sensor.vertical_fov) + "rad");
+    DistSnsrInfo.cpp_cout("\tSensor orientation quaternion: " +
+                          std::to_string(distance_sensor.quaternion[0]) +
+                          std::to_string(distance_sensor.quaternion[1]) +
+                          std::to_string(distance_sensor.quaternion[2]) +
+                          std::to_string(distance_sensor.quaternion[3]));
+    DistSnsrInfo.cpp_cout("\tSignal quality: " + std::to_string(distance_sensor.signal_quality));
 }
 
 /********************************************************************************
  * Function: print_local_position
  * Description: Print the local position mavlink message.
  ********************************************************************************/
-void print_local_position(mavlink_local_position_ned_t& local_position) 
+void print_local_position(mavlink_local_position_ned_t &local_position, const char *term)
 {
+    DebugTerm PrintLocPos(term);
+
     PrintPass::c_printf("Local Position:\n");
     PrintPass::c_printf("\tTimestamp: %u\n", local_position.time_boot_ms);
     PrintPass::c_printf("\tPosition (meters):\n");
@@ -244,8 +270,10 @@ void print_local_position(mavlink_local_position_ned_t& local_position)
  * Function: print_position_target_local_ned
  * Description: Print the position_target_local_ned mavlink message.
  ********************************************************************************/
-void print_position_target_local_ned(mavlink_position_target_local_ned_t& position_target_local_ned) 
+void print_position_target_local_ned(mavlink_position_target_local_ned_t &position_target_local_ned, const char *term)
 {
+    DebugTerm PrintPosTrgt(term);
+
     PrintPass::c_printf("Position target local NED: %u\n", position_target_local_ned.time_boot_ms);
     PrintPass::c_printf("\tTime since boot (ms): %u\n", position_target_local_ned.time_boot_ms);
     PrintPass::c_printf("\tPosition (X, Y, Z): %.3f, %.3f, %.3f\n", position_target_local_ned.x, position_target_local_ned.y, position_target_local_ned.z);
@@ -261,8 +289,10 @@ void print_position_target_local_ned(mavlink_position_target_local_ned_t& positi
  * Function: print_set_position_target_local_ned
  * Description: Print the set_position_target_local_ned mavlink message.
  ********************************************************************************/
-void print_set_position_target_local_ned(mavlink_set_position_target_local_ned_t& set_position_target_local_ned)
+void print_set_position_target_local_ned(mavlink_set_position_target_local_ned_t &set_position_target_local_ned, const char *term)
 {
+    DebugTerm PrintSetPosTrgt(term);
+
     PrintPass::c_printf("\tTime since boot (ms): %u\n", set_position_target_local_ned.time_boot_ms);
     PrintPass::c_printf("\tPosition (X, Y, Z): %.3f, %.3f, %.3f\n", set_position_target_local_ned.x, set_position_target_local_ned.y, set_position_target_local_ned.z);
     PrintPass::c_printf("\tVelocity (X, Y, Z): %.3f, %.3f, %.3f\n", set_position_target_local_ned.vx, set_position_target_local_ned.vy, set_position_target_local_ned.vz);
@@ -279,8 +309,10 @@ void print_set_position_target_local_ned(mavlink_set_position_target_local_ned_t
  * Function: print_attitude
  * Description: Print the attitude mavlink message.
  ********************************************************************************/
-void print_attitude(mavlink_attitude_t &attitude) 
+void print_attitude(mavlink_attitude_t &attitude, const char *term)
 {
+    DebugTerm PrintAtt(term);
+
     PrintPass::c_printf("Attitude:\n");
     PrintPass::c_printf("\tRoll: %.4f radians\n", attitude.roll);
     PrintPass::c_printf("\tPitch: %.4f radians\n", attitude.pitch);
@@ -294,8 +326,10 @@ void print_attitude(mavlink_attitude_t &attitude)
  * Function: print_attitude_target
  * Description: Print the attitude target mavlink message.
  ********************************************************************************/
-void print_attitude_target(mavlink_attitude_target_t &attitude_target) 
+void print_attitude_target(mavlink_attitude_target_t &attitude_target, const char *term)
 {
+    DebugTerm PrintAttTrgt(term);
+
     PrintPass::c_printf("Attitude Target:\n");
     PrintPass::c_printf("\tTime Boot (ms): %lu\n", attitude_target.time_boot_ms);
     PrintPass::c_printf("\tType Mask: %u\n", attitude_target.type_mask);
@@ -310,8 +344,10 @@ void print_attitude_target(mavlink_attitude_target_t &attitude_target)
  * Function: print_set_attitude_target
  * Description: Print the set_attitude_target mavlink message.
  ********************************************************************************/
-void print_set_attitude_target(mavlink_set_attitude_target_t &set_attitude_target) 
+void print_set_attitude_target(mavlink_set_attitude_target_t &set_attitude_target, const char *term)
 {
+    DebugTerm PrintSetAttTrgt(term);
+
     PrintPass::c_printf("Set Attitude Target:\n");
     PrintPass::c_printf("\tTime Boot (ms): %lu\n", set_attitude_target.time_boot_ms);
     PrintPass::c_printf("\tTarget System: %u\n", set_attitude_target.target_system);
@@ -328,8 +364,10 @@ void print_set_attitude_target(mavlink_set_attitude_target_t &set_attitude_targe
  * Function: print_attitude_quaternion
  * Description: Print the attitude quaternion mavlink message.
  ********************************************************************************/
-void print_attitude_quaternion(mavlink_attitude_quaternion_t &attitude_quaternion) 
+void print_attitude_quaternion(mavlink_attitude_quaternion_t &attitude_quaternion, const char *term)
 {
+    DebugTerm PrintAttQuat(term);
+
     PrintPass::c_printf("Attitude Quaternion:\n");
     PrintPass::c_printf("\tTime Boot (ms): %ul\n", attitude_quaternion.time_boot_ms);
     PrintPass::c_printf("\tQuaternion (q): [%f, %f, %f, %f]\n", attitude_quaternion.q1, attitude_quaternion.q2, attitude_quaternion.q3, attitude_quaternion.q4);
@@ -343,334 +381,339 @@ void print_attitude_quaternion(mavlink_attitude_quaternion_t &attitude_quaternio
  * Function: print_command_ack
  * Description: Print the mavlink command received by the autopilot.
  ********************************************************************************/
-void print_command_ack(mavlink_command_ack_t &command_ack) 
+void print_command_ack(mavlink_command_ack_t &command_ack, const char *term)
 {
-	DebugTerm CmdAck("/dev/pts/3");
-    
+    DebugTerm CmdAck(term);
+
     CmdAck.cpp_cout("Command ACK received:");
     CmdAck.cpp_cout_oneline("\tCommand: ");
 
     switch (command_ack.command)
     {
-        case MAV_CMD_NAV_WAYPOINT:
-            CmdAck.cpp_cout("MAV_CMD_NAV_WAYPOINT");
-            break;
-        case MAV_CMD_NAV_LOITER_UNLIM:
-            CmdAck.cpp_cout("MAV_CMD_NAV_LOITER_UNLIM");
-            break;
-        case MAV_CMD_NAV_LOITER_TURNS:
-            CmdAck.cpp_cout("MAV_CMD_NAV_LOITER_TURNS");
-            break;
-        case MAV_CMD_NAV_LOITER_TIME:
-            CmdAck.cpp_cout("MAV_CMD_NAV_LOITER_TIME");
-            break;
-        case MAV_CMD_NAV_RETURN_TO_LAUNCH:
-            CmdAck.cpp_cout("MAV_CMD_NAV_RETURN_TO_LAUNCH");
-            break;
-        case MAV_CMD_NAV_LAND:
-            CmdAck.cpp_cout("MAV_CMD_NAV_LAND");
-            break;
-        case MAV_CMD_NAV_TAKEOFF:
-            CmdAck.cpp_cout("MAV_CMD_NAV_TAKEOFF");
-            break;
-        case MAV_CMD_NAV_LAND_LOCAL:
-            CmdAck.cpp_cout("MAV_CMD_NAV_LAND_LOCAL");
-            break;
-        case MAV_CMD_NAV_TAKEOFF_LOCAL:
-            CmdAck.cpp_cout("MAV_CMD_NAV_TAKEOFF_LOCAL");
-            break;
-        case MAV_CMD_NAV_FOLLOW:
-            CmdAck.cpp_cout("MAV_CMD_NAV_FOLLOW");
-            break;
-        case MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT:
-            CmdAck.cpp_cout("MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT");
-            break;
-        case MAV_CMD_NAV_LOITER_TO_ALT:
-            CmdAck.cpp_cout("MAV_CMD_NAV_LOITER_TO_ALT");
-            break;
-        case MAV_CMD_DO_FOLLOW:
-            CmdAck.cpp_cout("MAV_CMD_DO_FOLLOW");
-            break;
-        case MAV_CMD_DO_FOLLOW_REPOSITION:
-            CmdAck.cpp_cout("MAV_CMD_DO_FOLLOW_REPOSITION");
-            break;
-        case MAV_CMD_DO_ORBIT:
-            CmdAck.cpp_cout("MAV_CMD_DO_ORBIT");
-            break;
-        case MAV_CMD_NAV_ROI:
-            CmdAck.cpp_cout("MAV_CMD_NAV_ROI");
-            break;
-        case MAV_CMD_NAV_PATHPLANNING:
-            CmdAck.cpp_cout("MAV_CMD_NAV_PATHPLANNING");
-            break;
-        case MAV_CMD_NAV_SPLINE_WAYPOINT:
-            CmdAck.cpp_cout("MAV_CMD_NAV_SPLINE_WAYPOINT");
-            break;
-        case MAV_CMD_NAV_VTOL_TAKEOFF:
-            CmdAck.cpp_cout("MAV_CMD_NAV_VTOL_TAKEOFF");
-            break;
-        case MAV_CMD_NAV_VTOL_LAND:
-            CmdAck.cpp_cout("MAV_CMD_NAV_VTOL_LAND");
-            break;
-        case MAV_CMD_NAV_GUIDED_ENABLE:
-            CmdAck.cpp_cout("MAV_CMD_NAV_GUIDED_ENABLE");
-            break;
-        case MAV_CMD_NAV_DELAY:
-            CmdAck.cpp_cout("MAV_CMD_NAV_DELAY");
-            break;
-        case MAV_CMD_NAV_PAYLOAD_PLACE:
-            CmdAck.cpp_cout("MAV_CMD_NAV_PAYLOAD_PLACE");
-            break;
-        case MAV_CMD_NAV_LAST:
-            CmdAck.cpp_cout("MAV_CMD_NAV_LAST");
-            break;
-        case MAV_CMD_CONDITION_DELAY:
-            CmdAck.cpp_cout("MAV_CMD_CONDITION_DELAY");
-            break;
-        case MAV_CMD_CONDITION_CHANGE_ALT:
-            CmdAck.cpp_cout("MAV_CMD_CONDITION_CHANGE_ALT");
-            break;
-        case MAV_CMD_CONDITION_DISTANCE:
-            CmdAck.cpp_cout("MAV_CMD_CONDITION_DISTANCE");
-            break;
-        case MAV_CMD_CONDITION_YAW:
-            CmdAck.cpp_cout("MAV_CMD_CONDITION_YAW");
-            break;
-        case MAV_CMD_CONDITION_LAST:
-            CmdAck.cpp_cout("MAV_CMD_CONDITION_LAST");
-            break;
-        case MAV_CMD_DO_SET_MODE:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_MODE");
-            break;
-        case MAV_CMD_DO_JUMP:
-            CmdAck.cpp_cout("MAV_CMD_DO_JUMP");
-            break;
-        case MAV_CMD_DO_CHANGE_SPEED:
-            CmdAck.cpp_cout("MAV_CMD_DO_CHANGE_SPEED");
-            break;
-        case MAV_CMD_DO_SET_HOME:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_HOME");
-            break;
-        case MAV_CMD_DO_SET_PARAMETER:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_PARAMETER");
-            break;
-        case MAV_CMD_DO_SET_RELAY:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_RELAY");
-            break;
-        case MAV_CMD_DO_REPEAT_RELAY:
-            CmdAck.cpp_cout("MAV_CMD_DO_REPEAT_RELAY");
-            break;
-        case MAV_CMD_DO_SET_SERVO:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_SERVO");
-            break;
-        case MAV_CMD_DO_REPEAT_SERVO:
-            CmdAck.cpp_cout("MAV_CMD_DO_REPEAT_SERVO");
-            break;
-        case MAV_CMD_DO_FLIGHTTERMINATION:
-            CmdAck.cpp_cout("MAV_CMD_DO_FLIGHTTERMINATION");
-            break;
-        case MAV_CMD_DO_CHANGE_ALTITUDE:
-            CmdAck.cpp_cout("MAV_CMD_DO_CHANGE_ALTITUDE");
-            break;
-        case MAV_CMD_DO_SET_ACTUATOR:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_ACTUATOR");
-            break;
-        case MAV_CMD_DO_LAND_START:
-            CmdAck.cpp_cout("MAV_CMD_DO_LAND_START");
-            break;
-        case MAV_CMD_DO_RALLY_LAND:
-            CmdAck.cpp_cout("MAV_CMD_DO_RALLY_LAND");
-            break;
-        case MAV_CMD_DO_GO_AROUND:
-            CmdAck.cpp_cout("MAV_CMD_DO_GO_AROUND");
-            break;
-        case MAV_CMD_DO_REPOSITION:
-            CmdAck.cpp_cout("MAV_CMD_DO_REPOSITION");
-            break;
-        case MAV_CMD_DO_PAUSE_CONTINUE:
-            CmdAck.cpp_cout("MAV_CMD_DO_PAUSE_CONTINUE");
-            break;
-        case MAV_CMD_DO_SET_REVERSE:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_REVERSE");
-            break;
-        case MAV_CMD_DO_SET_ROI_LOCATION:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_ROI_LOCATION");
-            break;
-        case MAV_CMD_DO_SET_ROI_WPNEXT_OFFSET:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_ROI_WPNEXT_OFFSET");
-            break;
-        case MAV_CMD_DO_SET_ROI_NONE:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_ROI_NONE");
-            break;
-        case MAV_CMD_DO_SET_ROI_SYSID:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_ROI_SYSID");
-            break;
-        case MAV_CMD_DO_CONTROL_VIDEO:
-            CmdAck.cpp_cout("MAV_CMD_DO_CONTROL_VIDEO");
-            break;
-        case MAV_CMD_DO_SET_ROI:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_ROI");
-            break;
-        case MAV_CMD_DO_DIGICAM_CONFIGURE:
-            CmdAck.cpp_cout("MAV_CMD_DO_DIGICAM_CONFIGURE");
-            break;
-        case MAV_CMD_DO_DIGICAM_CONTROL:
-            CmdAck.cpp_cout("MAV_CMD_DO_DIGICAM_CONTROL");
-            break;
-        case MAV_CMD_DO_MOUNT_CONFIGURE:
-            CmdAck.cpp_cout("MAV_CMD_DO_MOUNT_CONFIGURE");
-            break;
-        case MAV_CMD_DO_MOUNT_CONTROL:
-            CmdAck.cpp_cout("MAV_CMD_DO_MOUNT_CONTROL");
-            break;
-        case MAV_CMD_DO_SET_CAM_TRIGG_DIST:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_CAM_TRIGG_DIST");
-            break;
-        case MAV_CMD_DO_FENCE_ENABLE:
-            CmdAck.cpp_cout("MAV_CMD_DO_FENCE_ENABLE");
-            break;
-        case MAV_CMD_DO_PARACHUTE:
-            CmdAck.cpp_cout("MAV_CMD_DO_PARACHUTE");
-            break;
-        case MAV_CMD_DO_MOTOR_TEST:
-            CmdAck.cpp_cout("MAV_CMD_DO_MOTOR_TEST");
-            break;
-        case MAV_CMD_DO_INVERTED_FLIGHT:
-            CmdAck.cpp_cout("MAV_CMD_DO_INVERTED_FLIGHT");
-            break;
-        case MAV_CMD_DO_GRIPPER:
-            CmdAck.cpp_cout("MAV_CMD_DO_GRIPPER");
-            break;
-        case MAV_CMD_DO_AUTOTUNE_ENABLE:
-            CmdAck.cpp_cout("MAV_CMD_DO_AUTOTUNE_ENABLE");
-            break;
-        case MAV_CMD_NAV_SET_YAW_SPEED:
-            CmdAck.cpp_cout("MAV_CMD_NAV_SET_YAW_SPEED");
-            break;
-        case MAV_CMD_DO_SET_CAM_TRIGG_INTERVAL:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_CAM_TRIGG_INTERVAL");
-            break;
-        case MAV_CMD_DO_MOUNT_CONTROL_QUAT:
-            CmdAck.cpp_cout("MAV_CMD_DO_MOUNT_CONTROL_QUAT");
-            break;
-        case MAV_CMD_DO_GUIDED_MASTER:
-            CmdAck.cpp_cout("MAV_CMD_DO_GUIDED_MASTER");
-            break;
-        case MAV_CMD_DO_GUIDED_LIMITS:
-            CmdAck.cpp_cout("MAV_CMD_DO_GUIDED_LIMITS");
-            break;
-        case MAV_CMD_DO_ENGINE_CONTROL:
-            CmdAck.cpp_cout("MAV_CMD_DO_ENGINE_CONTROL");
-            break;
-        case MAV_CMD_DO_SET_MISSION_CURRENT:
-            CmdAck.cpp_cout("MAV_CMD_DO_SET_MISSION_CURRENT");
-            break;
-        case MAV_CMD_DO_LAST:
-            CmdAck.cpp_cout("MAV_CMD_DO_LAST");
-            break;
-        case MAV_CMD_PREFLIGHT_CALIBRATION:
-            CmdAck.cpp_cout("MAV_CMD_PREFLIGHT_CALIBRATION");
-            break;
-        case MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS:
-            CmdAck.cpp_cout("MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS");
-            break;
-        case MAV_CMD_PREFLIGHT_UAVCAN:
-            CmdAck.cpp_cout("MAV_CMD_PREFLIGHT_UAVCAN");
-            break;
-        case MAV_CMD_PREFLIGHT_STORAGE:
-            CmdAck.cpp_cout("MAV_CMD_PREFLIGHT_STORAGE");
-            break;
-        case MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN:
-            CmdAck.cpp_cout("MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN");
-            break;
-        case MAV_CMD_OVERRIDE_GOTO:
-            CmdAck.cpp_cout("MAV_CMD_OVERRIDE_GOTO");
-            break;
-        case MAV_CMD_OBLIQUE_SURVEY:
-            CmdAck.cpp_cout("MAV_CMD_OBLIQUE_SURVEY");
-            break;
-        case MAV_CMD_MISSION_START:
-            CmdAck.cpp_cout("MAV_CMD_MISSION_START");
-            break;
-        case MAV_CMD_ACTUATOR_TEST:
-            CmdAck.cpp_cout("MAV_CMD_ACTUATOR_TEST");
-            break;
-        case MAV_CMD_CONFIGURE_ACTUATOR:
-            CmdAck.cpp_cout("MAV_CMD_CONFIGURE_ACTUATOR");
-            break;
-        case MAV_CMD_COMPONENT_ARM_DISARM:
-            CmdAck.cpp_cout("MAV_CMD_COMPONENT_ARM_DISARM");
-            break;
-        case MAV_CMD_RUN_PREARM_CHECKS:
-            CmdAck.cpp_cout("MAV_CMD_RUN_PREARM_CHECKS");
-            break;
-        case MAV_CMD_ILLUMINATOR_ON_OFF:
-            CmdAck.cpp_cout("MAV_CMD_ILLUMINATOR_ON_OFF");
-            break;
-        case MAV_CMD_GET_HOME_POSITION:
-            CmdAck.cpp_cout("MAV_CMD_GET_HOME_POSITION");
-            break;
-        case MAV_CMD_INJECT_FAILURE:
-            CmdAck.cpp_cout("MAV_CMD_INJECT_FAILURE");
-            break;
-        case MAV_CMD_START_RX_PAIR:
-            CmdAck.cpp_cout("MAV_CMD_START_RX_PAIR");
-            break;
-        case MAV_CMD_GET_MESSAGE_INTERVAL:
-            CmdAck.cpp_cout("MAV_CMD_GET_MESSAGE_INTERVAL");
-            break;
-        case MAV_CMD_SET_MESSAGE_INTERVAL:
-            CmdAck.cpp_cout("MAV_CMD_SET_MESSAGE_INTERVAL");
-            break;
-        case MAV_CMD_REQUEST_MESSAGE:
-            CmdAck.cpp_cout("MAV_CMD_REQUEST_MESSAGE");
-            break;
-        case MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES:
-            CmdAck.cpp_cout("MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES");
-            break;
-        case MAV_CMD_SET_CAMERA_MODE:
-            CmdAck.cpp_cout("MAV_CMD_SET_CAMERA_MODE");
-            break;
-        default:
-            CmdAck.cpp_cout("Unknown command");
-            break;
+    case MAV_CMD_NAV_WAYPOINT:
+        CmdAck.cpp_cout("MAV_CMD_NAV_WAYPOINT");
+        break;
+    case MAV_CMD_NAV_LOITER_UNLIM:
+        CmdAck.cpp_cout("MAV_CMD_NAV_LOITER_UNLIM");
+        break;
+    case MAV_CMD_NAV_LOITER_TURNS:
+        CmdAck.cpp_cout("MAV_CMD_NAV_LOITER_TURNS");
+        break;
+    case MAV_CMD_NAV_LOITER_TIME:
+        CmdAck.cpp_cout("MAV_CMD_NAV_LOITER_TIME");
+        break;
+    case MAV_CMD_NAV_RETURN_TO_LAUNCH:
+        CmdAck.cpp_cout("MAV_CMD_NAV_RETURN_TO_LAUNCH");
+        break;
+    case MAV_CMD_NAV_LAND:
+        CmdAck.cpp_cout("MAV_CMD_NAV_LAND");
+        break;
+    case MAV_CMD_NAV_TAKEOFF:
+        CmdAck.cpp_cout("MAV_CMD_NAV_TAKEOFF");
+        break;
+    case MAV_CMD_NAV_LAND_LOCAL:
+        CmdAck.cpp_cout("MAV_CMD_NAV_LAND_LOCAL");
+        break;
+    case MAV_CMD_NAV_TAKEOFF_LOCAL:
+        CmdAck.cpp_cout("MAV_CMD_NAV_TAKEOFF_LOCAL");
+        break;
+    case MAV_CMD_NAV_FOLLOW:
+        CmdAck.cpp_cout("MAV_CMD_NAV_FOLLOW");
+        break;
+    case MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT:
+        CmdAck.cpp_cout("MAV_CMD_NAV_CONTINUE_AND_CHANGE_ALT");
+        break;
+    case MAV_CMD_NAV_LOITER_TO_ALT:
+        CmdAck.cpp_cout("MAV_CMD_NAV_LOITER_TO_ALT");
+        break;
+    case MAV_CMD_DO_FOLLOW:
+        CmdAck.cpp_cout("MAV_CMD_DO_FOLLOW");
+        break;
+    case MAV_CMD_DO_FOLLOW_REPOSITION:
+        CmdAck.cpp_cout("MAV_CMD_DO_FOLLOW_REPOSITION");
+        break;
+    case MAV_CMD_DO_ORBIT:
+        CmdAck.cpp_cout("MAV_CMD_DO_ORBIT");
+        break;
+    case MAV_CMD_NAV_ROI:
+        CmdAck.cpp_cout("MAV_CMD_NAV_ROI");
+        break;
+    case MAV_CMD_NAV_PATHPLANNING:
+        CmdAck.cpp_cout("MAV_CMD_NAV_PATHPLANNING");
+        break;
+    case MAV_CMD_NAV_SPLINE_WAYPOINT:
+        CmdAck.cpp_cout("MAV_CMD_NAV_SPLINE_WAYPOINT");
+        break;
+    case MAV_CMD_NAV_VTOL_TAKEOFF:
+        CmdAck.cpp_cout("MAV_CMD_NAV_VTOL_TAKEOFF");
+        break;
+    case MAV_CMD_NAV_VTOL_LAND:
+        CmdAck.cpp_cout("MAV_CMD_NAV_VTOL_LAND");
+        break;
+    case MAV_CMD_NAV_GUIDED_ENABLE:
+        CmdAck.cpp_cout("MAV_CMD_NAV_GUIDED_ENABLE");
+        break;
+    case MAV_CMD_NAV_DELAY:
+        CmdAck.cpp_cout("MAV_CMD_NAV_DELAY");
+        break;
+    case MAV_CMD_NAV_PAYLOAD_PLACE:
+        CmdAck.cpp_cout("MAV_CMD_NAV_PAYLOAD_PLACE");
+        break;
+    case MAV_CMD_NAV_LAST:
+        CmdAck.cpp_cout("MAV_CMD_NAV_LAST");
+        break;
+    case MAV_CMD_CONDITION_DELAY:
+        CmdAck.cpp_cout("MAV_CMD_CONDITION_DELAY");
+        break;
+    case MAV_CMD_CONDITION_CHANGE_ALT:
+        CmdAck.cpp_cout("MAV_CMD_CONDITION_CHANGE_ALT");
+        break;
+    case MAV_CMD_CONDITION_DISTANCE:
+        CmdAck.cpp_cout("MAV_CMD_CONDITION_DISTANCE");
+        break;
+    case MAV_CMD_CONDITION_YAW:
+        CmdAck.cpp_cout("MAV_CMD_CONDITION_YAW");
+        break;
+    case MAV_CMD_CONDITION_LAST:
+        CmdAck.cpp_cout("MAV_CMD_CONDITION_LAST");
+        break;
+    case MAV_CMD_DO_SET_MODE:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_MODE");
+        break;
+    case MAV_CMD_DO_JUMP:
+        CmdAck.cpp_cout("MAV_CMD_DO_JUMP");
+        break;
+    case MAV_CMD_DO_CHANGE_SPEED:
+        CmdAck.cpp_cout("MAV_CMD_DO_CHANGE_SPEED");
+        break;
+    case MAV_CMD_DO_SET_HOME:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_HOME");
+        break;
+    case MAV_CMD_DO_SET_PARAMETER:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_PARAMETER");
+        break;
+    case MAV_CMD_DO_SET_RELAY:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_RELAY");
+        break;
+    case MAV_CMD_DO_REPEAT_RELAY:
+        CmdAck.cpp_cout("MAV_CMD_DO_REPEAT_RELAY");
+        break;
+    case MAV_CMD_DO_SET_SERVO:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_SERVO");
+        break;
+    case MAV_CMD_DO_REPEAT_SERVO:
+        CmdAck.cpp_cout("MAV_CMD_DO_REPEAT_SERVO");
+        break;
+    case MAV_CMD_DO_FLIGHTTERMINATION:
+        CmdAck.cpp_cout("MAV_CMD_DO_FLIGHTTERMINATION");
+        break;
+    case MAV_CMD_DO_CHANGE_ALTITUDE:
+        CmdAck.cpp_cout("MAV_CMD_DO_CHANGE_ALTITUDE");
+        break;
+    case MAV_CMD_DO_SET_ACTUATOR:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_ACTUATOR");
+        break;
+    case MAV_CMD_DO_LAND_START:
+        CmdAck.cpp_cout("MAV_CMD_DO_LAND_START");
+        break;
+    case MAV_CMD_DO_RALLY_LAND:
+        CmdAck.cpp_cout("MAV_CMD_DO_RALLY_LAND");
+        break;
+    case MAV_CMD_DO_GO_AROUND:
+        CmdAck.cpp_cout("MAV_CMD_DO_GO_AROUND");
+        break;
+    case MAV_CMD_DO_REPOSITION:
+        CmdAck.cpp_cout("MAV_CMD_DO_REPOSITION");
+        break;
+    case MAV_CMD_DO_PAUSE_CONTINUE:
+        CmdAck.cpp_cout("MAV_CMD_DO_PAUSE_CONTINUE");
+        break;
+    case MAV_CMD_DO_SET_REVERSE:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_REVERSE");
+        break;
+    case MAV_CMD_DO_SET_ROI_LOCATION:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_ROI_LOCATION");
+        break;
+    case MAV_CMD_DO_SET_ROI_WPNEXT_OFFSET:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_ROI_WPNEXT_OFFSET");
+        break;
+    case MAV_CMD_DO_SET_ROI_NONE:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_ROI_NONE");
+        break;
+    case MAV_CMD_DO_SET_ROI_SYSID:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_ROI_SYSID");
+        break;
+    case MAV_CMD_DO_CONTROL_VIDEO:
+        CmdAck.cpp_cout("MAV_CMD_DO_CONTROL_VIDEO");
+        break;
+    case MAV_CMD_DO_SET_ROI:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_ROI");
+        break;
+    case MAV_CMD_DO_DIGICAM_CONFIGURE:
+        CmdAck.cpp_cout("MAV_CMD_DO_DIGICAM_CONFIGURE");
+        break;
+    case MAV_CMD_DO_DIGICAM_CONTROL:
+        CmdAck.cpp_cout("MAV_CMD_DO_DIGICAM_CONTROL");
+        break;
+    case MAV_CMD_DO_MOUNT_CONFIGURE:
+        CmdAck.cpp_cout("MAV_CMD_DO_MOUNT_CONFIGURE");
+        break;
+    case MAV_CMD_DO_MOUNT_CONTROL:
+        CmdAck.cpp_cout("MAV_CMD_DO_MOUNT_CONTROL");
+        break;
+    case MAV_CMD_DO_SET_CAM_TRIGG_DIST:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_CAM_TRIGG_DIST");
+        break;
+    case MAV_CMD_DO_FENCE_ENABLE:
+        CmdAck.cpp_cout("MAV_CMD_DO_FENCE_ENABLE");
+        break;
+    case MAV_CMD_DO_PARACHUTE:
+        CmdAck.cpp_cout("MAV_CMD_DO_PARACHUTE");
+        break;
+    case MAV_CMD_DO_MOTOR_TEST:
+        CmdAck.cpp_cout("MAV_CMD_DO_MOTOR_TEST");
+        break;
+    case MAV_CMD_DO_INVERTED_FLIGHT:
+        CmdAck.cpp_cout("MAV_CMD_DO_INVERTED_FLIGHT");
+        break;
+    case MAV_CMD_DO_GRIPPER:
+        CmdAck.cpp_cout("MAV_CMD_DO_GRIPPER");
+        break;
+    case MAV_CMD_DO_AUTOTUNE_ENABLE:
+        CmdAck.cpp_cout("MAV_CMD_DO_AUTOTUNE_ENABLE");
+        break;
+    case MAV_CMD_NAV_SET_YAW_SPEED:
+        CmdAck.cpp_cout("MAV_CMD_NAV_SET_YAW_SPEED");
+        break;
+    case MAV_CMD_DO_SET_CAM_TRIGG_INTERVAL:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_CAM_TRIGG_INTERVAL");
+        break;
+    case MAV_CMD_DO_MOUNT_CONTROL_QUAT:
+        CmdAck.cpp_cout("MAV_CMD_DO_MOUNT_CONTROL_QUAT");
+        break;
+    case MAV_CMD_DO_GUIDED_MASTER:
+        CmdAck.cpp_cout("MAV_CMD_DO_GUIDED_MASTER");
+        break;
+    case MAV_CMD_DO_GUIDED_LIMITS:
+        CmdAck.cpp_cout("MAV_CMD_DO_GUIDED_LIMITS");
+        break;
+    case MAV_CMD_DO_ENGINE_CONTROL:
+        CmdAck.cpp_cout("MAV_CMD_DO_ENGINE_CONTROL");
+        break;
+    case MAV_CMD_DO_SET_MISSION_CURRENT:
+        CmdAck.cpp_cout("MAV_CMD_DO_SET_MISSION_CURRENT");
+        break;
+    case MAV_CMD_DO_LAST:
+        CmdAck.cpp_cout("MAV_CMD_DO_LAST");
+        break;
+    case MAV_CMD_PREFLIGHT_CALIBRATION:
+        CmdAck.cpp_cout("MAV_CMD_PREFLIGHT_CALIBRATION");
+        break;
+    case MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS:
+        CmdAck.cpp_cout("MAV_CMD_PREFLIGHT_SET_SENSOR_OFFSETS");
+        break;
+    case MAV_CMD_PREFLIGHT_UAVCAN:
+        CmdAck.cpp_cout("MAV_CMD_PREFLIGHT_UAVCAN");
+        break;
+    case MAV_CMD_PREFLIGHT_STORAGE:
+        CmdAck.cpp_cout("MAV_CMD_PREFLIGHT_STORAGE");
+        break;
+    case MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN:
+        CmdAck.cpp_cout("MAV_CMD_PREFLIGHT_REBOOT_SHUTDOWN");
+        break;
+    case MAV_CMD_OVERRIDE_GOTO:
+        CmdAck.cpp_cout("MAV_CMD_OVERRIDE_GOTO");
+        break;
+    case MAV_CMD_OBLIQUE_SURVEY:
+        CmdAck.cpp_cout("MAV_CMD_OBLIQUE_SURVEY");
+        break;
+    case MAV_CMD_MISSION_START:
+        CmdAck.cpp_cout("MAV_CMD_MISSION_START");
+        break;
+    case MAV_CMD_ACTUATOR_TEST:
+        CmdAck.cpp_cout("MAV_CMD_ACTUATOR_TEST");
+        break;
+    case MAV_CMD_CONFIGURE_ACTUATOR:
+        CmdAck.cpp_cout("MAV_CMD_CONFIGURE_ACTUATOR");
+        break;
+    case MAV_CMD_COMPONENT_ARM_DISARM:
+        CmdAck.cpp_cout("MAV_CMD_COMPONENT_ARM_DISARM");
+        break;
+    case MAV_CMD_RUN_PREARM_CHECKS:
+        CmdAck.cpp_cout("MAV_CMD_RUN_PREARM_CHECKS");
+        break;
+    case MAV_CMD_ILLUMINATOR_ON_OFF:
+        CmdAck.cpp_cout("MAV_CMD_ILLUMINATOR_ON_OFF");
+        break;
+    case MAV_CMD_GET_HOME_POSITION:
+        CmdAck.cpp_cout("MAV_CMD_GET_HOME_POSITION");
+        break;
+    case MAV_CMD_INJECT_FAILURE:
+        CmdAck.cpp_cout("MAV_CMD_INJECT_FAILURE");
+        break;
+    case MAV_CMD_START_RX_PAIR:
+        CmdAck.cpp_cout("MAV_CMD_START_RX_PAIR");
+        break;
+    case MAV_CMD_GET_MESSAGE_INTERVAL:
+        CmdAck.cpp_cout("MAV_CMD_GET_MESSAGE_INTERVAL");
+        break;
+    case MAV_CMD_SET_MESSAGE_INTERVAL:
+        CmdAck.cpp_cout("MAV_CMD_SET_MESSAGE_INTERVAL");
+        break;
+    case MAV_CMD_REQUEST_MESSAGE:
+        CmdAck.cpp_cout("MAV_CMD_REQUEST_MESSAGE");
+        break;
+    case MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES:
+        CmdAck.cpp_cout("MAV_CMD_REQUEST_AUTOPILOT_CAPABILITIES");
+        break;
+    case MAV_CMD_SET_CAMERA_MODE:
+        CmdAck.cpp_cout("MAV_CMD_SET_CAMERA_MODE");
+        break;
+    default:
+        CmdAck.cpp_cout("Unknown command");
+        break;
     }
 
     CmdAck.cpp_cout_oneline("\tResult: ");
 
     switch (command_ack.result)
     {
-        case 0:
-            CmdAck.cpp_cout("MAV_RESULT_ACCEPTED");
-            break;
-        case 1:
-            CmdAck.cpp_cout("MAV_RESULT_TEMPORARILY_REJECTED");
-            break;
-        case 2:
-            CmdAck.cpp_cout("MAV_RESULT_DENIED");
-            break;
-        case 3:
-            CmdAck.cpp_cout("MAV_RESULT_UNSUPPORTED");
-            break;
-        case 4:
-            CmdAck.cpp_cout("MAV_RESULT_FAILED");
-            break;
-        case 5:
-            CmdAck.cpp_cout("MAV_RESULT_IN_PROGRESS");
-            break;
-        case 6:
-            CmdAck.cpp_cout("MAV_RESULT_CANCELLED");
-            break;
-        case 7:
-            CmdAck.cpp_cout("MAV_RESULT_COMMAND_LONG_ONLY");
-            break;
-        case 8:
-            CmdAck.cpp_cout("MAV_RESULT_COMMAND_INT_ONLY");
-            break;
-        case 9:
-            CmdAck.cpp_cout("MAV_RESULT_COMMAND_COMMAND_UNSUPPORTED_MAV_FRAME");
-            break;
-        default:
-            CmdAck.cpp_cout("Unkown result");
+    case 0:
+        CmdAck.cpp_cout("MAV_RESULT_ACCEPTED");
+        break;
+    case 1:
+        CmdAck.cpp_cout("MAV_RESULT_TEMPORARILY_REJECTED");
+        break;
+    case 2:
+        CmdAck.cpp_cout("MAV_RESULT_DENIED");
+        break;
+    case 3:
+        CmdAck.cpp_cout("MAV_RESULT_UNSUPPORTED");
+        break;
+    case 4:
+        CmdAck.cpp_cout("MAV_RESULT_FAILED");
+        break;
+    case 5:
+        CmdAck.cpp_cout("MAV_RESULT_IN_PROGRESS");
+        break;
+    case 6:
+        CmdAck.cpp_cout("MAV_RESULT_CANCELLED");
+        break;
+    case 7:
+        CmdAck.cpp_cout("MAV_RESULT_COMMAND_LONG_ONLY");
+        break;
+    case 8:
+        CmdAck.cpp_cout("MAV_RESULT_COMMAND_INT_ONLY");
+        break;
+    case 9:
+        CmdAck.cpp_cout("MAV_RESULT_COMMAND_COMMAND_UNSUPPORTED_MAV_FRAME");
+        break;
+    default:
+        CmdAck.cpp_cout("Unkown result");
     }
+
+    CmdAck.cpp_cout("\tprogress: " + std::to_string(command_ack.progress));
+    CmdAck.cpp_cout("\tresult param 2: " + std::to_string(command_ack.result_param2));
+    CmdAck.cpp_cout("\ttarget sys: " + std::to_string(command_ack.target_system));
+    CmdAck.cpp_cout("\ttarget comp: " + std::to_string(command_ack.target_component));
 }
