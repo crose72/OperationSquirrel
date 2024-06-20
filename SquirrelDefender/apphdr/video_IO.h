@@ -48,8 +48,8 @@ public:
     ~Video();
 
     static bool video_init(void);
-    static bool create_input_video_stream(const commandLine &cmdLine, int positionArg);
-    static bool create_output_video_stream(const commandLine &cmdLine, int positionArg);
+    static bool create_input_video_stream(void);
+    static bool create_output_video_stream(void);
     static void video_proc_loop(void);
     static void video_output_loop(void);
     static void shutdown(void);

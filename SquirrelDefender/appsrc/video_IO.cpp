@@ -33,10 +33,6 @@ uint32_t input_video_height;
 GstElement *pipeline;
 GstBus *bus;
 
-int argc;
-char **argv;
-commandLine cmdLine(0, nullptr);
-
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
@@ -44,22 +40,6 @@ commandLine cmdLine(0, nullptr);
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-
-/********************************************************************************
- * Function: command_line_inputs
- * Description: Get command line inputs.
- ********************************************************************************/
-int command_line_inputs(void)
-{
-    commandLine cmdLine(argc, argv);
-
-    if (cmdLine.GetFlag("help"))
-    {
-        return Detection::print_usage();
-    }
-
-    return 1;
-}
 
 /********************************************************************************
  * Function: Video
@@ -77,7 +57,7 @@ Video::~Video(void) {}
  * Function: create_input_video_stream
  * Description: Create an input video stream from the attached cameras.
  ********************************************************************************/
-bool Video::create_input_video_stream(const commandLine &cmdLine, int positionArg)
+bool Video::create_input_video_stream(void)
 {
     videoOptions options;
 
@@ -109,7 +89,7 @@ bool Video::create_input_video_stream(const commandLine &cmdLine, int positionAr
  * Description: Create an output video stream from the input video stream
  *			   for displaying and passing to other software components.
  ********************************************************************************/
-bool Video::create_output_video_stream(const commandLine &cmdLine, int positionArg)
+bool Video::create_output_video_stream(void)
 {
     videoOptions options;
 
@@ -231,8 +211,8 @@ bool Video::video_init(void)
     valid_image_rcvd = false;
     image = NULL;
 
-    if (!create_input_video_stream(cmdLine, ARG_POSITION(0)) ||
-        !create_output_video_stream(cmdLine, ARG_POSITION(1)))
+    if (!create_input_video_stream() ||
+        !create_output_video_stream())
     {
         return false;
     }
