@@ -12,6 +12,7 @@
  * Includes
  ********************************************************************************/
 #include "vehicle_controller.h"
+#include "sim_flight_test_4_VelocityControl.h"
 
 /********************************************************************************
  * Typedefs
@@ -24,7 +25,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm VehStateInfo("/dev/pts/6");
+DebugTerm VehStateInfo("");
 
 /********************************************************************************
  * Calibration definitions
@@ -151,7 +152,15 @@ void VehicleController::vehicle_control_loop(void)
     }
     else if (system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
     {
+#ifdef USE_JETSON
+
         follow_mode();
+
+#elif USE_WSL
+
+        test_flight();
+
+#endif // USE_JETSON
     }
 }
 

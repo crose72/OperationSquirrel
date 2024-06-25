@@ -1,6 +1,6 @@
 {
     "Vel_PID_x": {
-        "Kp": 0.1,
+        "Kp": 0.005,
         "Ki": 0.0001,
         "Kd": 0.0001,
         "w1": 0.5,
@@ -48,12 +48,12 @@
         "w3": 0.0
     },
     "Target": {
-    "Desired_Height": 640.0,
-    "Desired_Width": 150.0
+        "Desired_Height": 640.0,
+        "Desired_Width": 150.0
     },
     "Detection_tracking": {
-        "Detect_Thresh" : 0.7,
-        "Max_Batch_Size" : 4,
+        "Detect_Thresh": 0.7,
+        "Max_Batch_Size": 4,
         "Precision": 0,
         "Device": 0,
         "Allow_gpu_fallback": false,

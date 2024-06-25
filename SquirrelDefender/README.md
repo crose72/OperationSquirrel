@@ -22,7 +22,7 @@ This folder contains the code for the Squirrel Defender and most of its dependen
 
 1. Execute `mkdir build` to create a build directory
 2. Execute `cd build` to go to the build folder
-3. Execute `cmake ..` to generate build files
+3. Execute `cmake ..` to generate build files (debug or release type)
 4. Execute `make -j$(nproc)` for fast builds or `make` for slow builds
 5. Execute `sudo ./squirreldefender` to run the program
 6. Execute `./unit_tests` to run the unit tests

@@ -2,7 +2,7 @@
  * @file    sim_flight_test_4_VelocityControl.h
  * @author  Cameron Rose
  * @date    12/27/2023
- * @brief   Command the drone to follow a NED velocity vector where +x is 
+ * @brief   Command the drone to follow a NED velocity vector where +x is
  *          forward, +y is right, and +z is down.
  ********************************************************************************/
 
@@ -17,12 +17,12 @@
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern int32_t alt;
+extern int32_t mav_veh_rel_alt;
 
 /********************************************************************************
  * Test flight object definitions
  ********************************************************************************/
-float target_velocity[3] = {0.0,0.0,0.0};
+float target_velocity[3] = {0.0, 0.0, 0.0};
 float timerVal = 0;
 int stage = 0;
 
@@ -47,46 +47,49 @@ void resetTimer(void)
  ********************************************************************************/
 void test_flight(void)
 {
-    countupTimer();
-
-    if (timerVal > 12.0 && stage == 0)
+    if (mav_veh_rel_alt > 150)
     {
-        target_velocity[0] = 87.0;
-        target_velocity[1] = 0;
-        target_velocity[2] = 0;
-        VehicleController::cmd_velocity_NED(target_velocity);
-        stage = 1;
-    }
+        countupTimer();
 
-    if (timerVal > 18 && stage == 1)
-    {
-        target_velocity[0] = 0.0;
-        target_velocity[1] = -87.0;
-        target_velocity[2] = 0.0;
-        VehicleController::cmd_velocity_NED(target_velocity);
-        stage = 2;
-    }
+        if (timerVal > 12.0 && stage == 0)
+        {
+            target_velocity[0] = 87.0;
+            target_velocity[1] = 0;
+            target_velocity[2] = 0;
+            VehicleController::cmd_velocity_NED(target_velocity);
+            stage = 1;
+        }
 
-    if (timerVal > 24.0 && stage == 2)
-    {
-        target_velocity[0] = -6.0;
-        target_velocity[1] = 4.0;
-        target_velocity[2] = -11.0;
-        VehicleController::cmd_velocity_NED(target_velocity);
-        stage = 3;
-    }
+        if (timerVal > 18 && stage == 1)
+        {
+            target_velocity[0] = 0.0;
+            target_velocity[1] = -87.0;
+            target_velocity[2] = 0.0;
+            VehicleController::cmd_velocity_NED(target_velocity);
+            stage = 2;
+        }
 
-    if (timerVal > 30.0 && stage == 3)
-    {
-        target_velocity[0] = -6.0;
-        target_velocity[1] = 4.0;
-        target_velocity[2] = -11.0;
-        VehicleController::cmd_velocity_NED(target_velocity);
-        stage = 4;
-    }
+        if (timerVal > 24.0 && stage == 2)
+        {
+            target_velocity[0] = -6.0;
+            target_velocity[1] = 4.0;
+            target_velocity[2] = -11.0;
+            VehicleController::cmd_velocity_NED(target_velocity);
+            stage = 3;
+        }
 
-    if (timerVal > 29 && stage == 4)
-    {
-        MavCmd::set_mode_RTL();
+        if (timerVal > 30.0 && stage == 3)
+        {
+            target_velocity[0] = -6.0;
+            target_velocity[1] = 4.0;
+            target_velocity[2] = -11.0;
+            VehicleController::cmd_velocity_NED(target_velocity);
+            stage = 4;
+        }
+
+        if (timerVal > 29 && stage == 4)
+        {
+            MavCmd::set_mode_RTL();
+        }
     }
 }

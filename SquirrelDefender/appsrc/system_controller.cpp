@@ -33,7 +33,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm SysStat("/dev/pts/2");
+DebugTerm SysStat("");
 bool systems_initialized;
 SYSTEM_STATE system_state;
 
@@ -104,18 +104,21 @@ int SystemController::system_state_machine(void)
         // Switch case determines how we transition from one state to another
         switch (system_state)
         {
+        // Default state is the first state, nothing is initialialized, no systems are active
         case SYSTEM_STATE::DEFAULT:
             if (systems_initialized)
             {
                 system_state = SYSTEM_STATE::INIT;
             }
             break;
+        // After video, inference, SLAM, and other systems have successfully initialized we are in the init state
         case SYSTEM_STATE::INIT:
             if ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && valid_image_rcvd)
             {
                 system_state = SYSTEM_STATE::PRE_ARM_GOOD;
             }
             break;
+        // Pre arm good means that the data is from a drone and pre arm checks are good
         case SYSTEM_STATE::PRE_ARM_GOOD:
             if (mav_type_is_quad && mav_veh_state == MAV_STATE_STANDBY)
             {
@@ -126,22 +129,25 @@ int SystemController::system_state_machine(void)
                 system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
             }
             break;
+        // Standby means we are ready to takeoff
         case SYSTEM_STATE::STANDBY:
             if (mav_veh_rel_alt > 1000 && mav_veh_state == MAV_STATE_ACTIVE)
             {
                 system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
             }
             break;
+        // In flight good means the vehicle is in the air and has no system failures
         case SYSTEM_STATE::IN_FLIGHT_GOOD:
 
             break;
+        // In flight good means the vehicle is in the air with some system failures (e.g. video feed stopped)
         case SYSTEM_STATE::IN_FLIGHT_ERROR:
 
             break;
         }
     }
 
-    SysStat.cpp_cout("System State: " + std::to_string(system_state));
+    // SysStat.cpp_cout("System State: " + std::to_string(system_state));
 }
 
 /********************************************************************************

@@ -211,11 +211,24 @@ bool Video::video_init(void)
     valid_image_rcvd = false;
     image = NULL;
 
+    #ifdef DEBUG_BUILD
+
     if (!create_input_video_stream() ||
         !create_output_video_stream())
     {
         return false;
     }
+
+    #else
+
+    if (!create_input_video_stream())
+    {
+        return false;
+    }
+
+    #endif // DEBUG_BUILD
+
+
 
     calc_video_res();
 

@@ -18,7 +18,7 @@ set(VALID_BUILD_TYPES Debug Release)
 
 # Set default build type to Release if not specified
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type (Debug or Release)" FORCE)
+  set(CMAKE_BUILD_TYPE Debug CACHE STRING "Build type (Debug or Release)")
 endif()
 
 # Validate CMAKE_BUILD_TYPE
@@ -31,7 +31,7 @@ message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 # Optional: Set specific compiler flags for each build type
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -g")
 
 # Define a macro for the build type
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

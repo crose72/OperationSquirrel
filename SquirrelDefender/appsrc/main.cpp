@@ -25,8 +25,6 @@
 
 #endif // USE_JETSON
 
-#include "sim_flight_test_4_VelocityControl.h"
-
 /********************************************************************************
  * Typedefs
  ********************************************************************************/
@@ -114,11 +112,12 @@ int main(void)
         Video::video_proc_loop();
         Detection::detection_loop();
         VehicleController::vehicle_control_loop();
+
+#ifdef DEBUG_BUILD
+
         Video::video_output_loop();
 
-#elif USE_WSL
-
-        test_flight();
+#endif // DEBUG_BUILD
 
 #endif // USE_JETSON
 
@@ -129,10 +128,10 @@ int main(void)
     }
 
 #ifdef USE_JETSON
-
+    /*
     Video::shutdown();
     Detection::shutdown();
-
+    */
 #endif // USE_JETSON
 
     MavMsg::mav_comm_shutdown();

@@ -23,9 +23,13 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm MavCmdAck("/dev/pts/3");
-DebugTerm SysStatInfo("/dev/pts/3");
-DebugTerm HeartbeatInfo("/dev/pts/3");
+#ifdef DEBUG_BUILD
+
+DebugTerm MavCmdAck("");
+DebugTerm SysStatInfo("");
+DebugTerm HeartbeatInfo("");
+
+#endif // DEBUG_BUILD
 
 uint16_t mav_veh_command_id;              /*<  Command ID (of acknowledged command).*/
 uint8_t mav_veh_command_result;           /*<  Result of command.*/
@@ -171,6 +175,8 @@ void MavMsg::proc_mav_heartbeat_msg(const mavlink_message_t *msg, const char *te
     mav_veh_state = heartbeat.system_status;
     mav_veh_mavlink_version = heartbeat.mavlink_version;
 
+#ifdef DEBUG_BUILD
+
     HeartbeatInfo.cpp_cout("Heartbeat type:" + std::to_string(mav_veh_type));
     HeartbeatInfo.cpp_cout("Autopilot type:" + std::to_string(mav_veh_autopilot_type));
     HeartbeatInfo.cpp_cout("Base mode:" + std::to_string(mav_veh_base_mode));
@@ -179,6 +185,8 @@ void MavMsg::proc_mav_heartbeat_msg(const mavlink_message_t *msg, const char *te
     HeartbeatInfo.cpp_cout("Mavlink version:" + std::to_string(mav_veh_mavlink_version));
 
     print_heartbeat(heartbeat, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -199,7 +207,11 @@ void MavMsg::proc_mav_gps_int_msg(const mavlink_message_t *msg, const char *term
     mav_veh_gps_vz = global_pos_int.vz;
     mav_veh_gps_hdg = global_pos_int.hdg;
 
+#ifdef DEBUG_BUILD
+
     print_global_position_int(global_pos_int, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -211,7 +223,11 @@ void MavMsg::proc_mav_system_time_msg(const mavlink_message_t *msg, const char *
     mavlink_system_time_t system_time;
     mavlink_msg_system_time_decode(msg, &system_time);
 
+#ifdef DEBUG_BUILD
+
     print_system_time(system_time, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -240,6 +256,8 @@ void MavMsg::proc_mav_sys_status_msg(const mavlink_message_t *msg, const char *t
     mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd = sys_status.onboard_control_sensors_enabled_extended;
     mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd = sys_status.onboard_control_sensors_health_extended;
 
+#ifdef DEBUG_BUILD
+
     SysStatInfo.cpp_cout("Control sensors present:" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_present));
     SysStatInfo.cpp_cout("Control sensors enabled:\t" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled));
     SysStatInfo.cpp_cout("Control sensors health:\t" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_health));
@@ -260,6 +278,8 @@ void MavMsg::proc_mav_sys_status_msg(const mavlink_message_t *msg, const char *t
     SysStatInfo.cpp_cout("PRE ARM GOOD:" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK));
 
     print_sys_status(sys_status, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -271,7 +291,11 @@ void MavMsg::proc_mav_statustext_msg(const mavlink_message_t *msg, const char *t
     mavlink_statustext_t statustext;
     mavlink_msg_statustext_decode(msg, &statustext);
 
+#ifdef DEBUG_BUILD
+
     print_statustext(statustext, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -283,7 +307,11 @@ void MavMsg::proc_mav_param_value_msg(const mavlink_message_t *msg, const char *
     mavlink_param_value_t param_value;
     mavlink_msg_param_value_decode(msg, &param_value);
 
+#ifdef DEBUG_BUILD
+
     print_param_value(param_value, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -295,7 +323,11 @@ void MavMsg::proc_mav_autopilot_version_msg(const mavlink_message_t *msg, const 
     mavlink_autopilot_version_t autopilot_version;
     mavlink_msg_autopilot_version_decode(msg, &autopilot_version);
 
+#ifdef DEBUG_BUILD
+
     print_autopilot_version(autopilot_version, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -317,7 +349,11 @@ void MavMsg::proc_mav_scaled_imu_msg(const mavlink_message_t *msg, const char *t
     mav_veh_imu_ymag = scaled_imu.ymag;
     mav_veh_imu_zmag = scaled_imu.zmag;
 
+#ifdef DEBUG_BUILD
+
     print_scaled_imu(scaled_imu, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -329,7 +365,11 @@ void MavMsg::proc_mav_local_position_msg(const mavlink_message_t *msg, const cha
     mavlink_local_position_ned_t local_position;
     mavlink_msg_local_position_ned_decode(msg, &local_position);
 
+#ifdef DEBUG_BUILD
+
     print_local_position(local_position, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -341,7 +381,11 @@ void MavMsg::proc_mav_position_target_local_ned_msg(const mavlink_message_t *msg
     mavlink_position_target_local_ned_t position_target_local_ned;
     mavlink_msg_position_target_local_ned_decode(msg, &position_target_local_ned);
 
+#ifdef DEBUG_BUILD
+
     print_position_target_local_ned(position_target_local_ned, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -353,7 +397,11 @@ void MavMsg::proc_mav_set_position_target_local_ned_msg(const mavlink_message_t 
     mavlink_set_position_target_local_ned_t set_position_target_local_ned;
     mavlink_msg_set_position_target_local_ned_decode(msg, &set_position_target_local_ned);
 
+#ifdef DEBUG_BUILD
+
     print_set_position_target_local_ned(set_position_target_local_ned, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -365,7 +413,11 @@ void MavMsg::proc_mav_attitude_msg(const mavlink_message_t *msg, const char *ter
     mavlink_attitude_t attitude;
     mavlink_msg_attitude_decode(msg, &attitude);
 
+#ifdef DEBUG_BUILD
+
     print_attitude(attitude, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -377,7 +429,11 @@ void MavMsg::proc_mav_attitude_target_msg(const mavlink_message_t *msg, const ch
     mavlink_attitude_target_t attitude_target;
     mavlink_msg_attitude_target_decode(msg, &attitude_target);
 
+#ifdef DEBUG_BUILD
+
     print_attitude_target(attitude_target, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -389,7 +445,11 @@ void MavMsg::proc_mav_set_attitude_target_msg(const mavlink_message_t *msg, cons
     mavlink_set_attitude_target_t set_attitude_target;
     mavlink_msg_set_attitude_target_decode(msg, &set_attitude_target);
 
+#ifdef DEBUG_BUILD
+
     print_set_attitude_target(set_attitude_target, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -401,7 +461,11 @@ void MavMsg::proc_mav_attitude_quaternion_msg(const mavlink_message_t *msg, cons
     mavlink_attitude_quaternion_t attitude_quaternion;
     mavlink_msg_attitude_quaternion_decode(msg, &attitude_quaternion);
 
+#ifdef DEBUG_BUILD
+
     print_attitude_quaternion(attitude_quaternion, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -420,7 +484,11 @@ void MavMsg::proc_mav_command_ack_msg(const mavlink_message_t *msg, const char *
     mav_veh_command_target_system = command_ack.target_system;
     mav_veh_command_target_component = command_ack.target_component;
 
+#ifdef DEBUG_BUILD
+
     print_command_ack(command_ack, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -432,7 +500,11 @@ void MavMsg::proc_mav_optical_flow_msg(const mavlink_message_t *msg, const char 
     mavlink_optical_flow_t optical_flow;
     mavlink_msg_optical_flow_decode(msg, &optical_flow);
 
+#ifdef DEBUG_BUILD
+
     print_optical_flow(optical_flow, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -456,7 +528,11 @@ void MavMsg::proc_mav_distance_sensor_msg(const mavlink_message_t *msg, const ch
     mav_veh_rngfdr_quaternion[4] = distance_sensor.quaternion[4];
     mav_veh_rngfdr_signal_quality = distance_sensor.signal_quality;
 
+#ifdef DEBUG_BUILD
+
     print_distance_sensor(distance_sensor, term);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -498,7 +574,7 @@ void MavMsg::parse_mav_msgs(void)
 
     int n = SerialComm::bytes_available();
 
-    const char *term = "/dev/pts/4";
+    const char *term = "";
 
     for (int i = n; i > 0; i--)
     {
@@ -525,7 +601,7 @@ void MavMsg::parse_mav_msgs(void)
                 MavMsg::proc_mav_optical_flow_msg(&msg, "");
                 break;
             case MAVLINK_MSG_ID_DISTANCE_SENSOR:
-                MavMsg::proc_mav_distance_sensor_msg(&msg, term);
+                MavMsg::proc_mav_distance_sensor_msg(&msg, "");
                 break;
             case MAVLINK_MSG_ID_ATTITUDE:
                 MavMsg::proc_mav_attitude_msg(&msg, "");
@@ -555,7 +631,7 @@ void MavMsg::parse_mav_msgs(void)
                 MavMsg::proc_mav_param_value_msg(&msg, "");
                 break;
             case MAVLINK_MSG_ID_COMMAND_ACK:
-                MavMsg::proc_mav_command_ack_msg(&msg, term);
+                MavMsg::proc_mav_command_ack_msg(&msg, "");
                 break;
             default:
                 PrintPass::c_printf("Received message with ID: %d\n", (int)msg.msgid);

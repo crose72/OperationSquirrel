@@ -23,7 +23,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm FollowData("/dev/pts/6");
+DebugTerm FollowData("");
 
 bool target_too_close;
 bool target_identified;
