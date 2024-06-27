@@ -1,7 +1,7 @@
 /********************************************************************************
  * @file    mavlink_cmd_handler.cpp
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  * @brief   Abstracts and simplifies the mavlink commands for use throughout the
  *          program.
  * 
@@ -24,6 +24,39 @@
 /********************************************************************************
  * Typedefs
  ********************************************************************************/
+// Auto Pilot Modes enumeration - same as in ArduPilot firmware
+enum class FlightMode : uint8_t 
+{
+    STABILIZE =     0,  // manual airframe angle with manual throttle
+    ACRO =          1,  // manual body-frame angular rate with manual throttle
+    ALT_HOLD =      2,  // manual airframe angle with automatic throttle
+    AUTO =          3,  // fully automatic waypoint control using mission commands
+    GUIDED =        4,  // fully automatic fly to coordinate or fly at velocity/direction using GCS immediate commands
+    LOITER =        5,  // automatic horizontal acceleration with automatic throttle
+    RTL =           6,  // automatic return to launching point
+    CIRCLE =        7,  // automatic circular flight with automatic throttle
+    LAND =          9,  // automatic landing with horizontal position control
+    DRIFT =        11,  // semi-autonomous position, yaw and throttle control
+    SPORT =        13,  // manual earth-frame angular rate control with manual throttle
+    FLIP =         14,  // automatically flip the vehicle on the roll axis
+    AUTOTUNE =     15,  // automatically tune the vehicle's roll and pitch gains
+    POSHOLD =      16,  // automatic position hold with manual override, with automatic throttle
+    BRAKE =        17,  // full-brake using inertial/GPS system, no pilot input
+    THROW =        18,  // throw to launch mode using inertial/GPS system, no pilot input
+    AVOID_ADSB =   19,  // automatic avoidance of obstacles in the macro scale - e.g. full-sized aircraft
+    GUIDED_NOGPS = 20,  // guided mode but only accepts attitude and altitude
+    SMART_RTL =    21,  // SMART_RTL returns to home by retracing its steps
+    FLOWHOLD  =    22,  // FLOWHOLD holds position with optical flow without rangefinder
+    FOLLOW    =    23,  // follow attempts to follow another vehicle or ground station
+    ZIGZAG    =    24,  // ZIGZAG mode is able to fly in a zigzag manner with predefined point A and point B
+    SYSTEMID  =    25,  // System ID mode produces automated system identification signals in the controllers
+    AUTOROTATE =   26,  // Autonomous autorotation
+    AUTO_RTL =     27,  // Auto RTL, this is not a true mode, AUTO will report as this mode if entered to perform a DO_LAND_START Landing sequence
+    TURTLE =       28,  // Flip over after crash
+
+    // Mode number 127 reserved for the "drone show mode" in the Skybrush
+    // fork at https://github.com/skybrush-io/ardupilot
+};
 
 /********************************************************************************
  * Private macros and defines
@@ -42,48 +75,91 @@
  ********************************************************************************/
 
 /********************************************************************************
- * Function: msg_handler
- * Description: Forgot the purpose of this, may be unnecessary.
+ * Function: MavCmd
+ * Description: Class constructor
  ********************************************************************************/
-void msg_handler(uint16_t mavlink_command, uint16_t msg_id, float msg_interval) 
-{
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize/*< [degE7] Longitude, expressed*/ the Madvlink message buffer
+MavCmd::MavCmd(){};
 
-    mavlink_msg_command_long_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, mavlink_command, 0, msg_id, msg_interval, 0, 0, 0, 0, 0);
-    offset_buffer(buffer, len, msg);
-    write_serial_port(buffer, len);
-}
+/********************************************************************************
+ * Function: ~MavCmd
+ * Description: Class destructor
+ ********************************************************************************/
+MavCmd::~MavCmd(){};
 
 /********************************************************************************
  * Function: takeoff_sequence
  * Description: Command vehicle to fly up to a specified relative altitude.
  ********************************************************************************/
-void takeoff_sequence(float takeoff_alt)
+void MavCmd::takeoff_sequence(float takeoff_alt)
 {
     // Set flight mode to guided
-    // enable or disable custom mode (including guided), mode # (found in mode.h), custom submode, empty, etc
-    send_cmd_long(MAV_CMD_DO_SET_MODE, 0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, 4, 0, 0, 0, 0, 0); // guided = 4
+    set_mode_GUIDED();
 
-    // Hand control over to the companion computer
-    // send_cmd_long(MAV_CMD_NAV_GUIDED_ENABLE, 0, 1, 0, 0, 0, 0, 0, 0);
-    
     // ARM the vehicle
-    send_cmd_long(MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 1, 0, 0, 0, 0, 0);
+    arm_vehicle();
 
     // Takeoff
-    send_cmd_long(MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, takeoff_alt);
+    takeoff_GPS_long(takeoff_alt);
 }
 
 /********************************************************************************
- * Function: return_to_launch
+ * Function: takeoff_LOCAL
+ * Description: Takekoff to specified height.
+ ********************************************************************************/
+void MavCmd::takeoff_LOCAL(float pitch, float ascend_rate, float yaw, int32_t x, int32_t y, float z)
+{
+    // All relevant arguments for MAV_CMD_NAV_TAKEOFF: uint8_t frame, uint16_t command, float param1, float param2, float param3, float param4, int32_t x, int32_t y, float z
+    send_cmd_int(MAV_FRAME_BODY_OFFSET_NED, MAV_CMD_NAV_TAKEOFF_LOCAL, pitch, 0, ascend_rate, yaw, x, y, z);
+}
+
+/********************************************************************************
+ * Function: takeoff_GPS_long
+ * Description: Takekoff to specified height using command_long.
+ ********************************************************************************/
+void MavCmd::takeoff_GPS_long(float alt)
+{
+    send_cmd_long(MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, alt);
+}
+
+/********************************************************************************
+ * Function: arm_vehicle
+ * Description: Arm vehicle.
+ ********************************************************************************/
+void MavCmd::arm_vehicle(void)
+{
+    // Arm throttle - param2 = 0 requires safety checks, param2 = 21196 allows
+    // arming to override preflight checks and disarming in flight
+    send_cmd_long(MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 0, 0, 0, 0, 0, 0);
+}
+
+/********************************************************************************
+ * Function: disarm_vehicle
+ * Description: Disarm vehicle.
+ ********************************************************************************/
+void MavCmd::disarm_vehicle(void)
+{
+    // Disarm throttle - param2 = 0 requires safety checks, param2 = 21196 allows
+    // arming to override preflight checks and disarming in flight
+    MavCmd::send_cmd_long(MAV_CMD_COMPONENT_ARM_DISARM, 0, 0, 1, 0, 0, 0, 0, 0);
+}
+
+/********************************************************************************
+ * Function: set_mode_GUIDED
+ * Description: Change mode to GUIDED to allow control from a companion computer.
+ ********************************************************************************/
+void MavCmd::set_mode_GUIDED(void)
+{
+    set_flight_mode(0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::GUIDED, 0);
+}
+
+
+/********************************************************************************
+ * Function: set_mode_RTL
  * Description: Change mode to RTL and vehicle will return to launch location.
  ********************************************************************************/
-void return_to_launch(void)
+void MavCmd::set_mode_RTL(void)
 {
-    // Set flight mode to RTL
-    send_cmd_long(MAV_CMD_DO_SET_MODE, 0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, 6, 0, 0, 0, 0, 0);
+    set_flight_mode(0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::RTL, 0);
 }
 
 /********************************************************************************
@@ -91,60 +167,76 @@ void return_to_launch(void)
  * Description: Commmand vehicle to move to a specified GPS location with 
  *              specific latitude, longtitude, and altitude.
  ********************************************************************************/
-void go_to_waypoint(int32_t lat, int32_t lon, float alt)
+void MavCmd::go_to_waypoint(int32_t lat, int32_t lon, float alt)
 {
     send_cmd_set_position_target_global_int(MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, (uint16_t)0b111111111000, lat, lon, alt, 0, 0, 0, 0, 0, 0, 0, 0); //mavlink_msg_command_int_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, MAV_CMD_DO_SET_MODE, 0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, 6, 0, 0, -35.3671 * 1e7, 149.1649 * 1e7, 0); is used for AUTO mode?
 }
 
 /********************************************************************************
- * Function: send_cmd_long
- * Description: This overloaded function is specifically designed to send a 
- *              mavlink command long to request that a mavlink message ID is 
+ * Function: set_flight_mode
+ * Description: Set the vehicle flight mode 
+ ********************************************************************************/
+ void MavCmd::set_flight_mode(uint8_t confirmation, float mode, float custom_mode, float custom_submode)
+ {
+    send_cmd_long(MAV_CMD_DO_SET_MODE, confirmation, mode, custom_mode, custom_submode, 0, 0, 0, 0);
+ }
+
+/********************************************************************************
+ * Function: set_mav_msg_rate
+ * Description: This function is specifically designed to send a 
+ *              mavlink command long to request that a mavlink message ID ims 
  *              sent at a desired rate.
  ********************************************************************************/
-void send_cmd_long(uint16_t mavlink_command, uint16_t msg_id, float msg_interval) 
+void MavCmd::set_mav_msg_rate(uint16_t msg_id, float msg_interval) 
 {
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize the Madvlink message buffer
+    mavlink_message_t msg;
 
-    mavlink_msg_command_long_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, mavlink_command, 0, msg_id, msg_interval, 0, 0, 0, 0, 0);
-    offset_buffer(buffer, len, msg);
-    write_serial_port(buffer, len);
+    mavlink_msg_command_long_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, MAV_CMD_SET_MESSAGE_INTERVAL, 0, msg_id, msg_interval, 0, 0, 0, 0, 0);
+    send_mav_cmd(msg);
 }
 
 /********************************************************************************
- * Function: send_cmd_long
+ * Function: req_mav_msg
  * Description: This overloaded function is specifically designed to send a 
  *              mavlink command long torequest that a specific mavlink message 
  *              ID is sent.
  ********************************************************************************/
-void send_cmd_long(uint16_t mavlink_command, uint16_t msg_id) 
+void MavCmd::req_mav_msg(uint16_t msg_id) 
 {
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize the Madvlink message buffer
+    mavlink_message_t msg;
 
-    mavlink_msg_command_long_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, mavlink_command, 0, msg_id, 0, 0, 0, 0, 0, 0);
-    offset_buffer(buffer, len, msg);
-    write_serial_port(buffer, len);
+    mavlink_msg_command_long_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, MAV_CMD_REQUEST_MESSAGE, 0, msg_id, 0, 0, 0, 0, 0, 0);
+    send_mav_cmd(msg);
 }
 
 /********************************************************************************
- * Function: send_cmd_long
+ * Function: send_cmd_int
  * Description: This overloaded function allows for various mavlink command 
  *              longs to be sent, including a mode change, takeoff, ARM throttle, 
  *              and more.
  ********************************************************************************/
-void send_cmd_long(uint16_t mavlink_command, uint8_t confirmation, float param1, float param2, float param3, float param4, float param5, float param6, float param7) 
+void MavCmd::send_cmd_int(uint8_t frame, uint16_t command, float param1, float param2, float param3, float param4, int32_t x, int32_t y, float z) 
 {
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize the Madvlink message buffer
+    mavlink_message_t msg;
+    uint8_t current = 0;        // no used according to documentation, set 0
+    uint8_t autocontinue = 0;   // no used according to documentation, set 0
+
+    mavlink_msg_command_int_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, frame, command, current, autocontinue, param1, param2, param3, param4, x, y, z);
+    send_mav_cmd(msg);
+}
+
+/********************************************************************************
+ * Function: send_cmd_long
+ * Description: This function sends mavlink command 
+ *              long which can do a mode change, takeoff, ARM throttle, 
+ *              and more.
+ ********************************************************************************/
+void MavCmd::send_cmd_long(uint16_t mavlink_command, uint8_t confirmation, float param1, float param2, float param3, float param4, float param5, float param6, float param7) 
+{
+    mavlink_message_t msg;
 
     mavlink_msg_command_long_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, mavlink_command, confirmation, param1, param2, param3, param4, param5, param6, param7);
-    offset_buffer(buffer, len, msg);
-    write_serial_port(buffer, len);
+    send_mav_cmd(msg);
 }
 
 /********************************************************************************
@@ -153,16 +245,13 @@ void send_cmd_long(uint16_t mavlink_command, uint8_t confirmation, float param1,
  *              global int message to send a vehicle to a specific GPS location 
  *              using an external controller.
  ********************************************************************************/
-void send_cmd_set_position_target_global_int(uint8_t coordinate_frame, uint16_t type_mask, int32_t lat_int, int32_t lon_int, float alt, float vx, float vy, float vz, float afx, float afy, float afz, float yaw, float yaw_rate) 
+void MavCmd::send_cmd_set_position_target_global_int(uint8_t coordinate_frame, uint16_t type_mask, int32_t lat_int, int32_t lon_int, float alt, float vx, float vy, float vz, float afx, float afy, float afz, float yaw, float yaw_rate) 
 {
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize the Madvlink message buffer
+    mavlink_message_t msg;
 
     // There should be an _encode function we want to use instead of the pack function
     mavlink_msg_set_position_target_global_int_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, 0, TARGET_SYS_ID, TARGET_COMP_ID, MAV_FRAME_GLOBAL_RELATIVE_ALT_INT, (uint16_t)0b111111111000, lat_int, lon_int, alt, 0, 0, 0, 0, 0, 0, 0, 0);
-    offset_buffer(buffer, len, msg);
-    write_serial_port(buffer, len);
+    send_mav_cmd(msg);
 }
 
 /********************************************************************************
@@ -171,31 +260,24 @@ void send_cmd_set_position_target_global_int(uint8_t coordinate_frame, uint16_t 
  *              allow for manually controlling the roll, pitch, yaw, and thrust 
  *              of a vehicle using an external controller.
  ********************************************************************************/
-void send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired_attitude_target)
+void MavCmd::send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired_attitude_target)
 {
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize the Madvlink message buffer
+    mavlink_message_t msg;
 
     mavlink_msg_set_attitude_target_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, desired_attitude_target);
-    offset_buffer(buffer, len, msg);
-    write_serial_port(buffer, len);
+    send_mav_cmd(msg);
 }
 
 /********************************************************************************
  * Function: send_cmd_set_position_target_local_ned
  * Description: This function uses the mavlink message set position target to 
- *              allow for manually controlling the position, velocity, and
+ *              allow for manually controlling the position, velocity, or
  *              acceleration of a vehicle using an external controller.
  ********************************************************************************/
-void send_cmd_set_position_target_local_ned(mavlink_set_position_target_local_ned_t *desired_position_target)
+void MavCmd::send_cmd_set_position_target_local_ned(mavlink_set_position_target_local_ned_t *desired_target)
 {
-    uint16_t len = 0; // length of buffer
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN]; // define length of buffer
-    mavlink_message_t msg; // initialize the Madvlink message buffer
+    mavlink_message_t msg;
 
-    mavlink_msg_set_position_target_local_ned_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, desired_position_target);
-    offset_buffer(buffer, len, msg);
-    write_serial_port(buffer, len);
+    mavlink_msg_set_position_target_local_ned_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, desired_target);
+    send_mav_cmd(msg);
 }
-

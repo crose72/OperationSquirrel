@@ -1,7 +1,9 @@
+#pragma once
+
 /********************************************************************************
  * @file    velocity_controller.h
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  ********************************************************************************/
 #ifndef VELOCITY_CONTROLLER_H
 #define VELOCITY_CONTROLLER_H
@@ -22,12 +24,26 @@
  ********************************************************************************/
 
 /********************************************************************************
- * Function prototypes
+ * Function prototypes and Class Definitions
  ********************************************************************************/
-void cmd_position(float position_target[3]);
-void cmd_velocity(float velocity_target[3]);
-void cmd_acceleration(float acceleration_target[3]);
-float calc_yaw_target(float x, float y);
-float calc_yaw_rate_target(float x, float y);
+class VelocityController
+{
+    VelocityController();
+    ~VelocityController(void);
+
+    public:
+        static void cmd_position_NED(float position_target[3]);
+        static void cmd_velocity_NED(float velocity_target[3]);
+        static void cmd_acceleration_NED(float acceleration_target[3]);
+        static void cmd_velocity_x_NED(float velocity_target);
+        static void cmd_velocity_y_NED(float velocity_target);
+        static void cmd_velocity_z_NED(float velocity_target);
+        static void cmd_velocity_xy_NED(float velocity_target[3]);
+
+    private:
+        static float calc_yaw_target(float x, float y);
+        static float calc_yaw_rate_target(float x, float y);
+};
+
 
 #endif // VELOCITY_CONTROLLER_H

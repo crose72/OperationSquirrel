@@ -1,51 +1,59 @@
+#pragma once
+
 /********************************************************************************
  * @file    datalog.h
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  ********************************************************************************/
 #ifndef DATALOG_H
 #define DATALOG_H
 
-/************************************
+/********************************************************************************
  * Includes
- ************************************/
+ ********************************************************************************/
 #include "common_inc.h"
+#include <string>
+#include <vector>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include "mavlink_msg_handler.h"
 
-/************************************
+/********************************************************************************
  * Imported objects
- ************************************/
-extern float elapsedTimeSeconds;
-extern int32_t lat;
-extern int32_t lon;
-extern int32_t alt;
-extern int32_t relative_alt;
-extern int16_t vx;
-extern int16_t vy;
-extern int16_t vz;
-extern uint16_t hdg;
-extern float roll;
-extern float pitch;
-extern float yaw;
-extern float rollspeed;
-extern float pitchspeed;
-extern float yawspeed;
-extern int16_t xacc;
-extern int16_t yacc;
-extern int16_t zacc;
-extern int16_t xgyro;
-extern int16_t ygyro;
-extern int16_t zgyro;
-extern int16_t xmag;
-extern int16_t ymag;
-extern int16_t zmag;
+ ********************************************************************************/
+extern float app_elapsed_time;
+extern int32_t mav_veh_lat;
+extern int32_t mav_veh_lon;
+extern int32_t mav_veh_alt;
+extern int32_t mav_veh_rel_alt;
+extern int16_t mav_veh_gps_vx;
+extern int16_t mav_veh_gps_vy;
+extern int16_t mav_veh_gps_vz;
+extern uint16_t mav_veh_gps_hdg;
+extern float mav_veh_roll;
+extern float mav_veh_pitch;
+extern float mav_veh_yaw;
+extern float mav_veh_rollspeed;
+extern float mav_veh_pitchspeed;
+extern float mav_veh_yawspeed;
+extern int16_t mav_veh_imu_ax;
+extern int16_t mav_veh_imu_ay;
+extern int16_t mav_veh_imu_az;
+extern int16_t mav_veh_imu_xgyro;
+extern int16_t mav_veh_imu_ygyro;
+extern int16_t mav_veh_imu_zgyro;
+extern int16_t mav_veh_imu_xmag;
+extern int16_t mav_veh_imu_ymag;
+extern int16_t mav_veh_imu_zmag;
 
-/************************************
+/********************************************************************************
  * Exported objects
- ************************************/
+ ********************************************************************************/
 
-/************************************
- * Function prototypes
- ************************************/
+/********************************************************************************
+ * Function prototypes and Class Definitions
+ ********************************************************************************/
 template <typename T>
 std::string toString(const T& value);
 void logData(void);

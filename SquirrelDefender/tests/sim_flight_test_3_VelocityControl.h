@@ -47,6 +47,7 @@ void resetTimer(void)
  ********************************************************************************/
 void test_flight(void)
 {
+    VelocityController VelController;
     countupTimer();
 
     if (timerVal > 6.0 && stage == 0)
@@ -54,7 +55,7 @@ void test_flight(void)
         target_velocity[0] = 10.0;
         target_velocity[1] = -4.0;
         target_velocity[2] = -4.0;
-        cmd_velocity(target_velocity);
+        VelController.cmd_position_NED(target_velocity);
         stage = 1;
     }
 
@@ -63,7 +64,7 @@ void test_flight(void)
         target_velocity[0] = 5.0;
         target_velocity[1] = 7.0;
         target_velocity[2] = 1.0;
-        cmd_velocity(target_velocity);
+        VelController.cmd_position_NED(target_velocity);
         stage = 2;
     }
 
@@ -72,7 +73,7 @@ void test_flight(void)
         target_velocity[0] = -6.0;
         target_velocity[1] = 4.0;
         target_velocity[2] = -2.0;
-        cmd_velocity(target_velocity);
+        VelController.cmd_position_NED(target_velocity);
         stage = 3;
     }
 

@@ -1,0 +1,6 @@
+# run SITL with two terminals and no console
+1. in the first terminal:
+	gdb -x /tmp/tmpUyovOT --args /home/cameroncrose72/GitHub/ardupilot/build/sitl/bin/arducopter -S --model + --speedup 1 --slave 0 --defaults ../Tools/autotest/default_params/copter.parm --sim-address=127.0.0.1 -I0
+	when you see (gdb) type "run" then press enter
+2. in the second terminal:
+	"mavproxy.py" "--out" "172.17.48.1:14550" "--out" "172.17.48.1:14551" "--master" "127.0.0.1:5760" "--sitl" "127.0.0.1:5501" "--map" "--console"

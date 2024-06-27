@@ -1,0 +1,64 @@
+{
+    "Vel_PID_x": {
+        "Kp": 0.005,
+        "Ki": 0.0001,
+        "Kd": 0.0001,
+        "w1": 0.5,
+        "w2": 0.5,
+        "w3": 0.0
+    },
+    "Vel_PID_y": {
+        "Kp": 0.001,
+        "Ki": 0.0,
+        "Kd": 0.0,
+        "w1": 1.0,
+        "w2": 0.0,
+        "w3": 0.0
+    },
+    "Vel_PID_z": {
+        "Kp": 0.0,
+        "Ki": 0.0,
+        "Kd": 0.0,
+        "w1": 0.0,
+        "w2": 0.0,
+        "w3": 0.0
+    },
+    "Vel_PID_x_reverse": {
+        "Kp": 0.01,
+        "Ki": 0.0,
+        "Kd": 0.0,
+        "w1": 1.0,
+        "w2": 0.0,
+        "w3": 0.0
+    },
+    "Vel_PID_y_reverse": {
+        "Kp": 0.001,
+        "Ki": 0.0,
+        "Kd": 0.0,
+        "w1": 1.0,
+        "w2": 0.0,
+        "w3": 0.0
+    },
+    "Vel_PID_z_reverse": {
+        "Kp": 0.0,
+        "Ki": 0.0,
+        "Kd": 0.0,
+        "w1": 0.0,
+        "w2": 0.0,
+        "w3": 0.0
+    },
+    "Target": {
+        "Desired_Height": 640.0,
+        "Desired_Width": 150.0
+    },
+    "Detection_tracking": {
+        "Detect_Thresh": 0.7,
+        "Max_Batch_Size": 4,
+        "Precision": 0,
+        "Device": 0,
+        "Allow_gpu_fallback": false,
+        "Min_Frames": 25,
+        "Drop_Frames": 50,
+        "Overlap_Threshold": 0.5
+    }
+}

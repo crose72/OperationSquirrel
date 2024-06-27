@@ -1,0 +1,4 @@
+[ZoneTransfer]
+ZoneId=3
+ReferrerUrl=https://custom.ardupilot.org/builds/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:adff74862b422bed8f839a9cc272bc5d/
+HostUrl=https://custom.ardupilot.org/builds/copter:MatekF405-TE:913ec4b29ce1f21c2bfa0978b7b93b27e1da34f9:adff74862b422bed8f839a9cc272bc5d/extra_hwdef.dat

@@ -1,27 +1,99 @@
 # Description
 This folder contains the code for the Squirrel Defender and most of its dependencies.  Some dependencies for the Jetson Nano or other companion computer are found elsewhere, but instructions for how to set those up will be provided in a different file.  This readme will explain how to compile and run this code as well as provide an outline for how the code is structured.
 
-## How to compile and run the program
+*** Follow the instructions in the scripts folder to set up swap and install the needed dependencies first
 
-1. Execute `make` to build the example
-2. Execute `sudo ./main` to run the program
-3. Execute `make clean` to remove the build files including the executable
+## Before compiling (specifically when linking ORB_SLAM, and pango directly)
+- Follow the instructions here to update the linker path https://stackoverflow.com/questions/480764/linux-error-while-loading-shared-libraries-cannot-open-shared-object-file-no-s 
+- Copy all .so files from `SquirrelDefender/lib/` to `/usr/local/lib/` on the jetson
+- Copy all folders from `SquirrelDefender/inc/` to `/usr/local/include/` on the jetson
+- Updated the shared library cache with `sudo ldconfig -v`
 
-## Makefile explanation
+## Install JetsonGPIO library (this enables use of the pins on the jetson nano)
+    # Update and Upgrade the System
+    cd /path/to/your/GitHub/or/other/code/folder
+    sudo apt-get update
+    sudo apt-get upgrade
 
-- Uncomment one of the following lines in the Makefile to compile for use on
-   the Jetson Nano using UART or on WSL2 using a TCP connection depending on where this
-   code is being executed.  Only one of them should be used at a time
-  - CFLAGS += -DUSE_UART
-  - CFLAGS += -DUSE_TCP
+    # Install Required Packages
+    sudo apt-get install cmake g++ python3-dev
+
+    # Clone the JetsonGPIO Repository
+    git clone https://github.com/pjueon/JetsonGPIO.git
+    cd JetsonGPIO
+
+    # Build the Library
+    mkdir build
+    cd build
+    cmake ..
+    make
+    sudo make install
+
+## CMakeLists explanation
+
+- Enable either USE_JETSON or USE_WSL by turning them ON or OFF (only one at a time)
+    - `option(USE_JETSON "Enable Jetson Nano specific features" ON)`
+    - `option(USE_WSL "Enable WSL specific features" OFF)`
+- Default release is Debug (enables print statements).  To turn off print statements and other debugging
+  features compile a Release type build
+    - `cmake -DCMAKE_BUILD_TYPE=Release ..`
 
 #### Other preprocessing directives will be added to configure the code to enable or disable other features
 
-## Code explanation
+## How to compile and run the program
 
-- `appsrc - source code files
-- `apphdr` - header files
-- `lib` - external libraries
-- `tests` - header files used to run flight tests
+1. Execute `mkdir build` to create a build directory
+2. Execute `cd build` to go to the build folder
+3. Execute `cmake ..` to generate build files (debug or release type)
+4. Execute `make -j$(nproc)` for fast builds or `make` for slow builds
+5. Execute `sudo ./squirreldefender` to run the program
+6. Execute `./unit_tests` to run the unit tests
+7. If the video doesn't display on your monitor, try executing `sudo systemctl restart nvargus-daemon`
 
-#### Further descriptions to come
+## To have this program run when the jetson nano powers on create a systemd service
+    # Create a .service file (one is already included in this folder so you can just copy that)
+    sudo nano /etc/systemd/system/squirrel_defender.service
+
+    # Here's what the file looks like anyways:
+        [Unit]
+        Description=Squirrel Defender program
+        After=network.target nvargus-daemon.service
+
+        [Service]
+        Type=simple
+        ExecStartPre=/bin/systemctl restart nvargus-daemon.service
+        ExecStart=<path-to-exe>/squirreldefender
+        WorkingDirectory=<path-to-build-folder>//SquirrelDefender/build
+        StandardOutput=journal
+        SandardError=journal
+        Restart=always
+        User=root
+
+        [Install]
+        WantedBy=multi-user.target                
+    
+    # Save the file and reload the daemon
+    sudo systemctl daemon-reload
+
+    # Enable the service
+    sudo systemctl enable squirrel_defender.service
+
+    # Start the service
+    sudo systemctl start squirrel_defender.service
+    
+    # Restart the service
+    sudo systemctl restart squirrel_defender.service
+
+    # Check status of the service
+    sudo systemctl status squirrel_defender.service
+
+## Folder structure
+
+- `appsrc` - source code files
+- `apphdr` - source header files
+- `inc` - header files for external libraries
+- `lib` - external compiled libraries
+- `tests` - header files used to run flight tests, whatever behavior you want to hard code the drone to do (especially useful when testing in WSL with virtual jetson)
+- `UnitTests` - all the code for unit tests, including helper files
+- `params.json` - parameters defined here are adjustable at runtime (not recommended with real vehicle, hardcode all of the parameters when using real vehicle)
+- `.editorconfig` - should automatically format the code when saving (if it doesn't then check your settings in vs code)

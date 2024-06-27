@@ -1,7 +1,9 @@
+#pragma once
+
 /********************************************************************************
  * @file    global_objects.h
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  ********************************************************************************/
 #ifndef GLOBAL_OBJECTS_H
 #define GLOBAL_OBJECTS_H
@@ -14,7 +16,7 @@
 /********************************************************************************
  * Global object declarations
  ********************************************************************************/
-extern bool firstLoopAfterStartup;
+extern bool first_loop_after_start;
 
 
 #endif // GLOBAL_OBJECTS_H

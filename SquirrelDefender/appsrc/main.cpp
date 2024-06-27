@@ -1,27 +1,29 @@
 /********************************************************************************
- * @file    ${file_name}
- * @author  ${user}
- * @date    ${date}
- * @brief   
+ * @file    target_tracking.cpp
+ * @author  Cameron Rose
+ * @date    6/7/2024
+ * @brief   Main source file where initializations, loops, and shutdown
+ * 			sequences are executed.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "global_objects.h"
-#include "global_calibrations.h"
-#include "serial_port_handler.h"
+#include "system_controller.h"
 #include "mavlink_msg_handler.h"
 #include "mavlink_cmd_handler.h"
-#include "scheduler.h"
+#include "follow_target.h"
 #include "datalog.h"
-#include "time_calc.h"
+#include <mutex>
 
-// Test flights
-// #include "sim_flight_test_1_GPSWaypoints.h"
-// #include "sim_flight_test_2_AttitudeControl.h"
-#include "sim_flight_test_3_VelocityControl.h"
+#ifdef USE_JETSON
+
+#include "video_IO.h"
+#include "object_detection.h"
+#include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
+
+#endif // USE_JETSON
 
 /********************************************************************************
  * Typedefs
@@ -34,6 +36,9 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
+TimeCalc MainAppTime;
+bool stop_program;
+std::mutex mutex;
 
 /********************************************************************************
  * Calibration definitions
@@ -44,60 +49,92 @@
  ********************************************************************************/
 
 /********************************************************************************
- * Function: main
- * Description: Main point of entry for the program.
+ * Function: sig_handler
+ * Description: Stop the program if Crl+C is entered in the terminal.
  ********************************************************************************/
-int main() 
+void sig_handler(int signo)
 {
-    initialize();
-    startTask_25ms();
+    if (signo == SIGINT)
+    {
+        stop_program = true;
+        PrintPass::c_fprintf("received SIGINT\n");
+    }
+}
 
-    while (!stopProgram) 
-	{
-        // Main code is executed in task_25ms()
+/********************************************************************************
+ * Function: attach_sig_handler
+ * Description: Attach sig handler to enable program termination by Crl+C.
+ ********************************************************************************/
+void attach_sig_handler(void)
+{
+    if (signal(SIGINT, sig_handler) == SIG_ERR)
+    {
+        PrintPass::c_fprintf("can't catch SIGINT");
+    }
+}
+
+/********************************************************************************
+ * Function: app_first_init
+ * Description: Updates variable for rest of program to know that the first loop
+ * 				is over.
+ ********************************************************************************/
+void app_first_init(void)
+{
+    if (first_loop_after_start == true)
+    {
+        first_loop_after_start = false;
+    }
+}
+
+/********************************************************************************
+ * Function: main
+ * Description: Entry point for the program.  Runs the main loop.
+ ********************************************************************************/
+int main(void)
+{
+    MainAppTime.calc_app_start_time();
+    stop_program = false;
+
+    if (SystemController::system_init() != 0)
+    {
+        return SystemController::system_init();
     }
 
-    stopTask_25ms();
+    while (!stop_program)
+    {
+        std::lock_guard<std::mutex> lock(mutex);
+        MainAppTime.calc_elapsed_time();
+        SystemController::system_control_loop();
+        MavMsg::mav_comm_loop();
+
+#ifdef USE_JETSON
+
+        Video::video_proc_loop();
+        Detection::detection_loop();
+        VehicleController::vehicle_control_loop();
+
+#ifdef DEBUG_BUILD
+
+        Video::video_output_loop();
+
+#endif // DEBUG_BUILD
+
+#endif // USE_JETSON
+
+        app_first_init();
+
+        MainAppTime.loop_rate_controller();
+        MainAppTime.calc_loop_start_time();
+    }
+
+#ifdef USE_JETSON
+    /*
+    Video::shutdown();
+    Detection::shutdown();
+    */
+#endif // USE_JETSON
+
+    MavMsg::mav_comm_shutdown();
 
     return 0;
-}
-
-/********************************************************************************
- * Function: initialize
- * Description: Any code that needs to be run once at the start of the program.
- ********************************************************************************/
-void initialize(void)
-{
-    // Code here is to be run once at the start of the program
-    calcStartTimeMS();
-    setupTask_25ms();
-
-    // Setup serial communication
-    open_serial_port();
-
-    // Set rates and request mavlink data from the flight controller
-    set_message_rates();
-    request_messages();
-
-    // Startup commands for drone
-    takeoff_sequence((float)6);
-}
-
-/********************************************************************************
- * Function: task_25ms
- * Description: Function to handle timer interrupt at 25ms (40Hz).  This periodic
- *              function runs the main code at the specified rate.
- ********************************************************************************/
-void task_25ms(int sig, siginfo_t* si, void* uc)
-{
-    std::lock_guard<std::mutex> lock(mutex);
-    calcElapsedTime();
-    parse_serial_data();
-    test_flight();
-    // logData();
-
-    if (firstLoopAfterStartup == true)
-    {
-        firstLoopAfterStartup = false;
-    }
 }

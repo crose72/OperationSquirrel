@@ -1,7 +1,7 @@
 /********************************************************************************
  * @file    datalog.cpp
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    6/7/2023
  * @brief   Record key information in a text file for debugging and issue
  *          resolution.
  ********************************************************************************/
@@ -53,7 +53,7 @@ std::string toString(const T& value)
  ********************************************************************************/
 void logData(void)
 {
-    if (firstLoopAfterStartup == true)
+    if (first_loop_after_start == true)
     {
         unusedDataFileName = checkAndAppendFileName(dataFileName);
     }
@@ -91,30 +91,30 @@ void logData(void)
 
     // Clear data vector and write to next row
     data.clear();
-    data.push_back({{toString(elapsedTimeSeconds),
-                    toString(lat),
-                    toString(lon),
-                    toString(alt),
-                    toString(relative_alt),
-                    toString(vx),
-                    toString(vy),
-                    toString(vz),
-                    toString(hdg),
-                    toString(roll),
-                    toString(pitch),
-                    toString(yaw),
-                    toString(rollspeed),
-                    toString(pitchspeed),
-                    toString(yawspeed),
-                    toString(xacc),
-                    toString(yacc),
-                    toString(zacc),
-                    toString(xgyro),
-                    toString(ygyro),
-                    toString(zgyro),
-                    toString(xmag),
-                    toString(ymag),
-                    toString(zmag)}});
+    data.push_back({{toString(app_elapsed_time),
+                     toString(mav_veh_lat),
+                     toString(mav_veh_lon),
+                     toString(mav_veh_alt),
+                     toString(mav_veh_rel_alt),
+                     toString(mav_veh_gps_vx),
+                     toString(mav_veh_gps_vy),
+                     toString(mav_veh_gps_vz),
+                     toString(mav_veh_gps_hdg),
+                     toString(mav_veh_roll),
+                     toString(mav_veh_pitch),
+                     toString(mav_veh_yaw),
+                     toString(mav_veh_rollspeed),
+                     toString(mav_veh_pitchspeed),
+                     toString(mav_veh_yawspeed),
+                     toString(mav_veh_imu_ax),
+                     toString(mav_veh_imu_ay),
+                     toString(mav_veh_imu_az),
+                     toString(mav_veh_imu_xgyro),
+                     toString(mav_veh_imu_ygyro),
+                     toString(mav_veh_imu_zgyro),
+                     toString(mav_veh_imu_xmag),
+                     toString(mav_veh_imu_ymag),
+                     toString(mav_veh_imu_zmag)}});
     writeToCSV(unusedDataFileName, data);
 }
 
