@@ -1,11 +1,33 @@
 # Description
-This folder contains the code for the Squirrel Defender and most of its dependencies.  Some dependencies for the Jetson Nano or other companion computer are found elsewhere, but instructions for how to set those up will be provided in a different file.  This readme will explain how to compile and run this code as well as provide an outline for how the code is structured.  Eventually everything needed will be contained within this folder.
+This folder contains the code for the Squirrel Defender and most of its dependencies.  Some dependencies for the Jetson Nano or other companion computer are found elsewhere, but instructions for how to set those up will be provided in a different file.  This readme will explain how to compile and run this code as well as provide an outline for how the code is structured.
+
+*** Follow the instructions in the scripts folder to set up swap and install the needed dependencies first
 
 ## Before compiling (specifically when linking ORB_SLAM, and pango directly)
 - Follow the instructions here to update the linker path https://stackoverflow.com/questions/480764/linux-error-while-loading-shared-libraries-cannot-open-shared-object-file-no-s 
 - Copy all .so files from `SquirrelDefender/lib/` to `/usr/local/lib/` on the jetson
 - Copy all folders from `SquirrelDefender/inc/` to `/usr/local/include/` on the jetson
 - Updated the shared library cache with `sudo ldconfig -v`
+
+## Install JetsonGPIO library (this enables use of the pins on the jetson nano)
+    # Update and Upgrade the System
+    cd /path/to/your/GitHub/or/other/code/folder
+    sudo apt-get update
+    sudo apt-get upgrade
+
+    # Install Required Packages
+    sudo apt-get install cmake g++ python3-dev
+
+    # Clone the JetsonGPIO Repository
+    git clone https://github.com/pjueon/JetsonGPIO.git
+    cd JetsonGPIO
+
+    # Build the Library
+    mkdir build
+    cd build
+    cmake ..
+    make
+    sudo make install
 
 ## CMakeLists explanation
 
@@ -27,6 +49,43 @@ This folder contains the code for the Squirrel Defender and most of its dependen
 5. Execute `sudo ./squirreldefender` to run the program
 6. Execute `./unit_tests` to run the unit tests
 7. If the video doesn't display on your monitor, try executing `sudo systemctl restart nvargus-daemon`
+
+## To have this program run when the jetson nano powers on create a systemd service
+    # Create a .service file (one is already included in this folder so you can just copy that)
+    sudo nano /etc/systemd/system/squirrel_defender.service
+
+    # Here's what the file looks like anyways:
+        [Unit]
+        Description=Squirrel Defender program
+        After=network.target nvargus-daemon.service
+
+        [Service]
+        Type=simple
+        ExecStartPre=/bin/systemctl restart nvargus-daemon.service
+        ExecStart=<path-to-exe>/squirreldefender
+        WorkingDirectory=<path-to-build-folder>//SquirrelDefender/build
+        StandardOutput=journal
+        SandardError=journal
+        Restart=always
+        User=root
+
+        [Install]
+        WantedBy=multi-user.target                
+    
+    # Save the file and reload the daemon
+    sudo systemctl daemon-reload
+
+    # Enable the service
+    sudo systemctl enable squirrel_defender.service
+
+    # Start the service
+    sudo systemctl start squirrel_defender.service
+    
+    # Restart the service
+    sudo systemctl restart squirrel_defender.service
+
+    # Check status of the service
+    sudo systemctl status squirrel_defender.service
 
 ## Folder structure
 

@@ -1,48 +1,51 @@
 #pragma once
 
+#ifdef USE_JETSON
+
 /********************************************************************************
- * @file    system_controller.h
+ * @file    jetson_IO.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef SYSTEM_CONTROLLER_H
-#define SYSTEM_CONTROLLER_H
+#ifndef JETSON_IO_H
+#define JETSON_IO_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "mavlink_msg_handler.h"
-#include "video_IO.h"
-#include "jetson_IO.h"
+#include <JetsonGPIO.h>
+#include <thread>
+#include <chrono>
+#include <unistd.h>
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern bool valid_image_rcvd;
-extern float dt_25ms;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern SYSTEM_STATE system_state;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class SystemController
+class StatusIndicators
 {
 public:
-    SystemController();
-    ~SystemController();
+    StatusIndicators();
+    ~StatusIndicators();
 
-    static int system_init(void);
-    static void system_control_loop(void);
-    static void system_shutdown(void);
-    static int system_state_machine(void);
-    static void led_system_indicators(void);
+    static bool gpio_init(void);
+    static void gpio_shutdown(void);
+    static void status_initializing(void);
+    static void status_good(void);
+    static void status_bad(void);
+    static void status_bad_blink(void);
+    static void clear_all_leds(void);
 
 private:
 };
 
-#endif // SYSTEM_CONTROLLER_H
+#endif // JETSON_IO_H
+
+#endif // USE_JETSON

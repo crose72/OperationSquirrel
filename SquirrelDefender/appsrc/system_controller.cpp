@@ -67,17 +67,24 @@ int SystemController::system_init(void)
 
 #ifdef USE_JETSON
 
+    StatusIndicators::gpio_init();
+    StatusIndicators::status_initializing();
+
     if (!Video::video_init() ||
         !Detection::detection_net_init() ||
         !Follow::follow_target_init())
     {
+        StatusIndicators::status_bad_blink();
         return 1;
     }
 
 #endif // USE_JETSON
 
+    StatusIndicators::status_initializing();
+
     if (!MavMsg::mav_comm_init())
     {
+        StatusIndicators::status_bad_blink();
         return 1;
     }
 
@@ -148,6 +155,40 @@ int SystemController::system_state_machine(void)
     }
 
     // SysStat.cpp_cout("System State: " + std::to_string(system_state));
+}
+
+/********************************************************************************
+ * Function: led_system_indicators
+ * Description: Control external leds to describe the system state.
+ ********************************************************************************/
+void SystemController::led_system_indicators(void)
+{
+    if (system_state == SYSTEM_STATE::DEFAULT ||
+        system_state == SYSTEM_STATE::INIT ||
+        system_state == SYSTEM_STATE::PRE_ARM_GOOD ||
+        system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
+    {
+        StatusIndicators::status_good();
+    }
+    else
+    {
+        StatusIndicators::status_good();
+    }
+}
+
+/********************************************************************************
+ * Function: system_control_loop
+ * Description: Main loop for functions that monitor and control system states.
+ ********************************************************************************/
+void SystemController::system_control_loop(void)
+{
+    system_state_machine();
+
+#ifdef USE_JETSON
+
+    led_system_indicators();
+
+#endif // USE_JETSON
 }
 
 /********************************************************************************

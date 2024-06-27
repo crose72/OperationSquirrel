@@ -104,7 +104,7 @@ int main(void)
     {
         std::lock_guard<std::mutex> lock(mutex);
         MainAppTime.calc_elapsed_time();
-        SystemController::system_state_machine();
+        SystemController::system_control_loop();
         MavMsg::mav_comm_loop();
 
 #ifdef USE_JETSON

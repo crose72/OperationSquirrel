@@ -8,6 +8,10 @@ project(SquirrelDefender)
 option(USE_JETSON "Enable Jetson Nano specific features" ON)
 option(USE_WSL "Enable WSL specific features" OFF)
 
+# Set the C++ standard
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
 # Set the policy for IN_LIST support
 if(POLICY CMP0057)
   cmake_policy(SET CMP0057 NEW)
@@ -144,6 +148,9 @@ include_directories(/usr/include/gstreamer-1.0/)
 include_directories(/usr/include/glib-2.0/)
 include_directories(/usr/lib/aarch64-linux-gnu/glib-2.0/include/)
 
+# GPIO includes
+include_directories(/usr/local/include/JetsonGPIO)
+
 # Jetson-specific configurations
 if (USE_JETSON)
     # Import jetson-inference and jetson-utils packages
@@ -161,6 +168,9 @@ if (USE_JETSON)
     pkg_check_modules(GLIB REQUIRED glib-2.0)
     pkg_check_modules(GOBJECT REQUIRED gobject-2.0)
     pkg_check_modules(GST_APP REQUIRED gstreamer-app-1.0)
+
+    # Find the JetsonGPIO library
+    find_library(JETSON_GPIO_LIB JetsonGPIO)
 
     # Include directories for GStreamer and GLib
     include_directories(${GST_INCLUDE_DIRS})
@@ -224,7 +234,8 @@ if (USE_JETSON)
         ${GST_LIBRARIES} 
         ${GLIB_LIBRARIES} 
         ${GOBJECT_LIBRARIES} 
-        ${GST_APP_LIBRARIES})
+        ${GST_APP_LIBRARIES}
+        ${JETSON_GPIO_LIB})
 elseif(USE_WSL)
     add_executable(squirreldefender ${SOURCES} ${HEADERS})
 endif()

@@ -19,7 +19,7 @@
 #include "global_calibrations.h"
 #include "global_types.h"
 
-// Custom libraries 
+// Custom libraries
 #include "time_calc.h"
 #include "debugger.h"
 
