@@ -71,8 +71,8 @@ bool Video::create_input_video_stream(void)
     options.frameRate = 30;
     options.numBuffers = 4;
     options.zeroCopy = true;
-    //options.flipMethod = videoOptions::FlipMethod::FLIP_NONE; // if using IMX219-83 stereo camera
-    options.flipMethod = videoOptions::FlipMethod::FLIP_ROTATE_180; // if using IMX219-160 stereo camera
+    options.flipMethod = videoOptions::FlipMethod::FLIP_NONE; // if using IMX219-83 stereo camera
+    // options.flipMethod = videoOptions::FlipMethod::FLIP_ROTATE_180; // if using IMX219-160 stereo camera
 
     input = videoSource::Create(options);
 

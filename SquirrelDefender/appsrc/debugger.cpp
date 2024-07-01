@@ -50,7 +50,7 @@ DebugTerm::DebugTerm(const std::string &terminal) : debug_terminal(terminal), us
 #ifdef DEBUG_BUILD
     if (!debug_terminal.is_open())
     {
-        PrintPass::cpp_cerr("Failed to open terminal: " + terminal);
+        // PrintPass::cpp_cerr("Failed to open terminal: " + terminal);
         use_default_term = true;
     }
 #endif
