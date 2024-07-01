@@ -71,7 +71,8 @@ bool Video::create_input_video_stream(void)
     options.frameRate = 30;
     options.numBuffers = 4;
     options.zeroCopy = true;
-    options.flipMethod = videoOptions::FlipMethod::FLIP_NONE;
+    //options.flipMethod = videoOptions::FlipMethod::FLIP_NONE; // if using IMX219-83 stereo camera
+    options.flipMethod = videoOptions::FlipMethod::FLIP_ROTATE_180; // if using IMX219-160 stereo camera
 
     input = videoSource::Create(options);
 
@@ -126,8 +127,9 @@ bool Video::create_output_video_stream(void)
 bool Video::capture_image(void)
 {
     int status = 0;
+    uchar3 *temp_image = NULL;
 
-    if (!input->Capture(&image, &status))
+    if (!input->Capture(&temp_image, &status))
     {
         if (status != videoSource::TIMEOUT)
         {
@@ -136,12 +138,13 @@ bool Video::capture_image(void)
     }
 
     // Checking for valid image, Capture may return true while image may still be NULL
-    if (image == NULL)
+    if (temp_image == NULL)
     {
         valid_image_rcvd = false;
         return false; // Return false if the image is not valid
     }
 
+    image = temp_image;
     valid_image_rcvd = true;
 
     return true;
@@ -211,7 +214,7 @@ bool Video::video_init(void)
     valid_image_rcvd = false;
     image = NULL;
 
-    #ifdef DEBUG_BUILD
+#ifdef DEBUG_BUILD
 
     if (!create_input_video_stream() ||
         !create_output_video_stream())
@@ -219,16 +222,14 @@ bool Video::video_init(void)
         return false;
     }
 
-    #else
+#else
 
     if (!create_input_video_stream())
     {
         return false;
     }
 
-    #endif // DEBUG_BUILD
-
-
+#endif // DEBUG_BUILD
 
     calc_video_res();
 

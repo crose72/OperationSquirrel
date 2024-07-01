@@ -94,13 +94,17 @@ void Detection::detect_objects(void)
 
     overlay_flags = overlay_flags | detectNet::OVERLAY_LABEL | detectNet::OVERLAY_CONFIDENCE | detectNet::OVERLAY_TRACKING | detectNet::OVERLAY_LINES;
 
-    if (overlay_flags > 0)
+    if (overlay_flags > 0 && image != NULL)
     {
         numDetections = net->Detect(image, input->GetWidth(), input->GetHeight(), &detections, overlay_flags);
     }
-    else
+    else if (image != NULL)
     {
         numDetections = net->Detect(image, input->GetWidth(), input->GetHeight(), &detections);
+    }
+    else
+    {
+        // No other options
     }
 }
 
