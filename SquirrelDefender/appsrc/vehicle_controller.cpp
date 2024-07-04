@@ -154,7 +154,7 @@ void VehicleController::vehicle_control_loop(void)
     {
 #ifdef USE_JETSON
 
-        // follow_mode();
+        follow_mode();
 
 #elif USE_WSL
 
