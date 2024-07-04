@@ -77,6 +77,8 @@ RNGFND1_SCALING  10
 RNGFND1_PIN      0
 RNGFND1_MAX_CM   4000
 RNGFND1_MIN_CM   0
+SIM_FLOW_ENABLE  1
+FLOW_TYPE       10
 # flightmodes
 # switch 1 Circle
 # switch 2 LAND
