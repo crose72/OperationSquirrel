@@ -101,6 +101,8 @@ Follow::~Follow(void){};
  ********************************************************************************/
 void Follow::get_control_params(void)
 {
+#ifdef DEBUG_BUILD
+
     Parameters veh_params("../params.json");
     // Accessing Vel_PID_x parameters
     Kp_x = veh_params.get_float_param("Vel_PID_x", "Kp");
@@ -133,6 +135,42 @@ void Follow::get_control_params(void)
     w1_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "w1");
     w2_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "w2");
     w3_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "w3");
+
+#else
+
+    // Vel_PID_x parameters for forward movement
+    Kp_x = 0.02;
+    Ki_x = 0.0;
+    Kd_x = 0.0;
+    w1_x = 0.5;
+    w2_x = 0.5;
+    w3_x = 0.0;
+
+    // Vel_PID_y parameters for forward movement
+    Kp_y = 0.0001;
+    Ki_y = 0.0;
+    Kd_y = 0.0;
+    w1_y = 0.0;
+    w2_y = 0.0;
+    w3_y = 0.0;
+
+    // Vel_PID_x parameters for reverse movement
+    Kp_x_rev = 0.01;
+    Ki_x_rev = 0.0;
+    Kd_x_rev = 0.0;
+    w1_x_rev = 1.0;
+    w2_x_rev = 0.0;
+    w3_x_rev = 0.0;
+
+    // Vel_PID_y parameters for reverse movement
+    Kp_y_rev = 0.001;
+    Ki_y_rev = 0.0;
+    Kd_y_rev = 0.0;
+    w1_y_rev = 1.0;
+    w2_y_rev = 0.0;
+    w3_y_rev = 0.0;
+
+#endif
 }
 
 /********************************************************************************
@@ -259,10 +297,10 @@ void Follow::follow_control_loop(void)
 
             vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev,
                                                   target_height_err, 0.0, 0.0,
-                                                  w1_x_rev, w2_x_rev, 0.0, CONTROL_DIM::X);
+                                                  w1_x_rev, 0.0, 0.0, CONTROL_DIM::X);
             vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev,
                                                   y_centroid_err, 0.0, 0.0,
-                                                  w1_y_rev, w2_y_rev, 0.0, CONTROL_DIM::Y);
+                                                  w1_y_rev, 0.0, 0.0, CONTROL_DIM::Y);
         }
         else
         {
@@ -270,10 +308,10 @@ void Follow::follow_control_loop(void)
 
             vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
                                                     x_centroid_err, target_height_err, 0.0,
-                                                    w1_x, w2_x, w3_x, CONTROL_DIM::X);
+                                                    w1_x, w2_x, 0.0, CONTROL_DIM::X);
             vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
                                                     y_centroid_err, 0.0, 0.0,
-                                                    w1_y, w2_y, w3_y, CONTROL_DIM::Y);
+                                                    w1_y, 0.0, 0.0, CONTROL_DIM::Y);
         }
     }
 }
