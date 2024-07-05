@@ -22,6 +22,8 @@
 #include <jetson-inference/objectTrackerIOU.h>
 #include "object_detection.h"
 #include <signal.h>
+#include <string>
+#include <fstream>
 
 /********************************************************************************
  * Imported objects
@@ -32,7 +34,6 @@
  ********************************************************************************/
 extern bool valid_image_rcvd;
 extern videoSource *input;
-extern videoOutput *output;
 extern uchar3 *image;
 extern detectNet *net;
 extern uint32_t input_video_width;
@@ -49,12 +50,14 @@ public:
 
     static bool video_init(void);
     static bool create_input_video_stream(void);
-    static bool create_output_video_stream(void);
+    static bool create_output_vid_stream(void);
+    static bool create_display_video_stream(void);
     static void video_proc_loop(void);
     static void video_output_loop(void);
     static void shutdown(void);
     static bool capture_image(void);
-    static bool render_output(void);
+    static bool save_video(void);
+    static bool display_video(void);
     static void calc_video_res(void);
     static void delete_input_video_stream(void);
     static void delete_output_video_stream(void);

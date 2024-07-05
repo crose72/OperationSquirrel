@@ -4,7 +4,7 @@
  * @file    videoIO.cpp
  * @author  Cameron Rose
  * @date    5/22/2024
- * @brief   Configure and start video streams, and output video for other
+ * @brief   Configure and start video streams, and output_vid_disp video for other
             software components.
  ********************************************************************************/
 
@@ -26,12 +26,11 @@
  ********************************************************************************/
 bool valid_image_rcvd;
 videoSource *input;
-videoOutput *output;
+videoOutput *output_vid_file;
+videoOutput *output_vid_disp;
 uchar3 *image;
 uint32_t input_video_width;
 uint32_t input_video_height;
-GstElement *pipeline;
-GstBus *bus;
 
 /********************************************************************************
  * Calibration definitions
@@ -66,8 +65,8 @@ bool Video::create_input_video_stream(void)
     options.resource.location = "0";
     options.deviceType = videoOptions::DeviceType::DEVICE_CSI;
     options.ioType = videoOptions::IoType::INPUT;
-    options.width = 1280;
-    options.height = 720;
+    options.width = 1280; // 1280 for imx219-83
+    options.height = 720; // 720 for imx219-83
     options.frameRate = 30;
     options.numBuffers = 4;
     options.zeroCopy = true;
@@ -86,11 +85,75 @@ bool Video::create_input_video_stream(void)
 }
 
 /********************************************************************************
- * Function: create_output_video
- * Description: Create an output video stream from the input video stream
+ * Function: file_exists
+ * Description: Return true if file name already exists.
+ ********************************************************************************/
+bool file_exists(const std::string &name)
+{
+    std::ifstream f(name.c_str());
+    return f.good();
+}
+
+/********************************************************************************
+ * Function: generate_unique_file_name
+ * Description: Generate a unique file name by incrementing the name by 1.
+ ********************************************************************************/
+std::string generate_unique_file_name(const std::string &base_name, const std::string &extension)
+{
+    std::string file_name = base_name + extension;
+    int index = 1;
+
+    while (file_exists(file_name))
+    {
+        file_name = base_name + "_" + std::to_string(index) + extension;
+        index++;
+    }
+
+    return file_name;
+}
+
+/********************************************************************************
+ * Function: create_output_vid_stream
+ * Description: Create an output video stream to save to a file
+ ********************************************************************************/
+bool Video::create_output_vid_stream(void)
+{
+    std::string base_path = "file:///home/crose72/Documents/GitHub/OperationSquirrel/SquirrelDefender/build/";
+    std::string base_name = "output";
+    std::string extension = ".mp4";
+    std::string file_name = generate_unique_file_name(base_name, extension);
+
+    videoOptions options;
+
+    options.resource = base_path + file_name;
+    options.resource.protocol = "file";
+    options.resource.location = file_name;
+    options.deviceType = videoOptions::DeviceType::DEVICE_FILE;
+    options.ioType = videoOptions::IoType::OUTPUT;
+    options.codec = videoOptions::Codec::CODEC_H264;
+    options.codecType = videoOptions::CodecType::CODEC_OMX;
+    options.width = 1280;
+    options.height = 720;
+    options.frameRate = 30;
+    options.zeroCopy = true;
+
+    output_vid_file = videoOutput::Create(options);
+
+    if (!output_vid_file)
+    {
+        LogError("detectnet:  failed to create output_vid_file stream\n");
+        return false;
+    }
+
+    return true;
+}
+
+/********************************************************************************
+ * Function: create_display_video_stream
+ * Description: Create an output_vid_disp video stream from the input video stream
  *			   for displaying and passing to other software components.
  ********************************************************************************/
-bool Video::create_output_video_stream(void)
+bool Video::create_display_video_stream(void)
 {
     videoOptions options;
 
@@ -99,22 +162,18 @@ bool Video::create_output_video_stream(void)
     options.resource.location = "0";
     options.deviceType = videoOptions::DeviceType::DEVICE_DISPLAY;
     options.ioType = videoOptions::IoType::OUTPUT;
-    options.width = 1280;
-    options.height = 720;
+    options.width = 1920;  // 1280 for imx219-83
+    options.height = 1080; // 720 for imx219-83
     options.frameRate = 30;
     options.numBuffers = 4;
     options.zeroCopy = true;
 
-    output = videoOutput::Create(options);
+    output_vid_disp = videoOutput::Create(options);
 
-    if (!output)
+    if (!output_vid_disp)
     {
-        LogError("detectnet:  failed to create output stream\n");
+        LogError("detectnet:  failed to create output_vid_disp stream\n");
         return false;
-    }
-
-    if (!output->Open())
-    {
     }
 
     return true;
@@ -151,23 +210,51 @@ bool Video::capture_image(void)
 }
 
 /********************************************************************************
- * Function: render_output
+ * Function: save_video
+ * Description: Save video to a file
+ ********************************************************************************/
+bool Video::save_video(void)
+{
+    // render output_vid_disp to the display
+    if (output_vid_file != NULL)
+    {
+        output_vid_file->Render(image, input->GetWidth(), input->GetHeight());
+
+        /*
+        // update the status bar
+        char str[256];
+        sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(net->GetPrecision()), net->GetNetworkFPS());
+        output_vid_file->SetStatus(str);
+        */
+
+        // check if the user quit
+        if (!output_vid_file->IsStreaming())
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/********************************************************************************
+ * Function: display_video
  * Description: Display the image on the screen.
  ********************************************************************************/
-bool Video::render_output(void)
+bool Video::display_video(void)
 {
-    // render output to the display
-    if (output != NULL)
+    // render output_vid_disp to the display
+    if (output_vid_disp != NULL)
     {
-        output->Render(image, input->GetWidth(), input->GetHeight());
+        output_vid_disp->Render(image, input->GetWidth(), input->GetHeight());
 
         // update the status bar
         char str[256];
         sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(net->GetPrecision()), net->GetNetworkFPS());
-        output->SetStatus(str);
+        output_vid_disp->SetStatus(str);
 
         // check if the user quit
-        if (!output->IsStreaming())
+        if (!output_vid_disp->IsStreaming())
         {
             return false;
         }
@@ -201,7 +288,16 @@ void Video::delete_input_video_stream(void)
  ********************************************************************************/
 void Video::delete_output_video_stream(void)
 {
-    SAFE_DELETE(output);
+#ifdef DEBUG_BUILD
+
+    SAFE_DELETE(output_vid_file);
+    SAFE_DELETE(output_vid_disp);
+
+#else
+
+    SAFE_DELETE(output_vid_file);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -217,14 +313,16 @@ bool Video::video_init(void)
 #ifdef DEBUG_BUILD
 
     if (!create_input_video_stream() ||
-        !create_output_video_stream())
+        !create_output_vid_stream() ||
+        !create_display_video_stream())
     {
         return false;
     }
 
 #else
 
-    if (!create_input_video_stream())
+    if (!create_input_video_stream() ||
+        !!create_output_vid_stream())
     {
         return false;
     }
@@ -251,7 +349,16 @@ void Video::video_proc_loop(void)
  ********************************************************************************/
 void Video::video_output_loop(void)
 {
-    render_output();
+#ifdef DEBUG_BUILD
+
+    display_video();
+    save_video();
+
+#else
+
+    save_video();
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************

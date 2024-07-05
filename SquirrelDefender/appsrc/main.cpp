@@ -93,6 +93,7 @@ void app_first_init(void)
 int main(void)
 {
     MainAppTime.calc_app_start_time();
+    attach_sig_handler();
     stop_program = false;
 
     if (SystemController::system_init() != 0)
@@ -112,12 +113,7 @@ int main(void)
         Video::video_proc_loop();
         Detection::detection_loop();
         VehicleController::vehicle_control_loop();
-
-#ifdef DEBUG_BUILD
-
         Video::video_output_loop();
-
-#endif // DEBUG_BUILD
 
 #endif // USE_JETSON
 
@@ -128,10 +124,10 @@ int main(void)
     }
 
 #ifdef USE_JETSON
-    /*
+
     Video::shutdown();
     Detection::shutdown();
-    */
+
 #endif // USE_JETSON
 
     MavMsg::mav_comm_shutdown();
