@@ -14,6 +14,7 @@
 #include "system_controller.h"
 #include "mavlink_msg_handler.h"
 #include "mavlink_cmd_handler.h"
+#include "datalog.h"
 
 #ifdef USE_JETSON
 #include "video_IO.h"
@@ -82,7 +83,8 @@ int SystemController::system_init(void)
 
     StatusIndicators::status_initializing();
 
-    if (!MavMsg::mav_comm_init())
+    if (!MavMsg::mav_comm_init() ||
+        !DataLogger::data_log_init())
     {
         StatusIndicators::status_bad_blink();
         return 1;

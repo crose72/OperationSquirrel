@@ -22,9 +22,9 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool headingsWritten = false;
+bool headings_written = false;
 std::string dataFileName = "data";
-std::string unusedDataFileName = "";
+std::string file_name = "";
 std::vector<std::vector<std::string>> data = {};
 
 /********************************************************************************
@@ -36,113 +36,63 @@ std::vector<std::vector<std::string>> data = {};
  ********************************************************************************/
 
 /********************************************************************************
- * Function: toString
- * Description: Convert a value to a string (float, integer, etc.)..
+ * Function: DataLogger
+ * Description: Class constructor
  ********************************************************************************/
-template <typename T>
-std::string toString(const T& value) 
+DataLogger::DataLogger(){};
+
+/********************************************************************************
+ * Function: ~DataLogger
+ * Description: Class destructor
+ ********************************************************************************/
+DataLogger::~DataLogger(){};
+
+/********************************************************************************
+ * Function: generate_unique_filename
+ * Description: If file exists, append an incremented number to the file name.
+ ********************************************************************************/
+std::string DataLogger::generate_unique_filename(const std::string &filename)
 {
-    std::ostringstream oss;
-    oss << value;
-    return oss.str();
+    int counter = 1;
+    std::string new_file_name = filename + ".csv"; // Add .csv extension initially
+    std::ifstream file(new_file_name);
+
+    while (file.is_open() == true)
+    {
+        file.close();
+        // If the file exists, append the counter number and try again
+        new_file_name = filename + "_" + std::to_string(counter++) + ".csv";
+        file.open(new_file_name);
+    }
+
+    return new_file_name;
 }
 
 /********************************************************************************
- * Function: logData
- * Description: Determine when to log flight data and then log it.
- ********************************************************************************/
-void logData(void)
-{
-    if (first_loop_after_start == true)
-    {
-        unusedDataFileName = checkAndAppendFileName(dataFileName);
-    }
-
-    if (headingsWritten == false)
-    {
-        // Heading row
-        data.push_back({"Time",
-                        "Latitude",
-                        "Longtitude",
-                        "Altitude",
-                        "Relative Altitude",
-                        "GPS Vx",
-                        "GPS Vy",
-                        "GPS Vz",
-                        "Heading",
-                        "Roll",
-                        "Pitch",
-                        "Yaw",
-                        "Rollspeed",
-                        "Pitchspeed",
-                        "YawSpeed",
-                        "Accel X",
-                        "Accel Y",
-                        "Accel Z",
-                        "Gyro X",
-                        "Gyro Y",
-                        "Gyro Z",
-                        "Magnetic Field X",
-                        "Magnetic Field Y",
-                        "Magnetic Field Z"});
-        writeToCSV(unusedDataFileName, data);
-        headingsWritten = true;
-    }
-
-    // Clear data vector and write to next row
-    data.clear();
-    data.push_back({{toString(app_elapsed_time),
-                     toString(mav_veh_lat),
-                     toString(mav_veh_lon),
-                     toString(mav_veh_alt),
-                     toString(mav_veh_rel_alt),
-                     toString(mav_veh_gps_vx),
-                     toString(mav_veh_gps_vy),
-                     toString(mav_veh_gps_vz),
-                     toString(mav_veh_gps_hdg),
-                     toString(mav_veh_roll),
-                     toString(mav_veh_pitch),
-                     toString(mav_veh_yaw),
-                     toString(mav_veh_rollspeed),
-                     toString(mav_veh_pitchspeed),
-                     toString(mav_veh_yawspeed),
-                     toString(mav_veh_imu_ax),
-                     toString(mav_veh_imu_ay),
-                     toString(mav_veh_imu_az),
-                     toString(mav_veh_imu_xgyro),
-                     toString(mav_veh_imu_ygyro),
-                     toString(mav_veh_imu_zgyro),
-                     toString(mav_veh_imu_xmag),
-                     toString(mav_veh_imu_ymag),
-                     toString(mav_veh_imu_zmag)}});
-    writeToCSV(unusedDataFileName, data);
-}
-
-/********************************************************************************
- * Function: writeToCSV
+ * Function: save_to_csv
  * Description: Write the data passed to this function into a CSV.
  ********************************************************************************/
-void writeToCSV(const std::string& filename, const std::vector<std::vector<std::string>>& data) 
+void DataLogger::save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data)
 {
     std::ofstream outFile(filename, std::ios_base::app); // Open in append mode
-    if (!outFile.is_open()) 
+    if (!outFile.is_open())
     {
         std::cerr << "Error: Unable to open file '" << filename << "'" << std::endl;
         return;
     }
 
     // Write data to the file, column-wise
-    if (!data.empty()) 
+    if (!data.empty())
     {
         size_t numRows = data.size();
         size_t numCols = data[0].size();
 
-        for (size_t row = 0; row < numRows; ++row) 
+        for (size_t row = 0; row < numRows; ++row)
         {
-            for (size_t col = 0; col < numCols; ++col) 
+            for (size_t col = 0; col < numCols; ++col)
             {
                 outFile << data[row][col];
-                if (col < numCols - 1) 
+                if (col < numCols - 1)
                 {
                     outFile << ',';
                 }
@@ -152,27 +102,197 @@ void writeToCSV(const std::string& filename, const std::vector<std::vector<std::
     }
 
     outFile.close();
-    // std::cout << "File " << filename << " written successfully." << std::endl;
 }
 
 /********************************************************************************
- * Function: checkAndAppendFileName
- * Description: Search for existing file name and increment the file number to 1
- *              greater than the highest existing file number.
+ * Function: data_log_init
+ * Description: Initialize data log variables and files.
  ********************************************************************************/
-std::string checkAndAppendFileName(const std::string& filename) 
+bool DataLogger::data_log_init(void)
 {
-    int counter = 1;
-    std::string newFilename = filename + ".csv"; // Add .csv extension initially
-    std::ifstream file(newFilename);
+    file_name = generate_unique_filename(dataFileName);
+    data.push_back({"Time",
+                    "Onboard Control Sensors Present",
+                    "Onboard Control Sensors Enabled",
+                    "Onboard Control Sensors Health",
+                    "System Load",
+                    "Voltage Battery",
+                    "Current Battery",
+                    "Drop Rate Comm",
+                    "Errors Comm",
+                    "Errors Count 1",
+                    "Errors Count 2",
+                    "Errors Count 3",
+                    "Errors Count 4",
+                    "Battery Remaining",
+                    "Onboard Control Sensors Present Extended",
+                    "Onboard Control Sensors Enabled Extended",
+                    "Onboard Control Sensors Health Extended",
+                    "Custom Mode",
+                    "Vehicle Type",
+                    "Autopilot Type",
+                    "Base Mode",
+                    "Vehicle State",
+                    "MAVLink Version",
+                    "Latitude",
+                    "Longitude",
+                    "Altitude",
+                    "Relative Altitude",
+                    "GPS Vx",
+                    "GPS Vy",
+                    "GPS Vz",
+                    "GPS Heading",
+                    "Roll",
+                    "Pitch",
+                    "Yaw",
+                    "Rollspeed",
+                    "Pitchspeed",
+                    "Yawspeed",
+                    "IMU Accel X",
+                    "IMU Accel Y",
+                    "IMU Accel Z",
+                    "IMU Gyro X",
+                    "IMU Gyro Y",
+                    "IMU Gyro Z",
+                    "IMU Mag X",
+                    "IMU Mag Y",
+                    "IMU Mag Z",
+                    "Target Quaternion 1",
+                    "Target Quaternion 2",
+                    "Target Quaternion 3",
+                    "Target Quaternion 4",
+                    "Target Roll Rate",
+                    "Target Pitch Rate",
+                    "Target Yaw Rate",
+                    "Target Thrust",
+                    "Actual Quaternion 1",
+                    "Actual Quaternion 2",
+                    "Actual Quaternion 3",
+                    "Actual Quaternion 4",
+                    "Actual Roll Rate",
+                    "Actual Pitch Rate",
+                    "Actual Yaw Rate",
+                    "Actual Thrust",
+                    "Rangefinder Min Distance",
+                    "Rangefinder Max Distance",
+                    "Rangefinder Current Distance",
+                    "Rangefinder Type",
+                    "Rangefinder ID",
+                    "Rangefinder Orientation",
+                    "Rangefinder Covariance",
+                    "Rangefinder Horizontal FOV",
+                    "Rangefinder Vertical FOV",
+                    "Rangefinder Quaternion 1",
+                    "Rangefinder Quaternion 2",
+                    "Rangefinder Quaternion 3",
+                    "Rangefinder Quaternion 4",
+                    "Rangefinder Signal Quality",
+                    "Optical Flow Compensated X",
+                    "Optical Flow Compensated Y",
+                    "Ground Distance",
+                    "Optical Flow X",
+                    "Optical Flow Y",
+                    "Sensor ID",
+                    "Optical Flow Quality",
+                    "Flow Rate X",
+                    "Flow Rate Y"});
+    save_to_csv(file_name, data);
 
-    while (file.is_open() == true) 
-    {
-        file.close();
-        // If the file exists, append the counter number and try again
-        newFilename = filename + "_" + std::to_string(counter++) + ".csv";
-        file.open(newFilename);
-    }
+    return true;
+}
 
-    return newFilename;
+/********************************************************************************
+ * Function: data_log_loop
+ * Description: Log data.
+ ********************************************************************************/
+void DataLogger::data_log_loop(void)
+{
+    // Clear data vector and write to next row
+    data.clear();
+    data.push_back({{std::to_string(app_elapsed_time),
+                     std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_present),
+                     std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled),
+                     std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_health),
+                     std::to_string(mav_veh_sys_stat_load),
+                     std::to_string(mav_veh_sys_stat_voltage_battery),
+                     std::to_string(mav_veh_sys_stat_current_battery),
+                     std::to_string(mav_veh_sys_stat_drop_rate_comm),
+                     std::to_string(mav_veh_sys_stat_errors_comm),
+                     std::to_string(mav_veh_sys_stat_errors_count1),
+                     std::to_string(mav_veh_sys_stat_errors_count2),
+                     std::to_string(mav_veh_sys_stat_errors_count3),
+                     std::to_string(mav_veh_sys_stat_errors_count4),
+                     std::to_string(mav_veh_sys_stat_battery_remaining),
+                     std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd),
+                     std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd),
+                     std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd),
+                     std::to_string(mav_veh_custom_mode),
+                     std::to_string(mav_veh_type),
+                     std::to_string(mav_veh_autopilot_type),
+                     std::to_string(mav_veh_base_mode),
+                     std::to_string(mav_veh_state),
+                     std::to_string(mav_veh_mavlink_version),
+                     std::to_string(mav_veh_lat),
+                     std::to_string(mav_veh_lon),
+                     std::to_string(mav_veh_alt),
+                     std::to_string(mav_veh_rel_alt),
+                     std::to_string(mav_veh_gps_vx),
+                     std::to_string(mav_veh_gps_vy),
+                     std::to_string(mav_veh_gps_vz),
+                     std::to_string(mav_veh_gps_hdg),
+                     std::to_string(mav_veh_roll),
+                     std::to_string(mav_veh_pitch),
+                     std::to_string(mav_veh_yaw),
+                     std::to_string(mav_veh_rollspeed),
+                     std::to_string(mav_veh_pitchspeed),
+                     std::to_string(mav_veh_yawspeed),
+                     std::to_string(mav_veh_imu_ax),
+                     std::to_string(mav_veh_imu_ay),
+                     std::to_string(mav_veh_imu_az),
+                     std::to_string(mav_veh_imu_xgyro),
+                     std::to_string(mav_veh_imu_ygyro),
+                     std::to_string(mav_veh_imu_zgyro),
+                     std::to_string(mav_veh_imu_xmag),
+                     std::to_string(mav_veh_imu_ymag),
+                     std::to_string(mav_veh_imu_zmag),
+                     std::to_string(mav_veh_q1_target),
+                     std::to_string(mav_veh_q2_target),
+                     std::to_string(mav_veh_q3_target),
+                     std::to_string(mav_veh_q4_target),
+                     std::to_string(mav_veh_roll_rate_target),
+                     std::to_string(mav_veh_pitch_rate_target),
+                     std::to_string(mav_veh_yaw_rate_target),
+                     std::to_string(mav_veh_thrust_target),
+                     std::to_string(mav_veh_q1_actual),
+                     std::to_string(mav_veh_q2_actual),
+                     std::to_string(mav_veh_q3_actual),
+                     std::to_string(mav_veh_q4_actual),
+                     std::to_string(mav_veh_roll_rate_actual),
+                     std::to_string(mav_veh_pitch_rate_actual),
+                     std::to_string(mav_veh_yaw_rate_actual),
+                     std::to_string(mav_veh_thrust_actual),
+                     std::to_string(mav_veh_rngfdr_min_distance),
+                     std::to_string(mav_veh_rngfdr_max_distance),
+                     std::to_string(mav_veh_rngfdr_current_distance),
+                     std::to_string(mav_veh_rngfdr_type),
+                     std::to_string(mav_veh_rngfdr_id),
+                     std::to_string(mav_veh_rngfdr_orientation),
+                     std::to_string(mav_veh_rngfdr_covariance),
+                     std::to_string(mav_veh_rngfdr_horizontal_fov),
+                     std::to_string(mav_veh_rngfdr_vertical_fov),
+                     std::to_string(mav_veh_rngfdr_quaternion[0]),
+                     std::to_string(mav_veh_rngfdr_quaternion[1]),
+                     std::to_string(mav_veh_rngfdr_quaternion[2]),
+                     std::to_string(mav_veh_rngfdr_quaternion[3]),
+                     std::to_string(mav_veh_rngfdr_signal_quality),
+                     std::to_string(mav_veh_flow_comp_m_x),
+                     std::to_string(mav_veh_flow_comp_m_y),
+                     std::to_string(mav_veh_ground_distance),
+                     std::to_string(mav_veh_flow_x),
+                     std::to_string(mav_veh_flow_y),
+                     std::to_string(mav_veh_sensor_id),
+                     std::to_string(mav_veh_quality),
+                     std::to_string(mav_veh_flow_rate_x),
+                     std::to_string(mav_veh_flow_rate_y)}});
+    save_to_csv(file_name, data);
 }

@@ -150,7 +150,7 @@ void Follow::get_control_params(void)
     Kp_y = 0.0001;
     Ki_y = 0.0;
     Kd_y = 0.0;
-    w1_y = 0.0;
+    w1_y = 1.0;
     w2_y = 0.0;
     w3_y = 0.0;
 

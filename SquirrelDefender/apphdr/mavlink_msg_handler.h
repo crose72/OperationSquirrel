@@ -106,6 +106,28 @@ extern float mav_veh_pitch_rate_actual;
 extern float mav_veh_yaw_rate_actual;
 extern float mav_veh_thrust_actual;
 
+extern uint16_t mav_veh_rngfdr_min_distance;
+extern uint16_t mav_veh_rngfdr_max_distance;
+extern uint16_t mav_veh_rngfdr_current_distance;
+extern uint8_t mav_veh_rngfdr_type;
+extern uint8_t mav_veh_rngfdr_id;
+extern uint8_t mav_veh_rngfdr_orientation;
+extern uint8_t mav_veh_rngfdr_covariance;
+extern float mav_veh_rngfdr_horizontal_fov;
+extern float mav_veh_rngfdr_vertical_fov;
+extern float mav_veh_rngfdr_quaternion[4];
+extern uint8_t mav_veh_rngfdr_signal_quality;
+
+extern float mav_veh_flow_comp_m_x;
+extern float mav_veh_flow_comp_m_y;
+extern float mav_veh_ground_distance;
+extern int16_t mav_veh_flow_x;
+extern int16_t mav_veh_flow_y;
+extern uint8_t mav_veh_sensor_id;
+extern uint8_t mav_veh_quality;
+extern float mav_veh_flow_rate_x;
+extern float mav_veh_flow_rate_y;
+
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/

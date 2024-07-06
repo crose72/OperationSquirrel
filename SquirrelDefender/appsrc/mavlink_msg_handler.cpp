@@ -128,6 +128,16 @@ float mav_veh_rngfdr_vertical_fov;        /*< [rad] Vertical Field of View (angl
 float mav_veh_rngfdr_quaternion[4];       /*<  Quaternion of the sensor orientation in vehicle body frame (w, x, y, z order, zero-rotation is 1, 0, 0, 0). Zero-rotation is along the vehicle body x-axis. This field is required if the orientation is set to MAV_SENSOR_ROTATION_CUSTOM. Set it to 0 if invalid."*/
 uint8_t mav_veh_rngfdr_signal_quality;    /*< [%] Signal quality of the sensor. Specific to each sensor type, representing the relation of the signal strength with the target reflectivity, distance, size or aspect, but normalised as a percentage. 0 = unknown/unset signal quality, 1 = invalid signal, 100 = perfect signal.*/
 
+float mav_veh_flow_comp_m_x;   /*< [m/s] Flow in x-sensor direction, angular-speed compensated*/
+float mav_veh_flow_comp_m_y;   /*< [m/s] Flow in y-sensor direction, angular-speed compensated*/
+float mav_veh_ground_distance; /*< [m] Ground distance. Positive value: distance known. Negative value: Unknown distance*/
+int16_t mav_veh_flow_x;        /*< [dpix] Flow in x-sensor direction*/
+int16_t mav_veh_flow_y;        /*< [dpix] Flow in y-sensor direction*/
+uint8_t mav_veh_sensor_id;     /*<  Sensor ID*/
+uint8_t mav_veh_quality;       /*<  Optical flow quality / confidence. 0: bad, 255: maximum quality*/
+float mav_veh_flow_rate_x;     /*< [rad/s] Flow rate about X axis*/
+float mav_veh_flow_rate_y;     /*< [rad/s] Flow rate about Y axis*/
+
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
@@ -257,25 +267,6 @@ void MavMsg::proc_mav_sys_status_msg(const mavlink_message_t *msg, const char *t
     mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd = sys_status.onboard_control_sensors_health_extended;
 
 #ifdef DEBUG_BUILD
-
-    SysStatInfo.cpp_cout("Control sensors present:" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_present));
-    SysStatInfo.cpp_cout("Control sensors enabled:\t" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled));
-    SysStatInfo.cpp_cout("Control sensors health:\t" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_health));
-    SysStatInfo.cpp_cout("Load:\t" + std::to_string(mav_veh_sys_stat_load));
-    SysStatInfo.cpp_cout("Batt V:\t" + std::to_string(mav_veh_sys_stat_voltage_battery));
-    SysStatInfo.cpp_cout("Batt I:\t" + std::to_string(mav_veh_sys_stat_current_battery));
-    SysStatInfo.cpp_cout("Comm drop rate: " + std::to_string(mav_veh_sys_stat_drop_rate_comm));
-    SysStatInfo.cpp_cout("Comm errors:\t" + std::to_string(mav_veh_sys_stat_errors_comm));
-    SysStatInfo.cpp_cout("Errors count 1:\t" + std::to_string(mav_veh_sys_stat_errors_count1));
-    SysStatInfo.cpp_cout("Errors count 2:\t" + std::to_string(mav_veh_sys_stat_errors_count2));
-    SysStatInfo.cpp_cout("Errors count 3:\t" + std::to_string(mav_veh_sys_stat_errors_count3));
-    SysStatInfo.cpp_cout("Errors count 4:\t" + std::to_string(mav_veh_sys_stat_errors_count4));
-    SysStatInfo.cpp_cout("Batt remaining:\t" + std::to_string(mav_veh_sys_stat_battery_remaining));
-    SysStatInfo.cpp_cout("Sensors present extended:\t" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd));
-    SysStatInfo.cpp_cout("Sensors enabled extended:\t" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd));
-    SysStatInfo.cpp_cout("Sensors health extended:\t" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd));
-
-    SysStatInfo.cpp_cout("PRE ARM GOOD:" + std::to_string(mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK));
 
     print_sys_status(sys_status, term);
 
@@ -499,6 +490,16 @@ void MavMsg::proc_mav_optical_flow_msg(const mavlink_message_t *msg, const char 
 {
     mavlink_optical_flow_t optical_flow;
     mavlink_msg_optical_flow_decode(msg, &optical_flow);
+
+    mav_veh_flow_comp_m_x = optical_flow.flow_comp_m_x;
+    mav_veh_flow_comp_m_y = optical_flow.flow_comp_m_y;
+    mav_veh_ground_distance = optical_flow.ground_distance;
+    mav_veh_flow_x = optical_flow.flow_x;
+    mav_veh_flow_y = optical_flow.flow_y;
+    mav_veh_sensor_id = optical_flow.sensor_id;
+    mav_veh_quality = optical_flow.quality;
+    mav_veh_flow_rate_x = optical_flow.flow_rate_x;
+    mav_veh_flow_rate_y = optical_flow.flow_rate_y;
 
 #ifdef DEBUG_BUILD
 

@@ -119,6 +119,7 @@ int main(void)
 
 #endif // USE_JETSON
 
+        DataLogger::data_log_loop();
         app_first_init();
 
         MainAppTime.loop_rate_controller();
