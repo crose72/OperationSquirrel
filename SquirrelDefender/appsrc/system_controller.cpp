@@ -158,7 +158,7 @@ int SystemController::system_state_machine(void)
 
     if (save_button_press)
     {
-        Video::video_output_file_reset()
+        Video::video_output_file_reset();
     }
 
 #endif // USE_JETSON
