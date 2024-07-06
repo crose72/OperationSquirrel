@@ -21,7 +21,6 @@
 #include "jetson-inference/objectTracker.h"
 #include <jetson-inference/objectTrackerIOU.h>
 #include "object_detection.h"
-#include <signal.h>
 #include <string>
 #include <fstream>
 
@@ -48,6 +47,7 @@ public:
     Video();
     ~Video();
 
+    static bool video_output_file_reset(void);
     static bool video_init(void);
     static bool create_input_video_stream(void);
     static bool create_output_vid_stream(void);
@@ -60,7 +60,8 @@ public:
     static bool display_video(void);
     static void calc_video_res(void);
     static void delete_input_video_stream(void);
-    static void delete_output_video_stream(void);
+    static void delete_video_file_stream(void);
+    static void delete_video_display_stream(void);
 
 private:
     static gboolean static_bus_callback(GstBus *bus, GstMessage *message, gpointer data);

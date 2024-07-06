@@ -1,0 +1,3 @@
+/home/crose72/Documents/GitHub/OperationSquirrel/scratch/JetsonIO-example/build/CMakeFiles/main.dir
+/home/crose72/Documents/GitHub/OperationSquirrel/scratch/JetsonIO-example/build/CMakeFiles/edit_cache.dir
+/home/crose72/Documents/GitHub/OperationSquirrel/scratch/JetsonIO-example/build/CMakeFiles/rebuild_cache.dir

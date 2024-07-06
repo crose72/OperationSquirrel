@@ -154,7 +154,14 @@ int SystemController::system_state_machine(void)
         }
     }
 
-    // SysStat.cpp_cout("System State: " + std::to_string(system_state));
+#ifdef USE_JETSON
+
+    if (save_button_press)
+    {
+        Video::video_output_file_reset()
+    }
+
+#endif // USE_JETSON
 }
 
 /********************************************************************************

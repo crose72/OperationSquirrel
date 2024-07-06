@@ -25,6 +25,8 @@
  * Object definitions
  ********************************************************************************/
 bool valid_image_rcvd;
+bool display_stream_created;
+bool file_stream_created;
 videoSource *input;
 videoOutput *output_vid_file;
 videoOutput *output_vid_disp;
@@ -142,8 +144,11 @@ bool Video::create_output_vid_stream(void)
     if (!output_vid_file)
     {
         LogError("detectnet:  failed to create output_vid_file stream\n");
+        file_stream_created = false;
         return false;
     }
+
+    file_stream_created = true;
 
     return true;
 }
@@ -173,8 +178,11 @@ bool Video::create_display_video_stream(void)
     if (!output_vid_disp)
     {
         LogError("detectnet:  failed to create output_vid_disp stream\n");
+        display_stream_created = false;
         return false;
     }
+
+    display_stream_created = true;
 
     return true;
 }
@@ -283,21 +291,37 @@ void Video::delete_input_video_stream(void)
 }
 
 /********************************************************************************
- * Function: delete_output_video_stream
- * Description: Delete the input to stop using resources.
+ * Function: delete_video_file_stream
+ * Description: Delete the output to the video file to stop using resources.
  ********************************************************************************/
-void Video::delete_output_video_stream(void)
+void Video::delete_video_file_stream(void)
 {
-#ifdef DEBUG_BUILD
-
     SAFE_DELETE(output_vid_file);
+}
+
+/********************************************************************************
+ * Function: delete_video_display_stream
+ * Description: Delete the display to stop using resources.
+ ********************************************************************************/
+void Video::delete_video_display_stream(void)
+{
     SAFE_DELETE(output_vid_disp);
+}
 
-#else
+/********************************************************************************
+ * Function: video_output_file_reset
+ * Description: Code to reset video streams.
+ ********************************************************************************/
+bool Video::video_output_file_reset(void)
+{
+    delete_video_file_stream();
 
-    SAFE_DELETE(output_vid_file);
+    if (!create_output_vid_stream())
+    {
+        return false;
+    }
 
-#endif // DEBUG_BUILD
+    return true;
 }
 
 /********************************************************************************
@@ -349,14 +373,25 @@ void Video::video_proc_loop(void)
  ********************************************************************************/
 void Video::video_output_loop(void)
 {
+
 #ifdef DEBUG_BUILD
 
-    display_video();
-    save_video();
+    if (display_stream_created)
+    {
+        display_video();
+    }
+
+    if (file_stream_created)
+    {
+        save_video();
+    }
 
 #else
 
-    save_video();
+    if (file_stream_created)
+    {
+        save_video();
+    }
 
 #endif // DEBUG_BUILD
 }
@@ -368,8 +403,15 @@ void Video::video_output_loop(void)
 void Video::shutdown(void)
 {
     LogVerbose("video:  shutting down...\n");
-    Video::delete_input_video_stream();
-    Video::delete_output_video_stream();
+    delete_input_video_stream();
+    delete_video_file_stream();
+
+#ifdef DEBUG_BUILD
+
+    delete_video_display_stream();
+
+#endif // DEBUG_BUILD
+
     LogVerbose("video:  shutdown complete.\n");
 }
 

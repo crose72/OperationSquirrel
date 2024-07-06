@@ -148,12 +148,10 @@ void StatusIndicators::save_video_button_state(void)
 
     if (button_state_prv == GPIO::LOW && button_state == GPIO::HIGH)
     {
-        PrintPass::cpp_cout("Button state pressed");
         save_button_press = true;
     }
     else
     {
-        PrintPass::cpp_cout("Button state unpressed");
         save_button_press = false;
     }
 
