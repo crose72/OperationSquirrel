@@ -346,7 +346,7 @@ bool Video::video_init(void)
 #else
 
     if (!create_input_video_stream() ||
-        !!create_output_vid_stream())
+        !create_output_vid_stream())
     {
         return false;
     }

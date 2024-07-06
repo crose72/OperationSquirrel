@@ -99,7 +99,7 @@ int main(void)
 
     if (SystemController::system_init() != 0)
     {
-        return SystemController::system_init();
+        return 1;
     }
 
     while (!stop_program)
