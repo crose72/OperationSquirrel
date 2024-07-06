@@ -13,6 +13,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include <JetsonGPIO.h>
 #include <thread>
 #include <chrono>
@@ -25,6 +26,7 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
+extern bool save_button_press;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
@@ -36,12 +38,14 @@ public:
     ~StatusIndicators();
 
     static bool gpio_init(void);
+    static void io_loop(void);
     static void gpio_shutdown(void);
     static void status_initializing(void);
     static void status_good(void);
     static void status_bad(void);
     static void status_bad_blink(void);
     static void clear_all_leds(void);
+    static void save_video_button_state(void);
 
 private:
 };

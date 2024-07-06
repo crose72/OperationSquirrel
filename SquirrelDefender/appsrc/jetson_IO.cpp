@@ -24,12 +24,16 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
+bool save_button_press;
+int button_state_prv;
 
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-const int GREEN_LED_PIN = 19;
 const int RED_LED_PIN = 18;
+const int GREEN_LED_PIN = 19;
+const int SAVE_BUTTON_PIN1 = 21;
+const int SAVE_BUTTON_PIN2 = 22;
 
 /********************************************************************************
  * Function definitions
@@ -46,28 +50,6 @@ StatusIndicators::StatusIndicators(void) {}
  * Description: Destructor
  ********************************************************************************/
 StatusIndicators::~StatusIndicators(void) {}
-
-/********************************************************************************
- * Function: gpio_init
- * Description: Initialize the pins on the jetson.
- ********************************************************************************/
-bool StatusIndicators::gpio_init(void)
-{
-    GPIO::setmode(GPIO::BOARD);
-    GPIO::setup(GREEN_LED_PIN, GPIO::OUT, GPIO::LOW);
-    GPIO::setup(RED_LED_PIN, GPIO::OUT, GPIO::LOW);
-
-    return true;
-}
-
-/********************************************************************************
- * Function: gpio_shutdown
- * Description: Cleanup tasks for jetson io.
- ********************************************************************************/
-void StatusIndicators::gpio_shutdown(void)
-{
-    GPIO::cleanup();
-}
 
 /********************************************************************************
  * Function: status_initializing
@@ -152,6 +134,64 @@ void StatusIndicators::clear_all_leds(void)
 {
     GPIO::output(GREEN_LED_PIN, GPIO::LOW);
     GPIO::output(RED_LED_PIN, GPIO::LOW);
+}
+
+/********************************************************************************
+ * Function: save_video_button_state
+ * Description: This function will monitor the state of the button.
+ *********************************
+ ***********************************************/
+void StatusIndicators::save_video_button_state(void)
+{
+    unsigned int button_state;
+    button_state = GPIO::input(SAVE_BUTTON_PIN2);
+
+    if (button_state_prv == GPIO::LOW && button_state == GPIO::HIGH)
+    {
+        PrintPass::cpp_cout("Button state pressed");
+        save_button_press = true;
+    }
+    else
+    {
+        PrintPass::cpp_cout("Button state unpressed");
+        save_button_press = false;
+    }
+
+    button_state_prv = button_state;
+}
+
+/********************************************************************************
+ * Function: gpio_init
+ * Description: Initialize the pins on the jetson.
+ ********************************************************************************/
+bool StatusIndicators::gpio_init(void)
+{
+    GPIO::setmode(GPIO::BOARD);
+    GPIO::setup(GREEN_LED_PIN, GPIO::OUT, GPIO::LOW);
+    GPIO::setup(RED_LED_PIN, GPIO::OUT, GPIO::LOW);
+    GPIO::setup(SAVE_BUTTON_PIN2, GPIO::IN); // starts low, matches SAVE_BUTTON_PIN1
+    save_button_press = false;
+    button_state_prv = GPIO::LOW;
+
+    return true;
+}
+
+/********************************************************************************
+ * Function: io_loop
+ * Description: Loop for all IO that needs to be monitored continuously.
+ ********************************************************************************/
+void StatusIndicators::io_loop(void)
+{
+    save_video_button_state();
+}
+
+/********************************************************************************
+ * Function: gpio_shutdown
+ * Description: Cleanup tasks for jetson io.
+ ********************************************************************************/
+void StatusIndicators::gpio_shutdown(void)
+{
+    GPIO::cleanup();
 }
 
 #endif // USE_JETSON

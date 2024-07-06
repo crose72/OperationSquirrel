@@ -31,7 +31,7 @@ extern bool stopProgram;
  * Function prototypes and Class Definitions
  ********************************************************************************/
 void initialize(void);
-void task_25ms(int sig, siginfo_t* si, void* uc);
+void task_25ms(int sig, siginfo_t *si, void *uc);
 void stopHandler(int sig);
 void startTask_25ms(void);
 void stopTask_25ms(void);

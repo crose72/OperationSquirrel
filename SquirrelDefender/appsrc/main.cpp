@@ -16,6 +16,7 @@
 #include "follow_target.h"
 #include "datalog.h"
 #include <mutex>
+#include <signal.h>
 
 #ifdef USE_JETSON
 
@@ -114,6 +115,7 @@ int main(void)
         Detection::detection_loop();
         VehicleController::vehicle_control_loop();
         Video::video_output_loop();
+        StatusIndicators::io_loop();
 
 #endif // USE_JETSON
 
