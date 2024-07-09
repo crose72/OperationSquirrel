@@ -1,3 +1,3 @@
 [submodule "ThirdParty/CppUTest"]
 	path = ThirdParty/CppUTest
-	url = https://github.com/pjueon/JetsonGPIO.git
+	url = https://github.com/cpputest/cpputest.git
