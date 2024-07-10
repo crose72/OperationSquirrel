@@ -20,6 +20,7 @@
 
 #ifdef USE_JETSON
 
+#include "jetson_IO.h"
 #include "video_IO.h"
 #include "object_detection.h"
 #include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
@@ -40,6 +41,8 @@
 TimeCalc MainAppTime;
 bool stop_program;
 std::mutex mutex;
+
+extern bool save_button_press;
 
 /********************************************************************************
  * Calibration definitions
@@ -102,7 +105,15 @@ int main(void)
         return 1;
     }
 
+#ifdef USE_JETSON
+
+    while (!stop_program && !save_button_press)
+
+#else
+
     while (!stop_program)
+
+#endif // USE_JETSON
     {
         std::lock_guard<std::mutex> lock(mutex);
         MainAppTime.calc_elapsed_time();
@@ -130,9 +141,11 @@ int main(void)
 
     Video::shutdown();
     Detection::shutdown();
+    StatusIndicators::gpio_shutdown();
 
 #endif // USE_JETSON
 
+    VehicleController::vehicle_control_shutdown();
     MavMsg::mav_comm_shutdown();
 
     return 0;

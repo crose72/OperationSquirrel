@@ -170,4 +170,5 @@ void VehicleController::vehicle_control_loop(void)
  ********************************************************************************/
 void VehicleController::vehicle_control_shutdown(void)
 {
+    MavCmd::set_mode_LAND();
 }

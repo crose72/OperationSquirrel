@@ -155,15 +155,6 @@ int SystemController::system_state_machine(void)
             break;
         }
     }
-
-#ifdef USE_JETSON
-
-    if (save_button_press)
-    {
-        Video::video_output_file_reset();
-    }
-
-#endif // USE_JETSON
 }
 
 /********************************************************************************

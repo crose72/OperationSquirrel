@@ -127,6 +127,15 @@ void MavCmd::disarm_vehicle(void)
 }
 
 /********************************************************************************
+ * Function: set_mode_LAND
+ * Description: Change mode to LAND.
+ ********************************************************************************/
+void MavCmd::set_mode_LAND(void)
+{
+    set_flight_mode(0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::LAND, 0);
+}
+
+/********************************************************************************
  * Function: set_mode_GUIDED
  * Description: Change mode to GUIDED to allow control from a companion computer.
  ********************************************************************************/
