@@ -202,6 +202,23 @@ void Follow::calc_target_size(int n)
 }
 
 /********************************************************************************
+ * Function: error_zero_protection
+ * Description: Calculate the error between a desired output and the actual,
+                return 0 if the actual is below a threshold.
+ ********************************************************************************/
+float Follow::error_zero_protection(float desired, float actual, float threshold)
+{
+    if (actual < threshold)
+    {
+        return 0;
+    }
+    else
+    {
+        return (desired - actual);
+    }
+}
+
+/********************************************************************************
  * Function: calc_follow_error
  * Description: Calculate the error of a target's position based
  ********************************************************************************/
@@ -210,11 +227,11 @@ void Follow::calc_follow_error(void)
     float bounding_box_left_side = 320.0;
     float bounding_box_right_side = 960.0;
 
-    target_left_err = (bounding_box_left_side - target_left_side);
-    target_right_err = (bounding_box_right_side - target_right_side);
-    x_centroid_err = x_desired - x_actual;
-    target_height_err = height_desired - height_actual;
-    y_centroid_err = y_actual - y_desired;
+    target_left_err = error_zero_protection(bounding_box_left_side, target_left_side, 1.0);
+    target_right_err = error_zero_protection(bounding_box_right_side, target_right_side, 1.0);
+    x_centroid_err = error_zero_protection(x_desired, x_actual, 1.0);
+    target_height_err = error_zero_protection(height_desired, height_actual, 1.0);
+    y_centroid_err = -error_zero_protection(y_desired, y_actual, 1.0);
 }
 
 /********************************************************************************

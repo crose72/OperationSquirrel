@@ -40,6 +40,18 @@ extern bool target_identified;
 extern float vx_adjust;
 extern float vy_adjust;
 extern float vz_adjust;
+extern float x_actual;
+extern float height_actual;
+extern float y_actual;
+extern float width_actual;
+extern float x_centroid_err;
+extern float target_height_err;
+extern float y_centroid_err;
+extern float target_left_side;
+extern float target_right_side;
+extern float target_left_err;
+extern float target_right_err;
+extern float target_height_err_rev;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
@@ -61,6 +73,7 @@ public:
     static void overtake_target(void);
 
 private:
+    static float error_zero_protection(float desired, float actual, float threshold);
 };
 
 #endif // FOLLOW_TARGET_H

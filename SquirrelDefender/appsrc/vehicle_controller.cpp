@@ -148,7 +148,7 @@ void VehicleController::vehicle_control_loop(void)
     }
     else if (system_state == SYSTEM_STATE::STANDBY)
     {
-        MavCmd::takeoff_GPS_long((float)2.0);
+        MavCmd::takeoff_GPS_long((float)1.5);
     }
     else if (system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
     {
