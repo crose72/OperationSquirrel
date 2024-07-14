@@ -23,6 +23,7 @@
  * Object definitions
  ********************************************************************************/
 bool headings_written = false;
+std::string dataFilePath = "../data/";
 std::string dataFileName = "data";
 std::string file_name = "";
 std::vector<std::vector<std::string>> data = {};
@@ -54,14 +55,14 @@ DataLogger::~DataLogger(){};
 std::string DataLogger::generate_unique_filename(const std::string &filename)
 {
     int counter = 1;
-    std::string new_file_name = filename + ".csv"; // Add .csv extension initially
+    std::string new_file_name = dataFilePath + filename + ".csv"; // Add .csv extension initially
     std::ifstream file(new_file_name);
 
     while (file.is_open() == true)
     {
         file.close();
         // If the file exists, append the counter number and try again
-        new_file_name = filename + "_" + std::to_string(counter++) + ".csv";
+        new_file_name = dataFilePath +filename + "_" + std::to_string(counter++) + ".csv";
         file.open(new_file_name);
     }
 

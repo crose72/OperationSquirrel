@@ -33,6 +33,7 @@ videoOutput *output_vid_disp;
 uchar3 *image;
 uint32_t input_video_width;
 uint32_t input_video_height;
+std::string base_path = "../data/";
 
 /********************************************************************************
  * Calibration definitions
@@ -102,12 +103,12 @@ bool file_exists(const std::string &name)
  ********************************************************************************/
 std::string generate_unique_file_name(const std::string &base_name, const std::string &extension)
 {
-    std::string file_name = base_name + extension;
+    std::string file_name = base_path + base_name + extension;
     int index = 1;
 
     while (file_exists(file_name))
     {
-        file_name = base_name + "_" + std::to_string(index) + extension;
+        file_name = base_path + base_name + "_" + std::to_string(index) + extension;
         index++;
     }
 
@@ -120,7 +121,7 @@ std::string generate_unique_file_name(const std::string &base_name, const std::s
  ********************************************************************************/
 bool Video::create_output_vid_stream(void)
 {
-    std::string base_path = "file:///home/crose72/Documents/GitHub/OperationSquirrel/SquirrelDefender/build/";
+    std::string base_path = "file:///home/crose72/Documents/GitHub/OperationSquirrel/SquirrelDefender/data/";
     std::string base_name = "output";
     std::string extension = ".mp4";
     std::string file_name = generate_unique_file_name(base_name, extension);

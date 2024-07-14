@@ -148,6 +148,7 @@ int main(void)
 
     Video::shutdown();
     Detection::shutdown();
+    StatusIndicators::status_program_complete();
     StatusIndicators::gpio_shutdown();
 
 #endif // USE_JETSON

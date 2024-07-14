@@ -74,7 +74,8 @@ int SystemController::system_init(void)
 
     if (!Video::video_init() ||
         !Detection::detection_net_init() ||
-        !Follow::follow_target_init())
+        !Follow::follow_target_init() ||
+        !VehicleController::vehicle_control_init())
     {
         StatusIndicators::status_bad_blink();
         return 1;
@@ -162,7 +163,7 @@ int SystemController::system_state_machine(void)
             break;
         // Standby means we are ready to takeoff
         case SYSTEM_STATE::STANDBY:
-            if (mav_veh_rel_alt > 1000 && mav_veh_state == MAV_STATE_ACTIVE)
+            if ((mav_veh_rel_alt > 1450 || mav_veh_rngfdr_current_distance > 145) && mav_veh_state == MAV_STATE_ACTIVE)
             {
                 system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
             }

@@ -164,7 +164,20 @@ void VehicleController::vehicle_control_loop(void)
     {
 #ifdef USE_JETSON
 
-        follow_mode();
+        if (takeoff_dbc_cnt > 0)
+        {
+            takeoff_dbc_cnt--;
+        }
+        else
+        {
+            takeoff_dbc_cnt = 0;
+            takeoff_dbc = true;
+        }
+
+        if (takeoff_dbc)
+        {
+            follow_mode();
+        }
 
 #elif USE_WSL
 

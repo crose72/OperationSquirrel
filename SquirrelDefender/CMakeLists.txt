@@ -74,11 +74,6 @@ include_directories(/usr/local/include/dynalo/detail/windows)
 # jetson-inference and utils includes
 include_directories(/usr/local/include/jetson-inference)
 include_directories(/usr/local/include/jetson-utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/calibration)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/experimental)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/plugins)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/c/tracking)
 
 # NaturalSort includes
 include_directories(/usr/local/include/NaturalSort)

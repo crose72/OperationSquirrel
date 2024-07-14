@@ -147,7 +147,7 @@ void Follow::get_control_params(void)
     w3_x = 0.0;
 
     // Vel_PID_y parameters for forward movement
-    Kp_y = 0.0001;
+    Kp_y = 0.001;
     Ki_y = 0.0;
     Kd_y = 0.0;
     w1_y = 1.0;
@@ -155,7 +155,7 @@ void Follow::get_control_params(void)
     w3_y = 0.0;
 
     // Vel_PID_x parameters for reverse movement
-    Kp_x_rev = 0.01;
+    Kp_x_rev = 0.02;
     Ki_x_rev = 0.0;
     Kd_x_rev = 0.0;
     w1_x_rev = 1.0;
