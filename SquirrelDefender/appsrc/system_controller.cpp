@@ -15,6 +15,7 @@
 #include "mavlink_msg_handler.h"
 #include "mavlink_cmd_handler.h"
 #include "datalog.h"
+#include "vehicle_controller.h"
 
 #ifdef USE_JETSON
 #include "video_IO.h"
@@ -79,16 +80,26 @@ int SystemController::system_init(void)
         return 1;
     }
 
-#endif // USE_JETSON
-
     StatusIndicators::status_initializing();
 
     if (!MavMsg::mav_comm_init() ||
-        !DataLogger::data_log_init())
+        !DataLogger::data_log_init() ||
+        !VehicleController::vehicle_control_init())
     {
         StatusIndicators::status_bad_blink();
         return 1;
     }
+
+#elif USE_WSL
+
+    if (!MavMsg::mav_comm_init() ||
+        /* !DataLogger::data_log_init() || */
+        !VehicleController::vehicle_control_init())
+    {
+        return 1;
+    }
+
+#endif // USE_JETSON
 
     systems_initialized = true;
 
@@ -109,6 +120,17 @@ int SystemController::system_state_machine(void)
     else
     {
         bool mav_type_is_quad = (mav_veh_type == MAV_TYPE_QUADROTOR && mav_veh_autopilot_type == MAV_AUTOPILOT_ARDUPILOTMEGA);
+        bool prearm_checks = false;
+
+#ifdef USE_JETSON
+
+        prearm_checks = ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && valid_image_rcvd);
+
+#elif USE_WSL
+
+        prearm_checks = ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0);
+
+#endif // USE_JETSON
 
         // Switch case determines how we transition from one state to another
         switch (system_state)
@@ -122,7 +144,7 @@ int SystemController::system_state_machine(void)
             break;
         // After video, inference, SLAM, and other systems have successfully initialized we are in the init state
         case SYSTEM_STATE::INIT:
-            if ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && valid_image_rcvd)
+            if (prearm_checks)
             {
                 system_state = SYSTEM_STATE::PRE_ARM_GOOD;
             }
@@ -157,6 +179,8 @@ int SystemController::system_state_machine(void)
     }
 }
 
+#ifdef USE_JETSON
+
 /********************************************************************************
  * Function: led_system_indicators
  * Description: Control external leds to describe the system state.
@@ -175,6 +199,8 @@ void SystemController::led_system_indicators(void)
         StatusIndicators::status_good();
     }
 }
+
+#endif // USE_JETSON
 
 /********************************************************************************
  * Function: system_control_loop

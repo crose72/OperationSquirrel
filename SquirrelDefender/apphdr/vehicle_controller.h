@@ -42,7 +42,7 @@ class VehicleController
     ~VehicleController();
 
 public:
-    static void vehicle_control_init(void);
+    static bool vehicle_control_init(void);
     static void vehicle_control_loop(void);
     static void vehicle_control_shutdown(void);
 

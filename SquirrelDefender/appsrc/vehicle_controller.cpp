@@ -26,6 +26,8 @@
  * Object definitions
  ********************************************************************************/
 DebugTerm VehStateInfo("");
+bool takeoff_dbc;
+uint16_t takeoff_dbc_cnt;
 
 /********************************************************************************
  * Calibration definitions
@@ -101,6 +103,8 @@ void VehicleController::cmd_acceleration_NED(float acceleration_target[3])
     VelocityController::cmd_acceleration_NED(acceleration_target);
 }
 
+#ifdef USE_JETSON
+
 /********************************************************************************
  * Function: follow_target
  * Description: Move in direction of vector ax,ay,az in the NED frame.
@@ -124,12 +128,18 @@ void VehicleController::follow_mode(void)
     }
 }
 
+#endif // USE_JETSON
+
 /********************************************************************************
  * Function: vehicle_control_init
  * Description: Initial setup of vehicle controller.
  ********************************************************************************/
-void VehicleController::vehicle_control_init(void)
+bool VehicleController::vehicle_control_init(void)
 {
+    takeoff_dbc = false;
+    takeoff_dbc_cnt = 200;
+
+    return true;
 }
 
 /********************************************************************************
@@ -148,7 +158,7 @@ void VehicleController::vehicle_control_loop(void)
     }
     else if (system_state == SYSTEM_STATE::STANDBY)
     {
-        MavCmd::takeoff_GPS_long((float)1.5);
+        MavCmd::takeoff_GPS_long((float)2.0);
     }
     else if (system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
     {
@@ -158,7 +168,20 @@ void VehicleController::vehicle_control_loop(void)
 
 #elif USE_WSL
 
-        test_flight();
+        if (takeoff_dbc_cnt > 0)
+        {
+            takeoff_dbc_cnt--;
+        }
+        else
+        {
+            takeoff_dbc_cnt = 0;
+            takeoff_dbc = true;
+        }
+
+        if (takeoff_dbc)
+        {
+            test_flight();
+        }
 
 #endif // USE_JETSON
     }

@@ -16,6 +16,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <cstdio>  // for perror
 #include <cstdint> // for uint8_t, uint16_t, etc.

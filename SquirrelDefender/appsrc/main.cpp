@@ -13,6 +13,7 @@
 #include "system_controller.h"
 #include "mavlink_msg_handler.h"
 #include "mavlink_cmd_handler.h"
+#include "vehicle_controller.h"
 #include "follow_target.h"
 #include "datalog.h"
 #include <mutex>
@@ -114,6 +115,7 @@ int main(void)
     while (!stop_program)
 
 #endif // USE_JETSON
+
     {
         std::lock_guard<std::mutex> lock(mutex);
         MainAppTime.calc_elapsed_time();
@@ -128,10 +130,15 @@ int main(void)
         Video::video_output_loop();
         StatusIndicators::io_loop();
 
+#elif USE_WSL
+
+        VehicleController::vehicle_control_loop();
+
 #endif // USE_JETSON
 
-        DataLogger::data_log_loop();
         app_first_init();
+
+        /* DataLogger::data_log_loop(); */
 
         MainAppTime.loop_rate_controller();
         MainAppTime.calc_loop_start_time();
