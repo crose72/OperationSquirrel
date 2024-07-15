@@ -1,31 +1,46 @@
 # Part 1: Connecting WSL code to SITL
 
 ## Description
+
 These instructions walk the user through how to control a simulated drone using the mavlink protocol over TCP.  It works in WSL/WSL2 and connects to the ArduPilot SITL without any additional hardware.  It will ARM the drone (if pre-arm checks pass), request some mavlink messages from the flight controller, and cause the drone to takeoff and fly in a predetermined pattern.  It is intended to simulate the code that will run on the Jetson Nano or other companion computer without needing anything but your laptop (or any computer running the SITL).  These instructions depend on [01-Setting-up-the-workflow](https://github.com/crose72/OperationSquirrel/blob/master/Docs/01-Setting-up-the-workflow.md).
 
 ### Cloning the OperationSquirrel repo
+
 1. Clone the repo
-	- `git clone --recurse-submodules https://github.com/crose72/OperationSquirrel.git`
+
+- `git clone --recurse-submodules https://github.com/crose72/OperationSquirrel.git`
+
 2. Update the submodules
-	- `git submodule init`
-	- `git submodule update`
+
+- `git submodule init`
+- `git submodule update`
 
 ### Connect compiled executable to ArduPilot SITL on WSL/WSL2
 
 1. Go to ArduCopter directory
-	- `cd ardupilot/ArduCopter`
+
+- `cd ardupilot/ArduCopter`
+
 2. Start the SITL with desired arguments (console and map in this case)
-	- `sim_vehicle.py --console --map`
+
+- `sim_vehicle.py --console --map`
+
 3. Go to OperationSquirrel/SquirrelDefender
-	- `cd OperationSquirrel/SquirrelDefender`
+
+- `cd OperationSquirrel/SquirrelDefender`
+
 4. Compile the code
     - `mkdir build`
-	- `cd build`
-	- `cmake ..`
-	- `make`
+
+- `cd build`
+- `cmake ..`
+- `make`
+
 5. Execute the program on the Jetson Nano
     - `sudo ./main`
-	- Optional: `./unit_tests` to run the unit tests
+
+- Optional: `./unit_tests` to run the unit tests
+
 6. The drone should ARM, send back messages, and takeoff
 
 Note: This requires two instances of WSL/WSL2 to be open, one for running SITL, the other to execute the companion computer code
@@ -44,45 +59,60 @@ For testing purposes, run this command before executing the program on the Jetso
 
 It temporarily enables access to the physical UART port (or whichever port you need to access) if it doesn't automatically work when executing the code.  You may be able to run the code without this command, so you may try that first.  Make sure you do this for the correct device.  Mine was ttyTHS1, yours may be different.  Additionally, it may be possible to execute the code on the Jetson Nano without doing this.  In which case, you may just execute the program (possibly needing sudo).
 
-
 ### Connect Jetson Nano to ArduPilot SITL on Windows WSL/WSL2
 
 1. Connect Jetson Nano UART ports to FTDI device (3v3 logic)
 2. Connect FTDI device to laptop
-3. Set up USBIPD https://learn.microsoft.com/en-us/windows/wsl/connect-usb (first time only)
+3. Set up USBIPD <https://learn.microsoft.com/en-us/windows/wsl/connect-usb> (first time only)
 4. Check what devices are visible using windows powershell (see what bus ID the FTDI device is)
-	- `usbipd wsl list`
+
+- `usbipd wsl list`
+
 5. Open WSL2 instance
 6. Attach the FTDI device to WSL2 using windows powershell
-	- `usbipd wsl attach --busid 2-1` (or whatever the bus id matches your device)
+
+- `usbipd wsl attach --busid 2-1` (or whatever the bus id matches your device)
+
 7. Change owner of device
-	- `sudo chown root:dialout /dev/ttyUSB0`
+
+- `sudo chown root:dialout /dev/ttyUSB0`
+
 8. Check that device is added to dialout
-	- `ls -l /dev/ttyUSB0`
+
+- `ls -l /dev/ttyUSB0`
+
 9. Give read+write access to the device
-	- `sudo chmod g+rw /dev/ttyUSB0`
+
+- `sudo chmod g+rw /dev/ttyUSB0`
+
 10. Go to ArduCopter directory
-	- `cd ardupilot/ArduCopter`
+
+- `cd ardupilot/ArduCopter`
+
 11. Start the SITL and access the uart port that the Jetson Nano is connected to
-	- `sim_vehicle.py --console --map -A --serial2=uart:/dev/ttyUSB0:115200`
+
+- `sim_vehicle.py --console --map -A --serial1=uart:/dev/ttyUSB0:115200`
+
 12. Go to OperationSquirrel/SquirrelDefender
-	- `cd OperationSquirrel/SquirrelDefender`
+
+- `cd OperationSquirrel/SquirrelDefender`
+
 13. Compile the code
     - `make`
 14. Execute the program on the Jetson Nano
     - `sudo ./main`
 15. The drone should ARM, send back messages, and takeoff
 
-
-#### If WSL2 does not recognize your device it may be due to an update in WSL2.  In which case you should follow the solution here https://github.com/dorssel/usbipd-win/issues/948.
-
+#### If WSL2 does not recognize your device it may be due to an update in WSL2.  In which case you should follow the solution here <https://github.com/dorssel/usbipd-win/issues/948>
 
 ### Connect Jetson Nano to real flight controller
 
 1. Connect Jetson Nano UART pins to the flight controller UART pins
 2. Configure the appropriate flight controller UART port in mission planner to send and receive mavlink messages
 3. Go to OperationSquirrel/SquirrelDefender
-	- `cd OperationSquirrel/SquirrelDefender`
+
+- `cd OperationSquirrel/SquirrelDefender`
+
 4. Compile the code
     - `make`
 5. Execute the program on the Jetson Nano

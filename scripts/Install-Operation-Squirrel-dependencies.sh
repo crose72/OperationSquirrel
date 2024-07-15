@@ -148,3 +148,32 @@ sudo make install
 sudo ldconfig
 
 echo "Jetson-Inference installed, SUCCESS!"
+
+cd ../..
+
+# -----------------------------------------------
+# Install JetsonGPIO
+# -----------------------------------------------
+
+echo "Installing JetsonGPIO"
+
+git clone https://github.com/pjueon/JetsonGPIO.git
+
+cd JetsonGPIO
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+
+echo "JetsonGPIO installed, SUCCESS!"
+
+cd ../..
+
+# -----------------------------------------------
+# Install JsonCpp
+# -----------------------------------------------
+
+sudo apt-get install libjsoncpp-dev
+
+echo "JsonCpp installed, SUCCESS!"

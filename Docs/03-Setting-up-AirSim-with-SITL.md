@@ -27,12 +27,66 @@ Note: Replace `AirSim` with `Colosseum` when it instructs to go to the AirSim di
 
 Note: Again these steps are taking place in the `Colosseum` directory instead of AirSim because we cloned Colosseum
 
-## Connecting SITL to AirSim
+## WSL2: Connecting SITL to AirSim
 
-You should already have SITL working independently before proceeding with these instructions.  AirSim is supposed to work with WSL2 according to these instructions: <https://discuss.ardupilot.org/t/gsoc-2019-airsim-simulator-support-for-ardupilot-sitl-part-ii/46395/5>, but I could not make it work with WSL2, I can get it working with WSL version 1, however.  These steps were done on Windows 11.  The only steps that should need to be repeated are 7 and 8 to start AirSim first and then SITL afterwards.  I have noticed that when I restart WSL I need to do step 5 again to apply the changes to the bash configuration, and VcXsrv does need to be opened again after restarting your computer
+You should already have SITL working independently before proceeding with these instructions.  AirSim is supposed to work with WSL2 according to these instructions: <https://discuss.ardupilot.org/t/gsoc-2019-airsim-simulator-support-for-ardupilot-sitl-part-ii/46395/5>, but they didn't work for me.  I did get it working by updating my `settings.json` file and using the `sim_vehicle.py` according to the post here: <https://discuss.ardupilot.org/t/gsoc-2019-airsim-simulator-support-for-ardupilot-sitl-part-ii/46395/29>
 
-1. Set up the ArduPilot development environment according to `[Start-Here]
-2.Setting-up-the-workflow.md`
+1. Set up the ArduPilot development environment according to `1.Setting-up-SITL.md`
+2. Make sure you are using WSL version 2
+3. Update your `settings.json` for AirSim (probably located in Documents/AirSim) to look like the following (which are found in the second link in the description above):
+
+    ```json
+    {
+    "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/main/docs/settings.md",
+    "SettingsVersion": 1.2,
+    "LogMessagesVisible": true,
+    "SimMode": "Multirotor",
+    "OriginGeopoint": {
+        "Latitude": -35.363261,
+        "Longitude": 149.165230,
+        "Altitude": 583
+    },
+    "Vehicles": {
+        "Copter": {
+            "VehicleType": "ArduCopter",
+            "UseSerial": false,
+            "LocalHostIp": "192.168.0.85",
+            "UdpIp": "172.26.240.75",
+            "UdpPort": 9003,
+            "ControlPort": 9002
+            }
+        }
+    }
+    ```
+
+    where `"LocalHostIp": "192.168.0.85",` is the IP address of your main Windows and can be found by opening a command prompt or powershell in windows and executing `ipconfig`, then look for the result under `IPv4 Address. . . . . . . . . . . : <your-windows-ip-addr>`
+
+    and `"UdpIp": "172.26.240.75",` is the IP address of your WSL and can be found by opening an instance of WSL and executing `ip addr show eth0` and will look like this `inet <your-wsl-ip-addr>/xx`and is the number before the `/`.
+
+4. (Instructions say to do this but I did not and it it still worked) Add the following to the end of your `~/.bashrc` file (uncomment the correct line for WSL2)
+
+    ```
+    # Export Display for XWindows
+    # For WLS1
+    export DISPLAY=0:0
+    # For WSL2
+    # export DISPLAY=$(grep -m 1 nameserver /etc/resolv.conf | awk '{print $2}'):0
+    ```
+
+5. Start AirSim by pressing the play button in VS with your Blocks or other project open (or use one of the precompiled binaries)
+6. Start SITL
+
+- `sim_vehicle.py -v ArduCopter -f airsim-copter -A --sim-address=<your-windows-ip-addr> --console --map`
+
+7. Disable arming checks in the SITL command line (for simulation testing purposes only and only if "Main Loop" is slow)
+
+- `param set ARMING_CHECK 0`
+
+## WSL1: Connecting SITL to AirSim
+
+You should already have SITL working independently before proceeding with these instructions.  AirSim is supposed to work with WSL2, these instructions are for WSL version 1, however.  These steps were done on Windows 11.  The only steps that need to be repeated should be 7 and 8 to start AirSim first and then SITL afterwards.  I have noticed that when I restart WSL I need to do step 5 again to apply the changes to the bash configuration, and VcXsrv does need to be opened again after restarting your computer
+
+1. Set up the ArduPilot development environment according to `1.Setting-up-SITL.md`
 2. Make sure you are using WSL version 1
 3. Update your `settings.json` for AirSim (probably located in Documents/AirSim) to look like the following:
 
