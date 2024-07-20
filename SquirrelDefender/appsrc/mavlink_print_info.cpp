@@ -36,7 +36,7 @@
  ********************************************************************************/
 void print_heartbeat(mavlink_heartbeat_t &heartbeat, const char *term)
 {
-    DebugTerm PrintHeartbeat(term);
+    /* DebugTerm PrintHeartbeat(term);*/
 
     PrintPass::c_printf("Heartbeat:\n");
     PrintPass::c_printf("\tType: %d\n", heartbeat.type);
@@ -53,7 +53,7 @@ void print_heartbeat(mavlink_heartbeat_t &heartbeat, const char *term)
  ********************************************************************************/
 void print_system_time(mavlink_system_time_t &system_time, const char *term)
 {
-    DebugTerm PrintSysTm(term);
+    /* DebugTerm PrintSysTm(term); */
 
     PrintPass::c_printf("System Time:\n");
     PrintPass::c_printf("\tUnix timestamp (us): %lu\n", system_time.time_unix_usec);
@@ -66,7 +66,7 @@ void print_system_time(mavlink_system_time_t &system_time, const char *term)
  ********************************************************************************/
 void print_sys_status(mavlink_sys_status_t &sys_status, const char *term)
 {
-    DebugTerm PrintSysStat(term);
+    /* DebugTerm PrintSysStat(term); */
 
     PrintPass::c_printf("System status:\n");
     PrintPass::c_printf("\tOnboard control sensors present: %u\n", sys_status.onboard_control_sensors_present);
@@ -90,7 +90,7 @@ void print_sys_status(mavlink_sys_status_t &sys_status, const char *term)
  ********************************************************************************/
 void print_statustext(mavlink_statustext_t &statustext, const char *term)
 {
-    DebugTerm PrintStatTxt(term);
+    /* DebugTerm PrintStatTxt(term); */
 
     PrintPass::c_printf("STATUSTEXT message:\n");
     PrintPass::c_printf("\tSeverity: %u\n", statustext.severity);
@@ -103,7 +103,7 @@ void print_statustext(mavlink_statustext_t &statustext, const char *term)
  ********************************************************************************/
 void print_param_value(mavlink_param_value_t &param_value, const char *term)
 {
-    DebugTerm PrintParamVal(term);
+    /* DebugTerm PrintParamVal(term); */
 
     PrintPass::c_printf("Parameter Name: %s\n", param_value.param_id);
     PrintPass::c_printf("\tValue: %.4f\n", param_value.param_value);
@@ -118,7 +118,7 @@ void print_param_value(mavlink_param_value_t &param_value, const char *term)
  ********************************************************************************/
 void print_autopilot_version(mavlink_autopilot_version_t &autopilot_version, const char *term)
 {
-    DebugTerm PrintAutopilotVrsn(term);
+    /* DebugTerm PrintAutopilotVrsn(term); */
 
     PrintPass::c_printf("Autopilot Version:\n");
     PrintPass::c_printf("\tCapabilities: %lu\n", autopilot_version.capabilities);
@@ -137,7 +137,7 @@ void print_autopilot_version(mavlink_autopilot_version_t &autopilot_version, con
  ********************************************************************************/
 void print_gps_global_origin(mavlink_gps_global_origin_t &gps_global_origin, const char *term)
 {
-    DebugTerm PrintGlobOrig(term);
+    /* DebugTerm PrintGlobOrig(term); */
 
     PrintPass::c_printf("GPS_GLOBAL_ORIGIN message:\n");
     PrintPass::c_printf("\tLatitude: %f\n", (double)gps_global_origin.latitude);
@@ -151,7 +151,7 @@ void print_gps_global_origin(mavlink_gps_global_origin_t &gps_global_origin, con
  ********************************************************************************/
 void print_home_position(mavlink_home_position_t &home_position, const char *term)
 {
-    DebugTerm PrintHomePos(term);
+    /* DebugTerm PrintHomePos(term);*/
 
     PrintPass::c_printf("HOME_POSITION message:\n");
     PrintPass::c_printf("\tLatitude: %f\n", (double)home_position.latitude);
@@ -165,7 +165,7 @@ void print_home_position(mavlink_home_position_t &home_position, const char *ter
  ********************************************************************************/
 void print_global_position_int(mavlink_global_position_int_t &global_pos_int, const char *term)
 {
-    DebugTerm PrintGPS(term);
+    /* DebugTerm PrintGPS(term); */
 
     PrintPass::c_printf("Global position:\n");
     PrintPass::c_printf("\tLatitude: %d degrees (1e-7)\n", global_pos_int.lat);
@@ -184,7 +184,7 @@ void print_global_position_int(mavlink_global_position_int_t &global_pos_int, co
  ********************************************************************************/
 void print_scaled_imu(mavlink_scaled_imu_t &scaled_imu, const char *term)
 {
-    DebugTerm PrintScaledIMU(term);
+    /* DebugTerm PrintScaledIMU(term); */
 
     PrintPass::c_printf("Scaled IMU data:\n");
     PrintPass::c_printf("\tX acceleration: %d\n", scaled_imu.xacc);
@@ -204,7 +204,7 @@ void print_scaled_imu(mavlink_scaled_imu_t &scaled_imu, const char *term)
  ********************************************************************************/
 void print_optical_flow(mavlink_optical_flow_t &optical_flow, const char *term)
 {
-    DebugTerm PrintOptFlow(term);
+    /* DebugTerm PrintOptFlow(term); */
 
     PrintPass::c_printf("Optical Flow data:\n");
     PrintPass::c_printf("\tTimestamp: %llu us\n", optical_flow.time_usec);
@@ -225,25 +225,25 @@ void print_optical_flow(mavlink_optical_flow_t &optical_flow, const char *term)
  ********************************************************************************/
 void print_distance_sensor(mavlink_distance_sensor_t &distance_sensor, const char *term)
 {
-    DebugTerm DistSnsrInfo(term);
+    /* DebugTerm DistSnsrInfo(term); */
 
-    DistSnsrInfo.cpp_cout("Distance Sensor data:\n");
-    DistSnsrInfo.cpp_cout("\tTimestamp: " + std::to_string(distance_sensor.time_boot_ms) + " ms");
-    DistSnsrInfo.cpp_cout("\tMinimum distance: " + std::to_string(distance_sensor.min_distance) + "cm");
-    DistSnsrInfo.cpp_cout("\tMaximum distance: " + std::to_string(distance_sensor.max_distance) + "cm");
-    DistSnsrInfo.cpp_cout("\tCurrent distance reading: " + std::to_string(distance_sensor.current_distance) + "cm");
-    DistSnsrInfo.cpp_cout("\tType of distance sensor: " + std::to_string(distance_sensor.type));
-    DistSnsrInfo.cpp_cout("\tOnboard ID of the sensor: " + std::to_string(distance_sensor.id));
-    DistSnsrInfo.cpp_cout("\tOrientation of the sensor: " + std::to_string(distance_sensor.orientation));
-    DistSnsrInfo.cpp_cout("\tMeasurement variance: " + std::to_string(distance_sensor.covariance) + "cm^2");
-    DistSnsrInfo.cpp_cout("\tHorizontal Field of View: " + std::to_string(distance_sensor.horizontal_fov) + "rad");
-    DistSnsrInfo.cpp_cout("\tVertical Field of View: " + std::to_string(distance_sensor.vertical_fov) + "rad");
-    DistSnsrInfo.cpp_cout("\tSensor orientation quaternion: " +
-                          std::to_string(distance_sensor.quaternion[0]) +
-                          std::to_string(distance_sensor.quaternion[1]) +
-                          std::to_string(distance_sensor.quaternion[2]) +
-                          std::to_string(distance_sensor.quaternion[3]));
-    DistSnsrInfo.cpp_cout("\tSignal quality: " + std::to_string(distance_sensor.signal_quality));
+    PrintPass::cpp_cout("Distance Sensor data:\n");
+    PrintPass::cpp_cout("\tTimestamp: " + std::to_string(distance_sensor.time_boot_ms) + " ms");
+    PrintPass::cpp_cout("\tMinimum distance: " + std::to_string(distance_sensor.min_distance) + "cm");
+    PrintPass::cpp_cout("\tMaximum distance: " + std::to_string(distance_sensor.max_distance) + "cm");
+    PrintPass::cpp_cout("\tCurrent distance reading: " + std::to_string(distance_sensor.current_distance) + "cm");
+    PrintPass::cpp_cout("\tType of distance sensor: " + std::to_string(distance_sensor.type));
+    PrintPass::cpp_cout("\tOnboard ID of the sensor: " + std::to_string(distance_sensor.id));
+    PrintPass::cpp_cout("\tOrientation of the sensor: " + std::to_string(distance_sensor.orientation));
+    PrintPass::cpp_cout("\tMeasurement variance: " + std::to_string(distance_sensor.covariance) + "cm^2");
+    PrintPass::cpp_cout("\tHorizontal Field of View: " + std::to_string(distance_sensor.horizontal_fov) + "rad");
+    PrintPass::cpp_cout("\tVertical Field of View: " + std::to_string(distance_sensor.vertical_fov) + "rad");
+    PrintPass::cpp_cout("\tSensor orientation quaternion: " +
+                        std::to_string(distance_sensor.quaternion[0]) +
+                        std::to_string(distance_sensor.quaternion[1]) +
+                        std::to_string(distance_sensor.quaternion[2]) +
+                        std::to_string(distance_sensor.quaternion[3]));
+    PrintPass::cpp_cout("\tSignal quality: " + std::to_string(distance_sensor.signal_quality));
 }
 
 /********************************************************************************
@@ -252,7 +252,7 @@ void print_distance_sensor(mavlink_distance_sensor_t &distance_sensor, const cha
  ********************************************************************************/
 void print_local_position(mavlink_local_position_ned_t &local_position, const char *term)
 {
-    DebugTerm PrintLocPos(term);
+    /* DebugTerm PrintLocPos(term); */
 
     PrintPass::c_printf("Local Position:\n");
     PrintPass::c_printf("\tTimestamp: %u\n", local_position.time_boot_ms);
@@ -272,7 +272,7 @@ void print_local_position(mavlink_local_position_ned_t &local_position, const ch
  ********************************************************************************/
 void print_position_target_local_ned(mavlink_position_target_local_ned_t &position_target_local_ned, const char *term)
 {
-    DebugTerm PrintPosTrgt(term);
+    /* DebugTerm PrintPosTrgt(term); */
 
     PrintPass::c_printf("Position target local NED: %u\n", position_target_local_ned.time_boot_ms);
     PrintPass::c_printf("\tTime since boot (ms): %u\n", position_target_local_ned.time_boot_ms);
@@ -291,7 +291,7 @@ void print_position_target_local_ned(mavlink_position_target_local_ned_t &positi
  ********************************************************************************/
 void print_set_position_target_local_ned(mavlink_set_position_target_local_ned_t &set_position_target_local_ned, const char *term)
 {
-    DebugTerm PrintSetPosTrgt(term);
+    /* DebugTerm PrintSetPosTrgt(term); */
 
     PrintPass::c_printf("\tTime since boot (ms): %u\n", set_position_target_local_ned.time_boot_ms);
     PrintPass::c_printf("\tPosition (X, Y, Z): %.3f, %.3f, %.3f\n", set_position_target_local_ned.x, set_position_target_local_ned.y, set_position_target_local_ned.z);
@@ -311,7 +311,7 @@ void print_set_position_target_local_ned(mavlink_set_position_target_local_ned_t
  ********************************************************************************/
 void print_attitude(mavlink_attitude_t &attitude, const char *term)
 {
-    DebugTerm PrintAtt(term);
+    /* DebugTerm PrintAtt(term); */
 
     PrintPass::c_printf("Attitude:\n");
     PrintPass::c_printf("\tRoll: %.4f radians\n", attitude.roll);
@@ -328,7 +328,7 @@ void print_attitude(mavlink_attitude_t &attitude, const char *term)
  ********************************************************************************/
 void print_attitude_target(mavlink_attitude_target_t &attitude_target, const char *term)
 {
-    DebugTerm PrintAttTrgt(term);
+    /*DebugTerm PrintAttTrgt(term); */
 
     PrintPass::c_printf("Attitude Target:\n");
     PrintPass::c_printf("\tTime Boot (ms): %lu\n", attitude_target.time_boot_ms);
@@ -346,7 +346,7 @@ void print_attitude_target(mavlink_attitude_target_t &attitude_target, const cha
  ********************************************************************************/
 void print_set_attitude_target(mavlink_set_attitude_target_t &set_attitude_target, const char *term)
 {
-    DebugTerm PrintSetAttTrgt(term);
+    /* DebugTerm PrintSetAttTrgt(term); */
 
     PrintPass::c_printf("Set Attitude Target:\n");
     PrintPass::c_printf("\tTime Boot (ms): %lu\n", set_attitude_target.time_boot_ms);
@@ -366,7 +366,7 @@ void print_set_attitude_target(mavlink_set_attitude_target_t &set_attitude_targe
  ********************************************************************************/
 void print_attitude_quaternion(mavlink_attitude_quaternion_t &attitude_quaternion, const char *term)
 {
-    DebugTerm PrintAttQuat(term);
+    /* DebugTerm PrintAttQuat(term); */
 
     PrintPass::c_printf("Attitude Quaternion:\n");
     PrintPass::c_printf("\tTime Boot (ms): %ul\n", attitude_quaternion.time_boot_ms);

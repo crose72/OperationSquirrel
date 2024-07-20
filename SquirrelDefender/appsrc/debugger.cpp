@@ -47,13 +47,11 @@ DebugTerm::DebugTerm() : use_default_term(true)
  ********************************************************************************/
 DebugTerm::DebugTerm(const std::string &terminal) : debug_terminal(terminal), use_default_term(false)
 {
-#ifdef DEBUG_BUILD
     if (!debug_terminal.is_open())
     {
-        // PrintPass::cpp_cerr("Failed to open terminal: " + terminal);
+        PrintPass::cpp_cerr("Failed to open terminal: " + terminal);
         use_default_term = true;
     }
-#endif
 }
 
 /********************************************************************************
@@ -62,12 +60,10 @@ DebugTerm::DebugTerm(const std::string &terminal) : debug_terminal(terminal), us
  ********************************************************************************/
 DebugTerm::~DebugTerm(void)
 {
-#ifdef DEBUG_BUILD
     if (debug_terminal.is_open())
     {
         debug_terminal.close();
     }
-#endif
 }
 
 /********************************************************************************
@@ -76,7 +72,6 @@ DebugTerm::~DebugTerm(void)
  ********************************************************************************/
 void DebugTerm::cpp_cout(const std::string &message)
 {
-#ifdef DEBUG_BUILD
     if (debug_terminal.is_open())
     {
         debug_terminal << message << std::endl;
@@ -86,7 +81,6 @@ void DebugTerm::cpp_cout(const std::string &message)
     {
         PrintPass::cpp_cout(message);
     }
-#endif
 }
 
 /********************************************************************************
@@ -95,7 +89,6 @@ void DebugTerm::cpp_cout(const std::string &message)
  ********************************************************************************/
 void DebugTerm::cpp_cout_oneline(const std::string &message)
 {
-#ifdef DEBUG_BUILD
     if (debug_terminal.is_open())
     {
         debug_terminal << message;
@@ -105,7 +98,6 @@ void DebugTerm::cpp_cout_oneline(const std::string &message)
     {
         PrintPass::cpp_cout_oneline(message);
     }
-#endif
 }
 
 /********************************************************************************
@@ -114,7 +106,6 @@ void DebugTerm::cpp_cout_oneline(const std::string &message)
  ********************************************************************************/
 void DebugTerm::cpp_cerr(const std::string &message)
 {
-#ifdef DEBUG_BUILD
     if (debug_terminal.is_open())
     {
         debug_terminal << message << std::endl;
@@ -124,7 +115,6 @@ void DebugTerm::cpp_cerr(const std::string &message)
     {
         PrintPass::cpp_cerr(message);
     }
-#endif
 }
 
 /********************************************************************************
@@ -133,7 +123,6 @@ void DebugTerm::cpp_cerr(const std::string &message)
  ********************************************************************************/
 void DebugTerm::cpp_cerr_oneline(const std::string &message)
 {
-#ifdef DEBUG_BUILD
     if (debug_terminal.is_open())
     {
         debug_terminal << message;
@@ -143,7 +132,6 @@ void DebugTerm::cpp_cerr_oneline(const std::string &message)
     {
         PrintPass::cpp_cerr_oneline(message);
     }
-#endif
 }
 
 /********************************************************************************

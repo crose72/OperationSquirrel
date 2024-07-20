@@ -138,7 +138,7 @@ int main(void)
 
         app_first_init();
 
-        /* DataLogger::data_log_loop(); */
+        DataLogger::data_log_loop();
 
         MainAppTime.loop_rate_controller();
         MainAppTime.calc_loop_start_time();
