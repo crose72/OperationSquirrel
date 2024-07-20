@@ -45,11 +45,13 @@ These instructions walk the user through how to control a simulated drone using 
 
 Note: This requires two instances of WSL/WSL2 to be open, one for running SITL, the other to execute the companion computer code
 
-# Part 2: Connecting Jetson Nano to SITL andReal drone
+# Part 2: Connecting Jetson Nano to SITL and Real drone
 
 ## Description
 
 These instructions walk the user through how to use the Jetson Nano to control a simulated drone using the mavlink protocol over UART serial communication.  It can also be configured to work in WSL2 and connect to the ArduPilot SITL without any additional hardware (this is outlined in a "Connecting-WSL-code-to-SITL").  It will ARM the drone (if pre-arm checks pass), request some mavlink messages from the flight controller, and cause the drone to takeoff and fly in a predetermined pattern.  It should easily work for raspberry pi or other companion computers, however the UART will likely need to be configured a little differently and use the appropriate read and write functions for the desired platform.  These instructions depend on [01-Setting-up-SITL](https://github.com/crose72/OperationSquirrel/blob/master/Docs/01-Setting-up-the-workflow.md).
+
+After an update to the WSL2 kernel the USBIPD feature stopped working.  Follow the instructions here if USBIPD doesn't work: <https://github.com/dorssel/usbipd-win/issues/948#issue-2290576921>.  I also recompiled the kernel to resolve the issue and my config and image files are in the `WSL` folder at the root of the repo.  Copy them to `C:\Users\<user-name>` before installing WSL2.
 
 ### Additional info
 
