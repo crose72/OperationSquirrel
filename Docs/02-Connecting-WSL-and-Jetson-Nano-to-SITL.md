@@ -66,44 +66,49 @@ It temporarily enables access to the physical UART port (or whichever port you n
 1. Connect Jetson Nano UART ports to FTDI device (3v3 logic)
 2. Connect FTDI device to laptop
 3. Set up USBIPD <https://learn.microsoft.com/en-us/windows/wsl/connect-usb> (first time only)
-4. Check what devices are visible using windows powershell (see what bus ID the FTDI device is)
+4. Open WSL2 instance
+5. Check what devices are visible using windows powershell (see what bus ID the FTDI device is)
 
 - `usbipd wsl list`
 
-5. Open WSL2 instance
-6. Attach the FTDI device to WSL2 using windows powershell
 
-- `usbipd wsl attach --busid 2-1` (or whatever the bus id matches your device)
+6. bind the FTDI device to WSL2 using windows powershell
 
-7. Change owner of device
+- `usbipd bind --busid 2-1`
+
+7. Attach the FTDI device to WSL2 using windows powershell
+
+- `usbipd attach --wsl Ubuntu-22.04 --busid 2-1` (or whatever the bus id matches your device)
+
+8. Change owner of device
 
 - `sudo chown root:dialout /dev/ttyUSB0`
 
-8. Check that device is added to dialout
+9. Check that device is added to dialout
 
 - `ls -l /dev/ttyUSB0`
 
-9. Give read+write access to the device
+10. Give read+write access to the device
 
 - `sudo chmod g+rw /dev/ttyUSB0`
 
-10. Go to ArduCopter directory
+11. Go to ArduCopter directory
 
 - `cd ardupilot/ArduCopter`
 
-11. Start the SITL and access the uart port that the Jetson Nano is connected to
+12. Start the SITL and access the uart port that the Jetson Nano is connected to
 
 - `sim_vehicle.py --console --map -A --serial1=uart:/dev/ttyUSB0:115200`
 
-12. Go to OperationSquirrel/SquirrelDefender
+13. Go to OperationSquirrel/SquirrelDefender
 
 - `cd OperationSquirrel/SquirrelDefender`
 
-13. Compile the code
+14. Compile the code
     - `make`
-14. Execute the program on the Jetson Nano
+15. Execute the program on the Jetson Nano
     - `sudo ./main`
-15. The drone should ARM, send back messages, and takeoff
+16. The drone should ARM, send back messages, and takeoff
 
 #### If WSL2 does not recognize your device it may be due to an update in WSL2.  In which case you should follow the solution here <https://github.com/dorssel/usbipd-win/issues/948>
 
