@@ -1,9 +1,11 @@
 #include "CppUTest/TestHarness.h"
 #include "pid_controller.h"
 
-TEST_GROUP(ExampleGroup)
-{
-};
+/********************************************************************************
+ * Test group name
+ ********************************************************************************/
+
+TEST_GROUP(ExampleGroup){};
 
 TEST(ExampleGroup, FirstTest)
 {
@@ -11,11 +13,15 @@ TEST(ExampleGroup, FirstTest)
 
     float control = 0.0;
 
-    control = vc.pid_controller_3d(0.1, 0.0, 0.0, 
-                                   5, 0.0, 0.0, 
+    control = vc.pid_controller_3d(0.1, 0.0, 0.0,
+                                   5, 0.0, 0.0,
                                    1.0, 0.0, 0.0, CONTROL_DIM::X);
     CHECK_EQUAL(control, 0.7);
 }
+
+/********************************************************************************
+ * Test details
+ ********************************************************************************/
 
 TEST(ExampleGroup, SecondTest)
 {
