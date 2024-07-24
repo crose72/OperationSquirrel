@@ -31,6 +31,9 @@ extern videoSource *input;
 extern int numDetections;
 extern uint32_t input_video_width;
 extern uint32_t input_video_height;
+extern uint16_t mav_veh_rngfdr_min_distance;
+extern uint16_t mav_veh_rngfdr_max_distance;
+extern uint16_t mav_veh_rngfdr_current_distance;
 
 /********************************************************************************
  * Exported objects

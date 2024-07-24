@@ -54,6 +54,8 @@ Detection::~Detection(void){};
  ********************************************************************************/
 bool Detection::create_detection_network(void)
 {
+#ifdef DEBUG_BUILD
+
     Parameters detection_params("../params.json");
 
     float detection_thresh = detection_params.get_float_param("Detection_tracking", "Detect_Thresh");
@@ -61,6 +63,16 @@ bool Detection::create_detection_network(void)
     uint32_t min_frames = detection_params.get_uint32_param("Detection_tracking", "Min_Frames");
     uint32_t drop_frames = detection_params.get_uint32_param("Detection_tracking", "Drop_Frames");
     float overlap_thresh = detection_params.get_float_param("Detection_tracking", "Overlap_Threshold");
+
+#else
+
+    float detection_thresh = (float)0.7;
+    uint32_t max_batch_size = (uint32_t)4;
+    uint32_t min_frames = (uint32_t)25;
+    uint32_t drop_frames = (uint32_t)50;
+    float overlap_thresh = (float)0.5;
+
+#endif // DEBUG_BUILD
 
     const char *model = "../networks/SSD-Mobilenet-v2/ssd_mobilenet_v2_coco.uff";
     const char *class_labels = "../networks/SSD-Mobilenet-v2/ssd_coco_labels.txt";

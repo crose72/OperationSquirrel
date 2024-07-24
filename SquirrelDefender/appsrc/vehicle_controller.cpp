@@ -117,6 +117,7 @@ void VehicleController::follow_mode(void)
 
     target_velocity[0] = vx_adjust;
     target_velocity[1] = vy_adjust;
+    target_velocity[2] = vz_adjust;
 
     if (target_too_close)
     {
