@@ -425,8 +425,8 @@ void Follow::follow_control_loop(void)
         else
         {
             vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
-                                                    x_centroid_err, target_height_err, 0.0,
-                                                    w1_x, w2_x, 0.0, CONTROL_DIM::X);
+                                                    target_height_err, 0.0, 0.0,
+                                                    w1_x, 0.0, 0.0, CONTROL_DIM::X);
             vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
                                                     y_centroid_err, 0.0, 0.0,
                                                     w1_y, 0.0, 0.0, CONTROL_DIM::Y);

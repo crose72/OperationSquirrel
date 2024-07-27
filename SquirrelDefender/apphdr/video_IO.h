@@ -27,6 +27,7 @@
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
+extern detectNet *net;
 
 /********************************************************************************
  * Exported objects
@@ -34,7 +35,6 @@
 extern bool valid_image_rcvd;
 extern videoSource *input;
 extern uchar3 *image;
-extern detectNet *net;
 extern uint32_t input_video_width;
 extern uint32_t input_video_height;
 
