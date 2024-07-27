@@ -1,0 +1,21 @@
+#Reducing WSL2 size on disk, giving back some of the memory to windows
+#The steps are in order, and windows powershell must be run in administrator mode
+
+wsl --shutdown
+
+#open window Diskpart
+
+diskpart
+
+#This path will likely be different for you
+select vdisk file="C:\Users\camer\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu18.04onWindows_79rhkp1fndgsc\LocalState\ext4.vhdx"
+
+attach vdisk readonly
+
+compact vdisk
+
+detach vdisk
+
+exit
+
+#can close powershell now
