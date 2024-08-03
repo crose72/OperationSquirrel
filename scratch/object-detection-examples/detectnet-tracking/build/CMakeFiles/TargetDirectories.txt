@@ -1,3 +1,0 @@
-/home/cameroncrose72/Documents/GitHub/OperationSquirrel/scratch/object-detection-examples/detectnet/build/CMakeFiles/rebuild_cache.dir
-/home/cameroncrose72/Documents/GitHub/OperationSquirrel/scratch/object-detection-examples/detectnet/build/CMakeFiles/detectnet.dir
-/home/cameroncrose72/Documents/GitHub/OperationSquirrel/scratch/object-detection-examples/detectnet/build/CMakeFiles/edit_cache.dir
