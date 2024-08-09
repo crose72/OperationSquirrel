@@ -143,7 +143,7 @@ void Follow::get_control_params(void)
 #else
 
     // Vel_PID_x parameters for forward movement
-    Kp_x = 0.02;
+    Kp_x = 0.025;
     Ki_x = 0.0009;
     Kd_x = 0.0005;
     w1_x = 0.5;
@@ -174,7 +174,7 @@ void Follow::get_control_params(void)
     w2_y_rev = 0.0;
     w3_y_rev = 0.0;
 
-#endif
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -183,12 +183,24 @@ void Follow::get_control_params(void)
  ********************************************************************************/
 void Follow::get_desired_target_size(void)
 {
+#ifdef DEBUG_BUILD
+
     Parameters target_params("../params.json");
 
     x_desired = static_cast<float>(input_video_height) / 2.0;
     y_desired = static_cast<float>(input_video_width) / 2.0;
     target_height_desired = target_params.get_float_param("Target", "Desired_Height");
     target_width_desired = target_params.get_float_param("Target", "Desired_Width");
+
+#else
+
+    x_desired = static_cast<float>(input_video_height) / 2.0;
+    y_desired = static_cast<float>(input_video_width) / 2.0;
+    target_height_desired = (float)650;
+    target_width_desired = (float)150;
+    vehicle_height_desired = 150;
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -272,22 +284,9 @@ int Follow::dtrmn_target_ID(void)
  ********************************************************************************/
 bool Follow::follow_target_init(void)
 {
-#ifdef DEBUG_BUILD
 
     get_control_params();
     get_desired_target_size();
-
-#else
-
-    x_desired = static_cast<float>(input_video_height) / 2.0;
-    y_desired = static_cast<float>(input_video_width) / 2.0;
-    target_height_desired = (float)650;
-    target_width_desired = (float)150;
-    vehicle_height_desired = 150;
-
-#endif // DEBUG_BUILD
-
-    get_control_params();
 
     target_too_close = false;
     target_identified = false;
@@ -305,6 +304,10 @@ bool Follow::follow_target_init(void)
     target_height_err_rev = 0.0;
     vehicle_rel_height_err = 0;
 
+    vx_adjust = 0.0;
+    vy_adjust = 0.0;
+    vz_adjust = 0.0;
+
     return true;
 }
 
@@ -317,12 +320,8 @@ void Follow::follow_control_loop(void)
 {
     int target_ID = -1;
 
-#ifdef DEBUG_BUILD
-
     get_control_params();
     get_desired_target_size();
-
-#endif // DEBUG_BUILD
 
     target_ID = dtrmn_target_ID();
 
