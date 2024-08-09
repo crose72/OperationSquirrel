@@ -76,10 +76,12 @@ float Kd_y_rev;
 float w1_y_rev;
 float w2_y_rev;
 float w3_y_rev;
+uint16_t vehicle_rel_height_err;
+uint16_t vehicle_height_desired;
 float x_desired;
-float height_desired;
+float target_height_desired;
 float y_desired;
-float width_desired;
+float target_width_desired;
 
 /********************************************************************************
  * Function definitions
@@ -185,8 +187,8 @@ void Follow::get_desired_target_size(void)
 
     x_desired = static_cast<float>(input_video_height) / 2.0;
     y_desired = static_cast<float>(input_video_width) / 2.0;
-    height_desired = target_params.get_float_param("Target", "Desired_Height");
-    width_desired = target_params.get_float_param("Target", "Desired_Width");
+    target_height_desired = target_params.get_float_param("Target", "Desired_Height");
+    target_width_desired = target_params.get_float_param("Target", "Desired_Width");
 }
 
 /********************************************************************************
@@ -232,8 +234,13 @@ void Follow::calc_follow_error(void)
     target_left_err = error_zero_protection(bounding_box_left_side, target_left_side, 1.0);
     target_right_err = error_zero_protection(bounding_box_right_side, target_right_side, 1.0);
     x_centroid_err = error_zero_protection(x_desired, x_actual, 1.0);
-    target_height_err = error_zero_protection(height_desired, height_actual, 1.0);
+    target_height_err = error_zero_protection(target_height_desired, height_actual, 1.0);
     y_centroid_err = -error_zero_protection(y_desired, y_actual, 1.0);
+
+    if (mav_veh_rngfdr_current_distance >= mav_veh_rngfdr_max_distance && mav_veh_rngfdr_current_distance >= 50)
+    {
+        vehicle_rel_height_err = vehicle_height_desired - mav_veh_rngfdr_current_distance;
+    }
 }
 
 /********************************************************************************
@@ -265,15 +272,28 @@ int Follow::dtrmn_target_ID(void)
  ********************************************************************************/
 bool Follow::follow_target_init(void)
 {
+#ifdef DEBUG_BUILD
+
+    get_control_params();
+    get_desired_target_size();
+
+#else
+
+    x_desired = static_cast<float>(input_video_height) / 2.0;
+    y_desired = static_cast<float>(input_video_width) / 2.0;
+    target_height_desired = (float)650;
+    target_width_desired = (float)150;
+    vehicle_height_desired = 150;
+
+#endif // DEBUG_BUILD
+
+    get_control_params();
+
     target_too_close = false;
     target_identified = false;
-    x_desired = 0;
     x_actual = 0.0;
-    height_desired = 0.0;
     height_actual = 0.0;
-    y_desired = 0;
     y_actual = 0.0;
-    width_desired = 0.0;
     width_actual = 0.0;
     x_centroid_err = 0.0;
     target_height_err = 0.0;
@@ -283,9 +303,7 @@ bool Follow::follow_target_init(void)
     target_left_err = 0.0;
     target_right_err = 0.0;
     target_height_err_rev = 0.0;
-
-    get_control_params();
-    get_desired_target_size();
+    vehicle_rel_height_err = 0;
 
     return true;
 }
@@ -299,8 +317,13 @@ void Follow::follow_control_loop(void)
 {
     int target_ID = -1;
 
+#ifdef DEBUG_BUILD
+
     get_control_params();
     get_desired_target_size();
+
+#endif // DEBUG_BUILD
+
     target_ID = dtrmn_target_ID();
 
     if (target_identified)
@@ -308,7 +331,7 @@ void Follow::follow_control_loop(void)
         calc_target_size(target_ID);
         calc_follow_error();
 
-        target_too_close = (height_actual > height_desired);
+        target_too_close = (height_actual > target_height_desired);
 
         if (target_too_close)
         {

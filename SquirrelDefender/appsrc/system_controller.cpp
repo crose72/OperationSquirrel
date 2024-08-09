@@ -178,6 +178,8 @@ int SystemController::system_state_machine(void)
             break;
         }
     }
+
+    return 0;
 }
 
 #ifdef USE_JETSON

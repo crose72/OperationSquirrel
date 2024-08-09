@@ -78,6 +78,8 @@ extern float target_left_err;
 extern float target_right_err;
 extern float target_height_err_rev;
 
+extern SYSTEM_STATE system_state;
+
 /********************************************************************************
  * Exported objects
  ********************************************************************************/

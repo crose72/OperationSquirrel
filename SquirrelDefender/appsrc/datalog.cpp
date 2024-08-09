@@ -40,13 +40,13 @@ std::vector<std::vector<std::string>> data = {};
  * Function: DataLogger
  * Description: Class constructor
  ********************************************************************************/
-DataLogger::DataLogger(){};
+DataLogger::DataLogger() {};
 
 /********************************************************************************
  * Function: ~DataLogger
  * Description: Class destructor
  ********************************************************************************/
-DataLogger::~DataLogger(){};
+DataLogger::~DataLogger() {};
 
 /********************************************************************************
  * Function: generate_unique_filename
@@ -62,7 +62,7 @@ std::string DataLogger::generate_unique_filename(const std::string &filename)
     {
         file.close();
         // If the file exists, append the counter number and try again
-        new_file_name = dataFilePath +filename + "_" + std::to_string(counter++) + ".csv";
+        new_file_name = dataFilePath + filename + "_" + std::to_string(counter++) + ".csv";
         file.open(new_file_name);
     }
 
@@ -116,6 +116,7 @@ bool DataLogger::data_log_init(void)
 
     file_name = generate_unique_filename(dataFileName);
     data.push_back({"Time",
+                    "System State",
                     "x_actual",
                     "height_actual",
                     "y_actual",
@@ -163,7 +164,7 @@ bool DataLogger::data_log_init(void)
                     "Flow Rate X",
                     "Flow Rate Y"});
 
-    #elif USE_WSL
+#elif USE_WSL
 
     data.push_back({"Time",
                     "Voltage Battery",
@@ -196,7 +197,7 @@ bool DataLogger::data_log_init(void)
                     "Flow Rate X",
                     "Flow Rate Y"});
 
-    #endif // USE_JETSON
+#endif // USE_JETSON
 
     save_to_csv(file_name, data);
 
@@ -215,85 +216,86 @@ void DataLogger::data_log_loop(void)
 #ifdef USE_JETSON
 
     data.push_back({{std::to_string(app_elapsed_time),
-                    std::to_string(x_actual),
-                    std::to_string(height_actual),
-                    std::to_string(y_actual),
-                    std::to_string(width_actual),
-                    std::to_string(x_centroid_err),
-                    std::to_string(target_height_err),
-                    std::to_string(y_centroid_err),
-                    std::to_string(target_left_side),
-                    std::to_string(target_right_side),
-                    std::to_string(target_left_err),
-                    std::to_string(target_right_err),
-                    std::to_string(target_height_err_rev),
-                    std::to_string(target_identified),
-                    std::to_string(target_too_close),
-                    std::to_string(vx_adjust),
-                    std::to_string(vy_adjust),
-                    std::to_string(vz_adjust),
-                    std::to_string(mav_veh_sys_stat_voltage_battery),
-                    std::to_string(mav_veh_sys_stat_current_battery),
-                    std::to_string(mav_veh_sys_stat_battery_remaining),
-                    std::to_string(mav_veh_rel_alt),
-                    std::to_string(mav_veh_gps_vx),
-                    std::to_string(mav_veh_gps_vy),
-                    std::to_string(mav_veh_gps_vz),
-                    std::to_string(mav_veh_gps_hdg),
-                    std::to_string(mav_veh_roll),
-                    std::to_string(mav_veh_pitch),
-                    std::to_string(mav_veh_yaw),
-                    std::to_string(mav_veh_rollspeed),
-                    std::to_string(mav_veh_pitchspeed),
-                    std::to_string(mav_veh_yawspeed),
-                    std::to_string(mav_veh_imu_ax),
-                    std::to_string(mav_veh_imu_ay),
-                    std::to_string(mav_veh_imu_az),
-                    std::to_string(mav_veh_imu_xgyro),
-                    std::to_string(mav_veh_imu_ygyro),
-                    std::to_string(mav_veh_imu_zgyro),
-                    std::to_string(mav_veh_rngfdr_current_distance),
-                    std::to_string(mav_veh_rngfdr_signal_quality),
-                    std::to_string(mav_veh_flow_comp_m_x),
-                    std::to_string(mav_veh_flow_comp_m_y),
-                    std::to_string(mav_veh_flow_x),
-                    std::to_string(mav_veh_flow_y),
-                    std::to_string(mav_veh_quality),
-                    std::to_string(mav_veh_flow_rate_x),
-                    std::to_string(mav_veh_flow_rate_y)}});
+                     std::to_string(system_state),
+                     std::to_string(x_actual),
+                     std::to_string(height_actual),
+                     std::to_string(y_actual),
+                     std::to_string(width_actual),
+                     std::to_string(x_centroid_err),
+                     std::to_string(target_height_err),
+                     std::to_string(y_centroid_err),
+                     std::to_string(target_left_side),
+                     std::to_string(target_right_side),
+                     std::to_string(target_left_err),
+                     std::to_string(target_right_err),
+                     std::to_string(target_height_err_rev),
+                     std::to_string(target_identified),
+                     std::to_string(target_too_close),
+                     std::to_string(vx_adjust),
+                     std::to_string(vy_adjust),
+                     std::to_string(vz_adjust),
+                     std::to_string(mav_veh_sys_stat_voltage_battery),
+                     std::to_string(mav_veh_sys_stat_current_battery),
+                     std::to_string(mav_veh_sys_stat_battery_remaining),
+                     std::to_string(mav_veh_rel_alt),
+                     std::to_string(mav_veh_gps_vx),
+                     std::to_string(mav_veh_gps_vy),
+                     std::to_string(mav_veh_gps_vz),
+                     std::to_string(mav_veh_gps_hdg),
+                     std::to_string(mav_veh_roll),
+                     std::to_string(mav_veh_pitch),
+                     std::to_string(mav_veh_yaw),
+                     std::to_string(mav_veh_rollspeed),
+                     std::to_string(mav_veh_pitchspeed),
+                     std::to_string(mav_veh_yawspeed),
+                     std::to_string(mav_veh_imu_ax),
+                     std::to_string(mav_veh_imu_ay),
+                     std::to_string(mav_veh_imu_az),
+                     std::to_string(mav_veh_imu_xgyro),
+                     std::to_string(mav_veh_imu_ygyro),
+                     std::to_string(mav_veh_imu_zgyro),
+                     std::to_string(mav_veh_rngfdr_current_distance),
+                     std::to_string(mav_veh_rngfdr_signal_quality),
+                     std::to_string(mav_veh_flow_comp_m_x),
+                     std::to_string(mav_veh_flow_comp_m_y),
+                     std::to_string(mav_veh_flow_x),
+                     std::to_string(mav_veh_flow_y),
+                     std::to_string(mav_veh_quality),
+                     std::to_string(mav_veh_flow_rate_x),
+                     std::to_string(mav_veh_flow_rate_y)}});
 
 #elif USE_WSL
 
     data.push_back({{std::to_string(app_elapsed_time),
-                    std::to_string(mav_veh_sys_stat_voltage_battery),
-                    std::to_string(mav_veh_sys_stat_current_battery),
-                    std::to_string(mav_veh_sys_stat_battery_remaining),
-                    std::to_string(mav_veh_rel_alt),
-                    std::to_string(mav_veh_gps_vx),
-                    std::to_string(mav_veh_gps_vy),
-                    std::to_string(mav_veh_gps_vz),
-                    std::to_string(mav_veh_gps_hdg),
-                    std::to_string(mav_veh_roll),
-                    std::to_string(mav_veh_pitch),
-                    std::to_string(mav_veh_yaw),
-                    std::to_string(mav_veh_rollspeed),
-                    std::to_string(mav_veh_pitchspeed),
-                    std::to_string(mav_veh_yawspeed),
-                    std::to_string(mav_veh_imu_ax),
-                    std::to_string(mav_veh_imu_ay),
-                    std::to_string(mav_veh_imu_az),
-                    std::to_string(mav_veh_imu_xgyro),
-                    std::to_string(mav_veh_imu_ygyro),
-                    std::to_string(mav_veh_imu_zgyro),
-                    std::to_string(mav_veh_rngfdr_current_distance),
-                    std::to_string(mav_veh_rngfdr_signal_quality),
-                    std::to_string(mav_veh_flow_comp_m_x),
-                    std::to_string(mav_veh_flow_comp_m_y),
-                    std::to_string(mav_veh_flow_x),
-                    std::to_string(mav_veh_flow_y),
-                    std::to_string(mav_veh_quality),
-                    std::to_string(mav_veh_flow_rate_x),
-                    std::to_string(mav_veh_flow_rate_y)}});
+                     std::to_string(mav_veh_sys_stat_voltage_battery),
+                     std::to_string(mav_veh_sys_stat_current_battery),
+                     std::to_string(mav_veh_sys_stat_battery_remaining),
+                     std::to_string(mav_veh_rel_alt),
+                     std::to_string(mav_veh_gps_vx),
+                     std::to_string(mav_veh_gps_vy),
+                     std::to_string(mav_veh_gps_vz),
+                     std::to_string(mav_veh_gps_hdg),
+                     std::to_string(mav_veh_roll),
+                     std::to_string(mav_veh_pitch),
+                     std::to_string(mav_veh_yaw),
+                     std::to_string(mav_veh_rollspeed),
+                     std::to_string(mav_veh_pitchspeed),
+                     std::to_string(mav_veh_yawspeed),
+                     std::to_string(mav_veh_imu_ax),
+                     std::to_string(mav_veh_imu_ay),
+                     std::to_string(mav_veh_imu_az),
+                     std::to_string(mav_veh_imu_xgyro),
+                     std::to_string(mav_veh_imu_ygyro),
+                     std::to_string(mav_veh_imu_zgyro),
+                     std::to_string(mav_veh_rngfdr_current_distance),
+                     std::to_string(mav_veh_rngfdr_signal_quality),
+                     std::to_string(mav_veh_flow_comp_m_x),
+                     std::to_string(mav_veh_flow_comp_m_y),
+                     std::to_string(mav_veh_flow_x),
+                     std::to_string(mav_veh_flow_y),
+                     std::to_string(mav_veh_quality),
+                     std::to_string(mav_veh_flow_rate_x),
+                     std::to_string(mav_veh_flow_rate_y)}});
 
 #endif // USE_JETSON
 
