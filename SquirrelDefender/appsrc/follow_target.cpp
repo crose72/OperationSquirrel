@@ -24,8 +24,8 @@
  * Object definitions
  ********************************************************************************/
 DebugTerm FollowData("");
-PID pid_rev;
 PID pid_forwd;
+PID pid_rev;
 
 bool target_too_close;
 bool target_identified;
@@ -49,99 +49,37 @@ float vz_adjust;
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-
-#ifdef DEBUG_BUILD
-
-// Vel_PID_x parameters for forward movement
 float Kp_x;
 float Ki_x;
 float Kd_x;
-float w1_x;
-float w2_x;
-float w3_x;
-
-// Vel_PID_y parameters for forward movement
 float Kp_y;
 float Ki_y;
 float Kd_y;
+float w1_x;
+float w2_x;
+float w3_x;
 float w1_y;
 float w2_y;
 float w3_y;
-
-// Vel_PID_z parameters for forward movement
-float Kp_z;
-float Ki_z;
-float Kd_z;
 float w1_z;
 float w2_z;
 float w3_z;
-
-// Vel_PID_x parameters for reverse movement
 float Kp_x_rev;
 float Ki_x_rev;
 float Kd_x_rev;
 float w1_x_rev;
 float w2_x_rev;
 float w3_x_rev;
-
-// Vel_PID_y parameters for reverse movement
 float Kp_y_rev;
 float Ki_y_rev;
 float Kd_y_rev;
 float w1_y_rev;
 float w2_y_rev;
 float w3_y_rev;
-
-// Vel_PID_z parameters for reverse movement
-float Kp_z_rev;
-float Ki_z_rev;
-float Kd_z_rev;
-float w1_z_rev;
-float w2_z_rev;
-float w3_z_rev;
-
-#else
-
-// Vel_PID_x parameters for forward movement
-const float Kp_x = 0.02;
-const float Ki_x = 0.0;
-const float Kd_x = 0.0;
-const float w1_x = 0.5;
-const float w2_x = 0.5;
-const float w3_x = 0.0;
-
-// Vel_PID_y parameters for forward movement
-const float Kp_y = 0.001;
-const float Ki_y = 0.0;
-const float Kd_y = 0.0;
-const float w1_y = 1.0;
-const float w2_y = 0.0;
-const float w3_y = 0.0;
-
-// Vel_PID_x parameters for reverse movement
-const float Kp_x_rev = 0.02;
-const float Ki_x_rev = 0.0;
-const float Kd_x_rev = 0.0;
-const float w1_x_rev = 1.0;
-const float w2_x_rev = 0.0;
-const float w3_x_rev = 0.0;
-
-// Vel_PID_y parameters for reverse movement
-const float Kp_y_rev = 0.001;
-const float Ki_y_rev = 0.0;
-const float Kd_y_rev = 0.0;
-const float w1_y_rev = 1.0;
-const float w2_y_rev = 0.0;
-const float w3_y_rev = 0.0;
-
-#endif // DEBUG_BUILD
-
-uint16_t vehicle_rel_height_err;
-uint16_t vehicle_height_desired;
 float x_desired;
-float target_height_desired;
+float height_desired;
 float y_desired;
-float target_width_desired;
+float width_desired;
 
 /********************************************************************************
  * Function definitions
@@ -165,6 +103,8 @@ Follow::~Follow(void) {};
  ********************************************************************************/
 void Follow::get_control_params(void)
 {
+#ifdef DEBUG_BUILD
+
     Parameters veh_params("../params.json");
     // Accessing Vel_PID_x parameters
     Kp_x = veh_params.get_float_param("Vel_PID_x", "Kp");
@@ -182,14 +122,6 @@ void Follow::get_control_params(void)
     w2_y = veh_params.get_float_param("Vel_PID_y", "w2");
     w3_y = veh_params.get_float_param("Vel_PID_y", "w3");
 
-    // Accessing Vel_PID_z parameters
-    Kp_z = veh_params.get_float_param("Vel_PID_z", "Kp");
-    Ki_z = veh_params.get_float_param("Vel_PID_z", "Ki");
-    Kd_z = veh_params.get_float_param("Vel_PID_z", "Kd");
-    w1_z = veh_params.get_float_param("Vel_PID_z", "w1");
-    w2_z = veh_params.get_float_param("Vel_PID_z", "w2");
-    w3_z = veh_params.get_float_param("Vel_PID_z", "w3");
-
     // Accessing Vel_PID_x parameters for reverse movement
     Kp_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "Kp");
     Ki_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "Ki");
@@ -206,13 +138,41 @@ void Follow::get_control_params(void)
     w2_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "w2");
     w3_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "w3");
 
-    // Accessing Vel_PID_z_reverse parameters
-    Kp_z_rev = veh_params.get_float_param("Vel_PID_z_reverse", "Kp");
-    Ki_z_rev = veh_params.get_float_param("Vel_PID_z_reverse", "Ki");
-    Kd_z_rev = veh_params.get_float_param("Vel_PID_z_reverse", "Kd");
-    w1_z_rev = veh_params.get_float_param("Vel_PID_z_reverse", "w1");
-    w2_z_rev = veh_params.get_float_param("Vel_PID_z_reverse", "w2");
-    w3_z_rev = veh_params.get_float_param("Vel_PID_z_reverse", "w3");
+#else
+
+    // Vel_PID_x parameters for forward movement
+    Kp_x = 0.02;
+    Ki_x = 0.0009;
+    Kd_x = 0.0005;
+    w1_x = 0.5;
+    w2_x = 0.5;
+    w3_x = 0.0;
+
+    // Vel_PID_y parameters for forward movement
+    Kp_y = 0.0001;
+    Ki_y = 0.00009;
+    Kd_y = 0.00005;
+    w1_y = 1.0;
+    w2_y = 0.0;
+    w3_y = 0.0;
+
+    // Vel_PID_x parameters for reverse movement
+    Kp_x_rev = 0.01;
+    Ki_x_rev = 0.00009;
+    Kd_x_rev = 0.00005;
+    w1_x_rev = 1.0;
+    w2_x_rev = 0.0;
+    w3_x_rev = 0.0;
+
+    // Vel_PID_y parameters for reverse movement
+    Kp_y_rev = 0.001;
+    Ki_y_rev = 0.00009;
+    Kd_y_rev = 0.00005;
+    w1_y_rev = 1.0;
+    w2_y_rev = 0.0;
+    w3_y_rev = 0.0;
+
+#endif
 }
 
 /********************************************************************************
@@ -225,8 +185,8 @@ void Follow::get_desired_target_size(void)
 
     x_desired = static_cast<float>(input_video_height) / 2.0;
     y_desired = static_cast<float>(input_video_width) / 2.0;
-    target_height_desired = target_params.get_float_param("Target", "Desired_Height");
-    target_width_desired = target_params.get_float_param("Target", "Desired_Width");
+    height_desired = target_params.get_float_param("Target", "Desired_Height");
+    width_desired = target_params.get_float_param("Target", "Desired_Width");
 }
 
 /********************************************************************************
@@ -272,13 +232,8 @@ void Follow::calc_follow_error(void)
     target_left_err = error_zero_protection(bounding_box_left_side, target_left_side, 1.0);
     target_right_err = error_zero_protection(bounding_box_right_side, target_right_side, 1.0);
     x_centroid_err = error_zero_protection(x_desired, x_actual, 1.0);
-    target_height_err = error_zero_protection(target_height_desired, height_actual, 1.0);
+    target_height_err = error_zero_protection(height_desired, height_actual, 1.0);
     y_centroid_err = -error_zero_protection(y_desired, y_actual, 1.0);
-
-    if (mav_veh_rngfdr_current_distance >= mav_veh_rngfdr_max_distance && mav_veh_rngfdr_current_distance >= 50)
-    {
-        vehicle_rel_height_err = vehicle_height_desired - mav_veh_rngfdr_current_distance;
-    }
 }
 
 /********************************************************************************
@@ -310,64 +265,16 @@ int Follow::dtrmn_target_ID(void)
  ********************************************************************************/
 bool Follow::follow_target_init(void)
 {
-#ifdef DEBUG_BUILD
-
-    get_control_params();
-    get_desired_target_size();
-
-#else
-
-    // Vel_PID_x parameters for forward movement
-    const Kp_x = 0.02;
-    const Ki_x = 0.0;
-    const Kd_x = 0.0;
-    const w1_x = 0.5;
-    const w2_x = 0.5;
-    const w3_x = 0.0;
-
-    // Vel_PID_y parameters for forward movement
-    const Kp_y = 0.001;
-    const Ki_y = 0.0;
-    const Kd_y = 0.0;
-    const w1_y = 1.0;
-    const w2_y = 0.0;
-    const w3_y = 0.0;
-
-    // Vel_PID_x parameters for reverse movement
-    const Kp_x_rev = 0.02;
-    const Ki_x_rev = 0.0;
-    const Kd_x_rev = 0.0;
-    const w1_x_rev = 1.0;
-    const w2_x_rev = 0.0;
-    const w3_x_rev = 0.0;
-
-    // Vel_PID_y parameters for reverse movement
-    const Kp_y_rev = 0.001;
-    const Ki_y_rev = 0.0;
-    const Kd_y_rev = 0.0;
-    const w1_y_rev = 1.0;
-    const w2_y_rev = 0.0;
-    const w3_y_rev = 0.0;
-
-    x_desired = static_cast<float>(input_video_height) / 2.0;
-    y_desired = static_cast<float>(input_video_width) / 2.0;
-    target_height_desired = (float)650;
-    target_width_desired = (float)150;
-    vehicle_height_desired = 150;
-
-#endif // DEBUG_BUILD
-
     target_too_close = false;
     target_identified = false;
     x_desired = 0;
     x_actual = 0.0;
-    target_height_desired = 0.0;
+    height_desired = 0.0;
     height_actual = 0.0;
     y_desired = 0;
     y_actual = 0.0;
-    target_width_desired = 0.0;
+    width_desired = 0.0;
     width_actual = 0.0;
-
     x_centroid_err = 0.0;
     target_height_err = 0.0;
     y_centroid_err = 0.0;
@@ -376,11 +283,9 @@ bool Follow::follow_target_init(void)
     target_left_err = 0.0;
     target_right_err = 0.0;
     target_height_err_rev = 0.0;
-    vehicle_rel_height_err = 0;
 
-    vx_adjust = 0;
-    vy_adjust = 0;
-    vz_adjust = 0;
+    get_control_params();
+    get_desired_target_size();
 
     return true;
 }
@@ -394,13 +299,8 @@ void Follow::follow_control_loop(void)
 {
     int target_ID = -1;
 
-#ifdef DEBUG_BUILD
-
     get_control_params();
     get_desired_target_size();
-
-#endif // DEBUG_BUILD
-
     target_ID = dtrmn_target_ID();
 
     if (target_identified)
@@ -408,7 +308,7 @@ void Follow::follow_control_loop(void)
         calc_target_size(target_ID);
         calc_follow_error();
 
-        target_too_close = (height_actual > target_height_desired);
+        target_too_close = (height_actual > height_desired);
 
         if (target_too_close)
         {
@@ -418,21 +318,15 @@ void Follow::follow_control_loop(void)
             vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev,
                                                   y_centroid_err, 0.0, 0.0,
                                                   w1_y_rev, 0.0, 0.0, CONTROL_DIM::Y);
-            vz_adjust = pid_rev.pid_controller_3d(Kp_z, Ki_z, Kd_z,
-                                                  vehicle_rel_height_err, 0.0, 0.0,
-                                                  w1_z_rev, 0.0, 0.0, CONTROL_DIM::Y);
         }
         else
         {
             vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
-                                                    target_height_err, 0.0, 0.0,
-                                                    w1_x, 0.0, 0.0, CONTROL_DIM::X);
+                                                    x_centroid_err, target_height_err, 0.0,
+                                                    w1_x, w2_x, 0.0, CONTROL_DIM::X);
             vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
                                                     y_centroid_err, 0.0, 0.0,
                                                     w1_y, 0.0, 0.0, CONTROL_DIM::Y);
-            vz_adjust = pid_forwd.pid_controller_3d(Kp_z, Ki_z, Kd_z,
-                                                    vehicle_rel_height_err, 0.0, 0.0,
-                                                    w1_z, 0.0, 0.0, CONTROL_DIM::Y);
         }
     }
 }
