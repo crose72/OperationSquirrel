@@ -78,13 +78,13 @@ enum class FlightMode : uint8_t
  * Function: MavCmd
  * Description: Class constructor
  ********************************************************************************/
-MavCmd::MavCmd(){};
+MavCmd::MavCmd() {};
 
 /********************************************************************************
  * Function: ~MavCmd
  * Description: Class destructor
  ********************************************************************************/
-MavCmd::~MavCmd(){};
+MavCmd::~MavCmd() {};
 
 /********************************************************************************
  * Function: takeoff_LOCAL
@@ -189,10 +189,7 @@ void MavCmd::set_flight_mode(uint8_t confirmation, float mode, float custom_mode
  ********************************************************************************/
 void MavCmd::set_mav_msg_rate(uint16_t msg_id, float msg_interval)
 {
-    mavlink_message_t msg;
-
-    mavlink_msg_command_long_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, MAV_CMD_SET_MESSAGE_INTERVAL, 0, msg_id, msg_interval, 0, 0, 0, 0, 0);
-    send_mav_cmd(msg);
+    send_cmd_long(MAV_CMD_SET_MESSAGE_INTERVAL, 0, msg_id, msg_interval, 0, 0, 0, 0, 1);
 }
 
 /********************************************************************************
@@ -203,10 +200,7 @@ void MavCmd::set_mav_msg_rate(uint16_t msg_id, float msg_interval)
  ********************************************************************************/
 void MavCmd::req_mav_msg(uint16_t msg_id)
 {
-    mavlink_message_t msg;
-
-    mavlink_msg_command_long_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, MAV_CMD_REQUEST_MESSAGE, 0, msg_id, 0, 0, 0, 0, 0, 0);
-    send_mav_cmd(msg);
+    send_cmd_long(MAV_CMD_REQUEST_MESSAGE, 0, msg_id, 0, 0, 0, 0, 0, 1);
 }
 
 /********************************************************************************
@@ -215,13 +209,29 @@ void MavCmd::req_mav_msg(uint16_t msg_id)
  *              longs to be sent, including a mode change, takeoff, ARM throttle,
  *              and more.
  ********************************************************************************/
-void MavCmd::send_cmd_int(uint8_t frame, uint16_t command, float param1, float param2, float param3, float param4, int32_t x, int32_t y, float z)
+void MavCmd::send_cmd_int(uint8_t command_int_frame, uint16_t mavlink_command,
+                          float cmd_int_param1, float cmd_int_param2, float cmd_int_param3, float cmd_int_param4, int32_t cmd_int_x, int32_t cmd_int_y, float cmd_int_z)
 {
     mavlink_message_t msg;
-    uint8_t current = 0;      // no used according to documentation, set 0
-    uint8_t autocontinue = 0; // no used according to documentation, set 0
+    mavlink_command_int_t command_int;
+    uint8_t command_int_current = 0;      // no used according to documentation, set 0
+    uint8_t command_int_autocontinue = 0; // no used according to documentation, set 0
 
-    mavlink_msg_command_int_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, frame, command, current, autocontinue, param1, param2, param3, param4, x, y, z);
+    command_int.target_system = TARGET_SYS_ID;
+    command_int.target_component = TARGET_COMP_ID;
+    command_int.frame = command_int_frame;
+    command_int.command = mavlink_command;
+    command_int.current = command_int_current;
+    command_int.autocontinue = command_int_autocontinue;
+    command_int.param1 = cmd_int_param1;
+    command_int.param2 = cmd_int_param2;
+    command_int.param3 = cmd_int_param3;
+    command_int.param4 = cmd_int_param4;
+    command_int.x = cmd_int_x;
+    command_int.y = cmd_int_y;
+    command_int.z = cmd_int_z;
+
+    mavlink_msg_command_int_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, &command_int);
     send_mav_cmd(msg);
 }
 
@@ -231,11 +241,25 @@ void MavCmd::send_cmd_int(uint8_t frame, uint16_t command, float param1, float p
  *              long which can do a mode change, takeoff, ARM throttle,
  *              and more.
  ********************************************************************************/
-void MavCmd::send_cmd_long(uint16_t mavlink_command, uint8_t confirmation, float param1, float param2, float param3, float param4, float param5, float param6, float param7)
+void MavCmd::send_cmd_long(uint16_t mavlink_command, uint8_t confirmation,
+                           float cmd_long_param1, float cmd_long_param2, float cmd_long_param3, float cmd_long_param4, float cmd_long_param5, float cmd_long_param6, float cmd_long_param7)
 {
     mavlink_message_t msg;
+    mavlink_command_long_t command_long;
 
-    mavlink_msg_command_long_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, mavlink_command, confirmation, param1, param2, param3, param4, param5, param6, param7);
+    command_long.target_system = TARGET_SYS_ID;
+    command_long.target_component = TARGET_COMP_ID;
+    command_long.command = mavlink_command;
+    command_long.confirmation = confirmation;
+    command_long.param1 = cmd_long_param1;
+    command_long.param2 = cmd_long_param2;
+    command_long.param3 = cmd_long_param3;
+    command_long.param4 = cmd_long_param4;
+    command_long.param5 = cmd_long_param5;
+    command_long.param6 = cmd_long_param6;
+    command_long.param7 = cmd_long_param7;
+
+    mavlink_msg_command_long_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, &command_long);
     send_mav_cmd(msg);
 }
 

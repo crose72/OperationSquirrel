@@ -59,6 +59,22 @@ extern uint8_t mav_veh_quality;
 extern float mav_veh_flow_rate_x;
 extern float mav_veh_flow_rate_y;
 
+extern float mav_veh_local_ned_x;
+extern float mav_veh_local_ned_y;
+extern float mav_veh_local_ned_z;
+extern float mav_veh_local_ned_vx;
+extern float mav_veh_local_ned_vy;
+extern float mav_veh_local_ned_vz;
+
+extern float mav_veh_q1_actual;
+extern float mav_veh_q2_actual;
+extern float mav_veh_q3_actual;
+extern float mav_veh_q4_actual;
+extern float mav_veh_roll_rate_actual;
+extern float mav_veh_pitch_rate_actual;
+extern float mav_veh_yaw_rate_actual;
+extern float mav_veh_repr_offset_q[4];
+
 extern bool target_too_close;
 extern bool target_identified;
 extern float vx_adjust;
