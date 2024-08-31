@@ -14,7 +14,7 @@ This document will guide you through setting up the entire workflow needed for d
     - <https://ardupilot.org/dev/docs/building-setup-linux.html#building-setup-linux>
     - You don’t need the git gui and WSL2 should come with git.  You should only need to follow the instructions        to clone the repo and install the required packages with the shell script.
 3. Confirm that your build environment is set up properly
-    - <https://github.com/ArduPilot/ardupilot/blob/master/BUILD.md>
+    - <https://github.com/ArduPilot/ardupilot/blob/dev/BUILD.md>
     - In WSL2 just change directories to the ardupilot/ArduCopter directory (wherever you cloned it)
         - `cd ardupilot/ArduCopter`
     - Configure with waf
@@ -43,4 +43,4 @@ You have now successfully setup SITL
 
 ## How to use our code to communicate with SITL
 
-Read [02-Connecting-WSL-and-Jetson-Nano-to-SITL](https://github.com/crose72/OperationSquirrel/blob/master/Docs/02-Connecting-WSL-and-Jetson-Nano-to-SITL.md) to learn how to use control a simulated or real drone with the code.
+Read [02-Connecting-WSL-and-Jetson-Nano-to-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/Docs/02-Connecting-WSL-and-Jetson-Nano-to-SITL.md) to learn how to use control a simulated or real drone with the code.
