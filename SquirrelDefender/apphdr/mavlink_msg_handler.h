@@ -104,7 +104,7 @@ extern float mav_veh_q4_actual;
 extern float mav_veh_roll_rate_actual;
 extern float mav_veh_pitch_rate_actual;
 extern float mav_veh_yaw_rate_actual;
-extern float mav_veh_thrust_actual;
+extern float mav_veh_repr_offset_q[4];
 
 extern uint16_t mav_veh_rngfdr_min_distance;
 extern uint16_t mav_veh_rngfdr_max_distance;
@@ -127,6 +127,13 @@ extern uint8_t mav_veh_sensor_id;
 extern uint8_t mav_veh_quality;
 extern float mav_veh_flow_rate_x;
 extern float mav_veh_flow_rate_y;
+
+extern float mav_veh_local_ned_x;
+extern float mav_veh_local_ned_y;
+extern float mav_veh_local_ned_z;
+extern float mav_veh_local_ned_vx;
+extern float mav_veh_local_ned_vy;
+extern float mav_veh_local_ned_vz;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
@@ -165,6 +172,7 @@ public:
     static void proc_mav_command_ack_msg(const mavlink_message_t *msg, const char *term);
     static void proc_mav_optical_flow_msg(const mavlink_message_t *msg, const char *term);
     static void proc_mav_distance_sensor_msg(const mavlink_message_t *msg, const char *term);
+    static void proc_mav_position_local_ned_msg(const mavlink_message_t *msg, const char *term);
 
 private:
     static void set_mav_msg_rate(uint16_t msg_id, float msg_interval) { MavCmd::set_mav_msg_rate(msg_id, msg_interval); };

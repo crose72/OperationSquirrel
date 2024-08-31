@@ -378,6 +378,23 @@ void print_attitude_quaternion(mavlink_attitude_quaternion_t &attitude_quaternio
 }
 
 /********************************************************************************
+ * Function: print_attitude_quaternion
+ * Description: Print the attitude quaternion mavlink message.
+ ********************************************************************************/
+void print_position_local_ned(const mavlink_local_position_ned_t &local_position, const char *term)
+{
+    /* DebugTerm PrintLocalPos(term); */
+
+    PrintPass::c_printf("Local Position NED:\n");
+    PrintPass::c_printf("\tX Position (m): %f\n", local_position.x);
+    PrintPass::c_printf("\tY Position (m): %f\n", local_position.y);
+    PrintPass::c_printf("\tZ Position (m): %f\n", local_position.z);
+    PrintPass::c_printf("\tX Speed (m/s): %f\n", local_position.vx);
+    PrintPass::c_printf("\tY Speed (m/s): %f\n", local_position.vy);
+    PrintPass::c_printf("\tZ Speed (m/s): %f\n", local_position.vz);
+}
+
+/********************************************************************************
  * Function: print_command_ack
  * Description: Print the mavlink command received by the autopilot.
  ********************************************************************************/
