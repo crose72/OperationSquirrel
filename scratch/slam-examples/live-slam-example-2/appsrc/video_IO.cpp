@@ -1,5 +1,3 @@
-#ifdef USE_JETSON
-
 /********************************************************************************
  * @file    videoIO.cpp
  * @author  Cameron Rose
@@ -257,10 +255,12 @@ bool Video::display_video(void)
     {
         output_vid_disp->Render(image, input->GetWidth(), input->GetHeight());
 
+        /*
         // update the status bar
         char str[256];
         sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(net->GetPrecision()), net->GetNetworkFPS());
         output_vid_disp->SetStatus(str);
+        */
 
         // check if the user quit
         if (!output_vid_disp->IsStreaming())
@@ -337,17 +337,14 @@ bool Video::video_init(void)
 
 #ifdef DEBUG_BUILD
 
-    if (!create_input_video_stream() ||
-        !create_output_vid_stream() ||
-        !create_display_video_stream())
+    if (!create_input_video_stream() ||)
     {
         return false;
     }
 
 #else
 
-    if (!create_input_video_stream() ||
-        !create_output_vid_stream())
+    if (!create_input_video_stream())
     {
         return false;
     }
@@ -405,15 +402,6 @@ void Video::shutdown(void)
 {
     LogVerbose("video:  shutting down...\n");
     delete_input_video_stream();
-    delete_video_file_stream();
-
-#ifdef DEBUG_BUILD
-
-    delete_video_display_stream();
-
-#endif // DEBUG_BUILD
 
     LogVerbose("video:  shutdown complete.\n");
 }
-
-#endif // USE_JETSON

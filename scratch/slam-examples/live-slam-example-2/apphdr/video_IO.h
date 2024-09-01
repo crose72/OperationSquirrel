@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef USE_JETSON
-
 /********************************************************************************
  * @file    video_IO.h
  * @author  Cameron Rose
@@ -15,7 +13,6 @@
  ********************************************************************************/
 #include "jetson-utils/videoSource.h"
 #include "jetson-utils/videoOutput.h"
-#include "jetson-utils/gstCamera.h"
 #include "jetson-inference/detectNet.h"
 #include "jetson-inference/objectTracker.h"
 #include <jetson-inference/objectTrackerIOU.h>
@@ -62,10 +59,6 @@ public:
     static void delete_video_display_stream(void);
 
 private:
-    static gboolean static_bus_callback(GstBus *bus, GstMessage *message, gpointer data);
-    gboolean bus_callback(GstBus *bus, GstMessage *message, gpointer data); // Used to access a gstreamer pipeline
 };
 
 #endif // VIDEO_IO_H
-
-#endif // USE_JETSON
