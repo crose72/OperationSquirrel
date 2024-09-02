@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
 /********************************************************************************
  * @file    follow_target.h
@@ -81,4 +81,4 @@ private:
 
 #endif // FOLLOW_TARGET_H
 
-#endif // USE_JETSON
+#endif // JETSON_B01

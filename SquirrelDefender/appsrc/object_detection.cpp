@@ -1,4 +1,4 @@
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
 /********************************************************************************
  * @file    target_tracking.cpp
@@ -40,13 +40,13 @@ int numDetections;
  * Function: Detection
  * Description: Class constructor
  ********************************************************************************/
-Detection::Detection(void){};
+Detection::Detection(void) {};
 
 /********************************************************************************
  * Function: ~Detection
  * Description: Class destructor
  ********************************************************************************/
-Detection::~Detection(void){};
+Detection::~Detection(void) {};
 
 /********************************************************************************
  * Function: create_detection_network
@@ -247,4 +247,4 @@ void Detection::shutdown(void)
     LogVerbose("detectnet:  shutdown complete.\n");
 }
 
-#endif // USE_JETSON
+#endif // JETSON_B01

@@ -19,14 +19,14 @@
 #include <mutex>
 #include <signal.h>
 
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
 #include "jetson_IO.h"
 #include "video_IO.h"
 #include "object_detection.h"
 #include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 
-#endif // USE_JETSON
+#endif // JETSON_B01
 
 /********************************************************************************
  * Typedefs
@@ -41,7 +41,7 @@
  ********************************************************************************/
 TimeCalc MainAppTime;
 bool stop_program;
-std::mutex mutex;
+std::mutex mutex_main;
 
 extern bool save_button_press;
 
@@ -106,7 +106,7 @@ int main(void)
         return 1;
     }
 
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
     while (!stop_program && !save_button_press)
 
@@ -114,15 +114,15 @@ int main(void)
 
     while (!stop_program)
 
-#endif // USE_JETSON
+#endif // JETSON_B01
 
     {
-        std::lock_guard<std::mutex> lock(mutex);
+        std::lock_guard<std::mutex> lock(mutex_main);
         MainAppTime.calc_elapsed_time();
         SystemController::system_control_loop();
         MavMsg::mav_comm_loop();
 
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
         Video::video_proc_loop();
         Detection::detection_loop();
@@ -130,11 +130,11 @@ int main(void)
         Video::video_output_loop();
         StatusIndicators::io_loop();
 
-#elif USE_WSL
+#elif WSL
 
         VehicleController::vehicle_control_loop();
 
-#endif // USE_JETSON
+#endif // JETSON_B01
 
         app_first_init();
 
@@ -144,14 +144,14 @@ int main(void)
         MainAppTime.calc_loop_start_time();
     }
 
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
     Video::shutdown();
     Detection::shutdown();
     StatusIndicators::status_program_complete();
     StatusIndicators::gpio_shutdown();
 
-#endif // USE_JETSON
+#endif // JETSON_B01
 
     VehicleController::vehicle_control_shutdown();
     MavMsg::mav_comm_shutdown();

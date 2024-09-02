@@ -112,7 +112,7 @@ void DataLogger::save_to_csv(const std::string &filename, const std::vector<std:
 bool DataLogger::data_log_init(void)
 {
 
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
     file_name = generate_unique_filename(dataFileName);
     data.push_back({"Time",
@@ -181,7 +181,7 @@ bool DataLogger::data_log_init(void)
                     "mav_veh_repr_offset_q[2]",
                     "mav_veh_repr_offset_q[3]"});
 
-#elif USE_WSL
+#elif WSL
 
     data.push_back({"Time",
                     "Voltage Battery",
@@ -231,7 +231,7 @@ bool DataLogger::data_log_init(void)
                     "mav_veh_repr_offset_q[2]",
                     "mav_veh_repr_offset_q[3]"});
 
-#endif // USE_JETSON
+#endif // JETSON_B01
 
     save_to_csv(file_name, data);
 
@@ -247,7 +247,7 @@ void DataLogger::data_log_loop(void)
     // Clear data vector and write to next row
     data.clear();
 
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
     data.push_back({{std::to_string(app_elapsed_time),
                      std::to_string(system_state),
@@ -315,7 +315,7 @@ void DataLogger::data_log_loop(void)
                      std::to_string(mav_veh_repr_offset_q[2]),
                      std::to_string(mav_veh_repr_offset_q[3])}});
 
-#elif USE_WSL
+#elif WSL
 
     data.push_back({{std::to_string(app_elapsed_time),
                      std::to_string(mav_veh_sys_stat_voltage_battery),
@@ -365,7 +365,7 @@ void DataLogger::data_log_loop(void)
                      std::to_string(mav_veh_repr_offset_q[2]),
                      std::to_string(mav_veh_repr_offset_q[3])}});
 
-#endif // USE_JETSON
+#endif // JETSON_B01
 
     save_to_csv(file_name, data);
 }

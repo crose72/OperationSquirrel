@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
 /********************************************************************************
  * @file    object_detection.h
@@ -74,4 +74,4 @@ private:
 
 #endif // OBJECT_DETECTION_H
 
-#endif // USE_JETSON
+#endif // JETSON_B01
