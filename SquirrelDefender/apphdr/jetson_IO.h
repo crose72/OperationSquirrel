@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
 /********************************************************************************
  * @file    jetson_IO.h
@@ -53,4 +53,4 @@ private:
 
 #endif // JETSON_IO_H
 
-#endif // USE_JETSON
+#endif // JETSON_B01

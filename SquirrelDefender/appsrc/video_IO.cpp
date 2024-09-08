@@ -1,4 +1,4 @@
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
 /********************************************************************************
  * @file    videoIO.cpp
@@ -416,4 +416,4 @@ void Video::shutdown(void)
     LogVerbose("video:  shutdown complete.\n");
 }
 
-#endif // USE_JETSON
+#endif // JETSON_B01

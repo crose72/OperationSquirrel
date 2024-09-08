@@ -1,4 +1,4 @@
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
 /********************************************************************************
  * @file    follow_target.cpp
@@ -353,4 +353,4 @@ void Follow::follow_control_loop(void)
     }
 }
 
-#endif // USE_JETSON
+#endif // JETSON_B01

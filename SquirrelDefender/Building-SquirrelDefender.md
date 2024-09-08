@@ -4,21 +4,32 @@ This folder contains the code for the Squirrel Defender and most of its dependen
 
 ## Follow the instructions in the scripts folder to set up swap and install the needed dependencies first
 
-## Before compiling (specifically when linking ORB_SLAM, and pango directly)
+## Before compiling (specifically if linking ORB_SLAM)
 
-- Follow the instructions here to update the linker path <https://stackoverflow.com/questions/480764/linux-error-while-loading-shared-libraries-cannot-open-shared-object-file-no-s>
-- Copy all .so files from `SquirrelDefender/lib/` to `/usr/local/lib/` on the jetson
-- Copy all folders from `SquirrelDefender/inc/` to `/usr/local/include/` on the jetson
-- Updated the shared library cache with `sudo ldconfig -v`
+- Follow the instructions in [Install-dependencies](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/Install-dependencies.md) to copy the contents of `jetson/usr-orin-nano` or the specific library files for your device to the correct path.
+- Update the shared library cache with `sudo ldconfig -v` (should be part of the steps for the bullet point above)
+- If you need to update the linker path for some reason <https://stackoverflow.com/questions/480764/linux-error-while-loading-shared-libraries-cannot-open-shared-object-file-no-s>
 
-## CMakeLists explanation
+## CMake instructions
 
-- Enable either USE_JETSON or USE_WSL by turning them ON or OFF (only one at a time)
-  - `option(USE_JETSON "Enable Jetson Nano specific features" ON)`
-  - `option(USE_WSL "Enable WSL specific features" OFF)`
-- Default release is `Debug` (enables print statements).  To turn off print statements and other debugging
-  features compile a Release type build
-  - `cmake -DCMAKE_BUILD_TYPE=Release ..`
+First you will want to update CMake to 3.28, the version we are currently using.  The Jetson Nano is arm64 or aarch64 so the appropriate file has been selected.  You only need to do this once.
+
+```
+# Remove old version of cmake and install a newer one
+	sudo apt-get remove cmake  # or your package manager's equivalent command
+
+# Replace <version> with the version number you downloaded
+	wget https://cmake.org/files/v3.28/cmake-3.28.0-linux-aarch64.sh
+	chmod +x cmake-3.28.0-linux-aarch64.sh
+	sudo ./cmake-3.28.0-linux-aarch64.sh --prefix=/usr/local --exclude-subdir
+```
+
+The CMake file allows you to choose the platform you are compiling for.  Currently the supported options are JETSON_B01 and WSL.  Enable one option at a time:
+- `option(JETSON_B01 "Enable Jetson Nano specific features" ON)`
+- `option(WSL "Enable WSL specific features" OFF)`
+
+You must also specify a Debug or Release build.  Debug enables all print statements.  Release disables most print statements to save throughtput for the program:
+- `cmake -DCMAKE_BUILD_TYPE=Release ..`
 
 #### Other preprocessing directives will be added to configure the code to enable or disable other features
 
@@ -49,7 +60,7 @@ This folder contains the code for the Squirrel Defender and most of its dependen
         ExecStart=<path-to-exe>/squirreldefender
         WorkingDirectory=<path-to-build-folder>//SquirrelDefender/build
         StandardOutput=journal
-        SandardError=journal
+        StandardError=journal
         Restart=always
         User=root
 

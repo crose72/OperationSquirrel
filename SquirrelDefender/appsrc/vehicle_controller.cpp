@@ -103,7 +103,7 @@ void VehicleController::cmd_acceleration_NED(float acceleration_target[3])
     VelocityController::cmd_acceleration_NED(acceleration_target);
 }
 
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
 /********************************************************************************
  * Function: follow_target
@@ -129,7 +129,7 @@ void VehicleController::follow_mode(void)
     }
 }
 
-#endif // USE_JETSON
+#endif // JETSON_B01
 
 /********************************************************************************
  * Function: vehicle_control_init
@@ -163,7 +163,7 @@ void VehicleController::vehicle_control_loop(void)
     }
     else if (system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
     {
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
         if (takeoff_dbc_cnt > 0)
         {
@@ -180,7 +180,7 @@ void VehicleController::vehicle_control_loop(void)
             follow_mode();
         }
 
-#elif USE_WSL
+#elif WSL
 
         if (takeoff_dbc_cnt > 0)
         {
@@ -197,7 +197,7 @@ void VehicleController::vehicle_control_loop(void)
             test_flight();
         }
 
-#endif // USE_JETSON
+#endif // JETSON_B01
     }
 }
 
