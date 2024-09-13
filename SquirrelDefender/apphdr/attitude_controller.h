@@ -34,7 +34,6 @@ extern float mav_veh_q4_actual;
 extern float mav_veh_roll_rate_actual;
 extern float mav_veh_pitch_rate_actual;
 extern float mav_veh_yaw_rate_actual;
-extern float mav_veh_thrust_actual;
 
 /********************************************************************************
  * Exported objects

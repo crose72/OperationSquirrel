@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
 /********************************************************************************
  * @file    parameters.h
@@ -32,20 +32,20 @@
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class Parameters {
-    public:
-        Parameters(const std::string& filename);
-        ~Parameters();
+class Parameters
+{
+public:
+    Parameters(const std::string &filename);
+    ~Parameters();
 
-        float get_float_param(const std::string& group, const std::string& key) const;
-        uint32_t get_uint32_param(const std::string& group, const std::string& key) const;
-        bool get_bool_param(const std::string& group, const std::string& key) const;
+    float get_float_param(const std::string &group, const std::string &key) const;
+    uint32_t get_uint32_param(const std::string &group, const std::string &key) const;
+    bool get_bool_param(const std::string &group, const std::string &key) const;
 
-    private:
-        Json::Value root;
+private:
+    Json::Value root;
 };
-
 
 #endif // PARAMETERS_H
 
-#endif // USE_JETSON
+#endif // JETSON_B01

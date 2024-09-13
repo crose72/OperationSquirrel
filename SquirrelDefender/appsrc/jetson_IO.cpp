@@ -1,4 +1,4 @@
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
 /********************************************************************************
  * @file    jetson_IO.cpp
@@ -185,7 +185,6 @@ void StatusIndicators::status_program_complete(void)
     GPIO::output(RED_LED_PIN, GPIO::HIGH);
 }
 
-
 /********************************************************************************
  * Function: gpio_init
  * Description: Initialize the pins on the jetson.
@@ -220,4 +219,4 @@ void StatusIndicators::gpio_shutdown(void)
     GPIO::cleanup();
 }
 
-#endif // USE_JETSON
+#endif // JETSON_B01

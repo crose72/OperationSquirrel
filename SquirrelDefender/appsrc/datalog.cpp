@@ -112,7 +112,7 @@ void DataLogger::save_to_csv(const std::string &filename, const std::vector<std:
 bool DataLogger::data_log_init(void)
 {
 
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
     file_name = generate_unique_filename(dataFileName);
     data.push_back({"Time",
@@ -162,9 +162,26 @@ bool DataLogger::data_log_init(void)
                     "Optical Flow Y",
                     "Optical Flow Quality",
                     "Flow Rate X",
-                    "Flow Rate Y"});
+                    "Flow Rate Y",
+                    "NED X",
+                    "NED Y",
+                    "NED Z",
+                    "NED Vx",
+                    "NED Vy",
+                    "NED Vz",
+                    "mav_veh_q1_actual",
+                    "mav_veh_q2_actual",
+                    "mav_veh_q3_actual",
+                    "mav_veh_q4_actual",
+                    "mav_veh_roll_rate_actual",
+                    "mav_veh_pitch_rate_actual",
+                    "mav_veh_yaw_rate_actuald",
+                    "mav_veh_repr_offset_q[0]",
+                    "mav_veh_repr_offset_q[1]",
+                    "mav_veh_repr_offset_q[2]",
+                    "mav_veh_repr_offset_q[3]"});
 
-#elif USE_WSL
+#elif WSL
 
     data.push_back({"Time",
                     "Voltage Battery",
@@ -195,9 +212,26 @@ bool DataLogger::data_log_init(void)
                     "Optical Flow Y",
                     "Optical Flow Quality",
                     "Flow Rate X",
-                    "Flow Rate Y"});
+                    "Flow Rate Y",
+                    "NED X",
+                    "NED Y",
+                    "NED Z",
+                    "NED Vx",
+                    "NED Vy",
+                    "NED Vz",
+                    "mav_veh_q1_actual",
+                    "mav_veh_q2_actual",
+                    "mav_veh_q3_actual",
+                    "mav_veh_q4_actual",
+                    "mav_veh_roll_rate_actual",
+                    "mav_veh_pitch_rate_actual",
+                    "mav_veh_yaw_rate_actuald",
+                    "mav_veh_repr_offset_q[0]",
+                    "mav_veh_repr_offset_q[1]",
+                    "mav_veh_repr_offset_q[2]",
+                    "mav_veh_repr_offset_q[3]"});
 
-#endif // USE_JETSON
+#endif // JETSON_B01
 
     save_to_csv(file_name, data);
 
@@ -213,7 +247,7 @@ void DataLogger::data_log_loop(void)
     // Clear data vector and write to next row
     data.clear();
 
-#ifdef USE_JETSON
+#ifdef JETSON_B01
 
     data.push_back({{std::to_string(app_elapsed_time),
                      std::to_string(system_state),
@@ -262,9 +296,26 @@ void DataLogger::data_log_loop(void)
                      std::to_string(mav_veh_flow_y),
                      std::to_string(mav_veh_quality),
                      std::to_string(mav_veh_flow_rate_x),
-                     std::to_string(mav_veh_flow_rate_y)}});
+                     std::to_string(mav_veh_flow_rate_y),
+                     std::to_string(mav_veh_local_ned_x),
+                     std::to_string(mav_veh_local_ned_y),
+                     std::to_string(mav_veh_local_ned_z),
+                     std::to_string(mav_veh_local_ned_vx),
+                     std::to_string(mav_veh_local_ned_vy),
+                     std::to_string(mav_veh_local_ned_vz),
+                     std::to_string(mav_veh_q1_actual),
+                     std::to_string(mav_veh_q2_actual),
+                     std::to_string(mav_veh_q3_actual),
+                     std::to_string(mav_veh_q4_actual),
+                     std::to_string(mav_veh_roll_rate_actual),
+                     std::to_string(mav_veh_pitch_rate_actual),
+                     std::to_string(mav_veh_yaw_rate_actual),
+                     std::to_string(mav_veh_repr_offset_q[0]),
+                     std::to_string(mav_veh_repr_offset_q[1]),
+                     std::to_string(mav_veh_repr_offset_q[2]),
+                     std::to_string(mav_veh_repr_offset_q[3])}});
 
-#elif USE_WSL
+#elif WSL
 
     data.push_back({{std::to_string(app_elapsed_time),
                      std::to_string(mav_veh_sys_stat_voltage_battery),
@@ -295,9 +346,26 @@ void DataLogger::data_log_loop(void)
                      std::to_string(mav_veh_flow_y),
                      std::to_string(mav_veh_quality),
                      std::to_string(mav_veh_flow_rate_x),
-                     std::to_string(mav_veh_flow_rate_y)}});
+                     std::to_string(mav_veh_flow_rate_y),
+                     std::to_string(mav_veh_local_ned_x),
+                     std::to_string(mav_veh_local_ned_y),
+                     std::to_string(mav_veh_local_ned_z),
+                     std::to_string(mav_veh_local_ned_vx),
+                     std::to_string(mav_veh_local_ned_vy),
+                     std::to_string(mav_veh_local_ned_vz),
+                     std::to_string(mav_veh_q1_actual),
+                     std::to_string(mav_veh_q2_actual),
+                     std::to_string(mav_veh_q3_actual),
+                     std::to_string(mav_veh_q4_actual),
+                     std::to_string(mav_veh_roll_rate_actual),
+                     std::to_string(mav_veh_pitch_rate_actual),
+                     std::to_string(mav_veh_yaw_rate_actual),
+                     std::to_string(mav_veh_repr_offset_q[0]),
+                     std::to_string(mav_veh_repr_offset_q[1]),
+                     std::to_string(mav_veh_repr_offset_q[2]),
+                     std::to_string(mav_veh_repr_offset_q[3])}});
 
-#endif // USE_JETSON
+#endif // JETSON_B01
 
     save_to_csv(file_name, data);
 }

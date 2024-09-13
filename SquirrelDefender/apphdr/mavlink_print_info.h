@@ -53,5 +53,6 @@ void print_system_time(mavlink_system_time_t &system_time, const char *term);
 void print_set_position_target_local_ned(mavlink_set_position_target_local_ned_t &set_position_target_local_ned, const char *term);
 void print_position_target_local_ned(mavlink_position_target_local_ned_t &position_target_local_ned, const char *term);
 void print_optical_flow(mavlink_optical_flow_t &optical_flow, const char *term);
+void print_position_local_ned(const mavlink_local_position_ned_t &local_position, const char *term);
 
 #endif // MAVLINK_PRINT_INFO_H
