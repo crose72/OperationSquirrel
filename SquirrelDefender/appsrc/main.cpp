@@ -15,6 +15,7 @@
 #include "mavlink_cmd_handler.h"
 #include "vehicle_controller.h"
 #include "follow_target.h"
+#include "localize_target.h"
 #include "datalog.h"
 #include <mutex>
 #include <signal.h>
@@ -39,9 +40,9 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-TimeCalc MainAppTime;
 bool stop_program;
 std::mutex mutex_main;
+DebugTerm MainTerm("");
 
 extern bool save_button_press;
 
@@ -97,11 +98,13 @@ void app_first_init(void)
  ********************************************************************************/
 int main(void)
 {
+    TimeCalc MainAppTime;
+
     MainAppTime.calc_app_start_time();
     attach_sig_handler();
     stop_program = false;
 
-    if (SystemController::system_init() != 0)
+    if (SystemController::init() != 0)
     {
         return 1;
     }
@@ -118,43 +121,35 @@ int main(void)
 
     {
         std::lock_guard<std::mutex> lock(mutex_main);
-        MainAppTime.calc_elapsed_time();
-        SystemController::system_control_loop();
-        MavMsg::mav_comm_loop();
+        SystemController::loop();
+        MavMsg::loop();
 
 #ifdef JETSON_B01
 
-        Video::video_proc_loop();
-        Detection::detection_loop();
-        VehicleController::vehicle_control_loop();
-        Video::video_output_loop();
-        StatusIndicators::io_loop();
+        Video::in_loop();
+        Detection::loop();
+        Localize::loop();
+        Follow::loop();
+        VehicleController::loop();
+        Video::out_loop();
+        StatusIndicators::loop();
 
 #elif WSL
 
-        VehicleController::vehicle_control_loop();
+        VehicleController::loop();
 
 #endif // JETSON_B01
 
         app_first_init();
 
-        DataLogger::data_log_loop();
+        DataLogger::loop();
 
+        MainAppTime.calc_elapsed_time();
         MainAppTime.loop_rate_controller();
         MainAppTime.calc_loop_start_time();
     }
 
-#ifdef JETSON_B01
-
-    Video::shutdown();
-    Detection::shutdown();
-    StatusIndicators::status_program_complete();
-    StatusIndicators::gpio_shutdown();
-
-#endif // JETSON_B01
-
-    VehicleController::vehicle_control_shutdown();
-    MavMsg::mav_comm_shutdown();
+    SystemController::shutdown();
 
     return 0;
 }

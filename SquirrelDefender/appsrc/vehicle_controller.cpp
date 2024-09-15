@@ -27,6 +27,7 @@
  ********************************************************************************/
 DebugTerm VehStateInfo("");
 bool takeoff_dbc;
+bool start_follow_mode;
 uint16_t takeoff_dbc_cnt;
 
 /********************************************************************************
@@ -107,47 +108,51 @@ void VehicleController::cmd_acceleration_NED(float acceleration_target[3])
 
 /********************************************************************************
  * Function: follow_target
- * Description: Move in direction of vector ax,ay,az in the NED frame.
+ * Description: Pass control outputs from the follow algorithm to the vehicle.
  ********************************************************************************/
 void VehicleController::follow_mode(void)
 {
     float target_velocity[3] = {0.0, 0.0, 0.0};
-
-    Follow::follow_control_loop();
+    float zero_velocity[3] = {0.0, 0.0, 0.0};
 
     target_velocity[0] = vx_adjust;
     target_velocity[1] = vy_adjust;
     target_velocity[2] = vz_adjust;
 
-    if (target_too_close)
+    if (target_identified && target_too_close)
     {
         VehicleController::cmd_velocity_xy_NED(target_velocity);
     }
-    else
+    else if (target_identified && !target_too_close)
     {
         VehicleController::cmd_velocity_NED(target_velocity);
+    }
+    else
+    {
+        VehicleController::cmd_velocity_NED(zero_velocity);
     }
 }
 
 #endif // JETSON_B01
 
 /********************************************************************************
- * Function: vehicle_control_init
+ * Function: init
  * Description: Initial setup of vehicle controller.
  ********************************************************************************/
-bool VehicleController::vehicle_control_init(void)
+bool VehicleController::init(void)
 {
     takeoff_dbc = false;
-    takeoff_dbc_cnt = 200;
+    start_follow_mode = false;
+    takeoff_dbc_cnt = 500;
 
     return true;
 }
 
 /********************************************************************************
- * Function: vehicle_control_loop
+ * Function: loop
  * Description: Vehicle controller main loop.  Handles all
  ********************************************************************************/
-void VehicleController::vehicle_control_loop(void)
+void VehicleController::loop(void)
 {
     if (system_state == SYSTEM_STATE::INIT)
     {
@@ -159,12 +164,10 @@ void VehicleController::vehicle_control_loop(void)
     }
     else if (system_state == SYSTEM_STATE::STANDBY)
     {
-        MavCmd::takeoff_GPS_long((float)2.0);
+        MavCmd::takeoff_GPS_long((float)2.3);
     }
     else if (system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
     {
-#ifdef JETSON_B01
-
         if (takeoff_dbc_cnt > 0)
         {
             takeoff_dbc_cnt--;
@@ -175,29 +178,15 @@ void VehicleController::vehicle_control_loop(void)
             takeoff_dbc = true;
         }
 
-        if (takeoff_dbc)
+        if (takeoff_dbc && mav_veh_rngfdr_current_distance > 100 || mav_veh_rel_alt > 1000)
+        {
+            start_follow_mode = true;
+        }
+
+        if (start_follow_mode)
         {
             follow_mode();
         }
-
-#elif WSL
-
-        if (takeoff_dbc_cnt > 0)
-        {
-            takeoff_dbc_cnt--;
-        }
-        else
-        {
-            takeoff_dbc_cnt = 0;
-            takeoff_dbc = true;
-        }
-
-        if (takeoff_dbc)
-        {
-            test_flight();
-        }
-
-#endif // JETSON_B01
     }
 }
 

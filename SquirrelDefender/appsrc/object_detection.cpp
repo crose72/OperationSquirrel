@@ -121,52 +121,6 @@ void Detection::detect_objects(void)
 }
 
 /********************************************************************************
- * Function: get_object_info
- * Description: Obtain info about detected objects.
- ********************************************************************************/
-void Detection::get_object_info(void)
-{
-    if (numDetections > 0)
-    {
-        // LogVerbose("%i objects detected\n", numDetections);
-
-        for (int n = 0; n < numDetections; n++)
-        {
-            float boxWidth = detections[n].Width();
-            float boxHeight = detections[n].Height();
-        }
-    }
-}
-
-/********************************************************************************
- * Function: print_object_info
- * Description: Print info about detected objects.
- ********************************************************************************/
-void Detection::print_object_info(void)
-{
-    if (numDetections > 0)
-    {
-        LogVerbose("%i objects detected\n", numDetections);
-
-        for (int n = 0; n < numDetections; n++)
-        {
-            if (detections[n].TrackID >= 0) // is this a tracked object?
-            {
-                if (detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
-                {
-                    LogVerbose("\ndetected obj %i  class #%u (%s)  confidence=%f\n", n, detections[n].ClassID, net->GetClassDesc(detections[n].ClassID), detections[n].Confidence);
-                    LogVerbose("bounding box %i  (%.2f, %.2f)  (%.2f, %.2f)  w=%.2f  h=%.2f\n", n, detections[n].Left, detections[n].Top, detections[n].Right, detections[n].Bottom, detections[n].Width(), detections[n].Height());
-                    LogVerbose("tracking  ID %i  status=%i  frames=%i  lost=%i\n", detections[n].TrackID, detections[n].TrackStatus, detections[n].TrackFrames, detections[n].TrackLost);
-                    LogVerbose("Object %i Edges (Left,Right,Top,Bottom)=(%.2f, %.2f, %.2f, %.2f)\n", n, detections[n].Left, detections[n].Right, detections[n].Top, detections[n].Bottom);
-                    LogVerbose("video width, video height: (%.2f, %.2f)\n", input_video_width, input_video_height);
-                    LogVerbose("box width, box height: (%.2f, %.2f)\n", detections[n].Width(), detections[n].Height());
-                }
-            }
-        }
-    }
-}
-
-/********************************************************************************
  * Function: print_print_performance_statsobject_info
  * Description: Print info about detection network performance.
  ********************************************************************************/
@@ -185,43 +139,10 @@ void Detection::delete_tracking_net(void)
 }
 
 /********************************************************************************
- * Function: usage
- * Description: Display a help message.
- ********************************************************************************/
-int Detection::print_usage(void)
-{
-    PrintPass::c_printf("usage: detectnet [--help] [--network=NETWORK] [--threshold=THRESHOLD] ...\n");
-    PrintPass::c_printf("                 input [output]\n\n");
-    PrintPass::c_printf("Locate objects in a video/image stream using an object detection DNN.\n");
-    PrintPass::c_printf("See below for additional arguments that may not be shown above.\n\n");
-    PrintPass::c_printf("positional arguments:\n");
-    PrintPass::c_printf("    input           resource URI of input stream  (see videoSource below)\n");
-    PrintPass::c_printf("    output          resource URI of output stream (see videoOutput below)\n\n");
-
-    PrintPass::c_printf("%s", detectNet::Usage());
-    PrintPass::c_printf("%s", objectTracker::Usage());
-    PrintPass::c_printf("%s", videoSource::Usage());
-    PrintPass::c_printf("%s", videoOutput::Usage());
-    PrintPass::c_printf("%s", Log::Usage());
-
-    return 0;
-}
-
-/********************************************************************************
- * Function: detection_loop
- * Description: Process video stream and output detected objects.
- ********************************************************************************/
-void Detection::detection_loop(void)
-{
-    detect_objects();
-    get_object_info();
-}
-
-/********************************************************************************
  * Function: initialize_detection_net
  * Description: Delete detection network to free up resources.
  ********************************************************************************/
-bool Detection::detection_net_init(void)
+bool Detection::init(void)
 {
     net = NULL;
     detections = NULL;
@@ -234,6 +155,15 @@ bool Detection::detection_net_init(void)
     }
 
     return true;
+}
+
+/********************************************************************************
+ * Function: loop
+ * Description: Process video stream and output detected objects.
+ ********************************************************************************/
+void Detection::loop(void)
+{
+    detect_objects();
 }
 
 /********************************************************************************

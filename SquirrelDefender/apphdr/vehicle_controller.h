@@ -28,6 +28,8 @@ extern float vx_adjust;
 extern float vy_adjust;
 extern float vz_adjust;
 extern float dt_25ms;
+extern uint16_t mav_veh_rngfdr_current_distance;
+extern int32_t mav_veh_rel_alt;
 
 /********************************************************************************
  * Exported objects
@@ -42,8 +44,8 @@ class VehicleController
     ~VehicleController();
 
 public:
-    static bool vehicle_control_init(void);
-    static void vehicle_control_loop(void);
+    static bool init(void);
+    static void loop(void);
     static void vehicle_control_shutdown(void);
 
     static void dtrmn_vehicle_action(void);

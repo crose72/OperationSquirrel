@@ -19,6 +19,13 @@
 /********************************************************************************
  * Private macros and defines
  ********************************************************************************/
+/* Max index of <DIM> based on <PARAM> */
+#define MAX_IDX_D_WIDTH 31
+#define MAX_IDX_D_HEIGHT 25
+#define MAX_IDX_Y_D_OFFSET 16
+#define MAX_IDX_Y_PIXEL_OFFSET 13
+#define MAX_IDX_DELTA_D_OFFSET 8
+#define MAX_IDX_DELTA_PIXEL_OFFSET 8
 
 /********************************************************************************
  * Object definitions
@@ -28,20 +35,8 @@ PID pid_forwd;
 PID pid_rev;
 
 bool target_too_close;
-bool target_identified;
-float x_actual;
-float height_actual;
-float y_actual;
-float width_actual;
-float x_centroid_err;
-float target_height_err;
-float y_centroid_err;
-float target_left_side;
-float target_right_side;
-float target_left_err;
-float target_right_err;
-float target_height_err_rev;
-
+float x_error;
+float y_error;
 float vx_adjust;
 float vy_adjust;
 float vz_adjust;
@@ -78,10 +73,10 @@ float w2_y_rev;
 float w3_y_rev;
 uint16_t vehicle_rel_height_err;
 uint16_t vehicle_height_desired;
-float x_desired;
 float target_height_desired;
-float y_desired;
 float target_width_desired;
+float x_desired = 1.0f; // Make const in the end
+float y_desired = 0.0f; // Make const in the end
 
 /********************************************************************************
  * Function definitions
@@ -140,114 +135,66 @@ void Follow::get_control_params(void)
     w2_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "w2");
     w3_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "w3");
 
-#else
+#else // Release
 
-    // Vel_PID_x parameters for forward movement
-    Kp_x = 0.025;
-    Ki_x = 0.0009;
-    Kd_x = 0.0005;
-    w1_x = 0.5;
-    w2_x = 0.5;
-    w3_x = 0.0;
+    Parameters veh_params("../params.json");
+    // Accessing Vel_PID_x parameters
+    Kp_x = veh_params.get_float_param("Vel_PID_x", "Kp");
+    Ki_x = veh_params.get_float_param("Vel_PID_x", "Ki");
+    Kd_x = veh_params.get_float_param("Vel_PID_x", "Kd");
+    w1_x = veh_params.get_float_param("Vel_PID_x", "w1");
+    w2_x = veh_params.get_float_param("Vel_PID_x", "w2");
+    w3_x = veh_params.get_float_param("Vel_PID_x", "w3");
 
-    // Vel_PID_y parameters for forward movement
-    Kp_y = 0.0001;
-    Ki_y = 0.00009;
-    Kd_y = 0.00005;
-    w1_y = 1.0;
-    w2_y = 0.0;
-    w3_y = 0.0;
+    // Accessing Vel_PID_y parameters
+    Kp_y = veh_params.get_float_param("Vel_PID_y", "Kp");
+    Ki_y = veh_params.get_float_param("Vel_PID_y", "Ki");
+    Kd_y = veh_params.get_float_param("Vel_PID_y", "Kd");
+    w1_y = veh_params.get_float_param("Vel_PID_y", "w1");
+    w2_y = veh_params.get_float_param("Vel_PID_y", "w2");
+    w3_y = veh_params.get_float_param("Vel_PID_y", "w3");
 
-    // Vel_PID_x parameters for reverse movement
-    Kp_x_rev = 0.01;
-    Ki_x_rev = 0.00009;
-    Kd_x_rev = 0.00005;
-    w1_x_rev = 1.0;
-    w2_x_rev = 0.0;
-    w3_x_rev = 0.0;
+    // Accessing Vel_PID_x parameters for reverse movement
+    Kp_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "Kp");
+    Ki_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "Ki");
+    Kd_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "Kd");
+    w1_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "w1");
+    w2_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "w2");
+    w3_x_rev = veh_params.get_float_param("Vel_PID_x_reverse", "w3");
 
-    // Vel_PID_y parameters for reverse movement
-    Kp_y_rev = 0.001;
-    Ki_y_rev = 0.00009;
-    Kd_y_rev = 0.00005;
-    w1_y_rev = 1.0;
-    w2_y_rev = 0.0;
-    w3_y_rev = 0.0;
-
-#endif // DEBUG_BUILD
-}
-
-/********************************************************************************
- * Function: get_desired_target_size
- * Description: Read follow target parameters from a json or other file type.
- ********************************************************************************/
-void Follow::get_desired_target_size(void)
-{
-#ifdef DEBUG_BUILD
-
-    Parameters target_params("../params.json");
-
-    x_desired = static_cast<float>(input_video_height) / 2.0;
-    y_desired = static_cast<float>(input_video_width) / 2.0;
-    target_height_desired = target_params.get_float_param("Target", "Desired_Height");
-    target_width_desired = target_params.get_float_param("Target", "Desired_Width");
-
-#else
-
-    x_desired = static_cast<float>(input_video_height) / 2.0;
-    y_desired = static_cast<float>(input_video_width) / 2.0;
-    target_height_desired = (float)650;
-    target_width_desired = (float)150;
-    vehicle_height_desired = 150;
+    // Accessing Vel_PID_y parameters for reverse movment
+    Kp_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "Kp");
+    Ki_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "Ki");
+    Kd_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "Kd");
+    w1_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "w1");
+    w2_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "w2");
+    w3_y_rev = veh_params.get_float_param("Vel_PID_y_reverse", "w3");
 
 #endif // DEBUG_BUILD
-}
-
-/********************************************************************************
- * Function: calc_target_size
- * Description: Calculate the parameters of a target.
- ********************************************************************************/
-void Follow::calc_target_size(int n)
-{
-    x_actual = detections[n].Height() / 2.0 + detections[n].Top;
-    height_actual = detections[n].Height();
-    y_actual = detections[n].Width() / 2.0 + detections[n].Left;
-    width_actual = detections[n].Width();
-    target_left_side = detections[n].Left;
-    target_right_side = detections[n].Right;
-}
-
-/********************************************************************************
- * Function: error_zero_protection
- * Description: Calculate the error between a desired output and the actual,
-                return 0 if the actual is below a threshold.
- ********************************************************************************/
-float Follow::error_zero_protection(float desired, float actual, float threshold)
-{
-    if (actual < threshold)
-    {
-        return 0;
-    }
-    else
-    {
-        return (desired - actual);
-    }
 }
 
 /********************************************************************************
  * Function: calc_follow_error
- * Description: Calculate the error of a target's position based
+ * Description: Calculate the error between the desired target offset and the
+ *              target's actual offset.
  ********************************************************************************/
 void Follow::calc_follow_error(void)
 {
-    float bounding_box_left_side = 320.0;
-    float bounding_box_right_side = 960.0;
 
-    target_left_err = error_zero_protection(bounding_box_left_side, target_left_side, 1.0);
-    target_right_err = error_zero_protection(bounding_box_right_side, target_right_side, 1.0);
-    x_centroid_err = error_zero_protection(x_desired, x_actual, 1.0);
-    target_height_err = error_zero_protection(target_height_desired, height_actual, 1.0);
-    y_centroid_err = -error_zero_protection(y_desired, y_actual, 1.0);
+    Parameters target_params("../params.json");
+
+    x_desired = target_params.get_float_param("Target", "Desired_X_offset");
+
+    if (d_object < 0.001f)
+    {
+        x_error = 0.0f;
+    }
+    else
+    {
+        x_error = x_object - x_desired;
+    }
+
+    y_error = y_object - y_desired;
 
     if (mav_veh_rngfdr_current_distance >= mav_veh_rngfdr_max_distance && mav_veh_rngfdr_current_distance >= 50)
     {
@@ -256,98 +203,53 @@ void Follow::calc_follow_error(void)
 }
 
 /********************************************************************************
- * Function: dtrmn_target_ID
- * Description: Determine which detected object to follow.
- ********************************************************************************/
-int Follow::dtrmn_target_ID(void)
-{
-    for (int n = 0; n < numDetections; n++)
-    {
-        if (detections[n].TrackID >= 0 && detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
-        {
-            target_identified = true;
-            return n;
-        }
-        else
-        {
-            target_identified = false;
-        }
-    }
-
-    return -1;
-}
-
-/********************************************************************************
- * Function: follow_target_init
+ * Function: init
  * Description: Initialize all follow target variables.  Run once at the start
  *              of the program.
  ********************************************************************************/
-bool Follow::follow_target_init(void)
+bool Follow::init(void)
 {
-
-    get_control_params();
-    get_desired_target_size();
-
     target_too_close = false;
-    target_identified = false;
-    x_actual = 0.0;
-    height_actual = 0.0;
-    y_actual = 0.0;
-    width_actual = 0.0;
-    x_centroid_err = 0.0;
-    target_height_err = 0.0;
-    y_centroid_err = 0.0;
-    target_left_side = 0.0;
-    target_right_side = 0.0;
-    target_left_err = 0.0;
-    target_right_err = 0.0;
-    target_height_err_rev = 0.0;
-    vehicle_rel_height_err = 0;
-
-    vx_adjust = 0.0;
-    vy_adjust = 0.0;
-    vz_adjust = 0.0;
+    x_error = 0.0f;
+    y_error = 0.0f;
+    vx_adjust = 0.0f;
+    vy_adjust = 0.0f;
+    vz_adjust = 0.0f;
 
     return true;
 }
 
 /********************************************************************************
- * Function: follow_control_loop
+ * Function: loop
  * Description: Return control parameters for the vehicle to follow a designated
  *              target at a distance.
  ********************************************************************************/
-void Follow::follow_control_loop(void)
+void Follow::loop(void)
 {
-    int target_ID = -1;
-
     get_control_params();
-    get_desired_target_size();
-
-    target_ID = dtrmn_target_ID();
 
     if (target_identified)
     {
-        calc_target_size(target_ID);
         calc_follow_error();
 
-        target_too_close = (height_actual > target_height_desired);
+        target_too_close = (x_error < 0.0);
 
         if (target_too_close)
         {
             vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                                  target_height_err, 0.0, 0.0,
+                                                  x_error, 0.0, 0.0,
                                                   w1_x_rev, 0.0, 0.0, CONTROL_DIM::X);
             vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                                  y_centroid_err, 0.0, 0.0,
+                                                  y_error, 0.0, 0.0,
                                                   w1_y_rev, 0.0, 0.0, CONTROL_DIM::Y);
         }
         else
         {
             vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
-                                                    x_centroid_err, target_height_err, 0.0,
-                                                    w1_x, w2_x, 0.0, CONTROL_DIM::X);
+                                                    x_error, 0.0, 0.0,
+                                                    w1_x, 0.0, 0.0, CONTROL_DIM::X);
             vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
-                                                    y_centroid_err, 0.0, 0.0,
+                                                    y_error, 0.0, 0.0,
                                                     w1_y, 0.0, 0.0, CONTROL_DIM::Y);
         }
     }

@@ -124,7 +124,7 @@ extern float mav_veh_ground_distance;
 extern int16_t mav_veh_flow_x;
 extern int16_t mav_veh_flow_y;
 extern uint8_t mav_veh_sensor_id;
-extern uint8_t mav_veh_quality;
+extern uint8_t mav_veh_flow_quality;
 extern float mav_veh_flow_rate_x;
 extern float mav_veh_flow_rate_y;
 
@@ -144,8 +144,8 @@ public:
     MavMsg();
     ~MavMsg();
 
-    static bool mav_comm_init(void);
-    static void mav_comm_loop(void);
+    static bool init(void);
+    static void loop(void);
     static void mav_comm_shutdown(void);
     static bool start_mav_comm(void) { return SerialComm::start_uart_comm(); }; // Open up uart port for mavlink messages
     static void stop_mav_comm(void) { SerialComm::stop_uart_comm(); };          // Stop mavlink comms on uart port

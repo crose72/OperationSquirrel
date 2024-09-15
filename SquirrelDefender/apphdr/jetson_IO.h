@@ -37,8 +37,8 @@ public:
     StatusIndicators();
     ~StatusIndicators();
 
-    static bool gpio_init(void);
-    static void io_loop(void);
+    static bool init(void);
+    static void loop(void);
     static void gpio_shutdown(void);
     static void status_initializing(void);
     static void status_program_complete(void);

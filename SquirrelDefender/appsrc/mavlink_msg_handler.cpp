@@ -134,7 +134,7 @@ float mav_veh_ground_distance; /*< [m] Ground distance. Positive value: distance
 int16_t mav_veh_flow_x;        /*< [dpix] Flow in x-sensor direction*/
 int16_t mav_veh_flow_y;        /*< [dpix] Flow in y-sensor direction*/
 uint8_t mav_veh_sensor_id;     /*<  Sensor ID*/
-uint8_t mav_veh_quality;       /*<  Optical flow quality / confidence. 0: bad, 255: maximum quality*/
+uint8_t mav_veh_flow_quality;  /*<  Optical flow quality / confidence. 0: bad, 255: maximum quality*/
 float mav_veh_flow_rate_x;     /*< [rad/s] Flow rate about X axis*/
 float mav_veh_flow_rate_y;     /*< [rad/s] Flow rate about Y axis*/
 
@@ -185,21 +185,18 @@ void MavMsg::proc_mav_heartbeat_msg(const mavlink_message_t *msg, const char *te
     mavlink_heartbeat_t heartbeat;
     mavlink_msg_heartbeat_decode(msg, &heartbeat);
 
-    mav_veh_type = heartbeat.type;
-    mav_veh_autopilot_type = heartbeat.autopilot;
-    mav_veh_base_mode = heartbeat.base_mode;
-    mav_veh_custom_mode = heartbeat.custom_mode;
-    mav_veh_state = heartbeat.system_status;
-    mav_veh_mavlink_version = heartbeat.mavlink_version;
+    /* Filter out non-quadrotor heartbeats - e.g. a GCS */
+    if (heartbeat.type == 2)
+    {
+        mav_veh_type = heartbeat.type;
+        mav_veh_autopilot_type = heartbeat.autopilot;
+        mav_veh_base_mode = heartbeat.base_mode;
+        mav_veh_custom_mode = heartbeat.custom_mode;
+        mav_veh_state = heartbeat.system_status;
+        mav_veh_mavlink_version = heartbeat.mavlink_version;
+    }
 
 #ifdef DEBUG_BUILD
-
-    HeartbeatInfo.cpp_cout("Heartbeat type:" + std::to_string(mav_veh_type));
-    HeartbeatInfo.cpp_cout("Autopilot type:" + std::to_string(mav_veh_autopilot_type));
-    HeartbeatInfo.cpp_cout("Base mode:" + std::to_string(mav_veh_base_mode));
-    HeartbeatInfo.cpp_cout("Custom mode:" + std::to_string(mav_veh_custom_mode));
-    HeartbeatInfo.cpp_cout("Mav state:" + std::to_string(mav_veh_state));
-    HeartbeatInfo.cpp_cout("Mavlink version:" + std::to_string(mav_veh_mavlink_version));
 
     print_heartbeat(heartbeat, term);
 
@@ -556,7 +553,7 @@ void MavMsg::proc_mav_optical_flow_msg(const mavlink_message_t *msg, const char 
     mav_veh_flow_x = optical_flow.flow_x;
     mav_veh_flow_y = optical_flow.flow_y;
     mav_veh_sensor_id = optical_flow.sensor_id;
-    mav_veh_quality = optical_flow.quality;
+    mav_veh_flow_quality = optical_flow.quality;
     mav_veh_flow_rate_x = optical_flow.flow_rate_x;
     mav_veh_flow_rate_y = optical_flow.flow_rate_y;
 
@@ -604,18 +601,18 @@ void MavMsg::proc_mav_distance_sensor_msg(const mavlink_message_t *msg, const ch
 bool MavMsg::start_message_subscriptions(void)
 {
     // What happens when we subscribe to a message and the request is denied?  How do we handle that?
-    MavMsg::subscribe(MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_1Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_HEARTBEAT, MESSAGE_RATE_DEFAULT);
     MavMsg::subscribe(MAVLINK_MSG_ID_GLOBAL_POSITION_INT, MESSAGE_RATE_40Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_SYSTEM_TIME, MESSAGE_RATE_DEFAULT);
     MavMsg::subscribe(MAVLINK_MSG_ID_SCALED_IMU, MESSAGE_RATE_40Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_ATTITUDE, MESSAGE_RATE_40Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_OPTICAL_FLOW, MESSAGE_RATE_40Hz);
     MavMsg::subscribe(MAVLINK_MSG_ID_DISTANCE_SENSOR, MESSAGE_RATE_40Hz);
-    MavMsg::subscribe(MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_1Hz);
-    MavMsg::subscribe(MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_1Hz);
-    MavMsg::subscribe(MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_1Hz);
-    MavMsg::subscribe(MAVLINK_MSG_ID_LOCAL_POSITION_NED, MESSAGE_RATE_1Hz);
-    MavMsg::subscribe(MAVLINK_MSG_ID_SYS_STATUS, MESSAGE_RATE_1Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_ATTITUDE_TARGET, MESSAGE_RATE_DEFAULT);
+    MavMsg::subscribe(MAVLINK_MSG_ID_ATTITUDE_QUATERNION, MESSAGE_RATE_DEFAULT);
+    MavMsg::subscribe(MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED, MESSAGE_RATE_40Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_LOCAL_POSITION_NED, MESSAGE_RATE_40Hz);
+    MavMsg::subscribe(MAVLINK_MSG_ID_SYS_STATUS, MESSAGE_RATE_DEFAULT);
     MavMsg::subscribe(MAVLINK_MSG_ID_PARAM_VALUE, MESSAGE_RATE_DEFAULT);
     MavMsg::subscribe(MAVLINK_MSG_ID_AUTOPILOT_VERSION, MESSAGE_RATE_DEFAULT);
 
@@ -705,10 +702,10 @@ void MavMsg::parse_mav_msgs(void)
 }
 
 /********************************************************************************
- * Function: mav_comm_init
+ * Function: init
  * Description: Code to run once at the beginning of the program.
  ********************************************************************************/
-bool MavMsg::mav_comm_init(void)
+bool MavMsg::init(void)
 {
     mav_veh_command_id = 0;
     mav_veh_command_result = 0;
@@ -816,10 +813,10 @@ bool MavMsg::mav_comm_init(void)
 }
 
 /********************************************************************************
- * Function: mav_comm_loop
+ * Function: loop
  * Description: Code to to execute each loop of the program.
  ********************************************************************************/
-void MavMsg::mav_comm_loop(void)
+void MavMsg::loop(void)
 {
     parse_mav_msgs();
 }

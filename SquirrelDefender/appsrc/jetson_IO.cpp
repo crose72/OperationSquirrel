@@ -186,10 +186,10 @@ void StatusIndicators::status_program_complete(void)
 }
 
 /********************************************************************************
- * Function: gpio_init
+ * Function: init
  * Description: Initialize the pins on the jetson.
  ********************************************************************************/
-bool StatusIndicators::gpio_init(void)
+bool StatusIndicators::init(void)
 {
     GPIO::setmode(GPIO::BOARD);
     GPIO::setup(GREEN_LED_PIN, GPIO::OUT, GPIO::LOW);
@@ -202,10 +202,10 @@ bool StatusIndicators::gpio_init(void)
 }
 
 /********************************************************************************
- * Function: io_loop
+ * Function: loop
  * Description: Loop for all IO that needs to be monitored continuously.
  ********************************************************************************/
-void StatusIndicators::io_loop(void)
+void StatusIndicators::loop(void)
 {
     save_video_button_state();
 }

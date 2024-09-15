@@ -3,63 +3,82 @@
 #ifdef JETSON_B01
 
 /********************************************************************************
- * @file    object_detection.h
+ * @file    localize_target.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef OBJECT_DETECTION_H
-#define OBJECT_DETECTION_H
+#ifndef LOCALIZE_TARGET_H
+#define LOCALIZE_TARGET_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "jetson-utils/videoSource.h"
-#include "jetson-utils/videoOutput.h"
-#include "jetson-inference/detectNet.h"
-#include "jetson-inference/objectTracker.h"
-#include <jetson-inference/objectTrackerIOU.h>
 #include "video_IO.h"
+#include "object_detection.h"
 #include "parameters.h"
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
+extern detectNet *net;
+extern detectNet::Detection *detections;
 extern videoSource *input;
-extern uchar3 *image;
+extern int numDetections;
 extern uint32_t input_video_width;
 extern uint32_t input_video_height;
+extern uint16_t mav_veh_rngfdr_min_distance;
+extern uint16_t mav_veh_rngfdr_max_distance;
+extern uint16_t mav_veh_rngfdr_current_distance;
+extern float mav_veh_pitch;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern detectNet *net;
-extern detectNet::Detection *detections;
-extern int numDetections;
+extern bool target_identified;
+extern int target_ID;
+extern float center_offset_x;
+extern float center_offset_y;
+extern float object_height;
+extern float object_width;
+extern float object_aspect;
+extern float object_left;
+extern float object_right;
+extern float object_top;
+extern float object_bottom;
+extern float d_object_h;
+extern float d_object_w;
+extern float x_object;
+extern float y_object;
+extern float z_object;
+extern float d_object;
+extern float x_error;
+extern float y_error;
+extern float delta_angle;
+extern float camera_tilt_angle;
+extern float delta_d_x;
+extern float delta_d_z;
+extern float camera_comp_angle;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class Detection
+class Localize
 {
 public:
-    Detection(void);
-    ~Detection(void);
+    Localize();
+    ~Localize();
 
-    static void loop(void);
     static bool init(void);
-    static void shutdown(void);
-    static bool create_detection_network(void);
-    static void detect_objects(void);
-    static void get_object_info(void);
-    static void print_object_info(void);
-    static int print_usage(void);
-    static void print_performance_stats(void);
-    static void delete_tracking_net(void);
+    static void loop(void);
+
+    static void dtrmn_target_ID(void);
+    static void get_target_info(int n);
+    static void calc_target_offest(void);
 
 private:
 };
 
-#endif // OBJECT_DETECTION_H
+#endif // LOCALIZE_TARGET_H
 
 #endif // JETSON_B01

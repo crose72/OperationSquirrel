@@ -47,12 +47,12 @@ public:
     ~Video();
 
     static bool video_output_file_reset(void);
-    static bool video_init(void);
+    static bool init(void);
     static bool create_input_video_stream(void);
     static bool create_output_vid_stream(void);
     static bool create_display_video_stream(void);
-    static void video_proc_loop(void);
-    static void video_output_loop(void);
+    static void in_loop(void);
+    static void out_loop(void);
     static void shutdown(void);
     static bool capture_image(void);
     static bool save_video(void);

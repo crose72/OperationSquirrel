@@ -326,11 +326,11 @@ bool Video::video_output_file_reset(void)
 }
 
 /********************************************************************************
- * Function: video_init
+ * Function: init
  * Description: Code to initialize video streams to run onces at the start of the
  *              program.
  ********************************************************************************/
-bool Video::video_init(void)
+bool Video::init(void)
 {
     valid_image_rcvd = false;
     image = NULL;
@@ -360,19 +360,19 @@ bool Video::video_init(void)
 }
 
 /********************************************************************************
- * Function: video_proc_loop
+ * Function: in_loop
  * Description: Main video processing loop.
  ********************************************************************************/
-void Video::video_proc_loop(void)
+void Video::in_loop(void)
 {
     capture_image();
 }
 
 /********************************************************************************
- * Function: video_output_loop
+ * Function: out_loop
  * Description: Code needed to run each loop to  provide the video output.
  ********************************************************************************/
-void Video::video_output_loop(void)
+void Video::out_loop(void)
 {
 
 #ifdef DEBUG_BUILD

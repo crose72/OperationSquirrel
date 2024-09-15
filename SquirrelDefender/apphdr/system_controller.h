@@ -38,9 +38,9 @@ public:
     SystemController();
     ~SystemController();
 
-    static int system_init(void);
-    static void system_control_loop(void);
-    static void system_shutdown(void);
+    static int init(void);
+    static void loop(void);
+    static void shutdown(void);
     static int system_state_machine(void);
     static void led_system_indicators(void);
 
