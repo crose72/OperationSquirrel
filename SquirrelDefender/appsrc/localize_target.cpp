@@ -33,7 +33,8 @@
 DebugTerm LocalizeData("");
 
 bool target_identified;
-int target_ID;
+int target_detection_ID;
+int target_track_ID;
 float center_offset_x;
 float center_offset_y;
 float object_height;
@@ -60,7 +61,7 @@ float camera_comp_angle;
  ********************************************************************************/
 const float center_of_frame_width = 640.0f;
 const float center_of_frame_height = 360.0f;
-const float camera_fixed_angle = 0.262f; // radians
+const float camera_fixed_angle = 0.426f; // radians
 const float PI = 3.14159;
 
 const float d_offset_w[MAX_IDX_D_WIDTH] = {
@@ -147,6 +148,7 @@ void Localize::get_target_info(int n)
     float object_center_y = (detections[n].Left + detections[n].Right) / 2.0f;
     float object_center_x = (detections[n].Bottom + detections[n].Top) / 2.0f;
 
+    target_track_ID = detections[n].TrackID;
     center_offset_y = object_center_y - center_of_frame_width;
     center_offset_x = object_center_x - center_of_frame_height;
     object_height = detections[n].Height();
@@ -249,24 +251,32 @@ void Localize::calc_target_offest(void)
 }
 
 /********************************************************************************
- * Function: dtrmn_target_ID
+ * Function: dtrmn_target
  * Description: Determine which detected object to Localize.
  ********************************************************************************/
-void Localize::dtrmn_target_ID(void)
+void Localize::dtrmn_target(void)
 {
-    target_ID = -1;
+    target_detection_ID = -1;
 
     for (int n = 0; n < numDetections; n++)
     {
+        /* A tracked object, classified as a person with some confidence level */
         if (detections[n].TrackID >= 0 && detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
         {
-            target_identified = true;
-            target_ID = n;
+            target_detection_ID = n;
         }
-        else
-        {
-            target_identified = false;
-        }
+    }
+
+    get_target_info(target_detection_ID);
+
+    /* Target detected, tracked, and has a size greater than 0 */
+    if (target_detection_ID >= 0 && target_track_ID >= 0 && object_height > 1 && object_width > 1)
+    {
+        target_identified = true;
+    }
+    else
+    {
+        target_identified = false;
     }
 }
 
@@ -300,7 +310,7 @@ bool Localize::init(void)
     delta_d_x = 0.0f;
     delta_d_z = 0.0f;
     camera_comp_angle = 0.0f;
-    target_ID = -1;
+    target_detection_ID = -1;
 
     return true;
 }
@@ -312,11 +322,10 @@ bool Localize::init(void)
  ********************************************************************************/
 void Localize::loop(void)
 {
-    dtrmn_target_ID();
+    dtrmn_target();
 
     if (target_identified)
     {
-        get_target_info(target_ID);
         calc_target_offest();
     }
 }

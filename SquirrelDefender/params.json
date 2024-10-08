@@ -1,16 +1,16 @@
 {
     "Vel_PID_x": {
-        "Kp": 0.5,
-        "Ki": 0.000,
-        "Kd": 0.0001,
+        "Kp": 0.025,
+        "Ki": 0.00009,
+        "Kd": 0.00005,
         "w1": 1.0,
         "w2": 0.0,
         "w3": 0.0
     },
     "Vel_PID_y": {
         "Kp": 0.01,
-        "Ki": 0.0,
-        "Kd": 0.0,
+        "Ki": 0.00009,
+        "Kd": 0.00005,
         "w1": 1.0,
         "w2": 0.0,
         "w3": 0.0
@@ -61,7 +61,7 @@
         "Device": 0,
         "Allow_gpu_fallback": false,
         "Min_Frames": 25,
-        "Drop_Frames": 50,
-        "Overlap_Threshold": 0.5
+        "Drop_Frames": 10,
+        "Overlap_Threshold": 0.1
     }
 }

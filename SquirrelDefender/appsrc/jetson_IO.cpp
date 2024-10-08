@@ -177,12 +177,16 @@ void StatusIndicators::status_program_complete(void)
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
             GPIO::output(GREEN_LED_PIN, GPIO::LOW);
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
+            GPIO::output(GREEN_LED_PIN, GPIO::HIGH);
+            std::this_thread::sleep_for(std::chrono::milliseconds(25));
+            GPIO::output(GREEN_LED_PIN, GPIO::LOW);
+            std::this_thread::sleep_for(std::chrono::milliseconds(25));
         }
         // Pause before repeating
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
     GPIO::output(GREEN_LED_PIN, GPIO::HIGH);
-    GPIO::output(RED_LED_PIN, GPIO::HIGH);
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 }
 
 /********************************************************************************

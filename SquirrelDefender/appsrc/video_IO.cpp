@@ -335,19 +335,15 @@ bool Video::init(void)
     valid_image_rcvd = false;
     image = NULL;
 
-#ifdef DEBUG_BUILD
-
     if (!create_input_video_stream() ||
-        !create_output_vid_stream() ||
-        !create_display_video_stream())
+        !create_output_vid_stream())
     {
         return false;
     }
 
-#else
+#ifdef DEBUG_BUILD
 
-    if (!create_input_video_stream() ||
-        !create_output_vid_stream())
+    if (!create_display_video_stream())
     {
         return false;
     }
@@ -382,19 +378,12 @@ void Video::out_loop(void)
         display_video();
     }
 
-    if (file_stream_created)
-    {
-        save_video();
-    }
-
-#else
-
-    if (file_stream_created)
-    {
-        save_video();
-    }
-
 #endif // DEBUG_BUILD
+
+    if (file_stream_created)
+    {
+        save_video();
+    }
 }
 
 /********************************************************************************

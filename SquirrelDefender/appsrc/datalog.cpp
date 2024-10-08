@@ -18,11 +18,11 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool headings_written = false;
-std::string data_file_path = "../data/";
-std::string data_file_name = "data";
-std::string file_name = "";
-std::vector<std::vector<std::string>> data = {};
+bool headings_written;
+std::string data_file_path;
+std::string data_file_name;
+std::string file_name;
+std::vector<std::vector<std::string>> data;
 
 /********************************************************************************
  * Calibration definitions
@@ -102,18 +102,17 @@ void DataLogger::save_to_csv(const std::string &filename, const std::vector<std:
 }
 
 /********************************************************************************
- * Function: init
- * Description: Initialize data log variables and files.
+ * Function: write_headers
+ * Description: Write the column headers of the log file.
  ********************************************************************************/
-bool DataLogger::init(void)
+void DataLogger::write_headers(void)
 {
-    file_name = generate_unique_filename(data_file_name);
-
     data.push_back({"app_elapsed_time",
                     "system_state",
                     "target_too_close",
                     "target_identified",
-                    "target_ID",
+                    "target_detection_ID",
+                    "target_track_ID",
                     "center_offset_x",
                     "center_offset_y",
                     "object_height",
@@ -192,6 +191,21 @@ bool DataLogger::init(void)
                     "mav_veh_mavlink_version"});
 
     save_to_csv(file_name, data);
+}
+
+/********************************************************************************
+ * Function: init
+ * Description: Initialize data log variables and files.
+ ********************************************************************************/
+bool DataLogger::init(void)
+{
+    headings_written = false;
+    data_file_path = "../data/";
+    data_file_name = "data";
+    file_name = "";
+    data = {};
+
+    file_name = generate_unique_filename(data_file_name);
 
     return true;
 }
@@ -202,14 +216,20 @@ bool DataLogger::init(void)
  ********************************************************************************/
 void DataLogger::loop(void)
 {
-    // Clear data vector and write to next row
+
+    if (first_loop_after_start)
+    {
+        write_headers();
+    }
+
     data.clear();
 
     data.push_back({{std::to_string(app_elapsed_time),
                      std::to_string(system_state),
                      std::to_string(target_too_close),
                      std::to_string(target_identified),
-                     std::to_string(target_ID),
+                     std::to_string(target_detection_ID),
+                     std::to_string(target_track_ID),
                      std::to_string(center_offset_x),
                      std::to_string(center_offset_y),
                      std::to_string(object_height),

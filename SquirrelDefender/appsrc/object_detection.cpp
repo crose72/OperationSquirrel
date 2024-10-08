@@ -66,11 +66,11 @@ bool Detection::create_detection_network(void)
 
 #else
 
-    float detection_thresh = (float)0.7;
+    float detection_thresh = (float)0.5;
     uint32_t max_batch_size = (uint32_t)4;
     uint32_t min_frames = (uint32_t)25;
-    uint32_t drop_frames = (uint32_t)50;
-    float overlap_thresh = (float)0.5;
+    uint32_t drop_frames = (uint32_t)10;
+    float overlap_thresh = (float)0.1;
 
 #endif // DEBUG_BUILD
 

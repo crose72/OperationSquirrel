@@ -88,7 +88,8 @@ extern uint8_t mav_veh_mavlink_version;
 
 /* Localize target variables*/
 extern bool target_identified;
-extern int target_ID;
+extern int target_detection_ID;
+extern int target_track_ID;
 extern float center_offset_x;
 extern float center_offset_y;
 extern float object_height;
@@ -139,6 +140,7 @@ public:
     static void data_log_shutdown(void);
 
 private:
+    static void write_headers(void);
     static void load_signals_from_file(const std::string &header_file_path);
     static void save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data);
     static std::string generate_unique_filename(const std::string &filename);

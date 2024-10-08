@@ -113,7 +113,6 @@ void VehicleController::cmd_acceleration_NED(float acceleration_target[3])
 void VehicleController::follow_mode(void)
 {
     float target_velocity[3] = {0.0, 0.0, 0.0};
-    float zero_velocity[3] = {0.0, 0.0, 0.0};
 
     target_velocity[0] = vx_adjust;
     target_velocity[1] = vy_adjust;
@@ -129,7 +128,7 @@ void VehicleController::follow_mode(void)
     }
     else
     {
-        VehicleController::cmd_velocity_NED(zero_velocity);
+        VehicleController::cmd_velocity_NED(target_velocity);
     }
 }
 
@@ -164,7 +163,7 @@ void VehicleController::loop(void)
     }
     else if (system_state == SYSTEM_STATE::STANDBY)
     {
-        MavCmd::takeoff_GPS_long((float)2.3);
+        MavCmd::takeoff_GPS_long((float)4.0);
     }
     else if (system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
     {
@@ -178,7 +177,7 @@ void VehicleController::loop(void)
             takeoff_dbc = true;
         }
 
-        if (takeoff_dbc && mav_veh_rngfdr_current_distance > 100 || mav_veh_rel_alt > 1000)
+        if (takeoff_dbc && mav_veh_rngfdr_current_distance > 300 || mav_veh_rel_alt > 3000)
         {
             start_follow_mode = true;
         }

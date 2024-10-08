@@ -175,7 +175,6 @@ int SystemController::init(void)
         !Follow::init() ||
         !VehicleController::init())
     {
-        StatusIndicators::status_bad_blink();
         return 1;
     }
 
@@ -185,14 +184,13 @@ int SystemController::init(void)
         !DataLogger::init() ||
         !VehicleController::init())
     {
-        StatusIndicators::status_bad_blink();
         return 1;
     }
 
 #elif WSL
 
     if (!MavMsg::init() ||
-        /* !DataLogger::init() || */
+        !DataLogger::init() ||
         !VehicleController::init())
     {
         return 1;
@@ -230,8 +228,6 @@ void SystemController::shutdown(void)
 
     Video::shutdown();
     Detection::shutdown();
-    StatusIndicators::status_program_complete();
-    StatusIndicators::gpio_shutdown();
 
 #endif // JETSON_B01
 

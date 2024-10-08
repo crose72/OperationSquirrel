@@ -104,8 +104,14 @@ int main(void)
     attach_sig_handler();
     stop_program = false;
 
+    if (save_button_press)
+    {
+        return 2;
+    }
+
     if (SystemController::init() != 0)
     {
+        StatusIndicators::status_bad_blink();
         return 1;
     }
 
@@ -150,6 +156,8 @@ int main(void)
     }
 
     SystemController::shutdown();
+    StatusIndicators::status_program_complete();
+    StatusIndicators::gpio_shutdown();
 
     return 0;
 }

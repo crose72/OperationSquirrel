@@ -36,7 +36,8 @@ extern float mav_veh_pitch;
  * Exported objects
  ********************************************************************************/
 extern bool target_identified;
-extern int target_ID;
+extern int target_detection_ID;
+extern int target_track_ID;
 extern float center_offset_x;
 extern float center_offset_y;
 extern float object_height;
@@ -72,7 +73,7 @@ public:
     static bool init(void);
     static void loop(void);
 
-    static void dtrmn_target_ID(void);
+    static void dtrmn_target(void);
     static void get_target_info(int n);
     static void calc_target_offest(void);
 
