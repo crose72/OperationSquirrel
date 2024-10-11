@@ -22,6 +22,7 @@
 
 #ifdef JETSON_B01
 
+#include "track_target.h"
 #include "jetson_IO.h"
 #include "video_IO.h"
 #include "object_detection.h"
@@ -135,6 +136,7 @@ int main(void)
         Video::in_loop();
         Detection::loop();
         Localize::loop();
+        Track::loop();
         Follow::loop();
         VehicleController::loop();
         Video::out_loop();

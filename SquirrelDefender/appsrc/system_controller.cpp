@@ -171,6 +171,7 @@ int SystemController::init(void)
 
     if (!Video::init() ||
         !Detection::init() ||
+        !Track::init() ||
         !Localize::init() ||
         !Follow::init() ||
         !VehicleController::init())

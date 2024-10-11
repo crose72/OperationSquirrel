@@ -104,7 +104,7 @@ void Detection::detect_objects(void)
 {
     uint32_t overlay_flags = 0;
 
-    overlay_flags = overlay_flags | detectNet::OVERLAY_LABEL | detectNet::OVERLAY_CONFIDENCE | detectNet::OVERLAY_TRACKING | detectNet::OVERLAY_LINES;
+    // overlay_flags = overlay_flags | detectNet::OVERLAY_LABEL | detectNet::OVERLAY_CONFIDENCE | detectNet::OVERLAY_TRACKING | detectNet::OVERLAY_LINES;
 
     if (overlay_flags > 0 && image != NULL)
     {
