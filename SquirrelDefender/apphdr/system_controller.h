@@ -15,6 +15,7 @@
 #include "mavlink_msg_handler.h"
 #include "video_IO.h"
 #include "jetson_IO.h"
+#include "track_target.h"
 
 /********************************************************************************
  * Imported objects

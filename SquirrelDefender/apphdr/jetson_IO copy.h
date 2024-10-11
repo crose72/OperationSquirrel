@@ -3,63 +3,54 @@
 #ifdef JETSON_B01
 
 /********************************************************************************
- * @file    object_detection.h
+ * @file    jetson_IO.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef OBJECT_DETECTION_H
-#define OBJECT_DETECTION_H
+#ifndef JETSON_IO_H
+#define JETSON_IO_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "jetson-utils/videoSource.h"
-#include "jetson-utils/videoOutput.h"
-#include "jetson-inference/detectNet.h"
-#include "jetson-inference/objectTracker.h"
-#include <jetson-inference/objectTrackerIOU.h>
-#include "video_IO.h"
-#include "parameters.h"
+#include <JetsonGPIO.h>
+#include <thread>
+#include <chrono>
+#include <unistd.h>
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern videoSource *input;
-extern uchar3 *image;
-extern uint32_t input_video_width;
-extern uint32_t input_video_height;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern detectNet *net;
-extern detectNet::Detection *detections;
-extern int numDetections;
+extern bool save_button_press;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class Detection
+class StatusIndicators
 {
 public:
-    Detection(void);
-    ~Detection(void);
+    StatusIndicators();
+    ~StatusIndicators();
 
-    static void loop(void);
     static bool init(void);
-    static void shutdown(void);
-    static bool create_detection_network(void);
-    static void detect_objects(void);
-    static void get_object_info(void);
-    static void print_object_info(void);
-    static int print_usage(void);
-    static void print_performance_stats(void);
-    static void delete_tracking_net(void);
+    static void loop(void);
+    static void gpio_shutdown(void);
+    static void status_initializing(void);
+    static void status_program_complete(void);
+    static void status_good(void);
+    static void status_bad(void);
+    static void status_bad_blink(void);
+    static void clear_all_leds(void);
+    static void save_video_button_state(void);
 
 private:
 };
 
-#endif // OBJECT_DETECTION_H
+#endif // JETSON_IO_H
 
 #endif // JETSON_B01

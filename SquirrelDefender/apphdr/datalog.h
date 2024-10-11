@@ -21,6 +21,9 @@
 #include <unordered_map>
 #include <functional>
 #include "mavlink_msg_handler.h"
+#include "detect_target.h"
+#include "track_target.h"
+#include "localize_target.h"
 #include "follow_target.h"
 
 /********************************************************************************
@@ -90,15 +93,15 @@ extern uint8_t mav_veh_mavlink_version;
 extern bool target_identified;
 extern int target_detection_ID;
 extern int target_track_ID;
-extern float center_offset_x;
-extern float center_offset_y;
-extern float object_height;
-extern float object_width;
-extern float object_aspect;
-extern float object_left;
-extern float object_right;
-extern float object_top;
-extern float object_bottom;
+extern float target_cntr_offset_x;
+extern float target_cntr_offset_y;
+extern float target_height;
+extern float target_width;
+extern float target_aspect;
+extern float target_left;
+extern float target_right;
+extern float target_top;
+extern float target_bottom;
 extern float d_object_h;
 extern float d_object_w;
 extern float x_object;

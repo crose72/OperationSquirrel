@@ -32,18 +32,6 @@
  ********************************************************************************/
 DebugTerm LocalizeData("");
 
-bool target_identified;
-int target_detection_ID;
-int target_track_ID;
-float center_offset_x;
-float center_offset_y;
-float object_height;
-float object_width;
-float object_aspect;
-float object_left;
-float object_right;
-float object_top;
-float object_bottom;
 float d_object_h;
 float d_object_w;
 float x_object;
@@ -139,28 +127,6 @@ Localize::Localize(void) {};
 Localize::~Localize(void) {};
 
 /********************************************************************************
- * Function: get_target_info
- * Description: Obtain the important information about the target, such as the
- *              height and location of the center of the target in the frame.
- ********************************************************************************/
-void Localize::get_target_info(int n)
-{
-    float object_center_y = (detections[n].Left + detections[n].Right) / 2.0f;
-    float object_center_x = (detections[n].Bottom + detections[n].Top) / 2.0f;
-
-    target_track_ID = detections[n].TrackID;
-    center_offset_y = object_center_y - center_of_frame_width;
-    center_offset_x = object_center_x - center_of_frame_height;
-    object_height = detections[n].Height();
-    object_width = detections[n].Width();
-    object_aspect = object_width / object_height;
-    object_left = detections[n].Left;
-    object_right = detections[n].Right;
-    object_top = detections[n].Top;
-    object_bottom = detections[n].Bottom;
-}
-
-/********************************************************************************
  * Function: calc_target_offest
  * Description: Calculate the location of the target relative to the drone.
  *              First implementation will be relative to the camera, needs to use
@@ -177,12 +143,12 @@ void Localize::calc_target_offest(void)
     float delta_d;
 
     /* Calculate distance from camera offset */
-    d_idx_h = get_float_index(object_height, &height_index[0], MAX_IDX_D_HEIGHT, false);
-    d_idx_w = get_float_index(object_width, &width_index[0], MAX_IDX_D_WIDTH, false);
+    d_idx_h = get_float_index(target_height, &height_index[0], MAX_IDX_D_HEIGHT, false);
+    d_idx_w = get_float_index(target_width, &width_index[0], MAX_IDX_D_WIDTH, false);
     d_object_h = get_interpolated_value(d_idx_h, &d_offset_h[0], MAX_IDX_D_HEIGHT);
     d_object_w = get_interpolated_value(d_idx_w, &d_offset_w[0], MAX_IDX_D_WIDTH);
 
-    if (object_aspect > 0.4f)
+    if (target_aspect > 0.4f)
     {
         d_object = d_object_w;
     }
@@ -220,14 +186,14 @@ void Localize::calc_target_offest(void)
     if (delta_angle > 0.0f && delta_angle < camera_fixed_angle)
     {
         delta_idx_d = get_float_index(d_object, &delta_offset_d[0], MAX_IDX_DELTA_D_OFFSET, true);
-        delta_idx_pix = get_float_index(std::abs(center_offset_x), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
+        delta_idx_pix = get_float_index(std::abs(target_cntr_offset_x), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
         delta_d = get_2d_interpolated_value(&delta_offset[0][0], MAX_IDX_DELTA_PIXEL_OFFSET, MAX_IDX_DELTA_D_OFFSET, y_idx_pix, y_idx_d);
 
         delta_d_x = delta_d * cos(delta_angle);
         delta_d_z = delta_d * sin(delta_angle);
 
         /* If object center is below the center of the frame */
-        if (center_offset_x > center_of_frame_height)
+        if (target_cntr_offset_x > center_of_frame_height)
         {
             delta_d_x = -delta_d_x;
             delta_d_z = -delta_d_z;
@@ -241,42 +207,12 @@ void Localize::calc_target_offest(void)
     /* Calculate target y offset from the center line of view of the camera based on calibrated forward distance and the
        offset of the center of the target to the side of the center of the video frame in pixels */
     y_idx_d = get_float_index(d_object, &y_offset_d[0], MAX_IDX_Y_D_OFFSET, true);
-    y_idx_pix = get_float_index(std::abs(center_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
+    y_idx_pix = get_float_index(std::abs(target_cntr_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
     y_object = get_2d_interpolated_value(&y_offset[0][0], MAX_IDX_Y_PIXEL_OFFSET, MAX_IDX_Y_D_OFFSET, y_idx_pix, y_idx_d);
 
-    if (center_offset_y < 0.0f)
+    if (target_cntr_offset_y < 0.0f)
     {
         y_object = -y_object;
-    }
-}
-
-/********************************************************************************
- * Function: dtrmn_target
- * Description: Determine which detected object to Localize.
- ********************************************************************************/
-void Localize::dtrmn_target(void)
-{
-    target_detection_ID = -1;
-
-    for (int n = 0; n < numDetections; n++)
-    {
-        /* A tracked object, classified as a person with some confidence level */
-        if (detections[n].TrackID >= 0 && detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
-        {
-            target_detection_ID = n;
-        }
-    }
-
-    get_target_info(target_detection_ID);
-
-    /* Target detected, tracked, and has a size greater than 0 */
-    if (target_detection_ID >= 0 && target_track_ID >= 0 && object_height > 1 && object_width > 1)
-    {
-        target_identified = true;
-    }
-    else
-    {
-        target_identified = false;
     }
 }
 
@@ -287,16 +223,6 @@ void Localize::dtrmn_target(void)
  ********************************************************************************/
 bool Localize::init(void)
 {
-    target_identified = false;
-    center_offset_x = 0.0f;
-    center_offset_y = 0.0f;
-    object_height = 0.0f;
-    object_width = 0.0f;
-    object_aspect = 0.0f;
-    object_left = 0.0f;
-    object_right = 0.0f;
-    object_top = 0.0f;
-    object_bottom = 0.0f;
     d_object_h = 0.0f;
     d_object_w = 0.0f;
     x_object = 0.0f;
@@ -310,7 +236,6 @@ bool Localize::init(void)
     delta_d_x = 0.0f;
     delta_d_z = 0.0f;
     camera_comp_angle = 0.0f;
-    target_detection_ID = -1;
 
     return true;
 }
@@ -322,8 +247,6 @@ bool Localize::init(void)
  ********************************************************************************/
 void Localize::loop(void)
 {
-    dtrmn_target();
-
     if (target_identified)
     {
         calc_target_offest();

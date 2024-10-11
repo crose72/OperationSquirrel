@@ -341,12 +341,12 @@ bool Video::init(void)
         return false;
     }
 
-#ifdef DEBUG_BUILD
-
     if (!create_display_video_stream())
     {
         return false;
     }
+
+#ifdef DEBUG_BUILD
 
 #endif // DEBUG_BUILD
 
@@ -373,12 +373,12 @@ void Video::out_loop(void)
 
 #ifdef DEBUG_BUILD
 
+#endif // DEBUG_BUILD
+
     if (display_stream_created)
     {
         display_video();
     }
-
-#endif // DEBUG_BUILD
 
     if (file_stream_created)
     {
