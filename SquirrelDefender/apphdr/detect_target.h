@@ -3,12 +3,12 @@
 #ifdef JETSON_B01
 
 /********************************************************************************
- * @file    object_detection.h
+ * @file    detect_target.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef OBJECT_DETECTION_H
-#define OBJECT_DETECTION_H
+#ifndef DETECT_TARGET_H
+#define DETECT_TARGET_H
 
 /********************************************************************************
  * Includes
@@ -35,7 +35,7 @@ extern uint32_t input_video_height;
  ********************************************************************************/
 extern detectNet *net;
 extern detectNet::Detection *detections;
-extern int numDetections;
+extern int detection_count;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
@@ -60,6 +60,6 @@ public:
 private:
 };
 
-#endif // OBJECT_DETECTION_H
+#endif // DETECT_TARGET_H
 
 #endif // JETSON_B01

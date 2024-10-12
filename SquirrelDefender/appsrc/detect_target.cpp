@@ -11,7 +11,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "object_detection.h"
+#include "detect_target.h"
 
 /********************************************************************************
  * Typedefs
@@ -26,7 +26,7 @@
  ********************************************************************************/
 detectNet *net;
 detectNet::Detection *detections;
-int numDetections;
+int detection_count;
 
 /********************************************************************************
  * Calibration definitions
@@ -108,11 +108,11 @@ void Detection::detect_objects(void)
 
     if (overlay_flags > 0 && image != NULL)
     {
-        numDetections = net->Detect(image, input->GetWidth(), input->GetHeight(), &detections, overlay_flags);
+        detection_count = net->Detect(image, input->GetWidth(), input->GetHeight(), &detections, overlay_flags);
     }
     else if (image != NULL)
     {
-        numDetections = net->Detect(image, input->GetWidth(), input->GetHeight(), &detections);
+        detection_count = net->Detect(image, input->GetWidth(), input->GetHeight(), &detections);
     }
     else
     {
@@ -146,7 +146,7 @@ bool Detection::init(void)
 {
     net = NULL;
     detections = NULL;
-    numDetections = 0;
+    detection_count = 0;
 
     if (!create_detection_network())
     {

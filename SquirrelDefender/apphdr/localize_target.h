@@ -15,38 +15,32 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "video_IO.h"
-#include "object_detection.h"
+#include "detect_target.h"
 #include "parameters.h"
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern detectNet *net;
-extern detectNet::Detection *detections;
-extern videoSource *input;
-extern int numDetections;
-extern uint32_t input_video_width;
-extern uint32_t input_video_height;
 extern uint16_t mav_veh_rngfdr_min_distance;
 extern uint16_t mav_veh_rngfdr_max_distance;
 extern uint16_t mav_veh_rngfdr_current_distance;
 extern float mav_veh_pitch;
+extern bool target_identified;
+extern int target_detection_ID;
+extern int target_track_ID;
+extern float target_cntr_offset_x;
+extern float target_cntr_offset_y;
+extern float target_height;
+extern float target_width;
+extern float target_aspect;
+extern float target_left;
+extern float target_right;
+extern float target_top;
+extern float target_bottom;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool target_identified;
-extern int target_detection_ID;
-extern int target_track_ID;
-extern float center_offset_x;
-extern float center_offset_y;
-extern float object_height;
-extern float object_width;
-extern float object_aspect;
-extern float object_left;
-extern float object_right;
-extern float object_top;
-extern float object_bottom;
 extern float d_object_h;
 extern float d_object_w;
 extern float x_object;

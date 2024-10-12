@@ -25,7 +25,7 @@
 #include "track_target.h"
 #include "jetson_IO.h"
 #include "video_IO.h"
-#include "object_detection.h"
+#include "detect_target.h"
 #include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 
 #endif // JETSON_B01
@@ -135,6 +135,7 @@ int main(void)
 
         Video::in_loop();
         Detection::loop();
+        Track::loop();
         Localize::loop();
         Track::loop();
         Follow::loop();

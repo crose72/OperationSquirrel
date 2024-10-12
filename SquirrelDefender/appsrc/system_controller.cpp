@@ -19,7 +19,7 @@
 
 #ifdef JETSON_B01
 #include "video_IO.h"
-#include "object_detection.h"
+#include "detect_target.h"
 #include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 #include "follow_target.h"
 #endif // JETSON_B01

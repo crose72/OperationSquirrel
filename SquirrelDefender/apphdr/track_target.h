@@ -15,7 +15,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "video_IO.h"
-#include "object_detection.h"
+#include "detect_target.h"
 #include "parameters.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/tracking.hpp>
@@ -30,24 +30,36 @@
 extern detectNet *net;
 extern detectNet::Detection *detections;
 extern uchar3 *image;
-extern int numDetections;
+extern int detection_count;
 extern uint32_t input_video_width;
 extern uint32_t input_video_height;
 extern bool valid_image_rcvd;
 extern bool target_identified;
 extern int target_detection_ID;
 extern int target_track_ID;
-extern float object_height;
-extern float object_width;
-extern float object_aspect;
-extern float object_left;
-extern float object_right;
-extern float object_top;
-extern float object_bottom;
+extern float target_height;
+extern float target_width;
+extern float target_aspect;
+extern float target_left;
+extern float target_right;
+extern float target_top;
+extern float target_bottom;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
+extern bool target_identified;
+extern int target_detection_ID;
+extern int target_track_ID;
+extern float target_cntr_offset_x;
+extern float target_cntr_offset_y;
+extern float target_height;
+extern float target_width;
+extern float target_aspect;
+extern float target_left;
+extern float target_right;
+extern float target_top;
+extern float target_bottom;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
@@ -60,6 +72,13 @@ public:
 
     static bool init(void);
     static void loop(void);
+
+    static void track_target(void);
+    static void get_target_info(int n);
+    static void update_target_info(void);
+    static void dtrmn_target(void);
+    static void tracker_init(cv::Ptr<cv::Tracker> &tracker, cv::Mat &image, cv::Rect2d &bounding_box);
+    static bool tracker_update(cv::Ptr<cv::Tracker> &tracker, cv::Mat &image, cv::Rect2d &bounding_box);
 
 private:
 };

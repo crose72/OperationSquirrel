@@ -19,7 +19,7 @@
 #include "jetson-inference/detectNet.h"
 #include "jetson-inference/objectTracker.h"
 #include <jetson-inference/objectTrackerIOU.h>
-#include "object_detection.h"
+#include "detect_target.h"
 #include <string>
 #include <fstream>
 
