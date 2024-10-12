@@ -25,7 +25,7 @@ extern uint16_t mav_veh_rngfdr_min_distance;
 extern uint16_t mav_veh_rngfdr_max_distance;
 extern uint16_t mav_veh_rngfdr_current_distance;
 extern float mav_veh_pitch;
-extern bool target_identified;
+extern bool target_valid;
 extern float x_object;
 extern float y_object;
 extern float z_object;

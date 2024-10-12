@@ -118,11 +118,11 @@ void VehicleController::follow_mode(void)
     target_velocity[1] = vy_adjust;
     target_velocity[2] = vz_adjust;
 
-    if (target_identified && target_too_close)
+    if (target_valid && target_too_close)
     {
         VehicleController::cmd_velocity_xy_NED(target_velocity);
     }
-    else if (target_identified && !target_too_close)
+    else if (target_valid && !target_too_close)
     {
         VehicleController::cmd_velocity_NED(target_velocity);
     }

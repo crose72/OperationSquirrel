@@ -27,12 +27,15 @@
 DebugTerm TrackingData("");
 
 bool target_tracked;
+bool tracking;
 bool initialized_cv_image;
-bool target_identified;
+bool target_valid;
 int target_detection_ID;
 int target_track_ID;
 float target_cntr_offset_x;
 float target_cntr_offset_y;
+float target_center_y;
+float target_center_x;
 float target_height;
 float target_width;
 float target_aspect;
@@ -72,57 +75,26 @@ Track::~Track(void) {};
  * Function: tracker_init
  * Description: Initialize the tracker by resetting the bounding box to zeros.
  ********************************************************************************/
-void Track::tracker_init(cv::Ptr<cv::Tracker> &tracker, cv::Mat &image, cv::Rect2d &bounding_box)
+void Track::tracker_init(cv::Ptr<cv::Tracker> &tracker, cv::Mat &cv_image, cv::Rect2d &bounding_box)
 {
-    target_bounding_box = cv::Rect2d(0.0, 0.0, 0.0, 0.0);
-    tracker->init(image, target_bounding_box);
+    bounding_box = cv::Rect2d(0.0, 0.0, 0.0, 0.0);
+    tracker->init(cv_image, target_bounding_box);
 }
 
 /********************************************************************************
  * Function: tracker_update
  * Description: Update the bounding box around the tracked target.
  ********************************************************************************/
-bool Track::tracker_update(cv::Ptr<cv::Tracker> &tracker, cv::Mat &image, cv::Rect2d &bounding_box)
+bool Track::tracker_update(cv::Ptr<cv::Tracker> &tracker, cv::Mat &cv_image, cv::Rect2d &bounding_box)
 {
-    return tracker->update(image, bounding_box);
+    return tracker->update(cv_image, bounding_box);
 }
 
 /********************************************************************************
- * Function: get_target_info
- * Description: Obtain the important information about the target, such as the
- *              height and location of the center of the target in the frame.
- ********************************************************************************/
-void Track::get_target_info(int n)
-{
-    float target_center_y = (detections[n].Left + detections[n].Right) / 2.0f;
-    float target_center_x = (detections[n].Bottom + detections[n].Top) / 2.0f;
-
-    target_track_ID = detections[n].TrackID;
-    target_cntr_offset_y = target_center_y - center_of_frame_width;
-    target_cntr_offset_x = target_center_x - center_of_frame_height;
-    target_height = detections[n].Height();
-    target_width = detections[n].Width();
-    target_aspect = target_width / target_height;
-    target_left = detections[n].Left;
-    target_right = detections[n].Right;
-    target_top = detections[n].Top;
-    target_bottom = detections[n].Bottom;
-}
-
-/********************************************************************************
- * Function: update_target_info
- * Description: Obtain the important information about the target, such as the
- *              height and location of the center of the target in the frame.
- ********************************************************************************/
-void Track::update_target_info(void)
-{
-}
-
-/********************************************************************************
- * Function: dtrmn_target
+ * Function: identify_target
  * Description: Determine which detected object to track.
  ********************************************************************************/
-void Track::dtrmn_target(void)
+void Track::identify_target(void)
 {
     target_detection_ID = -1;
 
@@ -134,17 +106,44 @@ void Track::dtrmn_target(void)
             target_detection_ID = n;
         }
     }
+}
 
-    get_target_info(target_detection_ID);
+/********************************************************************************
+ * Function: get_target_info
+ * Description: Obtain the important information about the target, such as the
+ *              height and location of the center of the target in the frame.
+ ********************************************************************************/
+void Track::get_target_info(void)
+{
+    target_height = detections[target_detection_ID].Height();
+    target_width = detections[target_detection_ID].Width();
+    target_track_ID = detections[target_detection_ID].TrackID;
+    target_left = detections[target_detection_ID].Left;
+    target_right = detections[target_detection_ID].Right;
+    target_top = detections[target_detection_ID].Top;
+    target_bottom = detections[target_detection_ID].Bottom;
+    target_center_y = (target_left + target_right) / 2.0f;
+    target_center_x = (target_bottom + target_top) / 2.0f;
+    target_cntr_offset_y = target_center_y - center_of_frame_width;
+    target_cntr_offset_x = target_center_x - center_of_frame_height;
+    target_aspect = target_width / target_height;
+}
 
-    /* Target detected, tracked, and has a size greater than 0 */
+/********************************************************************************
+ * Function: validate_target
+ * Description: Determine which detected object to track.
+ ********************************************************************************/
+void Track::validate_target(void)
+{
+    /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
+       implimented. */
     if (target_detection_ID >= 0 && target_track_ID >= 0 && target_height > 1 && target_width > 1)
     {
-        target_identified = true;
+        target_valid = true;
     }
     else
     {
-        target_identified = false;
+        target_valid = false;
     }
 }
 
@@ -165,15 +164,44 @@ void Track::track_target(void)
     }
     else if (valid_image_rcvd && initialized_cv_image)
     {
-        target_bounding_box = cv::Rect2d(target_left, target_top, target_width, target_height);
-        target_tracked = tracker_update(target_tracker, image_cv_wrapped, target_bounding_box);
-    }
+        if (!tracking)
+        {
+            target_bounding_box = cv::Rect2d(target_left, target_top, target_width, target_height);
+            tracker_init(target_tracker, image_cv_wrapped, target_bounding_box);
+        }
 
-    if (target_tracked)
-    {
-        // Draw the target_tracked box
-        cv::rectangle(image_cv_wrapped, target_bounding_box, cv::Scalar(255, 0, 0), 2, 1);
+        target_tracked = tracker_update(target_tracker, image_cv_wrapped, target_bounding_box);
+        if (target_tracked)
+        {
+            // Draw the target_tracked box
+            cv::rectangle(image_cv_wrapped, target_bounding_box, cv::Scalar(255, 0, 0), 2, 1);
+            tracking = true;
+        }
+        else
+        {
+            tracking = false;
+        }
     }
+}
+
+/********************************************************************************
+ * Function: update_target_info
+ * Description: Obtain the important information about the target, such as the
+ *              height and location of the center of the target in the frame.
+ ********************************************************************************/
+void Track::update_target_info(void)
+{
+    target_height = target_bounding_box.height;
+    target_width = target_bounding_box.width;
+    target_left = target_bounding_box.x;
+    target_right = target_left + target_width;
+    target_top = target_bounding_box.y;
+    target_bottom = target_top + target_height;
+    target_center_y = (target_left + target_right) / 2.0f;
+    target_center_x = (target_bottom + target_top) / 2.0f;
+    target_cntr_offset_y = target_center_y - center_of_frame_width;
+    target_cntr_offset_x = target_center_x - center_of_frame_height;
+    target_aspect = target_width / target_height;
 }
 
 /********************************************************************************
@@ -183,7 +211,7 @@ void Track::track_target(void)
  ********************************************************************************/
 bool Track::init(void)
 {
-    target_identified = false;
+    target_valid = false;
     target_cntr_offset_x = 0.0f;
     target_cntr_offset_y = 0.0f;
     target_height = 0.0f;
@@ -198,6 +226,7 @@ bool Track::init(void)
     target_tracker = cv::TrackerCSRT::create();
     initialized_cv_image = false;
     target_tracked = false;
+    tracking = false;
     target_bounding_box = cv::Rect2d(0.0, 0.0, 0.0, 0.0);
     // Allocate memory for image before using it
     cudaMallocManaged(&image, input_video_width * input_video_height * sizeof(uchar3));
@@ -213,9 +242,11 @@ bool Track::init(void)
  ********************************************************************************/
 void Track::loop(void)
 {
-    dtrmn_target();
+    identify_target();
+    get_target_info();
+    validate_target();
     track_target();
-    update_target_info();
+    // update_target_info();
 }
 
 #endif // JETSON_B01

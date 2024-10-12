@@ -90,7 +90,7 @@ extern uint8_t mav_veh_state;
 extern uint8_t mav_veh_mavlink_version;
 
 /* Localize target variables*/
-extern bool target_identified;
+extern bool target_valid;
 extern int target_detection_ID;
 extern int target_track_ID;
 extern float target_cntr_offset_x;

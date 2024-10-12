@@ -23,7 +23,7 @@
  * Imported objects
  ********************************************************************************/
 extern bool target_too_close;
-extern bool target_identified;
+extern bool target_valid;
 extern float vx_adjust;
 extern float vy_adjust;
 extern float vz_adjust;

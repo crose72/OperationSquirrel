@@ -241,7 +241,7 @@ void Follow::loop(void)
 
     target_too_close = (x_error < 0.0);
 
-    if (target_identified && target_too_close)
+    if (target_valid && target_too_close)
     {
         vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev,
                                               x_error, 0.0, 0.0,
@@ -250,7 +250,7 @@ void Follow::loop(void)
                                               y_error, 0.0, 0.0,
                                               w1_y_rev, 0.0, 0.0, CONTROL_DIM::Y);
     }
-    else if (target_identified && !target_too_close)
+    else if (target_valid && !target_too_close)
     {
         vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
                                                 x_error, 0.0, 0.0,

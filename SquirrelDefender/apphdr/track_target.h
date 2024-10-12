@@ -34,7 +34,7 @@ extern int detection_count;
 extern uint32_t input_video_width;
 extern uint32_t input_video_height;
 extern bool valid_image_rcvd;
-extern bool target_identified;
+extern bool target_valid;
 extern int target_detection_ID;
 extern int target_track_ID;
 extern float target_height;
@@ -48,7 +48,7 @@ extern float target_bottom;
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool target_identified;
+extern bool target_valid;
 extern int target_detection_ID;
 extern int target_track_ID;
 extern float target_cntr_offset_x;
@@ -73,10 +73,11 @@ public:
     static bool init(void);
     static void loop(void);
 
+    static void identify_target(void);
+    static void get_target_info(void);
+    static void validate_target(void);
     static void track_target(void);
-    static void get_target_info(int n);
     static void update_target_info(void);
-    static void dtrmn_target(void);
     static void tracker_init(cv::Ptr<cv::Tracker> &tracker, cv::Mat &image, cv::Rect2d &bounding_box);
     static bool tracker_update(cv::Ptr<cv::Tracker> &tracker, cv::Mat &image, cv::Rect2d &bounding_box);
 
