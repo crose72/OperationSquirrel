@@ -29,7 +29,9 @@ DebugTerm TrackingData("");
 bool target_tracked;
 bool tracking;
 bool initialized_cv_image;
+bool initialized_tracker;
 bool target_valid;
+bool target_valid_prv;
 int target_detection_ID;
 int target_track_ID;
 float target_cntr_offset_x;
@@ -46,8 +48,8 @@ float target_bottom;
 
 cv::cuda::GpuMat gpuImage;
 cv::Mat image_cv_wrapped;
-cv::Ptr<cv::Tracker> target_tracker;
-cv::Rect2d target_bounding_box;
+cv::Ptr<cv::TrackerCSRT> target_tracker;
+cv::Rect target_bounding_box;
 
 /********************************************************************************
  * Calibration definitions
@@ -75,19 +77,32 @@ Track::~Track(void) {};
  * Function: tracker_init
  * Description: Initialize the tracker by resetting the bounding box to zeros.
  ********************************************************************************/
-void Track::tracker_init(cv::Ptr<cv::Tracker> &tracker, cv::Mat &cv_image, cv::Rect2d &bounding_box)
+
+bool Track::tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
 {
-    bounding_box = cv::Rect2d(0.0, 0.0, 0.0, 0.0);
-    tracker->init(cv_image, target_bounding_box);
+    tracker->init(cv_image, bounding_box);
+
+    return true;
 }
 
 /********************************************************************************
  * Function: tracker_update
  * Description: Update the bounding box around the tracked target.
  ********************************************************************************/
-bool Track::tracker_update(cv::Ptr<cv::Tracker> &tracker, cv::Mat &cv_image, cv::Rect2d &bounding_box)
+bool Track::tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
 {
-    return tracker->update(cv_image, bounding_box);
+    bool success;
+    try {
+        success = tracker->update(cv_image, bounding_box);
+        if (!success) {
+            std::cerr << "Tracking failed." << std::endl;
+        }
+    }
+    catch (const cv::Exception& e) {
+        std::cerr << "OpenCV error: " << e.what() << std::endl;
+    }
+
+    return success;
 }
 
 /********************************************************************************
@@ -96,7 +111,11 @@ bool Track::tracker_update(cv::Ptr<cv::Tracker> &tracker, cv::Mat &cv_image, cv:
  ********************************************************************************/
 void Track::identify_target(void)
 {
+
+
     target_detection_ID = -1;
+
+#ifdef JETSON_B01
 
     for (int n = 0; n < detection_count; n++)
     {
@@ -106,6 +125,23 @@ void Track::identify_target(void)
             target_detection_ID = n;
         }
     }
+
+#elif _WIN32
+
+    for (int n = 0; n < yolo_detection_count; n++)
+    {
+        /* A tracked object, classified as a person with some confidence level */
+        if (yolo_detections[n].ClassID == 0 && yolo_detections[n].Confidence > 0.5)
+        {
+            target_detection_ID = n;
+        }
+}
+
+#else
+
+#error "Please define build platform."
+
+#endif
 }
 
 /********************************************************************************
@@ -115,6 +151,8 @@ void Track::identify_target(void)
  ********************************************************************************/
 void Track::get_target_info(void)
 {
+#ifdef JETSON_B01
+
     target_height = detections[target_detection_ID].Height();
     target_width = detections[target_detection_ID].Width();
     target_track_ID = detections[target_detection_ID].TrackID;
@@ -127,6 +165,27 @@ void Track::get_target_info(void)
     target_cntr_offset_y = target_center_y - center_of_frame_width;
     target_cntr_offset_x = target_center_x - center_of_frame_height;
     target_aspect = target_width / target_height;
+
+#elif _WIN32
+
+    target_height = yolo_detections[target_detection_ID].Height();
+    target_width = yolo_detections[target_detection_ID].Width();
+    target_track_ID = 0;
+    target_left = yolo_detections[target_detection_ID].Left;
+    target_right = yolo_detections[target_detection_ID].Right;
+    target_top = yolo_detections[target_detection_ID].Top;
+    target_bottom = yolo_detections[target_detection_ID].Bottom;
+    target_center_y = (target_left + target_right) / 2.0f;
+    target_center_x = (target_bottom + target_top) / 2.0f;
+    target_cntr_offset_y = target_center_y - center_of_frame_width;
+    target_cntr_offset_x = target_center_x - center_of_frame_height;
+    target_aspect = target_width / target_height;
+
+#else
+
+#error "Please define a build platform."
+
+#endif
 }
 
 /********************************************************************************
@@ -135,6 +194,8 @@ void Track::get_target_info(void)
  ********************************************************************************/
 void Track::validate_target(void)
 {
+#if JETSON_B01
+
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
        implimented. */
     if (target_detection_ID >= 0 && target_track_ID >= 0 && target_height > 1 && target_width > 1)
@@ -145,6 +206,27 @@ void Track::validate_target(void)
     {
         target_valid = false;
     }
+
+#elif _WIN32
+
+    /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
+   implimented. */
+    if (target_detection_ID >= 0 && target_height > 1 && target_width > 1)
+    {
+        target_valid = true;
+}
+    else
+    {
+        target_valid = false;
+    }
+
+#else
+
+#error "Please define build platform."
+
+#endif // JETSON_B01
+
+    target_valid_prv = target_valid;
 }
 
 /********************************************************************************
@@ -154,34 +236,101 @@ void Track::validate_target(void)
  ********************************************************************************/
 void Track::track_target(void)
 {
-    /* Don't wrap the image from jetson inference until a valid image has been received.
-       That way we know the memory has been allocaed and is ready. */
+#ifdef JETSON_B01
+
+/* Don't wrap the image from jetson inference until a valid image has been received.
+   That way we know the memory has been allocaed and is ready. */
     if (valid_image_rcvd && !initialized_cv_image)
     {
+
         // gpuImage = cv::cuda::GpuMat(input_video_height, input_video_width, CV_8UC3);
         image_cv_wrapped = cv::Mat(input_video_height, input_video_width, CV_8UC3, image); // Directly wrap uchar3*
         initialized_cv_image = true;
     }
     else if (valid_image_rcvd && initialized_cv_image)
     {
-        if (!tracking)
+        if (target_valid && !initialized_tracker)
         {
-            target_bounding_box = cv::Rect2d(target_left, target_top, target_width, target_height);
+            target_bounding_box = cv::Rect(target_left, target_top, target_width, target_height);
             tracker_init(target_tracker, image_cv_wrapped, target_bounding_box);
+            initialized_tracker = true;
         }
 
-        target_tracked = tracker_update(target_tracker, image_cv_wrapped, target_bounding_box);
+        if (initialized_tracker)
+        {
+            // Perform preprocessing on GPU (e.g., convert to grayscale)
+            //cv::cuda::GpuMat gpu_gray;
+            //cv::cvtColor(gpu_frame, gpu_gray, cv::COLOR_BGR2GRAY);
+
+            // Download processed frame back to CPU for tracking
+            //gpu_gray.download(image);  // Download back to CPU for tracking
+            //target_bounding_box = cv::Rect(target_left, target_top, target_width, target_height);
+
+            /*std::cout << "Before tracker->update: Bounding Box - x: " << target_bounding_box.x
+                << ", y: " << target_bounding_box.y << ", width: " << target_bounding_box.width
+                << ", height: " << target_bounding_box.height << std::endl;*/
+            //cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
+            target_tracked = tracker_update(target_tracker, image_cv_wrapped, target_bounding_box);
+        }
+
+        if (target_tracked)
+        {
+            std::cout << "Tracking" << std::endl;
+            cv::rectangle(image_cv_wrapped, target_bounding_box, cv::Scalar(255, 0, 0));
+
+            tracking = true;
+        }
+        else
+        {
+            std::cout << "Not Tracking" << std::endl;
+            initialized_tracker = false;
+            tracking = false;
+        }
+    }
+
+#elif _WIN32
+
+    /* Don't wrap the image from jetson inference until a valid image has been received.
+   That way we know the memory has been allocaed and is ready. */
+    if (valid_image_rcvd && !initialized_cv_image)
+    {
+        // gpuImage = cv::cuda::GpuMat(input_video_height, input_video_width, CV_8UC3);
+        //image_cv_wrapped = image;
+        initialized_cv_image = true;
+    }
+    else if (valid_image_rcvd && initialized_cv_image)
+    {
+        if (target_valid_prv && !target_valid)
+        {
+            target_bounding_box = cv::Rect(target_left, target_top, target_width, target_height);
+            tracker_init(target_tracker, image, target_bounding_box);
+        }
+
+        PrintPass::cpp_cout("My code made it this far!");
+          
+        target_bounding_box = cv::Rect(target_left, target_top, target_width, target_height);
+        target_tracked = tracker_update(target_tracker, image, target_bounding_box);
+        //cv::rectangle(image, target_bounding_box, cv::Scalar(255, 0, 0), 2, 1);
+        
         if (target_tracked)
         {
             // Draw the target_tracked box
-            cv::rectangle(image_cv_wrapped, target_bounding_box, cv::Scalar(255, 0, 0), 2, 1);
+            cv::rectangle(image, target_bounding_box, cv::Scalar(255, 0, 0), 2, 1);
             tracking = true;
         }
         else
         {
             tracking = false;
         }
+        
     }
+
+#else
+
+#error "Please define build platform."
+
+#endif // JETSON_B01
+
 }
 
 /********************************************************************************
@@ -212,6 +361,7 @@ void Track::update_target_info(void)
 bool Track::init(void)
 {
     target_valid = false;
+    target_valid_prv = false;
     target_cntr_offset_x = 0.0f;
     target_cntr_offset_y = 0.0f;
     target_height = 0.0f;
@@ -223,13 +373,14 @@ bool Track::init(void)
     target_bottom = 0.0f;
     target_detection_ID = -1;
 
-    target_tracker = cv::TrackerCSRT::create();
     initialized_cv_image = false;
     target_tracked = false;
     tracking = false;
-    target_bounding_box = cv::Rect2d(0.0, 0.0, 0.0, 0.0);
+    target_bounding_box = cv::Rect(0.0, 0.0, 0.0, 0.0);
+    target_tracker = cv::TrackerCSRT::create();
+
     // Allocate memory for image before using it
-    cudaMallocManaged(&image, input_video_width * input_video_height * sizeof(uchar3));
+    // cudaMallocManaged(&image_cv_wrapped, input_video_width * input_video_height * sizeof(uchar3));
     // gpuImage.upload(image_cv_wrapped);
 
     return true;
@@ -249,4 +400,4 @@ void Track::loop(void)
     // update_target_info();
 }
 
-#endif // JETSON_B01
+#endif // ENABLE_CV

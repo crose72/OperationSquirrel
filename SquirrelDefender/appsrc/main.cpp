@@ -20,12 +20,16 @@
 #include <mutex>
 #include <signal.h>
 
+#include "track_target.h"
+#include "localize_target.h"
+
 #ifdef JETSON_B01
 
 #include "track_target.h"
 #include "jetson_IO.h"
 #include "video_IO.h"
 #include "detect_target.h"
+#include "detect_target_yolo.h"
 #include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 
 #endif // JETSON_B01
@@ -137,20 +141,14 @@ int main(void)
         Detection::loop();
         Track::loop();
         Localize::loop();
-        Track::loop();
         Follow::loop();
         VehicleController::loop();
         Video::out_loop();
         StatusIndicators::loop();
 
-#elif WSL
-
-        VehicleController::loop();
-
 #endif // JETSON_B01
 
         app_first_init();
-
         DataLogger::loop();
 
         MainAppTime.calc_elapsed_time();

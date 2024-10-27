@@ -17,21 +17,18 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <map>
-#include <unordered_map>
-#include <functional>
 #include "mavlink_msg_handler.h"
-#include "detect_target.h"
+#include "follow_target.h"
 #include "track_target.h"
 #include "localize_target.h"
-#include "follow_target.h"
+#include "detect_target.h"
+#include "detect_target_yolo.h"
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
 extern float app_elapsed_time;
 
-/* Mavlink variables */
 extern uint16_t mav_veh_sys_stat_voltage_battery;
 extern int16_t mav_veh_sys_stat_current_battery;
 extern int8_t mav_veh_sys_stat_battery_remaining;
@@ -148,4 +145,5 @@ private:
     static void save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data);
     static std::string generate_unique_filename(const std::string &filename);
 };
+
 #endif // DATALOG_H

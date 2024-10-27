@@ -375,6 +375,7 @@ void Video::out_loop(void)
 
 #endif // DEBUG_BUILD
 
+    // note: put in debug build
     if (display_stream_created)
     {
         display_video();

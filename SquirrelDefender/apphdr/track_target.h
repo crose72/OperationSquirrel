@@ -21,18 +21,37 @@
 #include <opencv2/tracking.hpp>
 #include <opencv2/core/utility.hpp>
 #include <opencv2/cudawarping.hpp>
+#include "detect_target_yolo.h"
+
+#ifdef JETSON_B01
+
 #include <jetson-utils/cudaMappedMemory.h> // Assuming Jetson Inference utilities are available
 #include <jetson-utils/cudaRGB.h>          // For cuda functions
+
+#endif // JETSON_B01
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
+
+#ifdef JETSON_B01
+
 extern detectNet *net;
 extern detectNet::Detection *detections;
 extern uchar3 *image;
 extern int detection_count;
 extern uint32_t input_video_width;
 extern uint32_t input_video_height;
+
+#endif //JETSON_B01
+
+/*
+extern cv::dnn::Net net;
+extern std::vector<yolo_net::detection> yolo_detections;
+extern int yolo_detection_count;
+extern cv::Mat image;
+*/
+
 extern bool valid_image_rcvd;
 extern bool target_valid;
 extern int target_detection_ID;
@@ -78,12 +97,12 @@ public:
     static void validate_target(void);
     static void track_target(void);
     static void update_target_info(void);
-    static void tracker_init(cv::Ptr<cv::Tracker> &tracker, cv::Mat &image, cv::Rect2d &bounding_box);
-    static bool tracker_update(cv::Ptr<cv::Tracker> &tracker, cv::Mat &image, cv::Rect2d &bounding_box);
+    static bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &image, cv::Rect &bounding_box);
+    static bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &image, cv::Rect &bounding_box);
 
 private:
 };
 
 #endif // TRACK_TARGET_H
 
-#endif // JETSON_B01
+#endif // ENABLE_CV
