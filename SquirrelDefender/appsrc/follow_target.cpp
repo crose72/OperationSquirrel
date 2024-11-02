@@ -1,4 +1,4 @@
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
 /********************************************************************************
  * @file    follow_target.cpp
@@ -19,13 +19,6 @@
 /********************************************************************************
  * Private macros and defines
  ********************************************************************************/
-/* Max index of <DIM> based on <PARAM> */
-#define MAX_IDX_D_WIDTH 31
-#define MAX_IDX_D_HEIGHT 25
-#define MAX_IDX_Y_D_OFFSET 16
-#define MAX_IDX_Y_PIXEL_OFFSET 13
-#define MAX_IDX_DELTA_D_OFFSET 8
-#define MAX_IDX_DELTA_PIXEL_OFFSET 8
 
 /********************************************************************************
  * Object definitions
@@ -111,14 +104,14 @@ const float w1_x_rev = 1.0f;
 const float w2_x_rev = 0.0f;
 const float w3_x_rev = 0.0f;
 
-/* y reverse
- */
+/* y reverse */
 const float Kp_y_rev = 0.01f;
 const float Ki_y_rev = 0.0f;
 const float Kd_y_rev = 0.0001f;
 const float w1_y_rev = 1.0f;
 const float w2_y_rev = 0.0f;
 const float w3_y_rev = 0.0f;
+
 const uint16_t vehicle_rel_height_err = 0.0f;
 const uint16_t vehicle_height_desired = 0.0f;
 const float target_height_desired = 0.0f;
@@ -131,24 +124,15 @@ const float y_desired = 0.0f; // Make const in the ends
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-
-/********************************************************************************
- * Function: Follow
- * Description: Follow class constructor.
- ********************************************************************************/
-Follow::Follow(void) {};
-
-/********************************************************************************
- * Function: ~Follow
- * Description: Follow class destructor.
- ********************************************************************************/
-Follow::~Follow(void) {};
+void get_control_params(void);
+void calc_follow_error(void);
+void overtake_target(void);
 
 /********************************************************************************
  * Function: get_control_params
  * Description: Read follow control parameters from a json or other file type.
  ********************************************************************************/
-void Follow::get_control_params(void)
+void get_control_params(void)
 {
 #ifdef DEBUG_BUILD
 
@@ -193,7 +177,7 @@ void Follow::get_control_params(void)
  * Description: Calculate the error between the desired target offset and the
  *              target's actual offset.
  ********************************************************************************/
-void Follow::calc_follow_error(void)
+void calc_follow_error(void)
 {
 
     // Parameters target_params("../params.json");
@@ -211,6 +195,19 @@ void Follow::calc_follow_error(void)
 
     y_error = y_object - y_desired;
 }
+
+
+/********************************************************************************
+ * Function: Follow
+ * Description: Follow class constructor.
+ ********************************************************************************/
+Follow::Follow(void) {};
+
+/********************************************************************************
+ * Function: ~Follow
+ * Description: Follow class destructor.
+ ********************************************************************************/
+Follow::~Follow(void) {};
 
 /********************************************************************************
  * Function: init
@@ -266,4 +263,4 @@ void Follow::loop(void)
     }
 }
 
-#endif // JETSON_B01
+#endif // ENABLE_CV

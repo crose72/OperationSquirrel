@@ -48,24 +48,14 @@ SYSTEM_STATE system_state;
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-
-/********************************************************************************
- * Function: SystemController
- * Description: Class constructor
- ********************************************************************************/
-SystemController::SystemController(void) {}
-
-/********************************************************************************
- * Function: ~SystemController
- * Description: Class destructor
- ********************************************************************************/
-SystemController::~SystemController(void) {}
+int system_state_machine(void);
+void led_system_indicators(void);
 
 /********************************************************************************
  * Function: system_state_machine
  * Description: Determine system state,.
  ********************************************************************************/
-int SystemController::system_state_machine(void)
+int system_state_machine(void)
 {
     // Initialize system status on startup
     if (first_loop_after_start)
@@ -141,7 +131,7 @@ int SystemController::system_state_machine(void)
  * Function: led_system_indicators
  * Description: Control external leds to describe the system state.
  ********************************************************************************/
-void SystemController::led_system_indicators(void)
+void led_system_indicators(void)
 {
     if (system_state == SYSTEM_STATE::DEFAULT ||
         system_state == SYSTEM_STATE::INIT ||
@@ -157,6 +147,18 @@ void SystemController::led_system_indicators(void)
 }
 
 #endif // JETSON_B01
+
+/********************************************************************************
+ * Function: SystemController
+ * Description: Class constructor
+ ********************************************************************************/
+SystemController::SystemController(void) {}
+
+/********************************************************************************
+ * Function: ~SystemController
+ * Description: Class destructor
+ ********************************************************************************/
+SystemController::~SystemController(void) {}
 
 /********************************************************************************
  * Function: init
@@ -234,6 +236,6 @@ void SystemController::shutdown(void)
 
 #endif // JETSON_B01
 
-    VehicleController::vehicle_control_shutdown();
-    MavMsg::mav_comm_shutdown();
+    VehicleController::shutdown();
+    MavMsg::shutdown();
 }

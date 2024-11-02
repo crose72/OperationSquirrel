@@ -1,4 +1,4 @@
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
 /********************************************************************************
  * @file    localize_target.cpp
@@ -113,18 +113,7 @@ const float delta_offset[MAX_IDX_DELTA_PIXEL_OFFSET][MAX_IDX_DELTA_D_OFFSET] = {
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-
-/********************************************************************************
- * Function: Localize
- * Description: Localize class constructor.
- ********************************************************************************/
-Localize::Localize(void) {};
-
-/********************************************************************************
- * Function: ~Localize
- * Description: Localize class destructor.
- ********************************************************************************/
-Localize::~Localize(void) {};
+void calc_target_offest(void);
 
 /********************************************************************************
  * Function: calc_target_offest
@@ -132,7 +121,7 @@ Localize::~Localize(void) {};
  *              First implementation will be relative to the camera, needs to use
  *              the center mass of the drone in the end though.
  ********************************************************************************/
-void Localize::calc_target_offest(void)
+void calc_target_offest(void)
 {
     float d_idx_h;
     float d_idx_w;
@@ -217,6 +206,18 @@ void Localize::calc_target_offest(void)
 }
 
 /********************************************************************************
+ * Function: Localize
+ * Description: Localize class constructor.
+ ********************************************************************************/
+Localize::Localize(void) {};
+
+/********************************************************************************
+ * Function: ~Localize
+ * Description: Localize class destructor.
+ ********************************************************************************/
+Localize::~Localize(void) {};
+
+/********************************************************************************
  * Function: localize_target_init
  * Description: Initialize all Localize target variables.  Run once at the start
  *              of the program.
@@ -253,4 +254,4 @@ void Localize::loop(void)
     }
 }
 
-#endif // JETSON_B01
+#endif // ENABLE_CV

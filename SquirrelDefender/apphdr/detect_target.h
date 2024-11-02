@@ -19,6 +19,7 @@
 #include "jetson-inference/detectNet.h"
 #include "jetson-inference/objectTracker.h"
 #include <jetson-inference/objectTrackerIOU.h>
+#include <jetson-inference/objectTrackerKLT.h>
 #include "video_IO.h"
 #include "parameters.h"
 
@@ -46,16 +47,10 @@ public:
     Detection(void);
     ~Detection(void);
 
-    static void loop(void);
+    
     static bool init(void);
+    static void loop(void);
     static void shutdown(void);
-    static bool create_detection_network(void);
-    static void detect_objects(void);
-    static void get_object_info(void);
-    static void print_object_info(void);
-    static int print_usage(void);
-    static void print_performance_stats(void);
-    static void delete_tracking_net(void);
 
 private:
 };

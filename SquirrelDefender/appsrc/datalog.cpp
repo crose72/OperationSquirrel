@@ -35,24 +35,16 @@ std::vector<std::vector<std::string>> data;
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-
-/********************************************************************************
- * Function: DataLogger
- * Description: Class constructor
- ********************************************************************************/
-DataLogger::DataLogger() {};
-
-/********************************************************************************
- * Function: ~DataLogger
- * Description: Class destructor
- ********************************************************************************/
-DataLogger::~DataLogger() {};
+static void write_headers(void);
+static void load_signals_from_file(const std::string &header_file_path);
+static void save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data);
+static std::string generate_unique_filename(const std::string &filename);
 
 /********************************************************************************
  * Function: generate_unique_filename
  * Description: If file exists, append an incremented number to the file name.
  ********************************************************************************/
-std::string DataLogger::generate_unique_filename(const std::string &filename)
+std::string generate_unique_filename(const std::string &filename)
 {
     int counter = 1;
     std::string new_file_name = data_file_path + filename + ".csv"; // Add .csv extension initially
@@ -73,7 +65,7 @@ std::string DataLogger::generate_unique_filename(const std::string &filename)
  * Function: save_to_csv
  * Description: Write the data passed to this function into a CSV.
  ********************************************************************************/
-void DataLogger::save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data)
+void save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data)
 {
     std::ofstream outFile(filename, std::ios_base::app); // Open in append mode
     if (!outFile.is_open())
@@ -109,7 +101,7 @@ void DataLogger::save_to_csv(const std::string &filename, const std::vector<std:
  * Function: write_headers
  * Description: Write the column headers of the log file.
  ********************************************************************************/
-void DataLogger::write_headers(void)
+void write_headers(void)
 {
     data.push_back({"app_elapsed_time",
                     "system_state",
@@ -198,6 +190,18 @@ void DataLogger::write_headers(void)
 }
 
 /********************************************************************************
+ * Function: DataLogger
+ * Description: Class constructor
+ ********************************************************************************/
+DataLogger::DataLogger() {};
+
+/********************************************************************************
+ * Function: ~DataLogger
+ * Description: Class destructor
+ ********************************************************************************/
+DataLogger::~DataLogger() {};
+
+/********************************************************************************
  * Function: init
  * Description: Initialize data log variables and files.
  ********************************************************************************/
@@ -210,6 +214,7 @@ bool DataLogger::init(void)
     data = {};
 
     file_name = generate_unique_filename(data_file_name);
+    write_headers();
 
     return true;
 }
@@ -220,12 +225,6 @@ bool DataLogger::init(void)
  ********************************************************************************/
 void DataLogger::loop(void)
 {
-
-    if (first_loop_after_start)
-    {
-        write_headers();
-    }
-
     data.clear();
 
     data.push_back({{std::to_string(app_elapsed_time),

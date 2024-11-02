@@ -27,6 +27,7 @@
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
+/* Mavlink variables */
 extern float app_elapsed_time;
 
 extern uint16_t mav_veh_sys_stat_voltage_battery;
@@ -86,7 +87,7 @@ extern uint32_t mav_veh_custom_mode;
 extern uint8_t mav_veh_state;
 extern uint8_t mav_veh_mavlink_version;
 
-/* Localize target variables*/
+/* Detect/Track target variables */
 extern bool target_valid;
 extern int target_detection_ID;
 extern int target_track_ID;
@@ -99,6 +100,8 @@ extern float target_left;
 extern float target_right;
 extern float target_top;
 extern float target_bottom;
+
+/* Localize target variables*/
 extern float d_object_h;
 extern float d_object_w;
 extern float x_object;
@@ -137,13 +140,10 @@ public:
 
     static bool init(void);
     static void loop(void);
-    static void data_log_shutdown(void);
+    static void shutdown(void);
 
 private:
-    static void write_headers(void);
-    static void load_signals_from_file(const std::string &header_file_path);
-    static void save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data);
-    static std::string generate_unique_filename(const std::string &filename);
+
 };
 
 #endif // DATALOG_H

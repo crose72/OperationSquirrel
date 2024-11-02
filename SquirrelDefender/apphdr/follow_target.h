@@ -51,10 +51,7 @@ public:
 
     static void loop(void);
     static bool init(void);
-
-    static void get_control_params(void);
-    static void calc_follow_error(void);
-    static void overtake_target(void);
+    static void shutdown(void);
 
 private:
 };

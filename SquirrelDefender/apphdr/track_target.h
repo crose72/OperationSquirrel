@@ -45,12 +45,14 @@ extern uint32_t input_video_height;
 
 #endif //JETSON_B01
 
-/*
+#ifdef WIN32
+
 extern cv::dnn::Net net;
 extern std::vector<yolo_net::detection> yolo_detections;
 extern int yolo_detection_count;
 extern cv::Mat image;
-*/
+
+#endif // WIN32
 
 extern bool valid_image_rcvd;
 extern bool target_valid;
@@ -91,14 +93,7 @@ public:
 
     static bool init(void);
     static void loop(void);
-
-    static void identify_target(void);
-    static void get_target_info(void);
-    static void validate_target(void);
-    static void track_target(void);
-    static void update_target_info(void);
-    static bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &image, cv::Rect &bounding_box);
-    static bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &image, cv::Rect &bounding_box);
+    static void shutdown(void);
 
 private:
 };

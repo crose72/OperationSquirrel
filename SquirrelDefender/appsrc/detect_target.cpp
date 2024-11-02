@@ -1,11 +1,11 @@
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
 /********************************************************************************
- * @file    target_tracking.cpp
+ * @file    detect_target.cpp
  * @author  Cameron Rose
  * @date    6/7/2023
- * @brief   All methods needed to initialize and create a detection network and
-            choose a target.
+ * @brief   This file contains the functions to initialize, run, and clean up
+            object detection code.
  ********************************************************************************/
 
 /********************************************************************************
@@ -35,24 +35,14 @@ int detection_count;
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-
-/********************************************************************************
- * Function: Detection
- * Description: Class constructor
- ********************************************************************************/
-Detection::Detection(void) {};
-
-/********************************************************************************
- * Function: ~Detection
- * Description: Class destructor
- ********************************************************************************/
-Detection::~Detection(void) {};
+bool create_detection_network(void);
+void detect_objects(void);
 
 /********************************************************************************
  * Function: create_detection_network
  * Description: Initialize the network used for object detection.
  ********************************************************************************/
-bool Detection::create_detection_network(void)
+bool create_detection_network(void)
 {
 #ifdef DEBUG_BUILD
 
@@ -80,14 +70,14 @@ bool Detection::create_detection_network(void)
     const char *class_labels = "../networks/SSD-Inception-v2/ssd_coco_labels.txt";
     float thresh = (float)0.5;
     const char *input_blob = "Input";
-    //const char *output_blob = "NMS";
-    const char *output_blob = "MarkOutput_0";
+    const char *output_blob = "NMS"; // for SSD
+    //const char *output_blob = "MarkOutput_0"; // for yolo?
     Dims3 inputDims(3, 720, 1280);
     const char *output_count = "NMS_1";
 
-    net = detectNet::Create("SSD_Inception_V2", detection_thresh, max_batch_size);
-    // net = detectNet::Create("SSD_Mobilenet_V2", detection_thresh, max_batch_size);
-    //net = detectNet::Create(model, class_labels, thresh, input_blob, inputDims, output_blob, output_count);
+    net = detectNet::Create("SSD_Inception_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
+    // net = detectNet::Create("SSD_Mobilenet_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
+    //net = detectNet::Create(model, class_labels, thresh, input_blob, inputDims, output_blob, output_count); // load model from specific path
     net->SetTracker(objectTrackerIOU::Create(min_frames, drop_frames, overlap_thresh));
 
     if (!net)
@@ -103,11 +93,11 @@ bool Detection::create_detection_network(void)
  * Function: detect_objects
  * Description: Initialize the network used for object detection.
  ********************************************************************************/
-void Detection::detect_objects(void)
+void detect_objects(void)
 {
     uint32_t overlay_flags = 0;
 
-    // overlay_flags = overlay_flags | detectNet::OVERLAY_LABEL | detectNet::OVERLAY_CONFIDENCE | detectNet::OVERLAY_TRACKING | detectNet::OVERLAY_LINES;
+    overlay_flags = overlay_flags | detectNet::OVERLAY_LABEL | detectNet::OVERLAY_CONFIDENCE | detectNet::OVERLAY_TRACKING | detectNet::OVERLAY_LINES;
 
     if (overlay_flags > 0 && image != NULL)
     {
@@ -122,24 +112,18 @@ void Detection::detect_objects(void)
         // No other options
     }
 }
+    
+/********************************************************************************
+ * Function: Detection
+ * Description: Class constructor
+ ********************************************************************************/
+Detection::Detection(void) {};
 
 /********************************************************************************
- * Function: print_print_performance_statsobject_info
- * Description: Print info about detection network performance.
+ * Function: ~Detection
+ * Description: Class destructor
  ********************************************************************************/
-void Detection::print_performance_stats(void)
-{
-    net->PrintProfilerTimes();
-}
-
-/********************************************************************************
- * Function: delete_tracking_net
- * Description: Delete detection network to free up resources.
- ********************************************************************************/
-void Detection::delete_tracking_net(void)
-{
-    SAFE_DELETE(net);
-}
+Detection::~Detection(void) {};
 
 /********************************************************************************
  * Function: initialize_detection_net
@@ -176,8 +160,8 @@ void Detection::loop(void)
 void Detection::shutdown(void)
 {
     LogVerbose("detectnet:  shutting down...\n");
-    Detection::delete_tracking_net();
+    SAFE_DELETE(net);
     LogVerbose("detectnet:  shutdown complete.\n");
 }
 
-#endif // JETSON_B01
+#endif // ENABLE_CV

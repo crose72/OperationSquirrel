@@ -39,7 +39,8 @@ public:
 
     static bool init(void);
     static void loop(void);
-    static void gpio_shutdown(void);
+    static void shutdown(void);
+
     static void status_initializing(void);
     static void status_program_complete(void);
     static void status_good(void);

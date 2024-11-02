@@ -139,7 +139,7 @@ int main(void)
 
         Video::in_loop();
         Detection::loop();
-        Track::loop();
+        //Track::loop();
         Localize::loop();
         Follow::loop();
         VehicleController::loop();
@@ -158,7 +158,7 @@ int main(void)
 
     SystemController::shutdown();
     StatusIndicators::status_program_complete();
-    StatusIndicators::gpio_shutdown();
+    StatusIndicators::shutdown();
 
     return 0;
 }

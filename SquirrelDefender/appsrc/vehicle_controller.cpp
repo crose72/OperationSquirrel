@@ -37,6 +37,37 @@ uint16_t takeoff_dbc_cnt;
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
+void follow_mode(void);
+
+#ifdef JETSON_B01
+
+/********************************************************************************
+ * Function: follow_target
+ * Description: Pass control outputs from the follow algorithm to the vehicle.
+ ********************************************************************************/
+void follow_mode(void)
+{
+    float target_velocity[3] = {0.0, 0.0, 0.0};
+
+    target_velocity[0] = vx_adjust;
+    target_velocity[1] = vy_adjust;
+    target_velocity[2] = vz_adjust;
+
+    if (target_valid && target_too_close)
+    {
+        VelocityController::cmd_velocity_xy_NED(target_velocity);
+    }
+    else if (target_valid && !target_too_close)
+    {
+        VelocityController::cmd_velocity_NED(target_velocity);
+    }
+    else
+    {
+        VelocityController::cmd_velocity_NED(target_velocity);
+    }
+}
+
+#endif // JETSON_B01
 
 /********************************************************************************
  * Function: VehicleController
@@ -49,90 +80,6 @@ VehicleController::VehicleController(void) {}
  * Description: Constructor of the VehicleController class.
  ********************************************************************************/
 VehicleController::~VehicleController(void) {}
-
-/********************************************************************************
- * Function: cmd_position_NED
- * Description: Move to an x,y,z coordinate in the NED frame.
- ********************************************************************************/
-void VehicleController::cmd_position_NED(float position_target[3])
-{
-    VelocityController::cmd_position_NED(position_target);
-}
-
-/********************************************************************************
- * Function: cmd_velocity_NED
- * Description: Move in direction of vector vx,vy,vz in the NED frame.
- ********************************************************************************/
-void VehicleController::cmd_velocity_NED(float velocity_target[3])
-{
-    VelocityController::cmd_velocity_NED(velocity_target);
-}
-
-/********************************************************************************
- * Function: cmd_velocity_xy_NED
- * Description: Move in xy plane given a vector vx,vy in the NED frame.
- ********************************************************************************/
-void VehicleController::cmd_velocity_xy_NED(float velocity_target[3])
-{
-    VelocityController::cmd_velocity_xy_NED(velocity_target);
-}
-
-/********************************************************************************
- * Function: cmd_velocity_x_NED
- * Description: Move in direction of vector vx in the NED frame.
- ********************************************************************************/
-void VehicleController::cmd_velocity_x_NED(float velocity_target)
-{
-    VelocityController::cmd_velocity_x_NED(velocity_target);
-}
-
-/********************************************************************************
- * Function: cmd_velocity_y_NED
- * Description: Move in direction of vector vy in the NED frame.
- ********************************************************************************/
-void VehicleController::cmd_velocity_y_NED(float velocity_target)
-{
-    VelocityController::cmd_velocity_y_NED(velocity_target);
-}
-
-/********************************************************************************
- * Function: cmd_acceleration_NED
- * Description: Move in direction of vector ax,ay,az in the NED frame.
- ********************************************************************************/
-void VehicleController::cmd_acceleration_NED(float acceleration_target[3])
-{
-    VelocityController::cmd_acceleration_NED(acceleration_target);
-}
-
-#ifdef JETSON_B01
-
-/********************************************************************************
- * Function: follow_target
- * Description: Pass control outputs from the follow algorithm to the vehicle.
- ********************************************************************************/
-void VehicleController::follow_mode(void)
-{
-    float target_velocity[3] = {0.0, 0.0, 0.0};
-
-    target_velocity[0] = vx_adjust;
-    target_velocity[1] = vy_adjust;
-    target_velocity[2] = vz_adjust;
-
-    if (target_valid && target_too_close)
-    {
-        VehicleController::cmd_velocity_xy_NED(target_velocity);
-    }
-    else if (target_valid && !target_too_close)
-    {
-        VehicleController::cmd_velocity_NED(target_velocity);
-    }
-    else
-    {
-        VehicleController::cmd_velocity_NED(target_velocity);
-    }
-}
-
-#endif // JETSON_B01
 
 /********************************************************************************
  * Function: init
@@ -190,10 +137,10 @@ void VehicleController::loop(void)
 }
 
 /********************************************************************************
- * Function: vehicle_control_shutdown
+ * Function: shutdown
  * Description: Code needed to shutdown the vehicle controller.
  ********************************************************************************/
-void VehicleController::vehicle_control_shutdown(void)
+void VehicleController::shutdown(void)
 {
     MavCmd::set_mode_LAND();
 }

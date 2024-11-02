@@ -66,10 +66,7 @@ public:
 
     static bool init(void);
     static void loop(void);
-
-    static void identify_target(void);
-    static void get_target_info(int n);
-    static void calc_target_offest(void);
+    static void shutdown(void);
 
 private:
 };

@@ -43,8 +43,6 @@ public:
     static int init(void);
     static void loop(void);
     static void shutdown(void);
-    static int system_state_machine(void);
-    static void led_system_indicators(void);
 
 private:
 };

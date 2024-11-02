@@ -215,10 +215,10 @@ void StatusIndicators::loop(void)
 }
 
 /********************************************************************************
- * Function: gpio_shutdown
+ * Function: shutdown
  * Description: Cleanup tasks for jetson io.
  ********************************************************************************/
-void StatusIndicators::gpio_shutdown(void)
+void StatusIndicators::shutdown(void)
 {
     GPIO::cleanup();
 }

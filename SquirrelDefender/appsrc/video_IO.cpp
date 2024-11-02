@@ -1,4 +1,4 @@
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
 /********************************************************************************
  * @file    videoIO.cpp
@@ -42,50 +42,17 @@ std::string base_path = "../data/";
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-
-/********************************************************************************
- * Function: Video
- * Description: Constructor of the Video class.
- ********************************************************************************/
-Video::Video(void) {}
-
-/********************************************************************************
- * Function: Video
- * Description: Constructor of the Video class.
- ********************************************************************************/
-Video::~Video(void) {}
-
-/********************************************************************************
- * Function: create_input_video_stream
- * Description: Create an input video stream from the attached cameras.
- ********************************************************************************/
-bool Video::create_input_video_stream(void)
-{
-    videoOptions options;
-
-    options.resource = URI("csi://0");
-    options.resource.protocol = "csi";
-    options.resource.location = "0";
-    options.deviceType = videoOptions::DeviceType::DEVICE_CSI;
-    options.ioType = videoOptions::IoType::INPUT;
-    options.width = 1280; // 1280 for imx219-83
-    options.height = 720; // 720 for imx219-83
-    options.frameRate = 30;
-    options.numBuffers = 4;
-    options.zeroCopy = true;
-    options.flipMethod = videoOptions::FlipMethod::FLIP_NONE; // if using IMX219-83 stereo camera
-    // options.flipMethod = videoOptions::FlipMethod::FLIP_ROTATE_180; // if using IMX219-160 stereo camera or H136 V1.3 must compile jetson inference with cmake-DENABLE_NVMM=off
-
-    input = videoSource::Create(options);
-
-    if (!input)
-    {
-        LogError("detectnet:  failed to create input stream\n");
-        return false;
-    }
-
-    return true;
-}
+bool video_output_file_reset(void);
+bool create_input_video_stream(void);
+bool create_output_vid_stream(void);
+bool create_display_video_stream(void);
+bool capture_image(void);
+bool save_video(void);
+bool display_video(void);
+void calc_video_res(void);
+void delete_input_video_stream(void);
+void delete_video_file_stream(void);
+void delete_video_display_stream(void);
 
 /********************************************************************************
  * Function: file_exists
@@ -116,10 +83,42 @@ std::string generate_unique_file_name(const std::string &base_name, const std::s
 }
 
 /********************************************************************************
+ * Function: create_input_video_stream
+ * Description: Create an input video stream from the attached cameras.
+ ********************************************************************************/
+bool create_input_video_stream(void)
+{
+    videoOptions options;
+
+    options.resource = URI("csi://0");
+    options.resource.protocol = "csi";
+    options.resource.location = "0";
+    options.deviceType = videoOptions::DeviceType::DEVICE_CSI;
+    options.ioType = videoOptions::IoType::INPUT;
+    options.width = 1280; // 1280 for imx219-83
+    options.height = 720; // 720 for imx219-83
+    options.frameRate = 30;
+    options.numBuffers = 4;
+    options.zeroCopy = true;
+    options.flipMethod = videoOptions::FlipMethod::FLIP_NONE; // if using IMX219-83 stereo camera
+    // options.flipMethod = videoOptions::FlipMethod::FLIP_ROTATE_180; // if using IMX219-160 stereo camera or H136 V1.3 must compile jetson inference with cmake-DENABLE_NVMM=off
+
+    input = videoSource::Create(options);
+
+    if (!input)
+    {
+        LogError("detectnet:  failed to create input stream\n");
+        return false;
+    }
+
+    return true;
+}
+
+/********************************************************************************
  * Function: create_output_vid_stream
  * Description: Create an output video stream to save to a file
  ********************************************************************************/
-bool Video::create_output_vid_stream(void)
+bool create_output_vid_stream(void)
 {
     std::string base_path = "file:///home/crose72/Documents/GitHub/OperationSquirrel/SquirrelDefender/data/";
     std::string base_name = "output";
@@ -159,7 +158,7 @@ bool Video::create_output_vid_stream(void)
  * Description: Create an output_vid_disp video stream from the input video stream
  *			   for displaying and passing to other software components.
  ********************************************************************************/
-bool Video::create_display_video_stream(void)
+bool create_display_video_stream(void)
 {
     videoOptions options;
 
@@ -192,7 +191,7 @@ bool Video::create_display_video_stream(void)
  * Function: capture_image
  * Description: Capture an image from the input video stream.
  ********************************************************************************/
-bool Video::capture_image(void)
+bool capture_image(void)
 {
     int status = 0;
     uchar3 *temp_image = NULL;
@@ -222,19 +221,12 @@ bool Video::capture_image(void)
  * Function: save_video
  * Description: Save video to a file
  ********************************************************************************/
-bool Video::save_video(void)
+bool save_video(void)
 {
     // render output_vid_disp to the display
     if (output_vid_file != NULL)
     {
         output_vid_file->Render(image, input->GetWidth(), input->GetHeight());
-
-        /*
-        // update the status bar
-        char str[256];
-        sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(net->GetPrecision()), net->GetNetworkFPS());
-        output_vid_file->SetStatus(str);
-        */
 
         // check if the user quit
         if (!output_vid_file->IsStreaming())
@@ -250,17 +242,21 @@ bool Video::save_video(void)
  * Function: display_video
  * Description: Display the image on the screen.
  ********************************************************************************/
-bool Video::display_video(void)
+bool display_video(void)
 {
     // render output_vid_disp to the display
     if (output_vid_disp != NULL)
     {
         output_vid_disp->Render(image, input->GetWidth(), input->GetHeight());
 
+        #ifdef DEBUG_BUILD
+
         // update the status bar
         char str[256];
         sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(net->GetPrecision()), net->GetNetworkFPS());
         output_vid_disp->SetStatus(str);
+
+        #endif // DEBUG_BUILD
 
         // check if the user quit
         if (!output_vid_disp->IsStreaming())
@@ -276,7 +272,7 @@ bool Video::display_video(void)
  * Function: calc_video_res
  * Description: Delete the input to stop using resources.
  ********************************************************************************/
-void Video::calc_video_res(void)
+void calc_video_res(void)
 {
     input_video_width = input->GetWidth();
     input_video_height = input->GetHeight();
@@ -286,7 +282,7 @@ void Video::calc_video_res(void)
  * Function: delete_input_video_stream
  * Description: Delete the input to stop using resources.
  ********************************************************************************/
-void Video::delete_input_video_stream(void)
+void delete_input_video_stream(void)
 {
     SAFE_DELETE(input);
 }
@@ -295,7 +291,7 @@ void Video::delete_input_video_stream(void)
  * Function: delete_video_file_stream
  * Description: Delete the output to the video file to stop using resources.
  ********************************************************************************/
-void Video::delete_video_file_stream(void)
+void delete_video_file_stream(void)
 {
     SAFE_DELETE(output_vid_file);
 }
@@ -304,7 +300,7 @@ void Video::delete_video_file_stream(void)
  * Function: delete_video_display_stream
  * Description: Delete the display to stop using resources.
  ********************************************************************************/
-void Video::delete_video_display_stream(void)
+void delete_video_display_stream(void)
 {
     SAFE_DELETE(output_vid_disp);
 }
@@ -313,7 +309,7 @@ void Video::delete_video_display_stream(void)
  * Function: video_output_file_reset
  * Description: Code to reset video streams.
  ********************************************************************************/
-bool Video::video_output_file_reset(void)
+bool video_output_file_reset(void)
 {
     delete_video_file_stream();
 
@@ -324,6 +320,18 @@ bool Video::video_output_file_reset(void)
 
     return true;
 }
+
+/********************************************************************************
+ * Function: Video
+ * Description: Constructor of the Video class.
+ ********************************************************************************/
+Video::Video(void) {}
+
+/********************************************************************************
+ * Function: Video
+ * Description: Constructor of the Video class.
+ ********************************************************************************/
+Video::~Video(void) {}
 
 /********************************************************************************
  * Function: init
@@ -340,7 +348,8 @@ bool Video::init(void)
     {
         return false;
     }
-
+    
+    // note: put in debug build
     if (!create_display_video_stream())
     {
         return false;
@@ -397,13 +406,14 @@ void Video::shutdown(void)
     delete_input_video_stream();
     delete_video_file_stream();
 
-#ifdef DEBUG_BUILD
-
+    // note: put in debug build
     delete_video_display_stream();
+
+#ifdef DEBUG_BUILD
 
 #endif // DEBUG_BUILD
 
     LogVerbose("video:  shutdown complete.\n");
 }
 
-#endif // JETSON_B01
+#endif // ENABLE_CV

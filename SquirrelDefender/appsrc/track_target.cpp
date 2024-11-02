@@ -60,25 +60,20 @@ const float center_of_frame_height = 360.0f;
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-
-/********************************************************************************
- * Function: Track
- * Description: Track class constructor.
- ********************************************************************************/
-Track::Track(void) {};
-
-/********************************************************************************
- * Function: ~Track
- * Description: Track class destructor.
- ********************************************************************************/
-Track::~Track(void) {};
+void identify_target(void);
+void get_target_info(void);
+void validate_target(void);
+void track_target(void);
+void update_target_info(void);
+bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &image, cv::Rect &bounding_box);
+bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &image, cv::Rect &bounding_box);
 
 /********************************************************************************
  * Function: tracker_init
  * Description: Initialize the tracker by resetting the bounding box to zeros.
  ********************************************************************************/
 
-bool Track::tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
+bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
 {
     tracker->init(cv_image, bounding_box);
 
@@ -89,7 +84,7 @@ bool Track::tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, c
  * Function: tracker_update
  * Description: Update the bounding box around the tracked target.
  ********************************************************************************/
-bool Track::tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
+bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
 {
     bool success;
     try {
@@ -109,7 +104,7 @@ bool Track::tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image,
  * Function: identify_target
  * Description: Determine which detected object to track.
  ********************************************************************************/
-void Track::identify_target(void)
+void identify_target(void)
 {
 
 
@@ -149,7 +144,7 @@ void Track::identify_target(void)
  * Description: Obtain the important information about the target, such as the
  *              height and location of the center of the target in the frame.
  ********************************************************************************/
-void Track::get_target_info(void)
+void get_target_info(void)
 {
 #ifdef JETSON_B01
 
@@ -192,7 +187,7 @@ void Track::get_target_info(void)
  * Function: validate_target
  * Description: Determine which detected object to track.
  ********************************************************************************/
-void Track::validate_target(void)
+void validate_target(void)
 {
 #if JETSON_B01
 
@@ -234,7 +229,7 @@ void Track::validate_target(void)
  * Description: Use the bounding box provided by the detection model as the
  *              basis for target_tracked the targeted object.
  ********************************************************************************/
-void Track::track_target(void)
+void track_target(void)
 {
 #ifdef JETSON_B01
 
@@ -338,7 +333,7 @@ void Track::track_target(void)
  * Description: Obtain the important information about the target, such as the
  *              height and location of the center of the target in the frame.
  ********************************************************************************/
-void Track::update_target_info(void)
+void update_target_info(void)
 {
     target_height = target_bounding_box.height;
     target_width = target_bounding_box.width;
@@ -352,6 +347,18 @@ void Track::update_target_info(void)
     target_cntr_offset_x = target_center_x - center_of_frame_height;
     target_aspect = target_width / target_height;
 }
+
+/********************************************************************************
+ * Function: Track
+ * Description: Track class constructor.
+ ********************************************************************************/
+Track::Track(void) {};
+
+/********************************************************************************
+ * Function: ~Track
+ * Description: Track class destructor.
+ ********************************************************************************/
+Track::~Track(void) {};
 
 /********************************************************************************
  * Function: localize_target_init

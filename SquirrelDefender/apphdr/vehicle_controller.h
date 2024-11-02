@@ -46,18 +46,7 @@ class VehicleController
 public:
     static bool init(void);
     static void loop(void);
-    static void vehicle_control_shutdown(void);
-
-    static void dtrmn_vehicle_action(void);
-    static void follow_mode(void);
-
-    static void cmd_position_NED(float position_target[3]);
-    static void cmd_velocity_NED(float velocity_target[3]);
-    static void cmd_acceleration_NED(float acceleration_target[3]);
-    static void cmd_velocity_x_NED(float velocity_target);
-    static void cmd_velocity_y_NED(float velocity_target);
-    static void cmd_velocity_z_NED(float velocity_target);
-    static void cmd_velocity_xy_NED(float velocity_target[3]);
+    static void shutdown(void);
 
 private:
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
 /********************************************************************************
  * @file    video_IO.h
@@ -46,25 +46,14 @@ public:
     Video();
     ~Video();
 
-    static bool video_output_file_reset(void);
     static bool init(void);
-    static bool create_input_video_stream(void);
-    static bool create_output_vid_stream(void);
-    static bool create_display_video_stream(void);
     static void in_loop(void);
     static void out_loop(void);
     static void shutdown(void);
-    static bool capture_image(void);
-    static bool save_video(void);
-    static bool display_video(void);
-    static void calc_video_res(void);
-    static void delete_input_video_stream(void);
-    static void delete_video_file_stream(void);
-    static void delete_video_display_stream(void);
 
 private:
 };
 
 #endif // VIDEO_IO_H
 
-#endif // JETSON_B01
+#endif // ENABLE_CV
