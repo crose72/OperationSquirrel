@@ -39,7 +39,7 @@ uint16_t takeoff_dbc_cnt;
  ********************************************************************************/
 void follow_mode(void);
 
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
 /********************************************************************************
  * Function: follow_target
@@ -67,7 +67,7 @@ void follow_mode(void)
     }
 }
 
-#endif // JETSON_B01
+#endif // ENABLE_CV
 
 /********************************************************************************
  * Function: VehicleController
@@ -114,6 +114,7 @@ void VehicleController::loop(void)
     }
     else if (system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
     {
+        /* Debounce counter to avoid sending vehicle commands before the vehicle is in position */
         if (takeoff_dbc_cnt > 0)
         {
             takeoff_dbc_cnt--;

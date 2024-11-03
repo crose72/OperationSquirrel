@@ -1,35 +1,33 @@
 /********************************************************************************
- * @file    target_tracking.cpp
+ * @file    main.cpp
  * @author  Cameron Rose
  * @date    6/7/2024
- * @brief   Main source file where initializations, loops, and shutdown
- * 			sequences are executed.
+ * @brief   Main entry point for the program, contains the loop functions for 
+            each software component.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include <mutex>
+#include <signal.h>
 #include "common_inc.h"
+#include "datalog.h"
+#include "video_IO.h"
 #include "system_controller.h"
 #include "mavlink_msg_handler.h"
 #include "mavlink_cmd_handler.h"
 #include "vehicle_controller.h"
-#include "follow_target.h"
-#include "localize_target.h"
-#include "datalog.h"
-#include <mutex>
-#include <signal.h>
-
+#include "detect_target_jetson_inference.h"
+#include "detect_target_yolo.h"
 #include "track_target.h"
 #include "localize_target.h"
+#include "follow_target.h"
+
 
 #ifdef JETSON_B01
 
-#include "track_target.h"
 #include "jetson_IO.h"
-#include "video_IO.h"
-#include "detect_target.h"
-#include "detect_target_yolo.h"
 #include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 
 #endif // JETSON_B01
@@ -85,19 +83,6 @@ void attach_sig_handler(void)
 }
 
 /********************************************************************************
- * Function: app_first_init
- * Description: Updates variable for rest of program to know that the first loop
- * 				is over.
- ********************************************************************************/
-void app_first_init(void)
-{
-    if (first_loop_after_start == true)
-    {
-        first_loop_after_start = false;
-    }
-}
-
-/********************************************************************************
  * Function: main
  * Description: Entry point for the program.  Runs the main loop.
  ********************************************************************************/
@@ -116,7 +101,6 @@ int main(void)
 
     if (SystemController::init() != 0)
     {
-        StatusIndicators::status_bad_blink();
         return 1;
     }
 
@@ -131,34 +115,30 @@ int main(void)
 #endif // JETSON_B01
 
     {
+        MainAppTime.calc_elapsed_time();
         std::lock_guard<std::mutex> lock(mutex_main);
         SystemController::loop();
         MavMsg::loop();
 
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
         Video::in_loop();
         Detection::loop();
-        //Track::loop();
         Localize::loop();
         Follow::loop();
-        VehicleController::loop();
         Video::out_loop();
         StatusIndicators::loop();
 
-#endif // JETSON_B01
+#endif // ENABLE_CV
 
-        app_first_init();
+        VehicleController::loop();
         DataLogger::loop();
 
-        MainAppTime.calc_elapsed_time();
         MainAppTime.loop_rate_controller();
         MainAppTime.calc_loop_start_time();
     }
 
     SystemController::shutdown();
-    StatusIndicators::status_program_complete();
-    StatusIndicators::shutdown();
 
     return 0;
 }

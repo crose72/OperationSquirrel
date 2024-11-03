@@ -64,13 +64,6 @@ void YOLO::loop(void)
 {
     yolo_net::detect(image, yolo_detections);
     yolo_detection_count = yolo_detections.size();
-
-    /*for (int n = 0; n < yolo_detection_count; n++)
-    {
-        PrintPass::cpp_cout("Class ID: " + std::to_string(yolo_detections[n].ClassID) + ", " + "Confidence: " + std::to_string(yolo_detections[n].Confidence) + ", " +
-            "Left: " + std::to_string(yolo_detections[n].Left) + ", " + "Right: " + std::to_string(yolo_detections[n].Right) + ", " +
-            "Top: " + std::to_string(yolo_detections[n].Top) + ", " + "Bottom: " + ", " + std::to_string(yolo_detections[n].Bottom));
-    }*/
 }
 
 /********************************************************************************

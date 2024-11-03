@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
 /********************************************************************************
  * @file    follow_target.h
@@ -58,4 +58,4 @@ private:
 
 #endif // FOLLOW_TARGET_H
 
-#endif // JETSON_B01
+#endif // ENABLE_CV

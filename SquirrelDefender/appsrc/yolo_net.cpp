@@ -260,16 +260,6 @@ void yolo_net::post_process(cv::Mat& input, std::vector<cv::Mat>& outputs, std::
     std::vector<int> indices;
     nms_suppression(boxes, confidences, indices);
 
-    // Adjust the box coordinates back to original image size
-    /*for (int i = 0; i < indices.size(); i++)
-    {
-        int idx = indices[i];
-        boxes[idx].x = static_cast<int>(boxes[idx].x * x_factor);
-        boxes[idx].y = static_cast<int>(boxes[idx].y * y_factor);
-        boxes[idx].width = static_cast<int>(boxes[idx].width * x_factor);
-        boxes[idx].height = static_cast<int>(boxes[idx].height * y_factor);
-    }*/
-
     // Draw bounding boxes and labels
     draw_bounding_boxes(input, indices, boxes, confidences, class_ids, class_list, detections);
 }

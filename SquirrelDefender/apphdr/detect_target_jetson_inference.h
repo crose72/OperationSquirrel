@@ -1,9 +1,9 @@
 #pragma once
 
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
 /********************************************************************************
- * @file    detect_target.h
+ * @file    detect_target_jetson_inference.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
@@ -57,4 +57,4 @@ private:
 
 #endif // DETECT_TARGET_H
 
-#endif // JETSON_B01
+#endif // ENABLE_CV

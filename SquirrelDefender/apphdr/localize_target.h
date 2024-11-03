@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
 /********************************************************************************
  * @file    localize_target.h
@@ -15,7 +15,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "video_IO.h"
-#include "detect_target.h"
+#include "detect_target_jetson_inference.h"
 #include "parameters.h"
 
 /********************************************************************************
@@ -73,4 +73,4 @@ private:
 
 #endif // LOCALIZE_TARGET_H
 
-#endif // JETSON_B01
+#endif // ENABLE_CV

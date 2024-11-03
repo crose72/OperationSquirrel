@@ -25,6 +25,11 @@
  * Object definitions
  ********************************************************************************/
 bool valid_image_rcvd;
+
+std::string base_path = "../data/";
+
+#ifdef JETSON_B01
+
 bool display_stream_created;
 bool file_stream_created;
 videoSource *input;
@@ -33,11 +38,35 @@ videoOutput *output_vid_disp;
 uchar3 *image;
 uint32_t input_video_width;
 uint32_t input_video_height;
-std::string base_path = "../data/";
+
+#elif _WIN32
+
+cv::Mat image;
+cv::VideoCapture cap;
+
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
 
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
+#ifdef JETSON_B01
+
+// Nothing to put here
+
+#elif _WIN32
+
+float input_video_width;
+float input_video_height;
+
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
 
 /********************************************************************************
  * Function definitions
@@ -88,6 +117,8 @@ std::string generate_unique_file_name(const std::string &base_name, const std::s
  ********************************************************************************/
 bool create_input_video_stream(void)
 {
+#ifdef JETSON_B01
+
     videoOptions options;
 
     options.resource = URI("csi://0");
@@ -111,6 +142,24 @@ bool create_input_video_stream(void)
         return false;
     }
 
+#elif _WIN32
+
+    cap.open(0);  // Open default webcam
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
+
+    if (!cap.isOpened())
+    {
+        std::cout << "Error: Could not open camera" << std::endl;
+        return false;
+    }
+
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
+
     return true;
 }
 
@@ -120,6 +169,8 @@ bool create_input_video_stream(void)
  ********************************************************************************/
 bool create_output_vid_stream(void)
 {
+#ifdef JETSON_B01
+    
     std::string base_path = "file:///home/crose72/Documents/GitHub/OperationSquirrel/SquirrelDefender/data/";
     std::string base_name = "output";
     std::string extension = ".mp4";
@@ -147,6 +198,16 @@ bool create_output_vid_stream(void)
         file_stream_created = false;
         return false;
     }
+
+#elif _WIN32
+
+    // No output stream created yet, just diasplaying the video
+
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
 
     file_stream_created = true;
 
@@ -193,10 +254,11 @@ bool create_display_video_stream(void)
  ********************************************************************************/
 bool capture_image(void)
 {
-    int status = 0;
-    uchar3 *temp_image = NULL;
+#ifdef JETSON_B01
 
-    if (!input->Capture(&temp_image, &status))
+    int status = 0;
+
+    if (!input->Capture(&image, &status))
     {
         if (status != videoSource::TIMEOUT)
         {
@@ -205,13 +267,28 @@ bool capture_image(void)
     }
 
     // Checking for valid image, Capture may return true while image may still be NULL
-    if (temp_image == NULL)
+    if (image == NULL)
     {
         valid_image_rcvd = false;
         return false; // Return false if the image is not valid
     }
 
-    image = temp_image;
+    
+#elif _WIN32
+
+    cap >> image;  // Capture image from the webcam
+
+    if (image.empty()) {
+        std::cout << "Error: Could not capture image" << std::endl;
+        return false;
+    }
+
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
+
     valid_image_rcvd = true;
 
     return true;
@@ -244,19 +321,21 @@ bool save_video(void)
  ********************************************************************************/
 bool display_video(void)
 {
+#ifdef JETSON_B01
+
     // render output_vid_disp to the display
     if (output_vid_disp != NULL)
     {
         output_vid_disp->Render(image, input->GetWidth(), input->GetHeight());
 
-        #ifdef DEBUG_BUILD
+#ifdef DEBUG_BUILD
 
         // update the status bar
         char str[256];
         sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(net->GetPrecision()), net->GetNetworkFPS());
         output_vid_disp->SetStatus(str);
 
-        #endif // DEBUG_BUILD
+#endif // DEBUG_BUILD
 
         // check if the user quit
         if (!output_vid_disp->IsStreaming())
@@ -264,6 +343,17 @@ bool display_video(void)
             return false;
         }
     }
+
+#elif _WIN32
+
+    cv::imshow("MyVid", image);
+    cv::waitKey(1);
+
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
 
     return true;
 }
@@ -274,8 +364,21 @@ bool display_video(void)
  ********************************************************************************/
 void calc_video_res(void)
 {
+#ifdef JETSON_B01
+
     input_video_width = input->GetWidth();
     input_video_height = input->GetHeight();
+
+#elif _WIN32
+
+    input_video_width = 1280.0;
+    input_video_height = 720.0;
+
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
 }
 
 /********************************************************************************
@@ -284,7 +387,20 @@ void calc_video_res(void)
  ********************************************************************************/
 void delete_input_video_stream(void)
 {
+#ifdef JETSON_B01
+
     SAFE_DELETE(input);
+
+#elif _WIN32
+
+    cap.release(); // Release the webcam
+    cv::destroyAllWindows();
+
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
 }
 
 /********************************************************************************

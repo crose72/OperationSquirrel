@@ -1,7 +1,7 @@
 #ifdef ENABLE_CV
 
 /********************************************************************************
- * @file    detect_target.cpp
+ * @file    detect_target_jetson_inference.cpp
  * @author  Cameron Rose
  * @date    6/7/2023
  * @brief   This file contains the functions to initialize, run, and clean up
@@ -11,7 +11,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "detect_target.h"
+#include "detect_target_jetson_inference.h"
 
 /********************************************************************************
  * Typedefs
@@ -46,7 +46,7 @@ bool create_detection_network(void)
 {
 #ifdef DEBUG_BUILD
 
-    Parameters detection_params("../params.json");
+    detect_target_jetson_inference.h detection_params("../params.json");
 
     float detection_thresh = detection_params.get_float_param("Detection_tracking", "Detect_Thresh");
     uint32_t max_batch_size = detection_params.get_uint32_param("Detection_tracking", "Max_Batch_Size");

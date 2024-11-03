@@ -34,7 +34,6 @@
  * Function prototypes and Class Definitions
  ********************************************************************************/
 
-
 class yolo_net
 {
     public:
@@ -84,8 +83,6 @@ class yolo_net
         static const cv::Scalar BLUE;
         static const cv::Scalar YELLOW;
         static const cv::Scalar RED;
-
-        //static std::vector<std::string> class_list;
 
         static std::vector<cv::Mat> pre_process(cv::Mat& input, cv::dnn::Net& net);
         static void clear_prev_detections(std::vector<yolo_net::detection>& detections);

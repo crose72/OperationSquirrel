@@ -127,6 +127,7 @@ const float y_desired = 0.0f; // Make const in the ends
 void get_control_params(void);
 void calc_follow_error(void);
 void overtake_target(void);
+void dtrmn_follow_vector(void);
 
 /********************************************************************************
  * Function: get_control_params
@@ -137,6 +138,7 @@ void get_control_params(void)
 #ifdef DEBUG_BUILD
 
     Parameters veh_params("../params.json");
+    
     // Accessing Vel_PID_x parameters
     Kp_x = veh_params.get_float_param("Vel_PID_x", "Kp");
     Ki_x = veh_params.get_float_param("Vel_PID_x", "Ki");
@@ -179,10 +181,15 @@ void get_control_params(void)
  ********************************************************************************/
 void calc_follow_error(void)
 {
+#ifdef JETSON_B01
+#ifdef DEBUG_BUILD
 
-    // Parameters target_params("../params.json");
+    Parameters target_params("../params.json");
 
-    // x_desired = target_params.get_float_param("Target", "Desired_X_offset");
+    x_desired = target_params.get_float_param("Target", "Desired_X_offset");
+
+#endif // DEBUG_BUILD
+#endif // JETSON_B01
 
     if (d_object < 0.001f)
     {
@@ -196,6 +203,39 @@ void calc_follow_error(void)
     y_error = y_object - y_desired;
 }
 
+/********************************************************************************
+ * Function: dtrmn_follow_vector
+ * Description: Determine the follow vector based on the vehicle's error between
+                the desired target offset and the actual target offset.
+ ********************************************************************************/
+void dtrmn_follow_vector(void)
+{
+    target_too_close = (x_error < 0.0);
+
+    if (target_valid && target_too_close)
+    {
+        vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev,
+                                              x_error, 0.0, 0.0,
+                                              w1_x_rev, 0.0, 0.0, CONTROL_DIM::X);
+        vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev,
+                                              y_error, 0.0, 0.0,
+                                              w1_y_rev, 0.0, 0.0, CONTROL_DIM::Y);
+    }
+    else if (target_valid && !target_too_close)
+    {
+        vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
+                                                x_error, 0.0, 0.0,
+                                                w1_x, 0.0, 0.0, CONTROL_DIM::X);
+        vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
+                                                y_error, 0.0, 0.0,
+                                                w1_y, 0.0, 0.0, CONTROL_DIM::Y);
+    }
+    else
+    {
+        vx_adjust = 0.0f;
+        vy_adjust = 0.0f;
+    }
+}
 
 /********************************************************************************
  * Function: Follow
@@ -235,32 +275,7 @@ void Follow::loop(void)
 {
     get_control_params();
     calc_follow_error();
-
-    target_too_close = (x_error < 0.0);
-
-    if (target_valid && target_too_close)
-    {
-        vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                              x_error, 0.0, 0.0,
-                                              w1_x_rev, 0.0, 0.0, CONTROL_DIM::X);
-        vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                              y_error, 0.0, 0.0,
-                                              w1_y_rev, 0.0, 0.0, CONTROL_DIM::Y);
-    }
-    else if (target_valid && !target_too_close)
-    {
-        vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
-                                                x_error, 0.0, 0.0,
-                                                w1_x, 0.0, 0.0, CONTROL_DIM::X);
-        vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
-                                                y_error, 0.0, 0.0,
-                                                w1_y, 0.0, 0.0, CONTROL_DIM::Y);
-    }
-    else
-    {
-        vx_adjust = 0.0f;
-        vy_adjust = 0.0f;
-    }
+    dtrmn_follow_vector();
 }
 
 #endif // ENABLE_CV

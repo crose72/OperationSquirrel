@@ -47,6 +47,8 @@ extern int yolo_detection_count;
 
 #else
 
+#error "Please define a build platform."
+
 #endif
 
 

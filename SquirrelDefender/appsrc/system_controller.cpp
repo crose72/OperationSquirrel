@@ -16,14 +16,16 @@
 #include "mavlink_cmd_handler.h"
 #include "datalog.h"
 #include "vehicle_controller.h"
+#include "video_IO.h"
+#include "detect_target_jetson_inference.h"
+#include "detect_target_yolo.h"
 
 
 #ifdef JETSON_B01
-#include "video_IO.h"
-#include "detect_target.h"
-#include "detect_target_yolo.h"
+
 #include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 #include "follow_target.h"
+
 #endif // JETSON_B01
 
 /********************************************************************************
@@ -149,6 +151,19 @@ void led_system_indicators(void)
 #endif // JETSON_B01
 
 /********************************************************************************
+ * Function: app_first_init
+ * Description: Updates variable for rest of program to know that the first loop
+ * 				is over.
+ ********************************************************************************/
+void app_first_init(void)
+{
+    if (first_loop_after_start == true)
+    {
+        first_loop_after_start = false;
+    }
+}
+
+/********************************************************************************
  * Function: SystemController
  * Description: Class constructor
  ********************************************************************************/
@@ -168,7 +183,7 @@ int SystemController::init(void)
 {
     systems_initialized = false;
 
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
     StatusIndicators::init();
     StatusIndicators::status_initializing();
@@ -180,6 +195,11 @@ int SystemController::init(void)
         !Follow::init() ||
         !VehicleController::init())
     {
+#ifdef JETSON_B01
+
+        StatusIndicators::status_bad_blink();
+
+#endif // JETSON_B01
         return 1;
     }
 
@@ -189,10 +209,15 @@ int SystemController::init(void)
         !DataLogger::init() ||
         !VehicleController::init())
     {
+#ifdef JETSON_B01
+
+        StatusIndicators::status_bad_blink();
+
+#endif // JETSON_B01
         return 1;
     }
 
-#elif WSL
+#else // WSL
 
     if (!MavMsg::init() ||
         !DataLogger::init() ||
@@ -201,7 +226,7 @@ int SystemController::init(void)
         return 1;
     }
 
-#endif // JETSON_B01
+#endif // ENABLE_CV
 
     systems_initialized = true;
 
@@ -215,6 +240,7 @@ int SystemController::init(void)
 void SystemController::loop(void)
 {
     system_state_machine();
+    app_first_init();
 
 #ifdef JETSON_B01
 
@@ -229,13 +255,22 @@ void SystemController::loop(void)
  ********************************************************************************/
 void SystemController::shutdown(void)
 {
-#ifdef JETSON_B01
+    VehicleController::shutdown();
+    MavMsg::shutdown();
+
+#ifdef ENABLE_CV
 
     Video::shutdown();
     Detection::shutdown();
 
+#endif // ENABLE_CV
+
+#ifdef JETSON_B01
+
+    StatusIndicators::status_program_complete();
+    StatusIndicators::shutdown();
+
 #endif // JETSON_B01
 
-    VehicleController::shutdown();
-    MavMsg::shutdown();
+
 }

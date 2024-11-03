@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
 /********************************************************************************
  * @file    track_target.h
@@ -15,7 +15,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "video_IO.h"
-#include "detect_target.h"
+#include "detect_target_jetson_inference.h"
 #include "parameters.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/tracking.hpp>
@@ -45,14 +45,14 @@ extern uint32_t input_video_height;
 
 #endif //JETSON_B01
 
-#ifdef WIN32
+#ifdef _WIN32
 
 extern cv::dnn::Net net;
 extern std::vector<yolo_net::detection> yolo_detections;
 extern int yolo_detection_count;
 extern cv::Mat image;
 
-#endif // WIN32
+#endif // _WIN32
 
 extern bool valid_image_rcvd;
 extern bool target_valid;
