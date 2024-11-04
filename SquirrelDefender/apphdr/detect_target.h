@@ -3,37 +3,34 @@
 #ifdef ENABLE_CV
 
 /********************************************************************************
- * @file    detect_target_yolo.h
+ * @file    detect_target.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef DETECT_TARGET_YOLO_H
-#define DETECT_TARGET_YOLO_H
+#ifndef DETECT_TARGET_H
+#define DETECT_TARGET_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "video_IO.h"
-#include "parameters.h"
-#include "yolo_net.h"
-#include <opencv2/opencv.hpp>
-#include <opencv2/dnn.hpp>
-#include <vector>
-#include <string>
-#include <fstream>
-#include <string>
+#include "detect_target_yolo.h"
+#include "detect_target_jetson_inference.h"
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
 #ifdef JETSON_B01
 
+extern videoSource* input;
 extern uchar3* image;
 
 #elif _WIN32
 
 extern cv::Mat image;
+extern cv::dnn::Net net;
+extern std::vector<yolo_net::detection> yolo_detections;
+extern int yolo_detection_count;
 
 #else
 
@@ -47,7 +44,10 @@ extern cv::Mat image;
  ********************************************************************************/
 #ifdef JETSON_B01
 
-/* None */
+extern detectNet *net;
+extern detectNet::Detection *detections;
+extern int detection_count;
+
 
 #elif _WIN32
 
@@ -64,11 +64,11 @@ extern int yolo_detection_count;
  * Function prototypes and Class Definitions
  ********************************************************************************/
 
-class YOLO
+class Detection
 {
 public:
-    YOLO(void);
-    ~YOLO(void);
+    Detection(void);
+    ~Detection(void);
 
     static bool init(void);
     static void loop(void);
@@ -77,6 +77,6 @@ public:
 private:
 };
 
-#endif // DETECT_TARGET_YOLO_H
+#endif // DETECT_TARGET_H
 
 #endif // ENABLE_CV

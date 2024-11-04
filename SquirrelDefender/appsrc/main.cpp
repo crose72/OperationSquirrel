@@ -18,12 +18,10 @@
 #include "mavlink_msg_handler.h"
 #include "mavlink_cmd_handler.h"
 #include "vehicle_controller.h"
-#include "detect_target_jetson_inference.h"
-#include "detect_target_yolo.h"
+#include "detect_target.h"
 #include "track_target.h"
 #include "localize_target.h"
 #include "follow_target.h"
-
 
 #ifdef JETSON_B01
 
@@ -94,10 +92,14 @@ int main(void)
     attach_sig_handler();
     stop_program = false;
 
+#ifdef JETSON_B01
+
     if (save_button_press)
     {
         return 2;
     }
+
+#endif // JETSON_B01
 
     if (SystemController::init() != 0)
     {
@@ -127,7 +129,6 @@ int main(void)
         Localize::loop();
         Follow::loop();
         Video::out_loop();
-        StatusIndicators::loop();
 
 #endif // ENABLE_CV
 

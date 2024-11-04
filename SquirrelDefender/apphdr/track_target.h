@@ -40,8 +40,8 @@ extern detectNet *net;
 extern detectNet::Detection *detections;
 extern uchar3 *image;
 extern int detection_count;
-extern uint32_t input_video_width;
-extern uint32_t input_video_height;
+extern float input_video_width;
+extern float input_video_height;
 
 #endif //JETSON_B01
 
@@ -51,6 +51,8 @@ extern cv::dnn::Net net;
 extern std::vector<yolo_net::detection> yolo_detections;
 extern int yolo_detection_count;
 extern cv::Mat image;
+extern float input_video_width;
+extern float input_video_height;
 
 #endif // _WIN32
 

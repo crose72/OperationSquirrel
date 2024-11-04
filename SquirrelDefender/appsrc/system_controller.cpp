@@ -17,16 +17,13 @@
 #include "datalog.h"
 #include "vehicle_controller.h"
 #include "video_IO.h"
-#include "detect_target_jetson_inference.h"
-#include "detect_target_yolo.h"
+#include "detect_target.h"
 
+#ifdef ENABLE_CV
 
-#ifdef JETSON_B01
-
-#include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 #include "follow_target.h"
 
-#endif // JETSON_B01
+#endif // ENABLE_CV
 
 /********************************************************************************
  * Typedefs
@@ -245,6 +242,7 @@ void SystemController::loop(void)
 #ifdef JETSON_B01
 
     led_system_indicators();
+    StatusIndicators::loop();
 
 #endif // JETSON_B01
 }

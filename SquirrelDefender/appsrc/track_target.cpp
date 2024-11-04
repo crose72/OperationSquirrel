@@ -237,8 +237,6 @@ void track_target(void)
    That way we know the memory has been allocaed and is ready. */
     if (valid_image_rcvd && !initialized_cv_image)
     {
-
-        // gpuImage = cv::cuda::GpuMat(input_video_height, input_video_width, CV_8UC3);
         image_cv_wrapped = cv::Mat(input_video_height, input_video_width, CV_8UC3, image); // Directly wrap uchar3*
         initialized_cv_image = true;
     }
@@ -253,18 +251,6 @@ void track_target(void)
 
         if (initialized_tracker)
         {
-            // Perform preprocessing on GPU (e.g., convert to grayscale)
-            //cv::cuda::GpuMat gpu_gray;
-            //cv::cvtColor(gpu_frame, gpu_gray, cv::COLOR_BGR2GRAY);
-
-            // Download processed frame back to CPU for tracking
-            //gpu_gray.download(image);  // Download back to CPU for tracking
-            //target_bounding_box = cv::Rect(target_left, target_top, target_width, target_height);
-
-            /*std::cout << "Before tracker->update: Bounding Box - x: " << target_bounding_box.x
-                << ", y: " << target_bounding_box.y << ", width: " << target_bounding_box.width
-                << ", height: " << target_bounding_box.height << std::endl;*/
-            //cv::cvtColor(image, image, cv::COLOR_RGB2BGR);
             target_tracked = tracker_update(target_tracker, image_cv_wrapped, target_bounding_box);
         }
 

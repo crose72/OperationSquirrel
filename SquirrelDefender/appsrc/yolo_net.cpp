@@ -269,7 +269,7 @@ void yolo_net::post_process(cv::Mat& input, std::vector<cv::Mat>& outputs, std::
  * Function: detect_objects
  * Description: Initialize the network used for object detection.
  ********************************************************************************/
-void yolo_net::detect(cv::Mat& input, std::vector<yolo_net::detection>& detections)
+void yolo_net::detect(cv::Mat& input, cv::dnn::Net net, std::vector<yolo_net::detection>& detections)
 {
     outputs = yolo_net::pre_process(input, net);
     yolo_net::post_process(input, outputs, detections, class_list);

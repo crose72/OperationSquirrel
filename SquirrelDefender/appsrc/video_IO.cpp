@@ -24,418 +24,14 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool valid_image_rcvd;
-
-std::string base_path = "../data/";
-
-#ifdef JETSON_B01
-
-bool display_stream_created;
-bool file_stream_created;
-videoSource *input;
-videoOutput *output_vid_file;
-videoOutput *output_vid_disp;
-uchar3 *image;
-uint32_t input_video_width;
-uint32_t input_video_height;
-
-#elif _WIN32
-
-cv::Mat image;
-cv::VideoCapture cap;
-
-#else
-
-#error "Please define a build platform."
-
-#endif // JETSON_B01
 
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-#ifdef JETSON_B01
-
-// Nothing to put here
-
-#elif _WIN32
-
-float input_video_width;
-float input_video_height;
-
-#else
-
-#error "Please define a build platform."
-
-#endif // JETSON_B01
 
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-bool video_output_file_reset(void);
-bool create_input_video_stream(void);
-bool create_output_vid_stream(void);
-bool create_display_video_stream(void);
-bool capture_image(void);
-bool save_video(void);
-bool display_video(void);
-void calc_video_res(void);
-void delete_input_video_stream(void);
-void delete_video_file_stream(void);
-void delete_video_display_stream(void);
-
-/********************************************************************************
- * Function: file_exists
- * Description: Return true if file name already exists.
- ********************************************************************************/
-bool file_exists(const std::string &name)
-{
-    std::ifstream f(name.c_str());
-    return f.good();
-}
-
-/********************************************************************************
- * Function: generate_unique_file_name
- * Description: Generate a unique file name by incrementing the name by 1.
- ********************************************************************************/
-std::string generate_unique_file_name(const std::string &base_name, const std::string &extension)
-{
-    std::string file_name = base_path + base_name + extension;
-    int index = 1;
-
-    while (file_exists(file_name))
-    {
-        file_name = base_path + base_name + "_" + std::to_string(index) + extension;
-        index++;
-    }
-
-    return file_name;
-}
-
-/********************************************************************************
- * Function: create_input_video_stream
- * Description: Create an input video stream from the attached cameras.
- ********************************************************************************/
-bool create_input_video_stream(void)
-{
-#ifdef JETSON_B01
-
-    videoOptions options;
-
-    options.resource = URI("csi://0");
-    options.resource.protocol = "csi";
-    options.resource.location = "0";
-    options.deviceType = videoOptions::DeviceType::DEVICE_CSI;
-    options.ioType = videoOptions::IoType::INPUT;
-    options.width = 1280; // 1280 for imx219-83
-    options.height = 720; // 720 for imx219-83
-    options.frameRate = 30;
-    options.numBuffers = 4;
-    options.zeroCopy = true;
-    options.flipMethod = videoOptions::FlipMethod::FLIP_NONE; // if using IMX219-83 stereo camera
-    // options.flipMethod = videoOptions::FlipMethod::FLIP_ROTATE_180; // if using IMX219-160 stereo camera or H136 V1.3 must compile jetson inference with cmake-DENABLE_NVMM=off
-
-    input = videoSource::Create(options);
-
-    if (!input)
-    {
-        LogError("detectnet:  failed to create input stream\n");
-        return false;
-    }
-
-#elif _WIN32
-
-    cap.open(0);  // Open default webcam
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
-
-    if (!cap.isOpened())
-    {
-        std::cout << "Error: Could not open camera" << std::endl;
-        return false;
-    }
-
-#else
-
-#error "Please define a build platform."
-
-#endif // JETSON_B01
-
-    return true;
-}
-
-/********************************************************************************
- * Function: create_output_vid_stream
- * Description: Create an output video stream to save to a file
- ********************************************************************************/
-bool create_output_vid_stream(void)
-{
-#ifdef JETSON_B01
-    
-    std::string base_path = "file:///home/crose72/Documents/GitHub/OperationSquirrel/SquirrelDefender/data/";
-    std::string base_name = "output";
-    std::string extension = ".mp4";
-    std::string file_name = generate_unique_file_name(base_name, extension);
-
-    videoOptions options;
-
-    options.resource = base_path + file_name;
-    options.resource.protocol = "file";
-    options.resource.location = file_name;
-    options.deviceType = videoOptions::DeviceType::DEVICE_FILE;
-    options.ioType = videoOptions::IoType::OUTPUT;
-    options.codec = videoOptions::Codec::CODEC_H264;
-    options.codecType = videoOptions::CodecType::CODEC_OMX;
-    options.width = 1280;
-    options.height = 720;
-    options.frameRate = 30;
-    options.zeroCopy = true;
-
-    output_vid_file = videoOutput::Create(options);
-
-    if (!output_vid_file)
-    {
-        LogError("detectnet:  failed to create output_vid_file stream\n");
-        file_stream_created = false;
-        return false;
-    }
-
-#elif _WIN32
-
-    // No output stream created yet, just diasplaying the video
-
-#else
-
-#error "Please define a build platform."
-
-#endif // JETSON_B01
-
-    file_stream_created = true;
-
-    return true;
-}
-
-/********************************************************************************
- * Function: create_display_video_stream
- * Description: Create an output_vid_disp video stream from the input video stream
- *			   for displaying and passing to other software components.
- ********************************************************************************/
-bool create_display_video_stream(void)
-{
-    videoOptions options;
-
-    options.resource = "display://0"; // Specify the display URI
-    options.resource.protocol = "display";
-    options.resource.location = "0";
-    options.deviceType = videoOptions::DeviceType::DEVICE_DISPLAY;
-    options.ioType = videoOptions::IoType::OUTPUT;
-    options.width = 1920;  // 1280 for imx219-83
-    options.height = 1080; // 720 for imx219-83
-    options.frameRate = 30;
-    options.numBuffers = 4;
-    options.zeroCopy = true;
-
-    output_vid_disp = videoOutput::Create(options);
-
-    if (!output_vid_disp)
-    {
-        LogError("detectnet:  failed to create output_vid_disp stream\n");
-        display_stream_created = false;
-        return false;
-    }
-
-    display_stream_created = true;
-
-    return true;
-}
-
-/********************************************************************************
- * Function: capture_image
- * Description: Capture an image from the input video stream.
- ********************************************************************************/
-bool capture_image(void)
-{
-#ifdef JETSON_B01
-
-    int status = 0;
-
-    if (!input->Capture(&image, &status))
-    {
-        if (status != videoSource::TIMEOUT)
-        {
-            return false;
-        }
-    }
-
-    // Checking for valid image, Capture may return true while image may still be NULL
-    if (image == NULL)
-    {
-        valid_image_rcvd = false;
-        return false; // Return false if the image is not valid
-    }
-
-    
-#elif _WIN32
-
-    cap >> image;  // Capture image from the webcam
-
-    if (image.empty()) {
-        std::cout << "Error: Could not capture image" << std::endl;
-        return false;
-    }
-
-#else
-
-#error "Please define a build platform."
-
-#endif // JETSON_B01
-
-    valid_image_rcvd = true;
-
-    return true;
-}
-
-/********************************************************************************
- * Function: save_video
- * Description: Save video to a file
- ********************************************************************************/
-bool save_video(void)
-{
-    // render output_vid_disp to the display
-    if (output_vid_file != NULL)
-    {
-        output_vid_file->Render(image, input->GetWidth(), input->GetHeight());
-
-        // check if the user quit
-        if (!output_vid_file->IsStreaming())
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-/********************************************************************************
- * Function: display_video
- * Description: Display the image on the screen.
- ********************************************************************************/
-bool display_video(void)
-{
-#ifdef JETSON_B01
-
-    // render output_vid_disp to the display
-    if (output_vid_disp != NULL)
-    {
-        output_vid_disp->Render(image, input->GetWidth(), input->GetHeight());
-
-#ifdef DEBUG_BUILD
-
-        // update the status bar
-        char str[256];
-        sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(net->GetPrecision()), net->GetNetworkFPS());
-        output_vid_disp->SetStatus(str);
-
-#endif // DEBUG_BUILD
-
-        // check if the user quit
-        if (!output_vid_disp->IsStreaming())
-        {
-            return false;
-        }
-    }
-
-#elif _WIN32
-
-    cv::imshow("MyVid", image);
-    cv::waitKey(1);
-
-#else
-
-#error "Please define a build platform."
-
-#endif // JETSON_B01
-
-    return true;
-}
-
-/********************************************************************************
- * Function: calc_video_res
- * Description: Delete the input to stop using resources.
- ********************************************************************************/
-void calc_video_res(void)
-{
-#ifdef JETSON_B01
-
-    input_video_width = input->GetWidth();
-    input_video_height = input->GetHeight();
-
-#elif _WIN32
-
-    input_video_width = 1280.0;
-    input_video_height = 720.0;
-
-#else
-
-#error "Please define a build platform."
-
-#endif // JETSON_B01
-}
-
-/********************************************************************************
- * Function: delete_input_video_stream
- * Description: Delete the input to stop using resources.
- ********************************************************************************/
-void delete_input_video_stream(void)
-{
-#ifdef JETSON_B01
-
-    SAFE_DELETE(input);
-
-#elif _WIN32
-
-    cap.release(); // Release the webcam
-    cv::destroyAllWindows();
-
-#else
-
-#error "Please define a build platform."
-
-#endif // JETSON_B01
-}
-
-/********************************************************************************
- * Function: delete_video_file_stream
- * Description: Delete the output to the video file to stop using resources.
- ********************************************************************************/
-void delete_video_file_stream(void)
-{
-    SAFE_DELETE(output_vid_file);
-}
-
-/********************************************************************************
- * Function: delete_video_display_stream
- * Description: Delete the display to stop using resources.
- ********************************************************************************/
-void delete_video_display_stream(void)
-{
-    SAFE_DELETE(output_vid_disp);
-}
-
-/********************************************************************************
- * Function: video_output_file_reset
- * Description: Code to reset video streams.
- ********************************************************************************/
-bool video_output_file_reset(void)
-{
-    delete_video_file_stream();
-
-    if (!create_output_vid_stream())
-    {
-        return false;
-    }
-
-    return true;
-}
 
 /********************************************************************************
  * Function: Video
@@ -456,28 +52,19 @@ Video::~Video(void) {}
  ********************************************************************************/
 bool Video::init(void)
 {
-    valid_image_rcvd = false;
-    image = NULL;
+#ifdef JETSON_B01
 
-    if (!create_input_video_stream() ||
-        !create_output_vid_stream())
-    {
-        return false;
-    }
-    
-    // note: put in debug build
-    if (!create_display_video_stream())
-    {
-        return false;
-    }
+    return VideoNV::init();
 
-#ifdef DEBUG_BUILD
+#elif _WIN32
 
-#endif // DEBUG_BUILD
+    return VideoWin::init();
 
-    calc_video_res();
+#else
 
-    return true;
+#error "Please define a build platform."
+
+#endif // JETSON_B01
 }
 
 /********************************************************************************
@@ -486,7 +73,19 @@ bool Video::init(void)
  ********************************************************************************/
 void Video::in_loop(void)
 {
-    capture_image();
+#ifdef JETSON_B01
+
+    VideoNV::in_loop();
+
+#elif _WIN32
+
+    VideoWin::in_loop();
+
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
 }
 
 /********************************************************************************
@@ -495,21 +94,19 @@ void Video::in_loop(void)
  ********************************************************************************/
 void Video::out_loop(void)
 {
+#ifdef JETSON_B01
 
-#ifdef DEBUG_BUILD
+    VideoNV::out_loop();
 
-#endif // DEBUG_BUILD
+#elif _WIN32
 
-    // note: put in debug build
-    if (display_stream_created)
-    {
-        display_video();
-    }
+    VideoWin::out_loop();
 
-    if (file_stream_created)
-    {
-        save_video();
-    }
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
 }
 
 /********************************************************************************
@@ -518,18 +115,19 @@ void Video::out_loop(void)
  ********************************************************************************/
 void Video::shutdown(void)
 {
-    LogVerbose("video:  shutting down...\n");
-    delete_input_video_stream();
-    delete_video_file_stream();
+#ifdef JETSON_B01
 
-    // note: put in debug build
-    delete_video_display_stream();
+    VideoNV::shutdown();
 
-#ifdef DEBUG_BUILD
+#elif _WIN32
 
-#endif // DEBUG_BUILD
+    VideoWin::shutdown();
 
-    LogVerbose("video:  shutdown complete.\n");
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
 }
 
 #endif // ENABLE_CV

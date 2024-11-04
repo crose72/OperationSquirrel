@@ -1,14 +1,15 @@
 #pragma once
 
 #ifdef ENABLE_CV
+#ifdef JETSON_B01
 
 /********************************************************************************
  * @file    detect_target_jetson_inference.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef DETECT_TARGET_H
-#define DETECT_TARGET_H
+#ifndef DETECT_TARGET_SSD_H
+#define DETECT_TARGET_SSD_H
 
 /********************************************************************************
  * Includes
@@ -28,8 +29,6 @@
  ********************************************************************************/
 extern videoSource *input;
 extern uchar3 *image;
-extern uint32_t input_video_width;
-extern uint32_t input_video_height;
 
 /********************************************************************************
  * Exported objects
@@ -41,11 +40,11 @@ extern int detection_count;
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class Detection
+class SSD
 {
 public:
-    Detection(void);
-    ~Detection(void);
+    SSD(void);
+    ~SSD(void);
 
     
     static bool init(void);
@@ -55,6 +54,7 @@ public:
 private:
 };
 
-#endif // DETECT_TARGET_H
+#endif // DETECT_TARGET_SSD_H
 
+#endif // JETSON_B01
 #endif // ENABLE_CV

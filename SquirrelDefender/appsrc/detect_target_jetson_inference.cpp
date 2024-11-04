@@ -1,4 +1,5 @@
 #ifdef ENABLE_CV
+#ifdef JETSON_B01
 
 /********************************************************************************
  * @file    detect_target_jetson_inference.cpp
@@ -114,22 +115,22 @@ void detect_objects(void)
 }
     
 /********************************************************************************
- * Function: Detection
+ * Function: SSD
  * Description: Class constructor
  ********************************************************************************/
-Detection::Detection(void) {};
+SSD::SSD(void) {};
 
 /********************************************************************************
- * Function: ~Detection
+ * Function: ~SSD
  * Description: Class destructor
  ********************************************************************************/
-Detection::~Detection(void) {};
+SSD::~SSD(void) {};
 
 /********************************************************************************
  * Function: initialize_detection_net
  * Description: Delete detection network to free up resources.
  ********************************************************************************/
-bool Detection::init(void)
+bool SSD::init(void)
 {
     net = NULL;
     detections = NULL;
@@ -148,7 +149,7 @@ bool Detection::init(void)
  * Function: loop
  * Description: Process video stream and output detected objects.
  ********************************************************************************/
-void Detection::loop(void)
+void SSD::loop(void)
 {
     detect_objects();
 }
@@ -157,11 +158,12 @@ void Detection::loop(void)
  * Function: shutdown
  * Description: Shutdown detection network
  ********************************************************************************/
-void Detection::shutdown(void)
+void SSD::shutdown(void)
 {
     LogVerbose("detectnet:  shutting down...\n");
     SAFE_DELETE(net);
     LogVerbose("detectnet:  shutdown complete.\n");
 }
 
+#endif // JETSON_B01
 #endif // ENABLE_CV

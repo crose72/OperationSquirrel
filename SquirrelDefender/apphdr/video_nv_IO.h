@@ -1,82 +1,62 @@
 #pragma once
 
 #ifdef ENABLE_CV
+#ifdef JETSON_B01
 
 /********************************************************************************
- * @file    detect_target_yolo.h
+ * @file    video_nv_IO.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef DETECT_TARGET_YOLO_H
-#define DETECT_TARGET_YOLO_H
+#ifndef VIDEO_NV_IO_H
+#define VIDEO_NV_IO_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "video_IO.h"
-#include "parameters.h"
-#include "yolo_net.h"
-#include <opencv2/opencv.hpp>
-#include <opencv2/dnn.hpp>
-#include <vector>
+#include "detect_target_jetson_inference.h"
 #include <string>
 #include <fstream>
-#include <string>
+#include "jetson-utils/videoSource.h"
+#include "jetson-utils/videoOutput.h"
+#include "jetson-inference/detectNet.h"
+#include "jetson-inference/objectTracker.h"
+#include <jetson-inference/objectTrackerIOU.h>
+
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-#ifdef JETSON_B01
-
-extern uchar3* image;
-
-#elif _WIN32
-
-extern cv::Mat image;
-
-#else
-
-#error "Please define a build platform."
-
-#endif
-
+extern detectNet *net;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-#ifdef JETSON_B01
-
-/* None */
-
-#elif _WIN32
-
-extern std::vector<yolo_net::detection> yolo_detections;
-extern int yolo_detection_count;
-
-#else
-
-#error "Please define a build platform."
-
-#endif
+extern bool valid_image_rcvd;
+extern videoSource *input;
+extern uchar3 *image;
+extern float input_video_width;
+extern float input_video_height;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-
-class YOLO
+class VideoNV
 {
 public:
-    YOLO(void);
-    ~YOLO(void);
+    VideoNV();
+    ~VideoNV();
 
     static bool init(void);
-    static void loop(void);
+    static void in_loop(void);
+    static void out_loop(void);
     static void shutdown(void);
 
 private:
 };
 
-#endif // DETECT_TARGET_YOLO_H
+#endif // VIDEO_NV_IO_H
 
+#endif // JETSON_B01
 #endif // ENABLE_CV

@@ -14,17 +14,20 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "detect_target_jetson_inference.h"
 #include <string>
 #include <fstream>
 
 #ifdef JETSON_B01
 
-#include "jetson-utils/videoSource.h"
-#include "jetson-utils/videoOutput.h"
-#include "jetson-inference/detectNet.h"
-#include "jetson-inference/objectTracker.h"
-#include <jetson-inference/objectTrackerIOU.h>
+#include "video_nv_IO.h"
+
+#elif _WIN32
+
+#include "video_win_IO.h"
+
+#else
+
+#error "Please define a build platform."
 
 #endif // JETSON_B01
 
@@ -36,24 +39,33 @@
 
 extern detectNet *net;
 
+#elif _WIN32
+
+/* No imported objects */
+
+#else
+
+#error "Please define a build platform."
+
 #endif // JETSON_B01
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool valid_image_rcvd;
-
 #ifdef JETSON_B01
 
+extern bool valid_image_rcvd;
 extern videoSource *input;
 extern uchar3 *image;
-extern uint32_t input_video_width;
-extern uint32_t input_video_height;
+extern float input_video_width;
+extern float input_video_height;
 
 #elif _WIN32
 
-cv::Mat image;
-cv::VideoCapture cap;
+extern bool valid_image_rcvd;
+extern cv::Mat image;
+extern float input_video_width;
+extern float input_video_height;
 
 #else
 
