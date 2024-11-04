@@ -207,8 +207,21 @@ DataLogger::~DataLogger() {};
  ********************************************************************************/
 bool DataLogger::init(void)
 {
-    headings_written = false;
+#ifdef JETSON_B01
+
     data_file_path = "../data/";
+
+#elif _WIN32
+
+    data_file_path = "../../data/";
+
+#else
+
+#error "Please define a build platform."
+
+#endif
+
+    headings_written = false;
     data_file_name = "data";
     file_name = "";
     data = {};

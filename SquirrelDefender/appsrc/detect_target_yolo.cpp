@@ -55,8 +55,8 @@ YOLO::~YOLO(void) {};
  ********************************************************************************/
 bool YOLO::init(void)
 {
-    const std::string class_list_path = "../networks/yolov5m/coco.names";
-    const std::string model = "../networks/yolov5m/yolov5m.onnx";
+    const std::string class_list_path = "../../networks/yolov5m/coco.names";
+    const std::string model = "../../networks/yolov5m/yolov5m.onnx";
     net = yolo_net::create(model, class_list_path, cv::dnn::DNN_BACKEND_CUDA, cv::dnn::DNN_TARGET_CUDA);
 
     return true;

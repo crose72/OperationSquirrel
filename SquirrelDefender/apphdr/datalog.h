@@ -21,8 +21,7 @@
 #include "follow_target.h"
 #include "track_target.h"
 #include "localize_target.h"
-#include "detect_target_jetson_inference.h"
-#include "detect_target_yolo.h"
+#include "detect_target.h"
 
 /********************************************************************************
  * Imported objects

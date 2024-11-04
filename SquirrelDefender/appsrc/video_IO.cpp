@@ -1,7 +1,7 @@
 #ifdef ENABLE_CV
 
 /********************************************************************************
- * @file    videoIO.cpp
+ * @file    video_IO.cpp
  * @author  Cameron Rose
  * @date    5/22/2024
  * @brief   Configure and start video streams, and output_vid_disp video for other

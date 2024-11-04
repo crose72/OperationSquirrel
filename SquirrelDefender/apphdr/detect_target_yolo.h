@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef ENABLE_CV
+#ifdef _WIN32
 
 /********************************************************************************
  * @file    detect_target_yolo.h
@@ -79,4 +80,5 @@ private:
 
 #endif // DETECT_TARGET_YOLO_H
 
+#endif // _WIN32
 #endif // ENABLE_CV
