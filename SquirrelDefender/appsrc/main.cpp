@@ -115,6 +115,7 @@ int main(void)
 
         Video::in_loop();
         Detection::loop();
+        Track::loop();
         Localize::loop();
         Follow::loop();
         Video::out_loop();

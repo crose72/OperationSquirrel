@@ -106,8 +106,6 @@ bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Re
  ********************************************************************************/
 void identify_target(void)
 {
-
-
     target_detection_ID = -1;
 
 #ifdef JETSON_B01
@@ -372,10 +370,6 @@ bool Track::init(void)
     target_bounding_box = cv::Rect(0.0, 0.0, 0.0, 0.0);
     target_tracker = cv::TrackerCSRT::create();
 
-    // Allocate memory for image before using it
-    // cudaMallocManaged(&image_cv_wrapped, input_video_width * input_video_height * sizeof(uchar3));
-    // gpuImage.upload(image_cv_wrapped);
-
     return true;
 }
 
@@ -389,8 +383,6 @@ void Track::loop(void)
     identify_target();
     get_target_info();
     validate_target();
-    track_target();
-    // update_target_info();
 }
 
 #endif // ENABLE_CV
