@@ -365,7 +365,7 @@ int main(int argc, char **argv)
         }
 
         // Check if fewer than 3 SIGINT signals were received in the time window
-        if (sigint_count == 1 && std::chrono::steady_clock::now() - last_sigint_time > sigint_time_window)
+        if ((sigint_count >= 1 && sigint_count < 3) && std::chrono::steady_clock::now() - last_sigint_time > sigint_time_window)
         {
             std::cout << "SIGINT not repeated 3 times within the time window. Capturing image." << std::endl;
             process_image_capture(image, 1280, 720);

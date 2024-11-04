@@ -12,17 +12,6 @@
  * Includes
  ********************************************************************************/
 #include "system_controller.h"
-#include "mavlink_msg_handler.h"
-#include "mavlink_cmd_handler.h"
-#include "datalog.h"
-#include "vehicle_controller.h"
-
-#ifdef JETSON_B01
-#include "video_IO.h"
-#include "object_detection.h"
-#include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
-#include "follow_target.h"
-#endif // JETSON_B01
 
 /********************************************************************************
  * Typedefs
@@ -46,72 +35,14 @@ SYSTEM_STATE system_state;
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-
-/********************************************************************************
- * Function: SystemController
- * Description: Class constructor
- ********************************************************************************/
-SystemController::SystemController(void) {}
-
-/********************************************************************************
- * Function: ~SystemController
- * Description: Class destructor
- ********************************************************************************/
-SystemController::~SystemController(void) {}
-
-/********************************************************************************
- * Function: system_init
- * Description: Return 0 if all system init tasks have successfully completed.
- ********************************************************************************/
-int SystemController::system_init(void)
-{
-    systems_initialized = false;
-
-#ifdef JETSON_B01
-
-    StatusIndicators::gpio_init();
-    StatusIndicators::status_initializing();
-
-    if (!Video::video_init() ||
-        !Detection::detection_net_init() ||
-        !Follow::follow_target_init() ||
-        !VehicleController::vehicle_control_init())
-    {
-        StatusIndicators::status_bad_blink();
-        return 1;
-    }
-
-    StatusIndicators::status_initializing();
-
-    if (!MavMsg::mav_comm_init() ||
-        !DataLogger::data_log_init() ||
-        !VehicleController::vehicle_control_init())
-    {
-        StatusIndicators::status_bad_blink();
-        return 1;
-    }
-
-#elif WSL
-
-    if (!MavMsg::mav_comm_init() ||
-        /* !DataLogger::data_log_init() || */
-        !VehicleController::vehicle_control_init())
-    {
-        return 1;
-    }
-
-#endif // JETSON_B01
-
-    systems_initialized = true;
-
-    return 0;
-}
+int system_state_machine(void);
+void led_system_indicators(void);
 
 /********************************************************************************
  * Function: system_state_machine
  * Description: Determine system state,.
  ********************************************************************************/
-int SystemController::system_state_machine(void)
+int system_state_machine(void)
 {
     // Initialize system status on startup
     if (first_loop_after_start)
@@ -123,7 +54,7 @@ int SystemController::system_state_machine(void)
         bool mav_type_is_quad = (mav_veh_type == MAV_TYPE_QUADROTOR && mav_veh_autopilot_type == MAV_AUTOPILOT_ARDUPILOTMEGA);
         bool prearm_checks = false;
 
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
         prearm_checks = ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && valid_image_rcvd);
 
@@ -131,9 +62,8 @@ int SystemController::system_state_machine(void)
 
         prearm_checks = ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0);
 
-#endif // JETSON_B01
-
-        // Switch case determines how we transition from one state to another
+#endif // ENABLE_CV
+       // Switch case determines how we transition from one state to another
         switch (system_state)
         {
         // Default state is the first state, nothing is initialialized, no systems are active
@@ -163,7 +93,7 @@ int SystemController::system_state_machine(void)
             break;
         // Standby means we are ready to takeoff
         case SYSTEM_STATE::STANDBY:
-            if ((mav_veh_rel_alt > 1450 || mav_veh_rngfdr_current_distance > 145) && mav_veh_state == MAV_STATE_ACTIVE)
+            if ((mav_veh_rel_alt > 1000 || mav_veh_rngfdr_current_distance > 100) && mav_veh_state == MAV_STATE_ACTIVE)
             {
                 system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
             }
@@ -182,14 +112,53 @@ int SystemController::system_state_machine(void)
     return 0;
 }
 
+/********************************************************************************
+ * Function: led_init
+ * Description: Initialize LEDs
+ ********************************************************************************/
+void led_init(void)
+{
 #ifdef JETSON_B01
+
+    StatusIndicators::init();
+
+#endif // JETSON_B01
+}
+
+/********************************************************************************
+ * Function: led_init_blink
+ * Description: Specific led sequence to indicate system initializing.
+ ********************************************************************************/
+void led_init_blink(void)
+{
+#ifdef JETSON_B01
+
+    StatusIndicators::status_initializing();
+
+#endif // JETSON_B01
+}
+
+/********************************************************************************
+ * Function: led_bad_blink
+ * Description: Control external leds to describe the system state.
+ ********************************************************************************/
+void led_bad_blink(void)
+{
+#ifdef JETSON_B01
+
+        StatusIndicators::status_bad_blink();
+
+#endif // JETSON_B01
+}
 
 /********************************************************************************
  * Function: led_system_indicators
  * Description: Control external leds to describe the system state.
  ********************************************************************************/
-void SystemController::led_system_indicators(void)
+void led_system_indicators(void)
 {
+#ifdef JETSON_B01
+
     if (system_state == SYSTEM_STATE::DEFAULT ||
         system_state == SYSTEM_STATE::INIT ||
         system_state == SYSTEM_STATE::PRE_ARM_GOOD ||
@@ -201,37 +170,135 @@ void SystemController::led_system_indicators(void)
     {
         StatusIndicators::status_good();
     }
+
+#endif // JETSON_B01
 }
+
+
+
+/********************************************************************************
+ * Function: app_first_init
+ * Description: Updates variable for rest of program to know that the first loop
+ * 				is over.
+ ********************************************************************************/
+void app_first_init(void)
+{
+    if (first_loop_after_start == true)
+    {
+        first_loop_after_start = false;
+    }
+}
+
+/********************************************************************************
+ * Function: SystemController
+ * Description: Class constructor
+ ********************************************************************************/
+SystemController::SystemController(void) {}
+
+/********************************************************************************
+ * Function: ~SystemController
+ * Description: Class destructor
+ ********************************************************************************/
+SystemController::~SystemController(void) {}
+
+/********************************************************************************
+ * Function: init
+ * Description: Return 0 if all system init tasks have successfully completed.
+ ********************************************************************************/
+int SystemController::init(void)
+{
+    systems_initialized = false;
+    
+#ifdef JETSON_B01
+
+    if (save_button_press)
+    {
+        return 2;
+    }
 
 #endif // JETSON_B01
 
+#ifdef ENABLE_CV
+
+    led_init();
+    led_init_blink();
+
+    if (!Video::init() ||
+        !Detection::init() ||
+        !Track::init() ||
+        !Localize::init() ||
+        !Follow::init() ||
+        !VehicleController::init())
+    {
+        led_bad_blink();
+        return 1;
+    }
+
+    led_init_blink();
+
+    if (!MavMsg::init() ||
+        !DataLogger::init() ||
+        !VehicleController::init())
+    {
+        led_bad_blink();
+        return 1;
+    }
+
+#else // WSL is the only platform that doesn't support computer vision at the moment
+
+    if (!MavMsg::init() ||
+        !DataLogger::init() ||
+        !VehicleController::init())
+    {
+        return 1;
+    }
+
+#endif // ENABLE_CV
+
+    systems_initialized = true;
+
+    return 0;
+}
+
 /********************************************************************************
- * Function: system_control_loop
+ * Function: loop
  * Description: Main loop for functions that monitor and control system states.
  ********************************************************************************/
-void SystemController::system_control_loop(void)
+void SystemController::loop(void)
 {
     system_state_machine();
+    app_first_init();
+    led_system_indicators();
 
 #ifdef JETSON_B01
 
-    led_system_indicators();
+    StatusIndicators::loop();
 
 #endif // JETSON_B01
 }
 
 /********************************************************************************
- * Function: system_shutdown
+ * Function: shutdown
  * Description: All shutdown functions are called here.
  ********************************************************************************/
-void SystemController::system_shutdown(void)
+void SystemController::shutdown(void)
 {
-#ifdef JETSON_B01
+    VehicleController::shutdown();
+    MavMsg::shutdown();
+
+#ifdef ENABLE_CV
 
     Video::shutdown();
     Detection::shutdown();
 
+#endif // ENABLE_CV
+
+#ifdef JETSON_B01
+
+    StatusIndicators::status_program_complete();
+    StatusIndicators::shutdown();
+
 #endif // JETSON_B01
 
-    MavMsg::mav_comm_shutdown();
+
 }

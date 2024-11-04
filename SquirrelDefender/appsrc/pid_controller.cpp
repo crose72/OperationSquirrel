@@ -81,9 +81,5 @@ float PID::pid_controller_3d(float Kp, float Ki, float Kd,
 
     err_prv[dim] = err;
 
-    DebugTerm pid_debug("");
-    pid_debug.cpp_cout("Dim: " + std::to_string(dim) +
-                       "\nP: " + std::to_string(proportional_term) + ", I: " + std::to_string(integral_term) + ", D: " + std::to_string(derivative_term));
-
     return control;
 }

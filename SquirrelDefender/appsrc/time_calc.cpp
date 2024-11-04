@@ -124,7 +124,7 @@ void TimeCalc::calc_elapsed_time(void)
         float app_elapsed_time_tmp = elapsed_time.count() / 1000.0f;
 
         // Truncate the number to three decimal places
-        app_elapsed_time = (std::floor(app_elapsed_time_tmp * 1000.0f) / 1000.0f - time_step);
+        app_elapsed_time = (std::floor(app_elapsed_time_tmp * 1000.0f) / 1000.0f);
 
         // Print program run time
         // PrintPass::c_printf("Elapsed Time: %0.3f\n", app_elapsed_time);

@@ -54,7 +54,7 @@ void test_flight(void)
         target_velocity[0] = 87.0;
         target_velocity[1] = 0;
         target_velocity[2] = 0;
-        VehicleController::cmd_velocity_NED(target_velocity);
+        VelocityController::cmd_velocity_NED(target_velocity);
         stage = 1;
     }
 
@@ -63,7 +63,7 @@ void test_flight(void)
         target_velocity[0] = 0.0;
         target_velocity[1] = -87.0;
         target_velocity[2] = 0.0;
-        VehicleController::cmd_velocity_NED(target_velocity);
+        VelocityController::cmd_velocity_NED(target_velocity);
         stage = 2;
     }
 
@@ -72,7 +72,7 @@ void test_flight(void)
         target_velocity[0] = -6.0;
         target_velocity[1] = 4.0;
         target_velocity[2] = -11.0;
-        VehicleController::cmd_velocity_NED(target_velocity);
+        VelocityController::cmd_velocity_NED(target_velocity);
         stage = 3;
     }
 
@@ -81,7 +81,7 @@ void test_flight(void)
         target_velocity[0] = -6.0;
         target_velocity[1] = 4.0;
         target_velocity[2] = -11.0;
-        VehicleController::cmd_velocity_NED(target_velocity);
+        VelocityController::cmd_velocity_NED(target_velocity);
         stage = 4;
     }
 

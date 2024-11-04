@@ -177,19 +177,23 @@ void StatusIndicators::status_program_complete(void)
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
             GPIO::output(GREEN_LED_PIN, GPIO::LOW);
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
+            GPIO::output(GREEN_LED_PIN, GPIO::HIGH);
+            std::this_thread::sleep_for(std::chrono::milliseconds(25));
+            GPIO::output(GREEN_LED_PIN, GPIO::LOW);
+            std::this_thread::sleep_for(std::chrono::milliseconds(25));
         }
         // Pause before repeating
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
     GPIO::output(GREEN_LED_PIN, GPIO::HIGH);
-    GPIO::output(RED_LED_PIN, GPIO::HIGH);
+    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 }
 
 /********************************************************************************
- * Function: gpio_init
+ * Function: init
  * Description: Initialize the pins on the jetson.
  ********************************************************************************/
-bool StatusIndicators::gpio_init(void)
+bool StatusIndicators::init(void)
 {
     GPIO::setmode(GPIO::BOARD);
     GPIO::setup(GREEN_LED_PIN, GPIO::OUT, GPIO::LOW);
@@ -202,19 +206,19 @@ bool StatusIndicators::gpio_init(void)
 }
 
 /********************************************************************************
- * Function: io_loop
+ * Function: loop
  * Description: Loop for all IO that needs to be monitored continuously.
  ********************************************************************************/
-void StatusIndicators::io_loop(void)
+void StatusIndicators::loop(void)
 {
     save_video_button_state();
 }
 
 /********************************************************************************
- * Function: gpio_shutdown
+ * Function: shutdown
  * Description: Cleanup tasks for jetson io.
  ********************************************************************************/
-void StatusIndicators::gpio_shutdown(void)
+void StatusIndicators::shutdown(void)
 {
     GPIO::cleanup();
 }
