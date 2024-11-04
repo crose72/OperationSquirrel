@@ -15,7 +15,7 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "detect_target_jetson_inference.h"
+#include "detect_target.h"
 #include <string>
 #include <fstream>
 #include "jetson-utils/videoSource.h"

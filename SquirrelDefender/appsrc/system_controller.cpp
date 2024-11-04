@@ -12,18 +12,6 @@
  * Includes
  ********************************************************************************/
 #include "system_controller.h"
-#include "mavlink_msg_handler.h"
-#include "mavlink_cmd_handler.h"
-#include "datalog.h"
-#include "vehicle_controller.h"
-#include "video_IO.h"
-#include "detect_target.h"
-
-#ifdef ENABLE_CV
-
-#include "follow_target.h"
-
-#endif // ENABLE_CV
 
 /********************************************************************************
  * Typedefs
@@ -66,7 +54,7 @@ int system_state_machine(void)
         bool mav_type_is_quad = (mav_veh_type == MAV_TYPE_QUADROTOR && mav_veh_autopilot_type == MAV_AUTOPILOT_ARDUPILOTMEGA);
         bool prearm_checks = false;
 
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
         prearm_checks = ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && valid_image_rcvd);
 
@@ -74,7 +62,7 @@ int system_state_machine(void)
 
         prearm_checks = ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0);
 
-#endif // JETSON_B01
+#endif // ENABLE_CV
        // Switch case determines how we transition from one state to another
         switch (system_state)
         {
@@ -124,7 +112,44 @@ int system_state_machine(void)
     return 0;
 }
 
+/********************************************************************************
+ * Function: led_init
+ * Description: Initialize LEDs
+ ********************************************************************************/
+void led_init(void)
+{
 #ifdef JETSON_B01
+
+    StatusIndicators::init();
+
+#endif // JETSON_B01
+}
+
+/********************************************************************************
+ * Function: led_init_blink
+ * Description: Specific led sequence to indicate system initializing.
+ ********************************************************************************/
+void led_init_blink(void)
+{
+#ifdef JETSON_B01
+
+    StatusIndicators::status_initializing();
+
+#endif // JETSON_B01
+}
+
+/********************************************************************************
+ * Function: led_bad_blink
+ * Description: Control external leds to describe the system state.
+ ********************************************************************************/
+void led_bad_blink(void)
+{
+#ifdef JETSON_B01
+
+        StatusIndicators::status_bad_blink();
+
+#endif // JETSON_B01
+}
 
 /********************************************************************************
  * Function: led_system_indicators
@@ -132,6 +157,8 @@ int system_state_machine(void)
  ********************************************************************************/
 void led_system_indicators(void)
 {
+#ifdef JETSON_B01
+
     if (system_state == SYSTEM_STATE::DEFAULT ||
         system_state == SYSTEM_STATE::INIT ||
         system_state == SYSTEM_STATE::PRE_ARM_GOOD ||
@@ -143,9 +170,11 @@ void led_system_indicators(void)
     {
         StatusIndicators::status_good();
     }
-}
 
 #endif // JETSON_B01
+}
+
+
 
 /********************************************************************************
  * Function: app_first_init
@@ -179,11 +208,20 @@ SystemController::~SystemController(void) {}
 int SystemController::init(void)
 {
     systems_initialized = false;
+    
+#ifdef JETSON_B01
+
+    if (save_button_press)
+    {
+        return 2;
+    }
+
+#endif // JETSON_B01
 
 #ifdef ENABLE_CV
 
-    StatusIndicators::init();
-    StatusIndicators::status_initializing();
+    led_init();
+    led_init_blink();
 
     if (!Video::init() ||
         !Detection::init() ||
@@ -192,29 +230,21 @@ int SystemController::init(void)
         !Follow::init() ||
         !VehicleController::init())
     {
-#ifdef JETSON_B01
-
-        StatusIndicators::status_bad_blink();
-
-#endif // JETSON_B01
+        led_bad_blink();
         return 1;
     }
 
-    StatusIndicators::status_initializing();
+    led_init_blink();
 
     if (!MavMsg::init() ||
         !DataLogger::init() ||
         !VehicleController::init())
     {
-#ifdef JETSON_B01
-
-        StatusIndicators::status_bad_blink();
-
-#endif // JETSON_B01
+        led_bad_blink();
         return 1;
     }
 
-#else // WSL
+#else // WSL is the only platform that doesn't support computer vision at the moment
 
     if (!MavMsg::init() ||
         !DataLogger::init() ||
@@ -238,10 +268,10 @@ void SystemController::loop(void)
 {
     system_state_machine();
     app_first_init();
+    led_system_indicators();
 
 #ifdef JETSON_B01
 
-    led_system_indicators();
     StatusIndicators::loop();
 
 #endif // JETSON_B01

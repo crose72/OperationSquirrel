@@ -15,7 +15,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "video_IO.h"
-#include "detect_target_jetson_inference.h"
+#include "detect_target.h"
 #include "parameters.h"
 
 /********************************************************************************

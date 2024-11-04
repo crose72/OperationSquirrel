@@ -15,13 +15,12 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "video_IO.h"
-#include "detect_target_jetson_inference.h"
+#include "detect_target.h"
 #include "parameters.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/tracking.hpp>
 #include <opencv2/core/utility.hpp>
 #include <opencv2/cudawarping.hpp>
-#include "detect_target_yolo.h"
 
 #ifdef JETSON_B01
 

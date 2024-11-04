@@ -45,8 +45,6 @@ bool stop_program;
 std::mutex mutex_main;
 DebugTerm MainTerm("");
 
-extern bool save_button_press;
-
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
@@ -92,18 +90,9 @@ int main(void)
     attach_sig_handler();
     stop_program = false;
 
-#ifdef JETSON_B01
-
-    if (save_button_press)
-    {
-        return 2;
-    }
-
-#endif // JETSON_B01
-
     if (SystemController::init() != 0)
     {
-        return 1;
+        return SystemController::init();
     }
 
 #ifdef JETSON_B01
@@ -126,6 +115,7 @@ int main(void)
 
         Video::in_loop();
         Detection::loop();
+        Track::loop();
         Localize::loop();
         Follow::loop();
         Video::out_loop();
