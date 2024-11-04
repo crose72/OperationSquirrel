@@ -7,7 +7,7 @@
 echo "Installing Jetson-Inference"
 
 sudo apt-get install git cmake libpython3-dev python3-numpy
-git clone --recursive --depth=1 https://github.com/dusty-nv/jetson-inference
+git clone --recursive --depth=1 https://github.com/crose72/jetson-inference.git
 cd jetson-inference
 
 # Configure and build

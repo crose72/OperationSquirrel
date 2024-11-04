@@ -29,16 +29,16 @@
 class VelocityController
 {
     VelocityController();
-    ~VelocityController(void);
+    ~VelocityController();
 
     public:
         static void cmd_position_NED(float position_target[3]);
         static void cmd_velocity_NED(float velocity_target[3]);
-        static void cmd_acceleration_NED(float acceleration_target[3]);
         static void cmd_velocity_x_NED(float velocity_target);
         static void cmd_velocity_y_NED(float velocity_target);
         static void cmd_velocity_z_NED(float velocity_target);
         static void cmd_velocity_xy_NED(float velocity_target[3]);
+        static void cmd_acceleration_NED(float acceleration_target[3]);
 
     private:
         static float calc_yaw_target(float x, float y);

@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef JETSON_B01
+#ifdef ENABLE_CV
 
 /********************************************************************************
  * @file    video_IO.h
@@ -14,28 +14,64 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "jetson-utils/videoSource.h"
-#include "jetson-utils/videoOutput.h"
-#include "jetson-inference/detectNet.h"
-#include "jetson-inference/objectTracker.h"
-#include <jetson-inference/objectTrackerIOU.h>
-#include "object_detection.h"
 #include <string>
 #include <fstream>
+
+#ifdef JETSON_B01
+
+#include "video_nv_IO.h"
+
+#elif _WIN32
+
+#include "video_win_IO.h"
+
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
+
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
+#ifdef JETSON_B01
+
 extern detectNet *net;
+
+#elif _WIN32
+
+/* No imported objects */
+
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
+#ifdef JETSON_B01
+
 extern bool valid_image_rcvd;
 extern videoSource *input;
 extern uchar3 *image;
-extern uint32_t input_video_width;
-extern uint32_t input_video_height;
+extern float input_video_width;
+extern float input_video_height;
+
+#elif _WIN32
+
+extern bool valid_image_rcvd;
+extern cv::Mat image;
+extern float input_video_width;
+extern float input_video_height;
+
+#else
+
+#error "Please define a build platform."
+
+#endif // JETSON_B01
 
 /********************************************************************************
  * Function prototypes and Class Definitions
@@ -46,25 +82,14 @@ public:
     Video();
     ~Video();
 
-    static bool video_output_file_reset(void);
-    static bool video_init(void);
-    static bool create_input_video_stream(void);
-    static bool create_output_vid_stream(void);
-    static bool create_display_video_stream(void);
-    static void video_proc_loop(void);
-    static void video_output_loop(void);
+    static bool init(void);
+    static void in_loop(void);
+    static void out_loop(void);
     static void shutdown(void);
-    static bool capture_image(void);
-    static bool save_video(void);
-    static bool display_video(void);
-    static void calc_video_res(void);
-    static void delete_input_video_stream(void);
-    static void delete_video_file_stream(void);
-    static void delete_video_display_stream(void);
 
 private:
 };
 
 #endif // VIDEO_IO_H
 
-#endif // JETSON_B01
+#endif // ENABLE_CV

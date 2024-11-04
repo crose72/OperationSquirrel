@@ -19,10 +19,14 @@
 #include <sstream>
 #include "mavlink_msg_handler.h"
 #include "follow_target.h"
+#include "track_target.h"
+#include "localize_target.h"
+#include "detect_target.h"
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
+/* Mavlink variables */
 extern float app_elapsed_time;
 
 extern uint16_t mav_veh_sys_stat_voltage_battery;
@@ -55,7 +59,7 @@ extern float mav_veh_flow_comp_m_x;
 extern float mav_veh_flow_comp_m_y;
 extern int16_t mav_veh_flow_x;
 extern int16_t mav_veh_flow_y;
-extern uint8_t mav_veh_quality;
+extern uint8_t mav_veh_flow_quality;
 extern float mav_veh_flow_rate_x;
 extern float mav_veh_flow_rate_y;
 
@@ -75,25 +79,48 @@ extern float mav_veh_pitch_rate_actual;
 extern float mav_veh_yaw_rate_actual;
 extern float mav_veh_repr_offset_q[4];
 
+extern uint8_t mav_veh_type;
+extern uint8_t mav_veh_autopilot_type;
+extern uint8_t mav_veh_base_mode;
+extern uint32_t mav_veh_custom_mode;
+extern uint8_t mav_veh_state;
+extern uint8_t mav_veh_mavlink_version;
+
+/* Detect/Track target variables */
+extern bool target_valid;
+extern int target_detection_ID;
+extern int target_track_ID;
+extern float target_cntr_offset_x;
+extern float target_cntr_offset_y;
+extern float target_height;
+extern float target_width;
+extern float target_aspect;
+extern float target_left;
+extern float target_right;
+extern float target_top;
+extern float target_bottom;
+
+/* Localize target variables*/
+extern float d_object_h;
+extern float d_object_w;
+extern float x_object;
+extern float y_object;
+extern float z_object;
+extern float d_object;
+extern float x_error;
+extern float y_error;
+extern float delta_angle;
+extern float camera_tilt_angle;
+extern float delta_d_x;
+extern float delta_d_z;
+
+/* Follow target variables */
 extern bool target_too_close;
-extern bool target_identified;
 extern float vx_adjust;
 extern float vy_adjust;
 extern float vz_adjust;
 
-extern float x_actual;
-extern float height_actual;
-extern float y_actual;
-extern float width_actual;
-extern float x_centroid_err;
-extern float target_height_err;
-extern float y_centroid_err;
-extern float target_left_side;
-extern float target_right_side;
-extern float target_left_err;
-extern float target_right_err;
-extern float target_height_err_rev;
-
+/* System variables */
 extern SYSTEM_STATE system_state;
 
 /********************************************************************************
@@ -110,13 +137,12 @@ public:
     DataLogger();
     ~DataLogger();
 
-    static bool data_log_init(void);
-    static void data_log_loop(void);
-    static void data_log_shutdown(void);
+    static bool init(void);
+    static void loop(void);
+    static void shutdown(void);
 
 private:
-    static void save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data);
-    static std::string generate_unique_filename(const std::string &filename);
+
 };
 
 #endif // DATALOG_H

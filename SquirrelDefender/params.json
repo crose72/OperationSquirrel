@@ -1,14 +1,14 @@
 {
     "Vel_PID_x": {
-        "Kp": 0.02,
-        "Ki": 0.0009,
-        "Kd": 0.0005,
+        "Kp": 0.025,
+        "Ki": 0.00009,
+        "Kd": 0.00005,
         "w1": 1.0,
         "w2": 0.0,
         "w3": 0.0
     },
     "Vel_PID_y": {
-        "Kp": 0.0001,
+        "Kp": 0.01,
         "Ki": 0.00009,
         "Kd": 0.00005,
         "w1": 1.0,
@@ -49,7 +49,10 @@
     },
     "Target": {
         "Desired_Height": 640.0,
-        "Desired_Width": 150.0
+        "Desired_Width": 150.0,
+        "Desired_X_offset": 3.0,
+        "Desired_Y_offset": 0.0,
+        "Desired_Z_offset": 0.0
     },
     "Detection_tracking": {
         "Detect_Thresh": 0.7,
@@ -58,7 +61,7 @@
         "Device": 0,
         "Allow_gpu_fallback": false,
         "Min_Frames": 25,
-        "Drop_Frames": 50,
-        "Overlap_Threshold": 0.5
+        "Drop_Frames": 10,
+        "Overlap_Threshold": 0.1
     }
 }

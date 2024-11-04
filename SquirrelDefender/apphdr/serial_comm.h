@@ -12,17 +12,34 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
+#include <cstdint> // for uint8_t, uint16_t, etc.
+#include <mavlink.h>
+#include <common.h>
+
+#ifdef JETSON_B01 || WSL // for linux
+
 #include <fcntl.h>
-#include <sys/ioctl.h>
 #include <unistd.h>
+#include <sys/ioctl.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <cstdio>  // for perror
 #include <cstdint> // for uint8_t, uint16_t, etc.
 #include <termios.h>
-#include <mavlink.h>
-#include <common.h>
+
+#elif _WIN32
+
+#include <winsock2.h> // For TCP/IP sockets
+#include <ws2tcpip.h>
+#include <windows.h>               // For COM ports (serial communication)
+#pragma comment(lib, "Ws2_32.lib") // Link WinSock2 library for TCP
+#include <windows.h>               // For WinAPI functions and types (CreateFile, HANDLE, DCB, etc.)
+#include <stdio.h>                 // For standard input/output (e.g., printf)
+#include <stdlib.h>                // For standard functions
+#include <string.h>                // For string manipulation
+
+#endif
 
 /********************************************************************************
  * Imported objects
@@ -35,30 +52,21 @@
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
- class SerialComm
- {
-    public:
-        SerialComm();
-        ~SerialComm();
+class SerialComm
+{
+public:
+    SerialComm();
+    ~SerialComm();
 
-        static bool start_uart_comm(void);
-        static void stop_uart_comm(void);
-        static void write_uart(mavlink_message_t &msg);
-        static uint8_t read_uart(void);
-        static int bytes_available(void);
+    static bool start_uart_comm(void);
+    static void stop_uart_comm(void);
+    static void write_uart(mavlink_message_t &msg);
+    static uint8_t read_uart(void);
+    static int bytes_available(void);
 
-    private:
-        static void offset_buffer(uint8_t* buffer, uint16_t &len, mavlink_message_t &msg);
-        static void clear_buffer(uint8_t* buffer, uint16_t len);
-
- };
- /*
-bool start_uart_comm(void);
-void write_to_uart(uint8_t* buffer, uint16_t len);
-void send_mav_msg(uint8_t* buffer, uint16_t len);
-uint8_t read_mav_msg(void);
-void SerialComm::offset_buffer(uint8_t* buffer, uint16_t &len, mavlink_message_t &msg);
-void clear_buffer(uint8_t* buffer, uint16_t len);
-void stop_serial_comm(void);*/
+private:
+    static void offset_buffer(uint8_t *buffer, uint16_t &len, mavlink_message_t &msg);
+    static void clear_buffer(uint8_t *buffer, uint16_t len);
+};
 
 #endif // SERIAL_COMM_H

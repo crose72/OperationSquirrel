@@ -14,58 +14,59 @@
 /********************************************************************************
  * Typedefs
  ********************************************************************************/
-#ifdef USE_UART
-
-// Do nothing
-
-#elif USE_TCP
-
-struct sockaddr_in sim_addr;
-
-#else
-
-#error "Please define USE_UART or USE_TCP."
-
-#endif
 
 /********************************************************************************
  * Private macros and defines
  ********************************************************************************/
-#ifdef USE_UART
+
+/********************************************************************************
+ * Private macros and defines
+ ********************************************************************************/
+#ifdef JETSON_B01_SERIAL
 
 #define SERIAL_PORT "/dev/ttyTHS1"
 #define BAUD_RATE B115200
-// #define SERIAL_PORT "/dev/ttyUSB0" // for SiK radio
-// #define BAUD_RATE B57600 // SiK radio baud rate
 
-#elif USE_TCP
+#elif WIN32_SERIAL
 
-#define _POSIX_C_SOURCE 200809L // enable certain POSIX-specific functionality
-#define SIM_IP "127.0.0.1"      // IP address of SITL simulation
-#define SIM_PORT 5762           // Port number used by SITL simulation
+#define SERIAL_PORT "COM3"  // Modify based on your USB port (e.g., COM3, COM4, etc.)
+#define BAUD_RATE CBR_57600 // 57600 for SiK radio, CBR_115200 typically
+
+#elif WSL_TCP || WIN32_TCP
+
+/* Sim port/address for linux or windows */
+#define SIM_IP "127.0.0.1" // IP address for SITL simulation
+#define SIM_PORT 5762      // Port number for SITL
 
 #else
 
-#error "Please define USE_UART or USE_TCP."
+#error "Please define the intended build target."
 
-#endif
+#endif // JETSON_B01_SERIAL
 
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-#ifdef USE_UART
-int uart_fd; // UART file descriptor
-int serial_port = 0;
-#elif USE_TCP
-int tcp_socket_fd; // TCP socket file descriptor
-int sock;
-#else
-#error "Please define USE_UART or USE_TCP."
-#endif
+#ifdef JETSON_B01_SERIAL
 
-/********************************************************************************
- * Calibration definitions
- ********************************************************************************/
+int uart_fd; // UART file descriptor for Linux
+int serial_port = 0;
+
+#elif WIN32_SERIAL
+
+HANDLE hComm; // Handle for COM port on Windows
+
+#elif WSL_TCP || WIN32_TCP
+
+SOCKET tcp_socket_fd; // TCP socket descriptor
+struct sockaddr_in sim_addr;
+int sock;
+
+#else
+
+#error "Please define the intended build target."
+
+#endif // JETSON_B01_SERIAL
 
 /********************************************************************************
  * Function definitions
@@ -85,15 +86,14 @@ SerialComm::~SerialComm(void) {}
 
 /********************************************************************************
  * Function: start_uart_comm
- * Description: Configure and make available the serial port to be used for
- *              UART or TCP comms.
+ * Description: Configure and make available the serial port for UART or TCP comms.
  ********************************************************************************/
 bool SerialComm::start_uart_comm(void)
 {
-#ifdef USE_UART
-    // Open the uart port
-    serial_port = open(SERIAL_PORT, O_RDWR);
+#ifdef JETSON_B01_SERIAL
 
+    // Open the UART port for Linux
+    serial_port = open(SERIAL_PORT, O_RDWR);
     if (serial_port < 0)
     {
         fprintf(stderr, "Error starting serial comms\n");
@@ -114,8 +114,69 @@ bool SerialComm::start_uart_comm(void)
 
     return true;
 
-#elif USE_TCP
-    // Create a socket for the TCP connection
+#elif WIN32_SERIAL
+
+    // Open the COM port
+    hComm = CreateFile(SERIAL_PORT, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+    if (hComm == INVALID_HANDLE_VALUE)
+    {
+        DWORD errCode = GetLastError();
+        fprintf(stderr, "Error opening COM port. Error code: %lu\n", errCode);
+        exit(EXIT_FAILURE); // Terminate the program with failure status
+        return false;
+    }
+
+    // Configure the COM port
+    DCB dcbSerialParams = {0};
+    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+    if (!GetCommState(hComm, &dcbSerialParams))
+    {
+        fprintf(stderr, "Error getting COM port state\n");
+        exit(EXIT_FAILURE); // Terminate the program with failure status
+        return false;
+    }
+
+    dcbSerialParams.BaudRate = BAUD_RATE;
+    dcbSerialParams.ByteSize = 8;
+    dcbSerialParams.StopBits = ONESTOPBIT;
+    dcbSerialParams.Parity = NOPARITY;
+
+    if (!SetCommState(hComm, &dcbSerialParams))
+    {
+        fprintf(stderr, "Error setting COM port state\n");
+        return false;
+    }
+
+    // Set timeouts for the serial port
+    COMMTIMEOUTS timeouts = {0};
+    timeouts.ReadIntervalTimeout = 50;         // Maximum time between two bytes, in ms
+    timeouts.ReadTotalTimeoutConstant = 50;    // Total timeout constant, in ms
+    timeouts.ReadTotalTimeoutMultiplier = 10;  // Per-byte timeout multiplier, in ms
+    timeouts.WriteTotalTimeoutConstant = 50;   // Write timeout constant, in ms
+    timeouts.WriteTotalTimeoutMultiplier = 10; // Per-byte write timeout multiplier, in ms
+
+    if (!SetCommTimeouts(hComm, &timeouts))
+    {
+        fprintf(stderr, "Error setting COM port timeouts\n");
+        return false;
+    }
+
+    return true;
+
+#else // Create a TCP connection, most of the logic is common to WSL_TCP and WIN32
+
+#ifdef WIN32_TCP // Initialize WinSock (Windows only)
+
+    WSADATA wsaData;
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+    {
+        fprintf(stderr, "WSAStartup failed\n");
+        return false;
+    }
+
+#endif
+
+    // Create a socket for the TCP connection - common for windows and linux
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0)
     {
@@ -136,22 +197,30 @@ bool SerialComm::start_uart_comm(void)
     }
 
     // Set the socket to non-blocking mode
+
+#ifdef WIN32_TCP
+
+    u_long mode = 1;
+    ioctlsocket(sock, FIONBIO, &mode);
+
+#else // WSL_TCP
+
     int flags = fcntl(sock, F_GETFL, 0);
     fcntl(sock, F_SETFL, flags | O_NONBLOCK);
 
-    tcp_socket_fd = sock;                                                  // Ensure the global file descriptor is set
-    PrintPass::c_printf("tcp_socket_fd initialized: %d\n", tcp_socket_fd); // Debug log
+#endif
+
+    tcp_socket_fd = sock;                                     // Ensure the global file descriptor is set
+    printf("tcp_socket_fd initialized: %d\n", tcp_socket_fd); // Debug log
 
     return true;
 
-#else
-#error "Please define USE_UART or USE_TCP."
-#endif
+#endif // JETSON_B01_SERIAL
 }
 
 /********************************************************************************
  * Function: send_uart
- * Description: Send a buffer of bytes on the uart serial port.
+ * Description: Send a buffer of bytes on the UART serial port or TCP connection.
  ********************************************************************************/
 void SerialComm::write_uart(mavlink_message_t &msg)
 {
@@ -160,120 +229,170 @@ void SerialComm::write_uart(mavlink_message_t &msg)
 
     offset_buffer(buffer, len, msg);
 
-#ifdef USE_UART
-    // Write to serial port
+#ifdef JETSON_B01_SERIAL
+
     uint16_t n = write(serial_port, buffer, len);
-
-    if (MAVLINK_MAX_PACKET_LEN < len)
-    {
-        fprintf(stderr, "Buffer too large\n");
-    }
-
     if (n < 0)
     {
         fprintf(stderr, "Error writing to serial port\n");
     }
 
-    clear_buffer(buffer, len);
+#elif WIN32_SERIAL
 
-#elif USE_TCP
-    // Write to serial port
-    uint16_t n = sendto(sock, buffer, len, 0, (struct sockaddr *)&sim_addr, sizeof(sim_addr));
-
-    if (MAVLINK_MAX_PACKET_LEN < len)
+    DWORD bytesWritten;
+    if (!WriteFile(hComm, buffer, len, &bytesWritten, NULL))
     {
-        fprintf(stderr, "Buffer too large\n");
+        fprintf(stderr, "Error writing to COM port\n");
     }
 
-    if (n < 0)
+#elif WSL_TCP || WIN32_TCP // send over TCP, common to WSL_TCP and WIN32_TCP
+
+    int n = send(tcp_socket_fd, (const char *)buffer, len, 0);
+    if (n == SOCKET_ERROR)
     {
-        fprintf(stderr, "Error writing to serial port\n");
+        fprintf(stderr, "Error writing to TCP socket\n");
     }
 
-    clear_buffer(buffer, len);
 #else
-#error "Please define USE_UART or USE_TCP."
-#endif
+
+#error "Please define the intended build target."
+
+#endif // JETSON_B01_SERIAL
+
+    clear_buffer(buffer, len);
 }
 
 /********************************************************************************
  * Function: read_uart
- * Description: Read some bytes from the uart serial port.
+ * Description: Read some bytes from the UART serial port or TCP connection.
  ********************************************************************************/
 uint8_t SerialComm::read_uart(void)
 {
-#if USE_UART
-    uint8_t byte;
+    uint8_t byte = 0;
+    int n = 0; // Declare n to avoid undeclared identifier error
+
+#ifdef JETSON_B01_SERIAL
 
     if (read(serial_port, &byte, 1) == -1)
     {
         fprintf(stderr, "Error reading from serial port\n");
     }
 
-    return byte;
+#elif WIN32_SERIAL
 
-#elif USE_TCP
-    uint8_t byte;
+    if (hComm == INVALID_HANDLE_VALUE)
+    {
+        DWORD errCode = GetLastError();
+        fprintf(stderr, "Error opening COM port. Error code: %lu\n", errCode);
+        return false;
+    }
 
-    ssize_t n = recv(sock, &byte, sizeof(byte), 0);
+    DWORD bytesRead;
+    if (!ReadFile(hComm, &byte, 1, &bytesRead, NULL))
+    {
+        DWORD errCode = GetLastError();
+        fprintf(stderr, "Error reading from COM port. Error code: %lu\n", errCode);
+    }
+
+#elif WSL_TCP || WIN32_TCP // read TCP port common to WSL_TCP and WIN32_TCP
+
+    n = recv(tcp_socket_fd, (char *)&byte, sizeof(byte), 0);
     if (n < 0)
     {
         fprintf(stderr, "Error reading from TCP port\n");
     }
 
-    return byte;
 #else
-#error "Please define USE_UART or USE_TCP."
-#endif
+
+#error "Please define the intended build target."
+
+#endif // JETSON_B01_SERIAL
+
+    return byte;
 }
 
 /********************************************************************************
  * Function: stop_uart_comm
- * Description: Close the serial port so it is no longer able to transmit.
+ * Description: Close the serial port or TCP connection.
  ********************************************************************************/
 void SerialComm::stop_uart_comm(void)
 {
-#if USE_UART
+
+#ifdef JETSON_B01_SERIAL
+
     close(serial_port);
-#elif USE_TCP
-    close(sock);
+
+#elif WIN32_SERIAL
+
+    CloseHandle(hComm);
+
+#elif WIN32_TCP
+
+    closesocket(tcp_socket_fd);
+    WSACleanup();
+
+#elif WSL_TCP
+
+    close(tcp_socket_fd);
+
 #else
-#error "Please define USE_UART or USE_TCP."
-#endif
+
+#error "Please define the intended build target."
+
+#endif // JETSON_B01_SERIAL
+
 }
 
 /********************************************************************************
  * Function: bytes_available
- * Description: Close the serial port so it is no longer able to transmit.
+ * Description: Check how many bytes are available for reading.
  ********************************************************************************/
 int SerialComm::bytes_available(void)
 {
-    int bytes;
+    int bytes = 0;
 
-#if USE_UART
+#ifdef JETSON_B01_SERIAL
 
     if (ioctl(uart_fd, FIONREAD, &bytes) == -1)
     {
         perror("ioctl");
         return -1;
     }
-    return bytes;
-#elif USE_TCP
+
+#elif WIN32_SERIAL
+
+    COMSTAT status;
+
+    DWORD errors;
+    ClearCommError(hComm, &errors, &status);
+    bytes = status.cbInQue;
+
+#elif WIN32_TCP
+
+    u_long availableBytes = 0;
+    ioctlsocket(tcp_socket_fd, FIONREAD, &availableBytes);
+    bytes = (int)availableBytes;
+
+#elif WSL_TCP // WSL_TCP
 
     if (ioctl(tcp_socket_fd, FIONREAD, &bytes) == -1)
     {
-        PrintPass::c_printf("ioctl\n");
+        perror("ioctl");
         return -1;
     }
-    return bytes;
+
 #else
-#error "Please define USE_UART or USE_TCP."
-#endif
+
+#error "Please define the intended build target."
+
+#endif // JETSON_B01_SERIAL
+
+    return bytes;
 }
 
 /********************************************************************************
  * Function: offset_buffer
- * Description: Offset the buffer by the its length to avoid overlapping buffers.
+ * Description: Offset the buffer by its length to avoid overlapping buffers.
  ********************************************************************************/
 void SerialComm::offset_buffer(uint8_t *buffer, uint16_t &len, mavlink_message_t &msg)
 {
@@ -282,7 +401,7 @@ void SerialComm::offset_buffer(uint8_t *buffer, uint16_t &len, mavlink_message_t
 
 /********************************************************************************
  * Function: clear_buffer
- * Description: Clear the buffer
+ * Description: Clear the buffer.
  ********************************************************************************/
 void SerialComm::clear_buffer(uint8_t *buffer, uint16_t len)
 {

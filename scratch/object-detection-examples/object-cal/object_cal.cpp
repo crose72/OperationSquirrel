@@ -42,13 +42,18 @@ const int required_sigint_count = 3;
 std::chrono::steady_clock::time_point last_sigint_time;
 std::chrono::seconds sigint_time_window(5); // Calibratable time window
 std::mutex image_mutex;
-int capture_delay = 10;
+int capture_delay = 15;
 
 float box_width;
 float box_height;
+float box_left;
+float box_right;
+float box_top;
+float box_bottom;
 float box_center_x;
 float box_center_y;
 uint32_t class_id;
+bool person_centered;
 
 // Timer variable
 std::chrono::steady_clock::time_point countdown_start;
@@ -91,40 +96,62 @@ void process_detections(detectNet::Detection *detections, int numDetections, vid
     for (int n = 0; n < numDetections; n++)
     {
         detectNet::Detection &detection = detections[n];
+        // If centered, show a green border
+        cv::Mat frame(cv::Size(frame_width, frame_height), CV_8UC3, (void *)image, cv::Mat::AUTO_STEP);
 
         // Determine if the object is centered
         if (is_centered(detection, frame_width, frame_height))
         {
-            // If centered, show a green border
-            cv::Mat frame(cv::Size(frame_width, frame_height), CV_8UC3, (void *)image, cv::Mat::AUTO_STEP);
             cv::rectangle(frame, cv::Point(0, 0), cv::Point(frame_width, frame_height), cv::Scalar(0, 255, 0), 4);
+            person_centered = true;
+        }
+        else
+        {
+            person_centered = false;
+        }
 
-            if (detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
-            {
-                // Print the size, width, and center of the bounding box
-                box_width = detection.Width();
-                box_height = detection.Height();
-                box_center_x = (detection.Left + detection.Right) / 2.0;
-                box_center_y = (detection.Top + detection.Bottom) / 2.0;
-                class_id = detections[n].ClassID;
+        if (detections[n].ClassID == 1 && detections[n].Confidence > 0.5)
+        {
+            // Print the size, width, and center of the bounding box
+            box_width = detection.Width();
+            box_height = detection.Height();
+            box_center_x = (detection.Left + detection.Right) / 2.0;
+            box_center_y = (detection.Top + detection.Bottom) / 2.0;
+            box_left = detection.Left;
+            box_right = detection.Right;
+            box_top = detection.Top;
+            box_bottom = detection.Bottom;
+            class_id = detections[n].ClassID;
 
-                std::cout << "Bounding box: width=" << box_width << ", height=" << box_height << std::endl;
-                std::cout << "Center of box: (" << box_center_x << ", " << box_center_y << ")" << std::endl;
-            }
+            // Prepare the text to overlay (Box width and height)
+            std::stringstream ss;
+            ss << "Width: " << box_width << " Height: " << box_height << " Left: " << box_left << " Right: " << box_right << " Top: " << box_top << " Bottom: " << box_bottom << " Center X: " << box_center_x << " Center Y: " << box_center_y;
+
+            // Overlay the text on the image at the upper right-hand corner
+            int fontFace = cv::FONT_HERSHEY_SIMPLEX;
+            double fontScale = 0.6;
+            int thickness = 1;
+            int baseline = 0;
+            cv::Size textSize = cv::getTextSize(ss.str(), fontFace, fontScale, thickness, &baseline);
+
+            // Calculate position: upper right-hand corner
+            cv::Point textOrg(frame_width - textSize.width - 10, textSize.height + 10); // Adjust as needed
+
+            // Draw the text on the image
+            cv::putText(frame, ss.str(), textOrg, fontFace, fontScale, cv::Scalar(255, 255, 255), thickness);
+
+            std::cout << "Bounding box: width=" << box_width << ", height=" << box_height << std::endl;
+            std::cout << "Center of box: (" << box_center_x << ", " << box_center_y << ")" << std::endl;
         }
     }
 }
 
 void capture_image(uchar3 *image, int frame_width, int frame_height)
 {
-    // Only print for the "person" class, which has ClassID == 1
-
-    // Convert the image to OpenCV format
     cv::Mat frame(cv::Size(frame_width, frame_height), CV_8UC3, (void *)image, cv::Mat::AUTO_STEP);
 
-    // Prepare the text to overlay (Box width and height)
     std::stringstream ss;
-    ss << "Width: " << box_width << " Height: " << box_height << "Center X: " << box_center_x << " Center Y: " << box_center_y << "Class: " << class_id;
+    ss << "Width: " << box_width << " Height: " << box_height << " Left: " << box_left << " Right: " << box_right << " Top: " << box_top << " Bottom: " << box_bottom << " Center X: " << box_center_x << " Center Y: " << box_center_y;
 
     // Overlay the text on the image at the upper right-hand corner
     int fontFace = cv::FONT_HERSHEY_SIMPLEX;
@@ -150,7 +177,7 @@ void capture_image(uchar3 *image, int frame_width, int frame_height)
 
 void process_image_capture(uchar3 *image, int frame_width, int frame_height)
 {
-    if (countdown_started && !image_captured && std::chrono::steady_clock::now() >= countdown_end)
+    if (!image_captured && std::chrono::steady_clock::now() >= countdown_end)
     {
         std::cout << "Countdown finished. Capturing image..." << std::endl;
         capture_image(image, frame_width, frame_height); // Capture image after countdown
@@ -338,7 +365,7 @@ int main(int argc, char **argv)
         }
 
         // Check if fewer than 3 SIGINT signals were received in the time window
-        if (sigint_count == 1 && std::chrono::steady_clock::now() - last_sigint_time > sigint_time_window)
+        if ((sigint_count >= 1 && sigint_count < 3) && std::chrono::steady_clock::now() - last_sigint_time > sigint_time_window)
         {
             std::cout << "SIGINT not repeated 3 times within the time window. Capturing image." << std::endl;
             process_image_capture(image, 1280, 720);

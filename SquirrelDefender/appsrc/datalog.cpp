@@ -22,11 +22,11 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool headings_written = false;
-std::string dataFilePath = "../data/";
-std::string dataFileName = "data";
-std::string file_name = "";
-std::vector<std::vector<std::string>> data = {};
+bool headings_written;
+std::string data_file_path;
+std::string data_file_name;
+std::string file_name;
+std::vector<std::vector<std::string>> data;
 
 /********************************************************************************
  * Calibration definitions
@@ -35,34 +35,26 @@ std::vector<std::vector<std::string>> data = {};
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-
-/********************************************************************************
- * Function: DataLogger
- * Description: Class constructor
- ********************************************************************************/
-DataLogger::DataLogger() {};
-
-/********************************************************************************
- * Function: ~DataLogger
- * Description: Class destructor
- ********************************************************************************/
-DataLogger::~DataLogger() {};
+static void write_headers(void);
+static void load_signals_from_file(const std::string &header_file_path);
+static void save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data);
+static std::string generate_unique_filename(const std::string &filename);
 
 /********************************************************************************
  * Function: generate_unique_filename
  * Description: If file exists, append an incremented number to the file name.
  ********************************************************************************/
-std::string DataLogger::generate_unique_filename(const std::string &filename)
+std::string generate_unique_filename(const std::string &filename)
 {
     int counter = 1;
-    std::string new_file_name = dataFilePath + filename + ".csv"; // Add .csv extension initially
+    std::string new_file_name = data_file_path + filename + ".csv"; // Add .csv extension initially
     std::ifstream file(new_file_name);
 
     while (file.is_open() == true)
     {
         file.close();
         // If the file exists, append the counter number and try again
-        new_file_name = dataFilePath + filename + "_" + std::to_string(counter++) + ".csv";
+        new_file_name = data_file_path + filename + "_" + std::to_string(counter++) + ".csv";
         file.open(new_file_name);
     }
 
@@ -73,7 +65,7 @@ std::string DataLogger::generate_unique_filename(const std::string &filename)
  * Function: save_to_csv
  * Description: Write the data passed to this function into a CSV.
  ********************************************************************************/
-void DataLogger::save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data)
+void save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data)
 {
     std::ofstream outFile(filename, std::ios_base::app); // Open in append mode
     if (!outFile.is_open())
@@ -106,165 +98,175 @@ void DataLogger::save_to_csv(const std::string &filename, const std::vector<std:
 }
 
 /********************************************************************************
- * Function: data_log_init
- * Description: Initialize data log variables and files.
+ * Function: write_headers
+ * Description: Write the column headers of the log file.
  ********************************************************************************/
-bool DataLogger::data_log_init(void)
+void write_headers(void)
 {
-
-#ifdef JETSON_B01
-
-    file_name = generate_unique_filename(dataFileName);
-    data.push_back({"Time",
-                    "System State",
-                    "x_actual",
-                    "height_actual",
-                    "y_actual",
-                    "width_actual",
-                    "x_centroid_err",
-                    "target_height_err",
-                    "y_centroid_err",
-                    "target_left_side",
-                    "target_right_side",
-                    "target_left_err",
-                    "target_right_err",
-                    "target_height_err_rev",
-                    "Target identified",
-                    "Target too close",
-                    "Vx adjust",
-                    "Vy adjust",
-                    "Vz adjust",
-                    "Voltage Battery",
-                    "Current Battery",
-                    "Battery Remaining",
-                    "Relative Altitude",
-                    "GPS Vx",
-                    "GPS Vy",
-                    "GPS Vz",
-                    "GPS Heading",
-                    "Roll",
-                    "Pitch",
-                    "Yaw",
-                    "Rollspeed",
-                    "Pitchspeed",
-                    "Yawspeed",
-                    "IMU Accel X",
-                    "IMU Accel Y",
-                    "IMU Accel Z",
-                    "IMU Gyro X",
-                    "IMU Gyro Y",
-                    "IMU Gyro Z",
-                    "Rangefinder Current Distance",
-                    "Rangefinder Signal Quality",
-                    "Optical Flow Compensated X",
-                    "Optical Flow Compensated Y",
-                    "Optical Flow X",
-                    "Optical Flow Y",
-                    "Optical Flow Quality",
-                    "Flow Rate X",
-                    "Flow Rate Y",
-                    "NED X",
-                    "NED Y",
-                    "NED Z",
-                    "NED Vx",
-                    "NED Vy",
-                    "NED Vz",
+    data.push_back({"app_elapsed_time",
+                    "system_state",
+                    "target_too_close",
+                    "target_valid",
+                    "target_detection_ID",
+                    "target_track_ID",
+                    "target_cntr_offset_x",
+                    "target_cntr_offset_y",
+                    "target_height",
+                    "target_width",
+                    "target_aspect",
+                    "target_left",
+                    "target_right",
+                    "target_top",
+                    "target_bottom",
+                    "d_object_h",
+                    "d_object_w",
+                    "x_object",
+                    "y_object",
+                    "z_object",
+                    "d_object",
+                    "x_error",
+                    "y_error",
+                    "delta_angle",
+                    "camera_tilt_angle",
+                    "delta_d_x",
+                    "delta_d_z",
+                    "vx_adjust",
+                    "vy_adjust",
+                    "vz_adjust",
+                    "mav_veh_sys_stat_voltage_battery",
+                    "mav_veh_sys_stat_current_battery",
+                    "mav_veh_sys_stat_battery_remaining",
+                    "mav_veh_rel_alt",
+                    "mav_veh_gps_vx",
+                    "mav_veh_gps_vy",
+                    "mav_veh_gps_vz",
+                    "mav_veh_gps_hdg",
+                    "mav_veh_roll",
+                    "mav_veh_pitch",
+                    "mav_veh_yaw",
+                    "mav_veh_rollspeed",
+                    "mav_veh_pitchspeed",
+                    "mav_veh_yawspeed",
+                    "mav_veh_imu_ax",
+                    "mav_veh_imu_ay",
+                    "mav_veh_imu_az",
+                    "mav_veh_imu_xgyro",
+                    "mav_veh_imu_ygyro",
+                    "mav_veh_imu_zgyro",
+                    "mav_veh_rngfdr_current_distance",
+                    "mav_veh_rngfdr_signal_quality",
+                    "mav_veh_flow_comp_m_x",
+                    "mav_veh_flow_comp_m_y",
+                    "mav_veh_flow_x",
+                    "mav_veh_flow_y",
+                    "mav_veh_flow_quality",
+                    "mav_veh_flow_rate_x",
+                    "mav_veh_flow_rate_y",
+                    "mav_veh_local_ned_x",
+                    "mav_veh_local_ned_y",
+                    "mav_veh_local_ned_z",
+                    "mav_veh_local_ned_vx",
+                    "mav_veh_local_ned_vy",
+                    "mav_veh_local_ned_vz",
                     "mav_veh_q1_actual",
                     "mav_veh_q2_actual",
                     "mav_veh_q3_actual",
                     "mav_veh_q4_actual",
                     "mav_veh_roll_rate_actual",
                     "mav_veh_pitch_rate_actual",
-                    "mav_veh_yaw_rate_actuald",
+                    "mav_veh_yaw_rate_actual",
                     "mav_veh_repr_offset_q[0]",
                     "mav_veh_repr_offset_q[1]",
                     "mav_veh_repr_offset_q[2]",
-                    "mav_veh_repr_offset_q[3]"});
-
-#elif WSL
-
-    data.push_back({"Time",
-                    "Voltage Battery",
-                    "Current Battery",
-                    "Battery Remaining",
-                    "Relative Altitude",
-                    "GPS Vx",
-                    "GPS Vy",
-                    "GPS Vz",
-                    "GPS Heading",
-                    "Roll",
-                    "Pitch",
-                    "Yaw",
-                    "Rollspeed",
-                    "Pitchspeed",
-                    "Yawspeed",
-                    "IMU Accel X",
-                    "IMU Accel Y",
-                    "IMU Accel Z",
-                    "IMU Gyro X",
-                    "IMU Gyro Y",
-                    "IMU Gyro Z",
-                    "Rangefinder Current Distance",
-                    "Rangefinder Signal Quality",
-                    "Optical Flow Compensated X",
-                    "Optical Flow Compensated Y",
-                    "Optical Flow X",
-                    "Optical Flow Y",
-                    "Optical Flow Quality",
-                    "Flow Rate X",
-                    "Flow Rate Y",
-                    "NED X",
-                    "NED Y",
-                    "NED Z",
-                    "NED Vx",
-                    "NED Vy",
-                    "NED Vz",
-                    "mav_veh_q1_actual",
-                    "mav_veh_q2_actual",
-                    "mav_veh_q3_actual",
-                    "mav_veh_q4_actual",
-                    "mav_veh_roll_rate_actual",
-                    "mav_veh_pitch_rate_actual",
-                    "mav_veh_yaw_rate_actuald",
-                    "mav_veh_repr_offset_q[0]",
-                    "mav_veh_repr_offset_q[1]",
-                    "mav_veh_repr_offset_q[2]",
-                    "mav_veh_repr_offset_q[3]"});
-
-#endif // JETSON_B01
+                    "mav_veh_repr_offset_q[3]",
+                    "mav_veh_type",
+                    "mav_veh_autopilot_type",
+                    "mav_veh_base_mode",
+                    " mav_veh_custom_mode",
+                    "mav_veh_state",
+                    "mav_veh_mavlink_version"});
 
     save_to_csv(file_name, data);
+}
+
+/********************************************************************************
+ * Function: DataLogger
+ * Description: Class constructor
+ ********************************************************************************/
+DataLogger::DataLogger() {};
+
+/********************************************************************************
+ * Function: ~DataLogger
+ * Description: Class destructor
+ ********************************************************************************/
+DataLogger::~DataLogger() {};
+
+/********************************************************************************
+ * Function: init
+ * Description: Initialize data log variables and files.
+ ********************************************************************************/
+bool DataLogger::init(void)
+{
+#ifdef JETSON_B01
+
+    data_file_path = "../data/";
+
+#elif _WIN32
+
+    data_file_path = "../../data/";
+
+#else
+
+#error "Please define a build platform."
+
+#endif
+
+    headings_written = false;
+    data_file_name = "data";
+    file_name = "";
+    data = {};
+
+    file_name = generate_unique_filename(data_file_name);
+    write_headers();
 
     return true;
 }
 
 /********************************************************************************
- * Function: data_log_loop
+ * Function: loop
  * Description: Log data.
  ********************************************************************************/
-void DataLogger::data_log_loop(void)
+void DataLogger::loop(void)
 {
-    // Clear data vector and write to next row
     data.clear();
-
-#ifdef JETSON_B01
 
     data.push_back({{std::to_string(app_elapsed_time),
                      std::to_string(system_state),
-                     std::to_string(x_actual),
-                     std::to_string(height_actual),
-                     std::to_string(y_actual),
-                     std::to_string(width_actual),
-                     std::to_string(x_centroid_err),
-                     std::to_string(target_height_err),
-                     std::to_string(y_centroid_err),
-                     std::to_string(target_left_side),
-                     std::to_string(target_right_side),
-                     std::to_string(target_left_err),
-                     std::to_string(target_right_err),
-                     std::to_string(target_height_err_rev),
-                     std::to_string(target_identified),
                      std::to_string(target_too_close),
+                     std::to_string(target_valid),
+                     std::to_string(target_detection_ID),
+                     std::to_string(target_track_ID),
+                     std::to_string(target_cntr_offset_x),
+                     std::to_string(target_cntr_offset_y),
+                     std::to_string(target_height),
+                     std::to_string(target_width),
+                     std::to_string(target_aspect),
+                     std::to_string(target_left),
+                     std::to_string(target_right),
+                     std::to_string(target_top),
+                     std::to_string(target_bottom),
+                     std::to_string(d_object_h),
+                     std::to_string(d_object_w),
+                     std::to_string(x_object),
+                     std::to_string(y_object),
+                     std::to_string(z_object),
+                     std::to_string(d_object),
+                     std::to_string(x_error),
+                     std::to_string(y_error),
+                     std::to_string(delta_angle),
+                     std::to_string(camera_tilt_angle),
+                     std::to_string(delta_d_x),
+                     std::to_string(delta_d_z),
                      std::to_string(vx_adjust),
                      std::to_string(vy_adjust),
                      std::to_string(vz_adjust),
@@ -294,7 +296,7 @@ void DataLogger::data_log_loop(void)
                      std::to_string(mav_veh_flow_comp_m_y),
                      std::to_string(mav_veh_flow_x),
                      std::to_string(mav_veh_flow_y),
-                     std::to_string(mav_veh_quality),
+                     std::to_string(mav_veh_flow_quality),
                      std::to_string(mav_veh_flow_rate_x),
                      std::to_string(mav_veh_flow_rate_y),
                      std::to_string(mav_veh_local_ned_x),
@@ -313,59 +315,13 @@ void DataLogger::data_log_loop(void)
                      std::to_string(mav_veh_repr_offset_q[0]),
                      std::to_string(mav_veh_repr_offset_q[1]),
                      std::to_string(mav_veh_repr_offset_q[2]),
-                     std::to_string(mav_veh_repr_offset_q[3])}});
-
-#elif WSL
-
-    data.push_back({{std::to_string(app_elapsed_time),
-                     std::to_string(mav_veh_sys_stat_voltage_battery),
-                     std::to_string(mav_veh_sys_stat_current_battery),
-                     std::to_string(mav_veh_sys_stat_battery_remaining),
-                     std::to_string(mav_veh_rel_alt),
-                     std::to_string(mav_veh_gps_vx),
-                     std::to_string(mav_veh_gps_vy),
-                     std::to_string(mav_veh_gps_vz),
-                     std::to_string(mav_veh_gps_hdg),
-                     std::to_string(mav_veh_roll),
-                     std::to_string(mav_veh_pitch),
-                     std::to_string(mav_veh_yaw),
-                     std::to_string(mav_veh_rollspeed),
-                     std::to_string(mav_veh_pitchspeed),
-                     std::to_string(mav_veh_yawspeed),
-                     std::to_string(mav_veh_imu_ax),
-                     std::to_string(mav_veh_imu_ay),
-                     std::to_string(mav_veh_imu_az),
-                     std::to_string(mav_veh_imu_xgyro),
-                     std::to_string(mav_veh_imu_ygyro),
-                     std::to_string(mav_veh_imu_zgyro),
-                     std::to_string(mav_veh_rngfdr_current_distance),
-                     std::to_string(mav_veh_rngfdr_signal_quality),
-                     std::to_string(mav_veh_flow_comp_m_x),
-                     std::to_string(mav_veh_flow_comp_m_y),
-                     std::to_string(mav_veh_flow_x),
-                     std::to_string(mav_veh_flow_y),
-                     std::to_string(mav_veh_quality),
-                     std::to_string(mav_veh_flow_rate_x),
-                     std::to_string(mav_veh_flow_rate_y),
-                     std::to_string(mav_veh_local_ned_x),
-                     std::to_string(mav_veh_local_ned_y),
-                     std::to_string(mav_veh_local_ned_z),
-                     std::to_string(mav_veh_local_ned_vx),
-                     std::to_string(mav_veh_local_ned_vy),
-                     std::to_string(mav_veh_local_ned_vz),
-                     std::to_string(mav_veh_q1_actual),
-                     std::to_string(mav_veh_q2_actual),
-                     std::to_string(mav_veh_q3_actual),
-                     std::to_string(mav_veh_q4_actual),
-                     std::to_string(mav_veh_roll_rate_actual),
-                     std::to_string(mav_veh_pitch_rate_actual),
-                     std::to_string(mav_veh_yaw_rate_actual),
-                     std::to_string(mav_veh_repr_offset_q[0]),
-                     std::to_string(mav_veh_repr_offset_q[1]),
-                     std::to_string(mav_veh_repr_offset_q[2]),
-                     std::to_string(mav_veh_repr_offset_q[3])}});
-
-#endif // JETSON_B01
+                     std::to_string(mav_veh_repr_offset_q[3]),
+                     std::to_string(mav_veh_type),
+                     std::to_string(mav_veh_autopilot_type),
+                     std::to_string(mav_veh_base_mode),
+                     std::to_string(mav_veh_custom_mode),
+                     std::to_string(mav_veh_state),
+                     std::to_string(mav_veh_mavlink_version)}});
 
     save_to_csv(file_name, data);
 }
