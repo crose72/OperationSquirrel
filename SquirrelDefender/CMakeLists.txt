@@ -144,7 +144,7 @@ elseif (WIN32)
         "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/lib/x64"
     )
 
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>$<$<CONFIG:RelWithDebInfo>:Release>")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
 endif()
 
 # squirreldefender and source file paths
