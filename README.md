@@ -1,6 +1,6 @@
 # OperationSquirrel
 
-This project is aimed at creating an autonomous drone to defend homes from squirrels.  Advanced control methods, path planning algorithms, localization, and AI/machine learning techniques will be deployed to achieve this goal.  The scope of this project is narrow, but the applications vary widely, as all of the engineering feats that need to be accomplished along the way are stepping stones for other exciting problems.  The work we do for this project can be expanded to defend crops from birds, home security, deliveries, or any other creative use you can come up with.
+This project is aimed at creating an autonomous drone to deliver static and/or dynamic payloads to a moving target.  Advanced control methods, path planning algorithms, localization, AI/ML techniques and more will be deployed to achieve this goal.  The engineering feats accomplished along the way are stepping stones for other exciting problems.  The work done for this project can be expanded to protect crops from birds, home security, deliveries, or any other creative use.
 
 - `arduPilot` - parameters, firmware and any other ardupilot and vehicle specific things
 - `docs` - instructions on how to set up the workflow and various other things
