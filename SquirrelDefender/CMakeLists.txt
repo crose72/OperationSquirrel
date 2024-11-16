@@ -3,12 +3,15 @@ cmake_minimum_required(VERSION 2.8)
 # Project definition
 project(SquirrelDefender)
 
-# Choose ONLY ONE platform for the build 
-option(JETSON_B01 "Compiling for Jetson Nano B01" ON)
+# Choose ONLY ONE platform for the build (JETSON_B01, WSL, WIN32) 
+option(JETSON_B01 "Compiling for Jetson Nano B01" OFF)
+
 option(WSL "Compiling for WSL" OFF)
-option(TCP "Compiling for Windows simulated environment" OFF)
+
+option(WIN32, "Compiling for Windows environment" ON)
+option(TCP "Compiling for Windows simulated environment" ON)
 option(SERIAL "Compiling for Windows with connected physical devices" OFF)
-option(ENABLE_CV "Enable video and computer vision functionality" ON)
+option(ENABLE_CV "Compiling for Windows with video and computer vision functionality" ON)
 
 # Ensure only one build platform is selected
 set(BUILD_PLATFORMS 0)
@@ -92,7 +95,7 @@ elseif(WIN32 AND TCP)
     add_definitions(-DSIM_VEH)
     add_definitions(-DWIN32_TCP)
     message("Building for _WIN32 with TCP comms.")
-elseif(WIN32 and SERIAL)
+elseif(WIN32 AND SERIAL)
     add_definitions(-DREAL_VEH)
     add_definitions(-DWIN32_SERIAL)
     message("Building for _WIN32 with serial comms.")
