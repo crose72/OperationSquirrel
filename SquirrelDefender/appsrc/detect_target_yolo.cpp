@@ -1,5 +1,5 @@
 #ifdef ENABLE_CV
-#ifdef _WIN32
+#ifdef BLD_WIN
 
 /********************************************************************************
  * @file    detect_target_yolo.cpp
@@ -81,5 +81,5 @@ void YOLO::shutdown(void)
 
 }
 
-#endif // _WIN32
+#endif // BLD_WIN
 #endif // ENABLE_CV

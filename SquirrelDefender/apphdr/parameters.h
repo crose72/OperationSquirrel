@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 /********************************************************************************
  * @file    parameters.h
@@ -48,4 +48,4 @@ private:
 
 #endif // PARAMETERS_H
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01

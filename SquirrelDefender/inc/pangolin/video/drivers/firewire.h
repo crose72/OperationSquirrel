@@ -31,7 +31,7 @@
 
 #include <dc1394/dc1394.h>
 
-#ifndef _WIN32
+#ifndef BLD_WIN
 #include <unistd.h>
 #endif
 

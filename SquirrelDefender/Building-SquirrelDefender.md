@@ -24,8 +24,8 @@ First you will want to update CMake to 3.28, the version we are currently using.
 	sudo ./cmake-3.28.0-linux-aarch64.sh --prefix=/usr/local --exclude-subdir
 ```
 
-The CMake file allows you to choose the platform you are compiling for.  Currently the supported options are JETSON_B01 and WSL.  Enable one option at a time:
-- `option(JETSON_B01 "Enable Jetson Nano specific features" ON)`
+The CMake file allows you to choose the platform you are compiling for.  Currently the supported options are BLD_JETSON_B01 and WSL.  Enable one option at a time:
+- `option(BLD_JETSON_B01 "Enable Jetson Nano specific features" ON)`
 - `option(WSL "Enable WSL specific features" OFF)`
 
 You must also specify a Debug or Release build.  Debug enables all print statements.  Release disables most print statements to save throughtput for the program:

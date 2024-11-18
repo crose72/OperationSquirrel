@@ -17,7 +17,7 @@
 #include <sstream>
 #include <iomanip>
 
-#ifdef _WIN32
+#ifdef BLD_WIN
 #ifndef WIN32
 #define WIN32
 #endif

@@ -2,7 +2,7 @@
 
 #if defined(__linux__) || defined(__linux) || defined(linux) || defined(_LINUX)
     #define DYNALO_HAS_LINUX
-#elif defined(_WIN32) || defined(_WIN64)
+#elif defined(BLD_WIN) || defined(_WIN64)
     #define DYNALO_HAS_WINDOWS
 #elif defined(__APPLE__)
     #define DYNALO_HAS_MACOS

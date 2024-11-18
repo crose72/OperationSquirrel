@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef ENABLE_CV
-#ifdef _WIN32
+#ifdef BLD_WIN
 
 /********************************************************************************
  * @file    detect_target_yolo.h
@@ -28,11 +28,11 @@
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 extern uchar3* image;
 
-#elif _WIN32
+#elif BLD_WIN
 
 extern cv::Mat image;
 
@@ -46,11 +46,11 @@ extern cv::Mat image;
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 /* None */
 
-#elif _WIN32
+#elif BLD_WIN
 
 extern std::vector<yolo_net::detection> yolo_detections;
 extern int yolo_detection_count;
@@ -80,5 +80,5 @@ private:
 
 #endif // DETECT_TARGET_YOLO_H
 
-#endif // _WIN32
+#endif // BLD_WIN
 #endif // ENABLE_CV
