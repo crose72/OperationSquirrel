@@ -181,7 +181,7 @@ void get_control_params(void)
  ********************************************************************************/
 void calc_follow_error(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 #ifdef DEBUG_BUILD
 
     Parameters target_params("../params.json");
@@ -189,7 +189,7 @@ void calc_follow_error(void)
     x_desired = target_params.get_float_param("Target", "Desired_X_offset");
 
 #endif // DEBUG_BUILD
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 
     if (d_object < 0.001f)
     {

@@ -1,5 +1,5 @@
 #ifdef ENABLE_CV
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 /********************************************************************************
  * @file    video_nv_IO.cpp
@@ -414,5 +414,5 @@ void VideoNV::shutdown(void)
     LogVerbose("video:  shutdown complete.\n");
 }
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 #endif // ENABLE_CV

@@ -1820,7 +1820,7 @@ JSON_HEDLEY_DIAGNOSTIC_POP
 #if defined(JSON_HEDLEY_IMPORT)
     #undef JSON_HEDLEY_IMPORT
 #endif
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if defined(BLD_WIN) || defined(__CYGWIN__)
 #  define JSON_HEDLEY_PRIVATE
 #  define JSON_HEDLEY_PUBLIC   __declspec(dllexport)
 #  define JSON_HEDLEY_IMPORT   __declspec(dllimport)
@@ -17429,7 +17429,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
         result["version"]["minor"] = NLOHMANN_JSON_VERSION_MINOR;
         result["version"]["patch"] = NLOHMANN_JSON_VERSION_PATCH;
 
-#ifdef _WIN32
+#ifdef BLD_WIN
         result["platform"] = "win32";
 #elif defined __linux__
         result["platform"] = "linux";

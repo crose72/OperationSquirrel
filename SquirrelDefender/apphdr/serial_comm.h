@@ -16,7 +16,7 @@
 #include <mavlink.h>
 #include <common.h>
 
-#ifdef JETSON_B01 || WSL // for linux
+#ifdef BLD_JETSON_B01 || WSL // for linux
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -28,7 +28,7 @@
 #include <cstdint> // for uint8_t, uint16_t, etc.
 #include <termios.h>
 
-#elif _WIN32
+#elif BLD_WIN
 
 #include <winsock2.h> // For TCP/IP sockets
 #include <ws2tcpip.h>

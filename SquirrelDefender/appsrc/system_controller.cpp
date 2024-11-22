@@ -118,11 +118,11 @@ int system_state_machine(void)
  ********************************************************************************/
 void led_init(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     StatusIndicators::init();
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 }
 
 /********************************************************************************
@@ -131,11 +131,11 @@ void led_init(void)
  ********************************************************************************/
 void led_init_blink(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     StatusIndicators::status_initializing();
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 }
 
 /********************************************************************************
@@ -144,11 +144,11 @@ void led_init_blink(void)
  ********************************************************************************/
 void led_bad_blink(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
         StatusIndicators::status_bad_blink();
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 }
 
 /********************************************************************************
@@ -157,7 +157,7 @@ void led_bad_blink(void)
  ********************************************************************************/
 void led_system_indicators(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     if (system_state == SYSTEM_STATE::DEFAULT ||
         system_state == SYSTEM_STATE::INIT ||
@@ -171,7 +171,7 @@ void led_system_indicators(void)
         StatusIndicators::status_good();
     }
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 }
 
 
@@ -209,14 +209,14 @@ int SystemController::init(void)
 {
     systems_initialized = false;
     
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     if (save_button_press)
     {
         return 2;
     }
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 
 #ifdef ENABLE_CV
 
@@ -270,11 +270,11 @@ void SystemController::loop(void)
     app_first_init();
     led_system_indicators();
 
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     StatusIndicators::loop();
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 }
 
 /********************************************************************************
@@ -293,12 +293,12 @@ void SystemController::shutdown(void)
 
 #endif // ENABLE_CV
 
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     StatusIndicators::status_program_complete();
     StatusIndicators::shutdown();
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 
 
 }

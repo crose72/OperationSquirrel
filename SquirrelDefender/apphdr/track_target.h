@@ -22,18 +22,18 @@
 #include <opencv2/core/utility.hpp>
 #include <opencv2/cudawarping.hpp>
 
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 #include <jetson-utils/cudaMappedMemory.h> // Assuming Jetson Inference utilities are available
 #include <jetson-utils/cudaRGB.h>          // For cuda functions
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
 
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 extern detectNet *net;
 extern detectNet::Detection *detections;
@@ -42,9 +42,9 @@ extern int detection_count;
 extern float input_video_width;
 extern float input_video_height;
 
-#endif //JETSON_B01
+#endif //BLD_JETSON_B01
 
-#ifdef _WIN32
+#ifdef BLD_WIN
 
 extern cv::dnn::Net net;
 extern std::vector<yolo_net::detection> yolo_detections;
@@ -53,7 +53,7 @@ extern cv::Mat image;
 extern float input_video_width;
 extern float input_video_height;
 
-#endif // _WIN32
+#endif // BLD_WIN
 
 extern bool valid_image_rcvd;
 extern bool target_valid;

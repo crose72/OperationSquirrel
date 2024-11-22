@@ -1,4 +1,4 @@
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 /********************************************************************************
  * @file    parameters.cpp
@@ -82,4 +82,4 @@ bool Parameters::get_bool_param(const std::string &group, const std::string &key
     return root[group][key].asBool();
 }
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01

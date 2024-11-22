@@ -108,7 +108,7 @@ void identify_target(void)
 {
     target_detection_ID = -1;
 
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     for (int n = 0; n < detection_count; n++)
     {
@@ -119,7 +119,7 @@ void identify_target(void)
         }
     }
 
-#elif _WIN32
+#elif BLD_WIN
 
     for (int n = 0; n < yolo_detection_count; n++)
     {
@@ -144,7 +144,7 @@ void identify_target(void)
  ********************************************************************************/
 void get_target_info(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     target_height = detections[target_detection_ID].Height();
     target_width = detections[target_detection_ID].Width();
@@ -159,7 +159,7 @@ void get_target_info(void)
     target_cntr_offset_x = target_center_x - center_of_frame_height;
     target_aspect = target_width / target_height;
 
-#elif _WIN32
+#elif BLD_WIN
 
     target_height = yolo_detections[target_detection_ID].Height();
     target_width = yolo_detections[target_detection_ID].Width();
@@ -187,7 +187,7 @@ void get_target_info(void)
  ********************************************************************************/
 void validate_target(void)
 {
-#if JETSON_B01
+#if BLD_JETSON_B01
 
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
        implimented. */
@@ -200,7 +200,7 @@ void validate_target(void)
         target_valid = false;
     }
 
-#elif _WIN32
+#elif BLD_WIN
 
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
    implimented. */
@@ -217,7 +217,7 @@ void validate_target(void)
 
 #error "Please define build platform."
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 
     target_valid_prv = target_valid;
 }
@@ -229,7 +229,7 @@ void validate_target(void)
  ********************************************************************************/
 void track_target(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 /* Don't wrap the image from jetson inference until a valid image has been received.
    That way we know the memory has been allocaed and is ready. */
@@ -267,7 +267,7 @@ void track_target(void)
         }
     }
 
-#elif _WIN32
+#elif BLD_WIN
 
     /* Don't wrap the image from jetson inference until a valid image has been received.
    That way we know the memory has been allocaed and is ready. */
@@ -308,7 +308,7 @@ void track_target(void)
 
 #error "Please define build platform."
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 
 }
 

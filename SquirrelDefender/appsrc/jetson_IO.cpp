@@ -1,4 +1,4 @@
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 /********************************************************************************
  * @file    jetson_IO.cpp
@@ -223,4 +223,4 @@ void StatusIndicators::shutdown(void)
     GPIO::cleanup();
 }
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01

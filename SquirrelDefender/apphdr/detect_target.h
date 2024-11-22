@@ -20,12 +20,12 @@
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 extern videoSource* input;
 extern uchar3* image;
 
-#elif _WIN32
+#elif BLD_WIN
 
 extern cv::Mat image;
 extern cv::dnn::Net net;
@@ -42,14 +42,14 @@ extern int yolo_detection_count;
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 extern detectNet *net;
 extern detectNet::Detection *detections;
 extern int detection_count;
 
 
-#elif _WIN32
+#elif BLD_WIN
 
 extern std::vector<yolo_net::detection> yolo_detections;
 extern int yolo_detection_count;

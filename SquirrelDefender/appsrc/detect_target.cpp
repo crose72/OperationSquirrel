@@ -51,11 +51,11 @@ Detection::~Detection(void) {};
  ********************************************************************************/
 bool Detection::init(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     return SSD::init();
 
-#elif _WIN32
+#elif BLD_WIN
 
     return YOLO::init();
 
@@ -72,11 +72,11 @@ bool Detection::init(void)
  ********************************************************************************/
 void Detection::loop(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     return SSD::loop();
 
-#elif _WIN32
+#elif BLD_WIN
 
     return YOLO::loop();
 
@@ -93,11 +93,11 @@ void Detection::loop(void)
  ********************************************************************************/
 void Detection::shutdown(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     return SSD::shutdown();
 
-#elif _WIN32
+#elif BLD_WIN
 
     return YOLO::shutdown();
 

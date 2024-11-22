@@ -52,11 +52,11 @@ Video::~Video(void) {}
  ********************************************************************************/
 bool Video::init(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     return VideoNV::init();
 
-#elif _WIN32
+#elif BLD_WIN
 
     return VideoWin::init();
 
@@ -64,7 +64,7 @@ bool Video::init(void)
 
 #error "Please define a build platform."
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 }
 
 /********************************************************************************
@@ -73,11 +73,11 @@ bool Video::init(void)
  ********************************************************************************/
 void Video::in_loop(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     VideoNV::in_loop();
 
-#elif _WIN32
+#elif BLD_WIN
 
     VideoWin::in_loop();
 
@@ -85,7 +85,7 @@ void Video::in_loop(void)
 
 #error "Please define a build platform."
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 }
 
 /********************************************************************************
@@ -94,11 +94,11 @@ void Video::in_loop(void)
  ********************************************************************************/
 void Video::out_loop(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     VideoNV::out_loop();
 
-#elif _WIN32
+#elif BLD_WIN
 
     VideoWin::out_loop();
 
@@ -106,7 +106,7 @@ void Video::out_loop(void)
 
 #error "Please define a build platform."
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 }
 
 /********************************************************************************
@@ -115,11 +115,11 @@ void Video::out_loop(void)
  ********************************************************************************/
 void Video::shutdown(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     VideoNV::shutdown();
 
-#elif _WIN32
+#elif BLD_WIN
 
     VideoWin::shutdown();
 
@@ -127,7 +127,7 @@ void Video::shutdown(void)
 
 #error "Please define a build platform."
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 }
 
 #endif // ENABLE_CV

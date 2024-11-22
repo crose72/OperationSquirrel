@@ -1,6 +1,6 @@
 
 #ifdef ENABLE_CV
-#ifdef _WIN32
+#ifdef BLD_WIN
 
 /********************************************************************************
 * @file    detect_target_yolo.cpp
@@ -275,5 +275,5 @@ void yolo_net::detect(cv::Mat& input, cv::dnn::Net net, std::vector<yolo_net::de
     yolo_net::post_process(input, outputs, detections, class_list);
 }
 
-#endif // _WIN32
+#endif // BLD_WIN
 #endif // ENABLE_CV

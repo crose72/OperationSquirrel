@@ -1,5 +1,5 @@
 #ifdef ENABLE_CV
-#ifdef _WIN32
+#ifdef BLD_WIN
 
 /********************************************************************************
  * @file    video_win_IO.cpp
@@ -86,7 +86,7 @@ std::string generate_unique_file_name(const std::string &base_name, const std::s
  ********************************************************************************/
 bool create_input_video_stream(void)
 {
-    cap.open(0);  // Open default webcam
+    cap.open(0, cv::CAP_DSHOW);  // Open default webcam
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
 
@@ -199,5 +199,5 @@ void VideoWin::shutdown(void)
     PrintPass::cpp_cout("video:  shutdown complete.\n");
 }
 
-#endif // _WIN32
+#endif // BLD_WIN
 #endif // ENABLE_CV
