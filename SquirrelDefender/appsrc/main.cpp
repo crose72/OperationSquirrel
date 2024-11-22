@@ -11,6 +11,8 @@
  ********************************************************************************/
 #include <mutex>
 #include <signal.h>
+#include <chrono>
+#include <thread>
 #include "common_inc.h"
 #include "datalog.h"
 #include "video_IO.h"
@@ -114,6 +116,10 @@ int main(void)
 #ifdef ENABLE_CV
 
         Video::in_loop();
+        if (first_loop_after_start)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+        }
         Detection::loop();
         Track::loop();
         Localize::loop();

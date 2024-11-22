@@ -101,9 +101,43 @@ endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-# Compiler flags for each build type
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -g")
+# Modified compiler flags for different platforms
+if(MSVC)
+    # MSVC-specific flags
+    set(CMAKE_CXX_FLAGS_DEBUG "/Zi /Od /MDd")  # Debug symbols, no optimization
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG /MT")  # Full optimization
+
+    # Correctly set iterator debug level based on configuration
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_definitions(-D_ITERATOR_DEBUG_LEVEL=2)
+    else()
+        add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
+    endif()
+else()
+    # GCC/Clang flags
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+endif()
+
+# Function to set compilation flags for specific target
+function(set_target_debug_flags target)
+    if(MSVC)
+        # For MSVC, control debug info and optimization per target
+        target_compile_options(${target} PRIVATE 
+            $<$<CONFIG:Debug>:/Zi /Od>
+            $<$<CONFIG:Release>:/O2>)
+        
+        # Set linker flags to generate PDB files
+        set_target_properties(${target} PROPERTIES 
+            LINK_FLAGS_DEBUG "/DEBUG /INCREMENTAL"
+            LINK_FLAGS_RELEASE "/INCREMENTAL:NO")
+    else()
+        # For GCC/Clang
+        target_compile_options(${target} PRIVATE
+            $<$<CONFIG:Debug>:-g -O0>
+            $<$<CONFIG:Release>:-O3>)
+    endif()
+endfunction()
 
 # Optional include code into debug or release build
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -168,6 +202,9 @@ if(USE_ENV_VAR)
         include_directories($ENV{HDR_OPENCV})
         include_directories($ENV{HDR_CUDA})
         include_directories($ENV{HDR_CUDNN})
+
+        set(DIR_OPENCV $ENV{DIR_OPENCV})
+        set(LIB_OPENCV $ENV{LIB_OPENCV})
 
         link_directories($ENV{LIB_TENSORRT})
         link_directories($ENV{LIB_OPENCV})
@@ -249,6 +286,7 @@ file(GLOB HEADERS ${HEADER_DIR}/*.h)
 # Compile the squirreldefender program
 if (BLD_JETSON_B01)
     cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
+    set_target_debug_falgs(squirreldefender)
 
     target_link_libraries(squirreldefender 
                         ${OpenCV_LIBS} 
@@ -258,29 +296,57 @@ if (BLD_JETSON_B01)
                         jsoncpp)
 elseif(BLD_WSL)
     add_executable(squirreldefender ${SOURCES} ${HEADERS})
+    set_target_debug_flags(squirreldefender)
 elseif(BLD_WIN)
+
+    if(USE_ENV_VAR)
+        find_package(OpenCV REQUIRED
+            PATHS $ENV{LIB_OPENCV}/../
+                  $ENV{LIB_OPENCV}
+            HINTS $ENV{LIB_OPENCV}/../
+                  $ENV{LIB_OPENCV}
+            NO_DEFAULT_PATH)  # Only look in specified paths
+    else()
+        find_package(OpenCV REQUIRED
+            PATHS "C:/opencv/opencv-4.10.0/install"
+                  "C:/opencv/opencv-4.10.0/install/x64/vc17"
+            NO_DEFAULT_PATH)
+    endif()
+
+    # Find OpenCV package first
+    find_package(OpenCV REQUIRED)
+    message(STATUS "OpenCV library status:")
+    message(STATUS "    version: ${OpenCV_VERSION}")
+    message(STATUS "    libraries: ${OpenCV_LIBS}")
+    message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
+
     add_executable(squirreldefender ${SOURCES} ${HEADERS})
-    target_link_libraries(squirreldefender Ws2_32)
-
-    add_compile_definitions($<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>)
-    add_compile_definitions($<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0>)
-
-    target_link_libraries(squirreldefender 
-        opencv_world4100
-        libprotobuf
-        zlib
-        ippicvmt
-        ippiw
-        ittnotify
-        libjpeg-turbo
-        libopenjp2
-        libtiff
-        libpng
-        IlmImf
-        libwebp
-    )
+    set_target_debug_flags(squirreldefender)
     
-    target_link_libraries(squirreldefender
+    # Add include directories
+    target_include_directories(squirreldefender PRIVATE ${OpenCV_INCLUDE_DIRS})
+    
+    # Link with OpenCV first
+    target_link_libraries(squirreldefender PRIVATE ${OpenCV_LIBS})
+    
+    # Add Windows sockets
+    target_link_libraries(squirreldefender PRIVATE Ws2_32)
+
+    # Set iterator debug level
+    target_compile_definitions(squirreldefender PRIVATE 
+        $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>
+        $<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0>)
+
+    # Match the runtime library with OpenCV
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(CMAKE_CXX_FLAGS_DEBUG "/Zi /Od /MDd")  # Use MDd for debug
+        target_compile_options(squirreldefender PRIVATE /MDd)
+    else()
+        set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG /MD")  # Use MD for release
+        target_compile_options(squirreldefender PRIVATE /MD)
+    endif()
+    
+    target_link_libraries(squirreldefender PRIVATE
         cudart_static
         cublas
         cublasLt
@@ -318,22 +384,29 @@ elseif(BLD_WIN)
         OpenCL
     )
 
-    target_link_libraries(squirreldefender
+    target_link_libraries(squirreldefender PRIVATE
         nvinfer_10
         nvinfer_plugin_10
         nvonnxparser_10
     )
 
-    target_link_libraries(squirreldefender
+    target_link_libraries(squirreldefender PRIVATE
         cudnn
-        cudnn64_9
-        cudnn_adv
-        cudnn_adv64_9
-        cudnn_cnn
-        cudnn_cnn64_9
-        cudnn_ops
-        cudnn_ops64_9
+        cudnn64_8
+        cudnn_adv_infer
+        cudnn_adv_infer64_8
+        cudnn_adv_train
+        cudnn_adv_train64_8
+        cudnn_cnn_infer
+        cudnn_cnn_infer64_8
+        cudnn_cnn_train
+        cudnn_cnn_train64_8
+        cudnn_ops_infer
+        cudnn_ops_infer64_8
+        cudnn_ops_train
+        cudnn_ops_train64_8
     )
 
     set_target_properties(squirreldefender PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 endif()
+
