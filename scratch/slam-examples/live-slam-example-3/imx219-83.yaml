@@ -1,0 +1,58 @@
+%YAML:1.0
+
+#--------------------------------------------------------------------------------------------
+# System config
+#--------------------------------------------------------------------------------------------
+
+File.version: "1.0"
+
+#--------------------------------------------------------------------------------------------
+# Camera Parameters. Adjust them!
+#--------------------------------------------------------------------------------------------
+
+Camera.type: "PinHole"
+
+Camera1.fx: 640.581899185372
+Camera1.fy: 655.726019816465
+Camera1.cx: 576.4682357944744
+Camera1.cy: 357.16374142271843
+
+Camera1.k1: -0.10221921624091175
+Camera1.k2: 0.5756550240712756
+Camera1.p1: -0.001995780726469621
+Camera1.p2: 0.0021440790128221887
+Camera1.p3: -0.998982093605573
+
+Camera.width: 640
+Camera.height: 480
+
+Camera.newWidth: 600
+Camera.newHeight: 350
+
+Camera.fps: 120
+Camera.RGB: 1
+
+#--------------------------------------------------------------------------------------------
+# ORB Parameters
+#--------------------------------------------------------------------------------------------
+
+ORBextractor.nFeatures: 1000
+ORBextractor.scaleFactor: 1.2
+ORBextractor.nLevels: 8
+ORBextractor.iniThFAST: 20
+ORBextractor.minThFAST: 7
+
+#--------------------------------------------------------------------------------------------
+# Viewer Parameters
+#---------------------------------------------------------------------------------------------
+
+Viewer.KeyFrameSize: 0.05
+Viewer.KeyFrameLineWidth: 1.0
+Viewer.GraphLineWidth: 0.9
+Viewer.PointSize: 2.0
+Viewer.CameraSize: 0.08
+Viewer.CameraLineWidth: 3.0
+Viewer.ViewpointX: 0.0
+Viewer.ViewpointY: -0.7
+Viewer.ViewpointZ: -1.8
+Viewer.ViewpointF: 500.0
