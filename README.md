@@ -1,5 +1,22 @@
 # OperationSquirrel
 
+## The drone
+<img src="https://github.com/user-attachments/assets/e551dd46-b7c2-478f-9a46-858f54ebddc5" alt="Image 1" width="640">
+
+### Drone stabilization test
+
+https://github.com/user-attachments/assets/681405a0-4fe6-4277-aa67-8812df1160f3
+
+### Autonomous drone following in simulation (hardware in loop)
+
+https://github.com/user-attachments/assets/a6b1fb76-5357-4e33-b026-c60e2d991b9d
+
+### Autonomous drone following in real life
+
+https://github.com/user-attachments/assets/12bda7be-26f7-4e50-8a76-f6e40bb1b42d
+
+## Description
+
 This project is aimed at creating an autonomous drone to deliver static and/or dynamic payloads to a moving target.  Advanced control methods, path planning algorithms, localization, AI/ML techniques and more will be deployed to achieve this goal.  The engineering feats accomplished along the way are stepping stones for other exciting problems.  The work done for this project can be expanded to protect crops from birds, home security, deliveries, or any other creative use.
 
 - `arduPilot` - parameters, firmware and any other ardupilot and vehicle specific things
@@ -14,7 +31,7 @@ This project is aimed at creating an autonomous drone to deliver static and/or d
 
 Developer chat: <https://discord.gg/Uxg9tpVMP9>
 
-# Getting started
+## Getting started
 
 1. Compiling the `squirreldefender` program
     - If you DO have the Jetson Nano or Jetson Orin Nano
