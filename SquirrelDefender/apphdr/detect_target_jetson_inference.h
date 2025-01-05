@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef ENABLE_CV
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 /********************************************************************************
  * @file    detect_target_jetson_inference.h
@@ -56,5 +56,5 @@ private:
 
 #endif // DETECT_TARGET_SSD_H
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 #endif // ENABLE_CV

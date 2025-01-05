@@ -17,11 +17,11 @@
 #include <string>
 #include <fstream>
 
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 #include "video_nv_IO.h"
 
-#elif _WIN32
+#elif BLD_WIN
 
 #include "video_win_IO.h"
 
@@ -29,17 +29,17 @@
 
 #error "Please define a build platform."
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 extern detectNet *net;
 
-#elif _WIN32
+#elif BLD_WIN
 
 /* No imported objects */
 
@@ -47,12 +47,12 @@ extern detectNet *net;
 
 #error "Please define a build platform."
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 extern bool valid_image_rcvd;
 extern videoSource *input;
@@ -60,7 +60,7 @@ extern uchar3 *image;
 extern float input_video_width;
 extern float input_video_height;
 
-#elif _WIN32
+#elif BLD_WIN
 
 extern bool valid_image_rcvd;
 extern cv::Mat image;
@@ -71,7 +71,7 @@ extern float input_video_height;
 
 #error "Please define a build platform."
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 
 /********************************************************************************
  * Function prototypes and Class Definitions

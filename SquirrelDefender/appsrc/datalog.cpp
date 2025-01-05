@@ -36,7 +36,6 @@ std::vector<std::vector<std::string>> data;
  * Function definitions
  ********************************************************************************/
 static void write_headers(void);
-static void load_signals_from_file(const std::string &header_file_path);
 static void save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data);
 static std::string generate_unique_filename(const std::string &filename);
 
@@ -207,11 +206,11 @@ DataLogger::~DataLogger() {};
  ********************************************************************************/
 bool DataLogger::init(void)
 {
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     data_file_path = "../data/";
 
-#elif _WIN32
+#elif BLD_WIN
 
     data_file_path = "../../data/";
 

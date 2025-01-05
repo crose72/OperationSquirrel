@@ -11,6 +11,8 @@
  ********************************************************************************/
 #include <mutex>
 #include <signal.h>
+#include <chrono>
+#include <thread>
 #include "common_inc.h"
 #include "datalog.h"
 #include "video_IO.h"
@@ -23,12 +25,12 @@
 #include "localize_target.h"
 #include "follow_target.h"
 
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 #include "jetson_IO.h"
 #include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 
 /********************************************************************************
  * Typedefs
@@ -95,7 +97,7 @@ int main(void)
         return SystemController::init();
     }
 
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
     while (!stop_program && !save_button_press)
 
@@ -103,7 +105,7 @@ int main(void)
 
     while (!stop_program)
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 
     {
         MainAppTime.calc_elapsed_time();
