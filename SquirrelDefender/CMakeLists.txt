@@ -237,14 +237,14 @@ else()
     # Default paths when not using environment variables
     if(BLD_WIN)
         include_directories(
-            C:/TensorRT/TensorRT-10.4.0.26/include
-            C:/opencv/opencv-4.10.0/install/include
+            C:/TensorRT/10.4.0.26/include
+            C:/opencv/4.10.0/install/include
             "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/include"
         )
 
         link_directories(
-            C:/TensorRT/TensorRT-10.4.0.26/lib
-            C:/opencv/opencv-4.10.0/install/x64/vc17/lib
+            C:/TensorRT/10.4.0.26/lib
+            C:/opencv/4.10.0/install/x64/vc17/lib
             "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/lib/x64"
         )
     elseif(BLD_JETSON_B01)
@@ -286,7 +286,7 @@ file(GLOB HEADERS ${HEADER_DIR}/*.h)
 # Compile the squirreldefender program
 if (BLD_JETSON_B01)
     cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
-    set_target_debug_falgs(squirreldefender)
+    set_target_debug_flags(squirreldefender)
 
     target_link_libraries(squirreldefender 
                         ${OpenCV_LIBS} 

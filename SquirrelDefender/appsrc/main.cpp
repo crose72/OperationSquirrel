@@ -116,10 +116,6 @@ int main(void)
 #ifdef ENABLE_CV
 
         Video::in_loop();
-        if (first_loop_after_start)
-        {
-            std::this_thread::sleep_for(std::chrono::seconds(3));
-        }
         Detection::loop();
         Track::loop();
         Localize::loop();
