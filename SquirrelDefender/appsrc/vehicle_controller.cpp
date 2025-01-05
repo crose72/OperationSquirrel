@@ -133,6 +133,7 @@ void VehicleController::loop(void)
         if (start_follow_mode)
         {
             follow_mode();
+            //test_flight();
         }
     }
 }

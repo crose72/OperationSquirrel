@@ -1,32 +1,78 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.10)
 
 # Project definition
 project(SquirrelDefender)
 
-# Choose ONLY ONE platform for the build 
-option(JETSON_B01 "Compiling for Jetson Nano B01" ON)
-option(WSL "Compiling for WSL" OFF)
-option(TCP "Compiling for Windows simulated environment" OFF)
-option(SERIAL "Compiling for Windows with connected physical devices" OFF)
-option(ENABLE_CV "Enable video and computer vision functionality" ON)
+#=============================================================================
+# Environment Variables Used (when USE_ENV_VAR=ON):
+#
+# Windows Build:
+#   Library Paths (*.lib, *.dll):
+#   LIB_TENSORRT    - TensorRT libraries (e.g., C:/TensorRT/TensorRT-10.4.0.26/lib)
+#   LIB_OPENCV      - OpenCV libraries (e.g., C:/opencv/opencv-4.10.0/install/x64/vc17/lib)
+#   LIB_CUDA        - CUDA libraries (e.g., C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/lib/x64)
+#
+#   Header Paths (*.h, *.hpp):
+#   HDR_TENSORRT    - TensorRT headers (e.g., C:/TensorRT/TensorRT-10.4.0.26/include)
+#   HDR_OPENCV      - OpenCV headers (e.g., C:/opencv/opencv-4.10.0/install/include)
+#   HDR_CUDA        - CUDA headers (e.g., C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/include)
+#
+# Jetson Build:
+#   Library Paths (*.so):
+#   LIB_JETSONGPIO       - JetsonGPIO libraries (e.g., /usr/local/lib)
+#   LIB_JETSONINFERENCE  - jetson-inference libraries (e.g., /usr/local/lib)
+#   LIB_JETSONUTILS      - jetson-utils libraries (e.g., /usr/local/lib)
+#   LIB_OPENCV           - OpenCV libraries (e.g., /usr/local/lib)
+#   LIB_CUDA            - CUDA libraries (e.g., /usr/local/cuda/lib64)
+#   LIB_TEGRA           - Tegra-specific libraries (e.g., /usr/lib/aarch64-linux-gnu/tegra)
+#
+#   Header Paths (*.h, *.hpp):
+#   HDR_JETSONGPIO       - JetsonGPIO headers (e.g., /usr/local/include/JetsonGPIO)
+#   HDR_JETSONINFERENCE  - jetson-inference headers (e.g., /usr/local/include/jetson-inference)
+#   HDR_JETSONUTILS      - jetson-utils headers (e.g., /usr/local/include/jetson-utils)
+#   HDR_OPENCV           - OpenCV headers (e.g., /usr/local/include/opencv4)
+#   HDR_CUDA            - CUDA headers (e.g., /usr/local/cuda/include)
+#
+# Usage:
+#   cmake -DUSE_ENV_VAR=ON ..
+#
+# Notes:
+#   - Windows paths use forward slashes (/) for CMake compatibility
+#   - Library paths should point to directories containing the binary files
+#   - Header paths should point to directories containing the include files
+#   - Some libraries might have additional platform-specific paths:
+#     - Jetson: /usr/lib/aarch64-linux-gnu/tegra
+#     - Windows: Additional DLL dependencies might be in System32
+#=============================================================================
+
+# Option to use environment variables for library paths
+option(USE_ENV_VAR "Use environment variables for library paths" OFF)
+
+# Choose ONLY ONE platform for the build (BLD_JETSON_B01, BLD_WSL, BLD_WIN) 
+option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" ON)
+option(BLD_WSL "Compiling for BLD_WSL" OFF)
+option(BLD_WIN "Compiling for Windows environment" OFF)
+option(WIN_TCP "Compiling for Windows simulated environment" OFF)
+option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
+option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" ON)
 
 # Ensure only one build platform is selected
 set(BUILD_PLATFORMS 0)
 
-if(JETSON_B01)
+if(BLD_JETSON_B01)
     math(EXPR BUILD_PLATFORMS "${BUILD_PLATFORMS} + 1")
 endif()
 
-if(WSL)
+if(BLD_WSL)
     math(EXPR BUILD_PLATFORMS "${BUILD_PLATFORMS} + 1")
 endif()
 
-if(WIN32)
+if(BLD_WIN)
     math(EXPR BUILD_PLATFORMS "${BUILD_PLATFORMS} + 1")
 endif()
 
 if(BUILD_PLATFORMS GREATER 1)
-    message(FATAL_ERROR "Error: More than one build platform option is selected. Please select only one of the following options: JETSON_B01, WSL, or other supported options.")
+    message(FATAL_ERROR "Error: More than one build platform option is selected. Please select only one of the following options: BLD_JETSON_B01, BLD_WSL, or other supported options.")
 endif()
 
 # Set the C++ standard
@@ -55,9 +101,43 @@ endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-# Compiler flags for each build type
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG -g")
+# Modified compiler flags for different platforms
+if(MSVC)
+    # MSVC-specific flags
+    set(CMAKE_CXX_FLAGS_DEBUG "/Zi /Od /MDd")  # Debug symbols, no optimization
+    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG /MT")  # Full optimization
+
+    # Correctly set iterator debug level based on configuration
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_definitions(-D_ITERATOR_DEBUG_LEVEL=2)
+    else()
+        add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
+    endif()
+else()
+    # GCC/Clang flags
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+endif()
+
+# Function to set compilation flags for specific target
+function(set_target_debug_flags target)
+    if(MSVC)
+        # For MSVC, control debug info and optimization per target
+        target_compile_options(${target} PRIVATE 
+            $<$<CONFIG:Debug>:/Zi /Od>
+            $<$<CONFIG:Release>:/O2>)
+        
+        # Set linker flags to generate PDB files
+        set_target_properties(${target} PROPERTIES 
+            LINK_FLAGS_DEBUG "/DEBUG /INCREMENTAL"
+            LINK_FLAGS_RELEASE "/INCREMENTAL:NO")
+    else()
+        # For GCC/Clang
+        target_compile_options(${target} PRIVATE
+            $<$<CONFIG:Debug>:-g -O0>
+            $<$<CONFIG:Release>:-O3>)
+    endif()
+endfunction()
 
 # Optional include code into debug or release build
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -66,12 +146,12 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_definitions(-DRELEASE_BUILD)
 endif()
 
-if (JETSON_B01)
+if (BLD_JETSON_B01)
     add_definitions(-DENABLE_CV)
     message("Enabled video and computer vision functionality.")
 
-elseif(WIN32)
-    if (ENABLE_CV)
+elseif(BLD_WIN)
+    if (WIN_ENABLE_CV)
         add_definitions(-DENABLE_CV)
         message("Enabled video and computer vision functionality.")
     else()
@@ -80,22 +160,24 @@ elseif(WIN32)
 endif()
 
 # Optionally include code that is specific to different platforms
-if (JETSON_B01)
-    add_definitions(-DJETSON_B01)
-    add_definitions(-DJETSON_B01_SERIAL)
-    message("Building for JETSON_B01 with serial comms.")
-elseif(WSL)
-    add_definitions(-DWSL)
-    add_definitions(-DWSL_TCP)
-    message("Building for WSL with TCP comms.")
-elseif(WIN32 AND TCP)
+if (BLD_JETSON_B01)
+    add_definitions(-DBLD_JETSON_B01)
+    add_definitions(-DBLD_JETSON_B01_SERIAL)
+    message("Building for BLD_JETSON_B01 with serial comms.")
+elseif(BLD_WSL)
+    add_definitions(-DBLD_WSL)
+    add_definitions(-DBLD_WSL_TCP)
+    message("Building for BLD_WSL with TCP comms.")
+elseif(BLD_WIN AND WIN_TCP)
     add_definitions(-DSIM_VEH)
-    add_definitions(-DWIN32_TCP)
-    message("Building for _WIN32 with TCP comms.")
-elseif(WIN32 and SERIAL)
+    add_definitions(-DBLD_WIN_TCP)
+    add_definitions(-DBLD_WIN)
+    message("Building for _BLD_WIN with TCP comms.")
+elseif(BLD_WIN AND WIN_SERIAL)
     add_definitions(-DREAL_VEH)
-    add_definitions(-DWIN32_SERIAL)
-    message("Building for _WIN32 with serial comms.")
+    add_definitions(-DBLD_WIN_SERIAL)
+    add_definitions(-DBLD_WIN)
+    message("Building for _BLD_WIN with serial comms.")
 else()
     message(FATAL_ERROR "Invalid build options.")
 endif()
@@ -105,46 +187,94 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/mavlink/v2.0/common)
 
-# Jetson B01 specific configurations
-if (JETSON_B01)
-    include_directories(/usr/local/include/JetsonGPIO
-                        /usr/local/include/jetson-inference
-                        /usr/local/include/jetson-utils
-                        ${OpenCV_INCLUDE_DIRS})
+# Environment variable validation and inclusion based on platform
+if(USE_ENV_VAR)
+    if(BLD_WIN)
+        # Validate required Windows environment variables
+        foreach(var LIB_TENSORRT LIB_OPENCV LIB_CUDA LIB_CUDNN HDR_TENSORRT HDR_OPENCV HDR_CUDA HDR_CUDNN)
+            if(NOT DEFINED ENV{${var}})
+                message(FATAL_ERROR "Environment variable ${var} is not defined")
+            endif()
+        endforeach()
 
-    # Set CUDA paths
-    set(CUDA_TOOLKIT_ROOT_DIR "/usr/local/cuda")
-    set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};${CUDA_TOOLKIT_ROOT_DIR}")
-    message(STATUS "CUDA_TOOLKIT_ROOT_DIR is set to ${CUDA_TOOLKIT_ROOT_DIR}")
-    message(STATUS "CMAKE_PREFIX_PATH is set to ${CMAKE_PREFIX_PATH}")
+        # Include Windows-specific directories from environment variables
+        include_directories($ENV{HDR_TENSORRT})
+        include_directories($ENV{HDR_OPENCV})
+        include_directories($ENV{HDR_CUDA})
+        include_directories($ENV{HDR_CUDNN})
 
-    #message(STATUS "Attempting to find VPI 2.0...")
-    #set(VPI_DIR "/opt/nvidia/vpi1")
-    #find_package(VPI 1.2 REQUIRED)
+        set(DIR_OPENCV $ENV{DIR_OPENCV})
+        set(LIB_OPENCV $ENV{LIB_OPENCV})
 
-    message(STATUS "Attempting to find CUDA...")
+        link_directories($ENV{LIB_TENSORRT})
+        link_directories($ENV{LIB_OPENCV})
+        link_directories($ENV{LIB_CUDA})
+        link_directories($ENV{LIB_CUDNN})
+    elseif(BLD_JETSON_B01)
+        # Validate required Jetson environment variables
+        foreach(var LIB_JETSONGPIO LIB_JETSONINFERENCE LIB_JETSONUTILS LIB_OPENCV LIB_CUDA LIB_TEGRA
+                    HDR_JETSONGPIO HDR_JETSONINFERENCE HDR_JETSONUTILS HDR_OPENCV HDR_CUDA)
+            if(NOT DEFINED ENV{${var}})
+                message(FATAL_ERROR "Environment variable ${var} is not defined")
+            endif()
+        endforeach()
+
+        # Include Jetson-specific directories from environment variables
+        include_directories($ENV{HDR_JETSONGPIO})
+        include_directories($ENV{HDR_JETSONINFERENCE})
+        include_directories($ENV{HDR_JETSONUTILS})
+        include_directories($ENV{HDR_OPENCV})
+        include_directories($ENV{HDR_CUDA})
+
+        link_directories($ENV{LIB_JETSONGPIO})
+        link_directories($ENV{LIB_JETSONINFERENCE})
+        link_directories($ENV{LIB_JETSONUTILS})
+        link_directories($ENV{LIB_OPENCV})
+        link_directories($ENV{LIB_CUDA})
+        link_directories($ENV{LIB_TEGRA})
+    endif()
+else()
+    # Default paths when not using environment variables
+    if(BLD_WIN)
+        set(TENSORRT_INCLUDE_DIR "C:/TensorRT/TensorRT-10.4.0.26/include" CACHE PATH "Path to TensorRT include directory")
+        
+        include_directories(
+            ${TENSORRT_INCLUDE_DIR}
+            "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/include"
+        )
+        
+        set(TENSORRT_LIB_DIR "C:/TensorRT/TensorRT-10.4.0.26/lib" CACHE PATH "Path to TensorRT library directory")
+        
+        link_directories(
+            ${TENSORRT_LIB_DIR}
+            "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/lib/x64"
+        )
+    elseif(BLD_JETSON_B01)
+        include_directories(
+            /usr/local/include/JetsonGPIO
+            /usr/local/include/jetson-inference
+            /usr/local/include/jetson-utils
+            /usr/local/cuda/include
+            /usr/local/include/opencv4
+        )
+
+        link_directories(
+            /usr/local/lib
+            /usr/local/cuda/lib64
+            /usr/lib/aarch64-linux-gnu/tegra
+        )
+    endif()
+endif()
+
+# Find required packages
+if(BLD_JETSON_B01)
     find_package(CUDA REQUIRED)
-
     find_package(OpenCV REQUIRED)
     find_package(jetson-utils REQUIRED)
     find_package(jetson-inference REQUIRED)
+    
     message(STATUS "Attempting to find JetsonGPIO library...")
     find_library(JETSON_GPIO_LIB JetsonGPIO)
-
-    link_directories(/usr/lib/aarch64-linux-gnu/tegra)
-elseif (WIN32)
-    include_directories(
-        C:/TensorRT/TensorRT-10.4.0.26/include
-        C:/opencv/opencv-4.10.0/install/include
-    )
-
-    link_directories(
-        C:/TensorRT/TensorRT-10.4.0.26/lib
-        C:/opencv/opencv-4.10.0/install/x64/vc17/lib
-        "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/lib/x64"
-    )
-
-    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
 endif()
 
 # squirreldefender and source file paths
@@ -156,8 +286,9 @@ file(GLOB SOURCES ${SOURCE_DIR}/*.cpp)
 file(GLOB HEADERS ${HEADER_DIR}/*.h)
 
 # Compile the squirreldefender program
-if (JETSON_B01)
+if (BLD_JETSON_B01)
     cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
+    set_target_debug_flags(squirreldefender)
 
     target_link_libraries(squirreldefender 
                         ${OpenCV_LIBS} 
@@ -165,20 +296,59 @@ if (JETSON_B01)
                         jetson-inference
                         jetson-utils
                         jsoncpp)
-elseif(WSL)
+elseif(BLD_WSL)
     add_executable(squirreldefender ${SOURCES} ${HEADERS})
-elseif(WIN32)
+    set_target_debug_flags(squirreldefender)
+elseif(BLD_WIN)
+
+    if(USE_ENV_VAR)
+        find_package(OpenCV REQUIRED
+            PATHS $ENV{LIB_OPENCV}/../
+                  $ENV{LIB_OPENCV}
+            HINTS $ENV{LIB_OPENCV}/../
+                  $ENV{LIB_OPENCV}
+            NO_DEFAULT_PATH)  # Only look in specified paths
+    else()
+        find_package(OpenCV REQUIRED
+            PATHS "C:/opencv/opencv-4.10.0/install"
+                  "C:/opencv/opencv-4.10.0/install/x64/vc17"
+            NO_DEFAULT_PATH)
+    endif()
+
+    # Find OpenCV package first
+    find_package(OpenCV REQUIRED)
+    message(STATUS "OpenCV library status:")
+    message(STATUS "    version: ${OpenCV_VERSION}")
+    message(STATUS "    libraries: ${OpenCV_LIBS}")
+    message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
+
     add_executable(squirreldefender ${SOURCES} ${HEADERS})
-    target_link_libraries(squirreldefender Ws2_32)
+    set_target_debug_flags(squirreldefender)
+    
+    # Add include directories
+    target_include_directories(squirreldefender PRIVATE ${OpenCV_INCLUDE_DIRS})
+    
+    # Link with OpenCV first
+    target_link_libraries(squirreldefender PRIVATE ${OpenCV_LIBS})
+    
+    # Add Windows sockets
+    target_link_libraries(squirreldefender PRIVATE Ws2_32)
 
-    add_compile_definitions($<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>)
-    add_compile_definitions($<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0>)
+    # Set iterator debug level
+    target_compile_definitions(squirreldefender PRIVATE 
+        $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>
+        $<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0>)
 
-    target_link_libraries(squirreldefender 
-        opencv_world4100
-    )
-
-    target_link_libraries(squirreldefender
+    # Match the runtime library with OpenCV
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(CMAKE_CXX_FLAGS_DEBUG "/Zi /Od /MDd")  # Use MDd for debug
+        target_compile_options(squirreldefender PRIVATE /MDd)
+    else()
+        set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG /MD")  # Use MD for release
+        target_compile_options(squirreldefender PRIVATE /MD)
+    endif()
+    
+    target_link_libraries(squirreldefender PRIVATE
         cudart_static
         cublas
         cublasLt
@@ -216,13 +386,13 @@ elseif(WIN32)
         OpenCL
     )
 
-    target_link_libraries(squirreldefender
+    target_link_libraries(squirreldefender PRIVATE
         nvinfer_10
         nvinfer_plugin_10
         nvonnxparser_10
     )
 
-    target_link_libraries(squirreldefender
+    target_link_libraries(squirreldefender PRIVATE
         cudnn
         cudnn64_8
         cudnn_adv_infer
@@ -241,3 +411,4 @@ elseif(WIN32)
 
     set_target_properties(squirreldefender PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 endif()
+

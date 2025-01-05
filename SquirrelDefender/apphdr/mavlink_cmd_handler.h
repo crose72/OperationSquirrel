@@ -45,7 +45,6 @@ public:
     static void disarm_vehicle(void);
     static void takeoff_LOCAL(float pitch, float ascend_rate, float yaw, int32_t x, int32_t y, float z);
     static void takeoff_GPS_long(float mav_veh_alt);
-    static void takeoff_GPS(float alt);
     static void set_mode_LAND(void);
     static void set_mode_GUIDED(void);
     static void set_mode_GUIDED_NOGPS(void);

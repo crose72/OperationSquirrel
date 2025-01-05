@@ -1,5 +1,5 @@
 #ifdef ENABLE_CV
-#ifdef JETSON_B01
+#ifdef BLD_JETSON_B01
 
 /********************************************************************************
  * @file    detect_target_jetson_inference.cpp
@@ -165,5 +165,5 @@ void SSD::shutdown(void)
     LogVerbose("detectnet:  shutdown complete.\n");
 }
 
-#endif // JETSON_B01
+#endif // BLD_JETSON_B01
 #endif // ENABLE_CV

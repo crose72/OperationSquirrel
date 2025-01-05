@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef ENABLE_CV
-#ifdef _WIN32
+#ifdef BLD_WIN
 
 /********************************************************************************
  * @file    video_win_IO.h
@@ -50,5 +50,5 @@ private:
 
 #endif // VIDEO_WIN_IO_H
 
-#endif // _WIN32
+#endif // BLD_WIN
 #endif // ENABLE_CV

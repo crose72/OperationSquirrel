@@ -1,0 +1,29 @@
+{
+    "windows": {
+        "LIB_TENSORRT": "D:/src/TensorRT-10.6.0.26.Windows.win10.cuda-12.6/TensorRT-10.6.0.26/lib",
+        "LIB_OPENCV": "D:/src/opencv/install/x64/vc17/staticlib",
+        "LIB_CUDA": "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/lib/x64",
+        "LIB_CUDNN": "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/lib/12.6/x64",
+        "HDR_TENSORRT": "D:/src/TensorRT-10.6.0.26.Windows.win10.cuda-12.6/TensorRT-10.6.0.26/include",
+        "HDR_OPENCV": "D:/src/opencv/install/include/opencv2",
+        "HDR_CUDA": "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/include",
+        "HDR_CUDNN": "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/include/12.6"
+    },
+    "jetson": {
+        "LIB_JETSONGPIO": "/usr/local/lib",
+        "LIB_JETSONINFERENCE": "/usr/local/lib",
+        "LIB_JETSONUTILS": "/usr/local/lib",
+        "LIB_OPENCV": "/usr/local/lib",
+        "LIB_CUDA": "/usr/local/cuda/lib64",
+        "LIB_TEGRA": "/usr/lib/aarch64-linux-gnu/tegra",
+        "HDR_JETSONGPIO": "/usr/local/include/JetsonGPIO",
+        "HDR_JETSONINFERENCE": "/usr/local/include/jetson-inference",
+        "HDR_JETSONUTILS": "/usr/local/include/jetson-utils",
+        "HDR_OPENCV": "/usr/local/include/opencv4",
+        "HDR_CUDA": "/usr/local/cuda/include"
+    },
+    "wsl": {
+        "LIB_OPENCV": "/usr/local/lib",
+        "HDR_OPENCV": "/usr/local/include/opencv4"
+    }
+}

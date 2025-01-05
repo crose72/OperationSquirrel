@@ -22,17 +22,17 @@
 /********************************************************************************
  * Private macros and defines
  ********************************************************************************/
-#ifdef JETSON_B01_SERIAL
+#ifdef BLD_JETSON_B01_SERIAL
 
 #define SERIAL_PORT "/dev/ttyTHS1"
 #define BAUD_RATE B115200
 
-#elif WIN32_SERIAL
+#elif BLD_WIN_SERIAL
 
 #define SERIAL_PORT "COM3"  // Modify based on your USB port (e.g., COM3, COM4, etc.)
 #define BAUD_RATE CBR_57600 // 57600 for SiK radio, CBR_115200 typically
 
-#elif WSL_TCP || WIN32_TCP
+#elif BLD_WSL_TCP || BLD_WIN_TCP
 
 /* Sim port/address for linux or windows */
 #define SIM_IP "127.0.0.1" // IP address for SITL simulation
@@ -42,21 +42,21 @@
 
 #error "Please define the intended build target."
 
-#endif // JETSON_B01_SERIAL
+#endif // BLD_JETSON_B01_SERIAL
 
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-#ifdef JETSON_B01_SERIAL
+#ifdef BLD_JETSON_B01_SERIAL
 
 int uart_fd; // UART file descriptor for Linux
 int serial_port = 0;
 
-#elif WIN32_SERIAL
+#elif BLD_WIN_SERIAL
 
 HANDLE hComm; // Handle for COM port on Windows
 
-#elif WSL_TCP || WIN32_TCP
+#elif BLD_WSL_TCP || BLD_WIN_TCP
 
 SOCKET tcp_socket_fd; // TCP socket descriptor
 struct sockaddr_in sim_addr;
@@ -66,7 +66,7 @@ int sock;
 
 #error "Please define the intended build target."
 
-#endif // JETSON_B01_SERIAL
+#endif // BLD_JETSON_B01_SERIAL
 
 /********************************************************************************
  * Function definitions
@@ -90,7 +90,7 @@ SerialComm::~SerialComm(void) {}
  ********************************************************************************/
 bool SerialComm::start_uart_comm(void)
 {
-#ifdef JETSON_B01_SERIAL
+#ifdef BLD_JETSON_B01_SERIAL
 
     // Open the UART port for Linux
     serial_port = open(SERIAL_PORT, O_RDWR);
@@ -114,7 +114,7 @@ bool SerialComm::start_uart_comm(void)
 
     return true;
 
-#elif WIN32_SERIAL
+#elif BLD_WIN_SERIAL
 
     // Open the COM port
     hComm = CreateFile(SERIAL_PORT, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
@@ -163,9 +163,9 @@ bool SerialComm::start_uart_comm(void)
 
     return true;
 
-#else // Create a TCP connection, most of the logic is common to WSL_TCP and WIN32
+#else // Create a TCP connection, most of the logic is common to BLD_WSL_TCP and WIN32
 
-#ifdef WIN32_TCP // Initialize WinSock (Windows only)
+#ifdef BLD_WIN_TCP // Initialize WinSock (Windows only)
 
     WSADATA wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -198,12 +198,12 @@ bool SerialComm::start_uart_comm(void)
 
     // Set the socket to non-blocking mode
 
-#ifdef WIN32_TCP
+#ifdef BLD_WIN_TCP
 
     u_long mode = 1;
     ioctlsocket(sock, FIONBIO, &mode);
 
-#else // WSL_TCP
+#else // BLD_WSL_TCP
 
     int flags = fcntl(sock, F_GETFL, 0);
     fcntl(sock, F_SETFL, flags | O_NONBLOCK);
@@ -215,7 +215,7 @@ bool SerialComm::start_uart_comm(void)
 
     return true;
 
-#endif // JETSON_B01_SERIAL
+#endif // BLD_JETSON_B01_SERIAL
 }
 
 /********************************************************************************
@@ -229,7 +229,7 @@ void SerialComm::write_uart(mavlink_message_t &msg)
 
     offset_buffer(buffer, len, msg);
 
-#ifdef JETSON_B01_SERIAL
+#ifdef BLD_JETSON_B01_SERIAL
 
     uint16_t n = write(serial_port, buffer, len);
     if (n < 0)
@@ -237,7 +237,7 @@ void SerialComm::write_uart(mavlink_message_t &msg)
         fprintf(stderr, "Error writing to serial port\n");
     }
 
-#elif WIN32_SERIAL
+#elif BLD_WIN_SERIAL
 
     DWORD bytesWritten;
     if (!WriteFile(hComm, buffer, len, &bytesWritten, NULL))
@@ -245,7 +245,7 @@ void SerialComm::write_uart(mavlink_message_t &msg)
         fprintf(stderr, "Error writing to COM port\n");
     }
 
-#elif WSL_TCP || WIN32_TCP // send over TCP, common to WSL_TCP and WIN32_TCP
+#elif BLD_WSL_TCP || BLD_WIN_TCP // send over TCP, common to BLD_WSL_TCP and BLD_WIN_TCP
 
     int n = send(tcp_socket_fd, (const char *)buffer, len, 0);
     if (n == SOCKET_ERROR)
@@ -257,7 +257,7 @@ void SerialComm::write_uart(mavlink_message_t &msg)
 
 #error "Please define the intended build target."
 
-#endif // JETSON_B01_SERIAL
+#endif // BLD_JETSON_B01_SERIAL
 
     clear_buffer(buffer, len);
 }
@@ -271,14 +271,14 @@ uint8_t SerialComm::read_uart(void)
     uint8_t byte = 0;
     int n = 0; // Declare n to avoid undeclared identifier error
 
-#ifdef JETSON_B01_SERIAL
+#ifdef BLD_JETSON_B01_SERIAL
 
     if (read(serial_port, &byte, 1) == -1)
     {
         fprintf(stderr, "Error reading from serial port\n");
     }
 
-#elif WIN32_SERIAL
+#elif BLD_WIN_SERIAL
 
     if (hComm == INVALID_HANDLE_VALUE)
     {
@@ -294,7 +294,7 @@ uint8_t SerialComm::read_uart(void)
         fprintf(stderr, "Error reading from COM port. Error code: %lu\n", errCode);
     }
 
-#elif WSL_TCP || WIN32_TCP // read TCP port common to WSL_TCP and WIN32_TCP
+#elif BLD_WSL_TCP || BLD_WIN_TCP // read TCP port common to BLD_WSL_TCP and BLD_WIN_TCP
 
     n = recv(tcp_socket_fd, (char *)&byte, sizeof(byte), 0);
     if (n < 0)
@@ -306,7 +306,7 @@ uint8_t SerialComm::read_uart(void)
 
 #error "Please define the intended build target."
 
-#endif // JETSON_B01_SERIAL
+#endif // BLD_JETSON_B01_SERIAL
 
     return byte;
 }
@@ -318,20 +318,20 @@ uint8_t SerialComm::read_uart(void)
 void SerialComm::stop_uart_comm(void)
 {
 
-#ifdef JETSON_B01_SERIAL
+#ifdef BLD_JETSON_B01_SERIAL
 
     close(serial_port);
 
-#elif WIN32_SERIAL
+#elif BLD_WIN_SERIAL
 
     CloseHandle(hComm);
 
-#elif WIN32_TCP
+#elif BLD_WIN_TCP
 
     closesocket(tcp_socket_fd);
     WSACleanup();
 
-#elif WSL_TCP
+#elif BLD_WSL_TCP
 
     close(tcp_socket_fd);
 
@@ -339,7 +339,7 @@ void SerialComm::stop_uart_comm(void)
 
 #error "Please define the intended build target."
 
-#endif // JETSON_B01_SERIAL
+#endif // BLD_JETSON_B01_SERIAL
 
 }
 
@@ -351,7 +351,7 @@ int SerialComm::bytes_available(void)
 {
     int bytes = 0;
 
-#ifdef JETSON_B01_SERIAL
+#ifdef BLD_JETSON_B01_SERIAL
 
     if (ioctl(uart_fd, FIONREAD, &bytes) == -1)
     {
@@ -359,7 +359,7 @@ int SerialComm::bytes_available(void)
         return -1;
     }
 
-#elif WIN32_SERIAL
+#elif BLD_WIN_SERIAL
 
     COMSTAT status;
 
@@ -367,13 +367,13 @@ int SerialComm::bytes_available(void)
     ClearCommError(hComm, &errors, &status);
     bytes = status.cbInQue;
 
-#elif WIN32_TCP
+#elif BLD_WIN_TCP
 
     u_long availableBytes = 0;
     ioctlsocket(tcp_socket_fd, FIONREAD, &availableBytes);
     bytes = (int)availableBytes;
 
-#elif WSL_TCP // WSL_TCP
+#elif BLD_WSL_TCP // BLD_WSL_TCP
 
     if (ioctl(tcp_socket_fd, FIONREAD, &bytes) == -1)
     {
@@ -385,7 +385,7 @@ int SerialComm::bytes_available(void)
 
 #error "Please define the intended build target."
 
-#endif // JETSON_B01_SERIAL
+#endif // BLD_JETSON_B01_SERIAL
 
     return bytes;
 }
