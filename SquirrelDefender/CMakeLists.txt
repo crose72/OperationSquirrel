@@ -46,13 +46,13 @@ project(SquirrelDefender)
 #=============================================================================
 
 # Option to use environment variables for library paths
-option(USE_ENV_VAR "Use environment variables for library paths" ON)
+option(USE_ENV_VAR "Use environment variables for library paths" OFF)
 
 # Choose ONLY ONE platform for the build (BLD_JETSON_B01, BLD_WSL, BLD_WIN) 
-option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" OFF)
+option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" ON)
 option(BLD_WSL "Compiling for BLD_WSL" OFF)
-option(BLD_WIN "Compiling for Windows environment" ON)
-option(WIN_TCP "Compiling for Windows simulated environment" ON)
+option(BLD_WIN "Compiling for Windows environment" OFF)
+option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" ON)
 
@@ -236,15 +236,17 @@ if(USE_ENV_VAR)
 else()
     # Default paths when not using environment variables
     if(BLD_WIN)
+        set(TENSORRT_INCLUDE_DIR "C:/TensorRT/TensorRT-10.4.0.26/include" CACHE PATH "Path to TensorRT include directory")
+        
         include_directories(
-            C:/TensorRT/TensorRT-10.4.0.26/include
-            C:/opencv/opencv-4.10.0/install/include
+            ${TENSORRT_INCLUDE_DIR}
             "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/include"
         )
-
+        
+        set(TENSORRT_LIB_DIR "C:/TensorRT/TensorRT-10.4.0.26/lib" CACHE PATH "Path to TensorRT library directory")
+        
         link_directories(
-            C:/TensorRT/TensorRT-10.4.0.26/lib
-            C:/opencv/opencv-4.10.0/install/x64/vc17/lib
+            ${TENSORRT_LIB_DIR}
             "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/lib/x64"
         )
     elseif(BLD_JETSON_B01)
@@ -286,7 +288,7 @@ file(GLOB HEADERS ${HEADER_DIR}/*.h)
 # Compile the squirreldefender program
 if (BLD_JETSON_B01)
     cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
-    set_target_debug_falgs(squirreldefender)
+    set_target_debug_flags(squirreldefender)
 
     target_link_libraries(squirreldefender 
                         ${OpenCV_LIBS} 
