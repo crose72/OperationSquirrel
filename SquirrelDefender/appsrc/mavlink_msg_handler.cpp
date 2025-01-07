@@ -25,9 +25,9 @@
  ********************************************************************************/
 #ifdef DEBUG_BUILD
 
-DebugTerm MavCmdAck("");
-DebugTerm SysStatInfo("");
-DebugTerm HeartbeatInfo("");
+DebugTerm MavCmdAck("/dev/pts/4");
+DebugTerm SysStatInfo("/dev/pts/4");
+DebugTerm HeartbeatInfo("/dev/pts/4");
 
 #endif // DEBUG_BUILD
 
@@ -156,8 +156,8 @@ bool start_mav_comm(void) { return SerialComm::start_uart_comm(); }; // Open up 
 void stop_mav_comm(void) { SerialComm::stop_uart_comm(); };          // Stop mavlink comms on uart port
 uint8_t read_mav_msg(void) { return SerialComm::read_uart(); };      // Read a byte
 void subscribe(uint16_t msg_id, float msg_interval);                 // Subscribe to a mavlink message at desired rate
-void set_mav_msg_rate(uint16_t msg_id, float msg_interval) { MavCmd::set_mav_msg_rate(msg_id, msg_interval); };
-void req_mav_msg(uint16_t msg_id) { MavCmd::req_mav_msg(msg_id); };
+void set_mav_msg_rate(uint16_t msg_id, float msg_interval) { MavCmd::set_mav_msg_rate(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, msg_id, msg_interval); };
+void req_mav_msg(uint16_t msg_id) { MavCmd::req_mav_msg(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, msg_id); };
 bool start_message_subscriptions(void);
 void parse_mav_msgs(void);
 
@@ -648,7 +648,7 @@ void parse_mav_msgs(void)
 
     int n = SerialComm::bytes_available();
 
-    const char *term = "";
+    const char *term = "/dev/pts/4";
 
     for (int i = n; i > 0; i--)
     {
@@ -660,55 +660,55 @@ void parse_mav_msgs(void)
             switch (msg.msgid)
             {
             case MAVLINK_MSG_ID_HEARTBEAT:
-                proc_mav_heartbeat_msg(&msg, "");
+                proc_mav_heartbeat_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
-                proc_mav_gps_int_msg(&msg, "");
+                proc_mav_gps_int_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_SYSTEM_TIME:
-                proc_mav_system_time_msg(&msg, "");
+                proc_mav_system_time_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_SCALED_IMU:
-                proc_mav_scaled_imu_msg(&msg, "");
+                proc_mav_scaled_imu_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_OPTICAL_FLOW:
-                proc_mav_optical_flow_msg(&msg, "");
+                proc_mav_optical_flow_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_DISTANCE_SENSOR:
-                proc_mav_distance_sensor_msg(&msg, "");
+                proc_mav_distance_sensor_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_ATTITUDE:
-                proc_mav_attitude_msg(&msg, "");
+                proc_mav_attitude_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_ATTITUDE_TARGET:
-                proc_mav_attitude_target_msg(&msg, "");
+                proc_mav_attitude_target_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_ATTITUDE_QUATERNION:
-                proc_mav_attitude_quaternion_msg(&msg, "");
+                proc_mav_attitude_quaternion_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_AUTOPILOT_VERSION:
-                proc_mav_autopilot_version_msg(&msg, "");
+                proc_mav_autopilot_version_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED:
-                proc_mav_position_target_local_ned_msg(&msg, "");
+                proc_mav_position_target_local_ned_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED:
-                proc_mav_set_position_target_local_ned_msg(&msg, "");
+                proc_mav_set_position_target_local_ned_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_LOCAL_POSITION_NED:
-                proc_mav_position_local_ned_msg(&msg, "");
+                proc_mav_position_local_ned_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_SYS_STATUS:
-                proc_mav_sys_status_msg(&msg, "");
+                proc_mav_sys_status_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_STATUSTEXT:
-                proc_mav_statustext_msg(&msg, "");
+                proc_mav_statustext_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_PARAM_VALUE:
-                proc_mav_param_value_msg(&msg, "");
+                proc_mav_param_value_msg(&msg, "/dev/pts/4");
                 break;
             case MAVLINK_MSG_ID_COMMAND_ACK:
-                proc_mav_command_ack_msg(&msg, "");
+                proc_mav_command_ack_msg(&msg, "/dev/pts/4");
                 break;
             default:
                 PrintPass::c_printf("Received message with ID: %d\n", (int)msg.msgid);

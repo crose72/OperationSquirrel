@@ -102,15 +102,16 @@ void VehicleController::loop(void)
 {
     if (system_state == SYSTEM_STATE::INIT)
     {
-        MavCmd::set_mode_GUIDED();
+        MavCmd::set_mode_GUIDED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+        PrintPass::cpp_cout("Arrived");
     }
     else if (system_state == SYSTEM_STATE::PRE_ARM_GOOD)
     {
-        MavCmd::arm_vehicle();
+        MavCmd::arm_vehicle(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
     }
     else if (system_state == SYSTEM_STATE::STANDBY)
     {
-        MavCmd::takeoff_GPS_long((float)4.0);
+        MavCmd::takeoff_GPS_long(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, (float)4.0);
     }
     else if (system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
     {
@@ -144,5 +145,5 @@ void VehicleController::loop(void)
  ********************************************************************************/
 void VehicleController::shutdown(void)
 {
-    MavCmd::set_mode_LAND();
+    MavCmd::set_mode_LAND(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
 }

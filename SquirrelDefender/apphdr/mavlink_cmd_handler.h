@@ -41,24 +41,22 @@ public:
     ~MavCmd();
 
     // Public member functions
-    static void arm_vehicle(void);
-    static void disarm_vehicle(void);
-    static void takeoff_LOCAL(float pitch, float ascend_rate, float yaw, int32_t x, int32_t y, float z);
-    static void takeoff_GPS_long(float mav_veh_alt);
-    static void set_mode_LAND(void);
-    static void set_mode_GUIDED(void);
-    static void set_mode_GUIDED_NOGPS(void);
-    static void set_mode_RTL(void);
-    static void go_to_waypoint(int32_t lat, int32_t lon, float alt);
-    static void set_flight_mode(uint8_t confirmation, float mode, float custom_mode, float custom_submode);
-    static void set_mav_msg_rate(uint16_t msg_id, float msg_interval); // For setting a message rate - command, msg id, message rate
-    static void req_mav_msg(uint16_t msg_id);                          // For requesting a mavlink message - command, msg id
-    static void send_cmd_long(uint16_t mavlink_command, uint8_t confirmation,
-                              float cmd_long_param1, float cmd_long_param2, float cmd_long_param3, float cmd_long_param4, float cmd_long_param5, float cmd_long_param6, float cmd_long_param7); // command, confirmation, param1 - param7
-    static void send_cmd_int(uint8_t command_int_frame, uint16_t mavlink_command,
-                             float cmd_int_param1, float cmd_int_param2, float cmd_int_param3, float cmd_int_param4, int32_t cmd_int_x, int32_t cmd_int_y, float cmd_int_z);
-    static void send_cmd_set_position_target_global_int(uint8_t coordinate_frame, uint16_t type_mask, int32_t lat_int, int32_t lon_int,
-                                                        float alt, float vx, float vy, float vz, float afx, float afy, float afz, float yaw, float yaw_rate); // coordinate_frame, type_mask, lat_int, lon_int, alt, vx, vy, vz, afx, afy, afz, yaw, yaw_rate
+    static void arm_vehicle(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id);
+    static void disarm_vehicle(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id);
+    static void takeoff_LOCAL(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, int32_t x, int32_t y, float z);
+    static void takeoff_GPS_long(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float alt);
+    static void set_mode_LAND(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id);
+    static void set_mode_GUIDED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id);
+    static void set_mode_GUIDED_NOGPS(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id);
+    static void set_mode_RTL(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id);
+    static void go_to_waypoint(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, int32_t lat, int32_t lon, float alt);
+    static void set_flight_mode(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, 
+                             uint8_t confirmation, float mode, float custom_mode, float custom_submode);
+    static void set_mav_msg_rate(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, uint16_t msg_id, float msg_interval); // For setting a message rate - command, msg id, message rate
+    static void req_mav_msg(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, uint16_t msg_id);                          // For requesting a mavlink message - command, msg id
+    static void send_cmd_long(uint8_t sender_sys_id, uint8_t sender_comp_id, const mavlink_command_long_t& command_long); // command, confirmation, param1 - param7
+    static void send_cmd_int(uint8_t sender_sys_id, uint8_t sender_comp_id, const mavlink_command_int_t& command_int);
+    static void send_cmd_set_position_target_global_int(uint8_t sender_sys_id, uint8_t sender_comp_id, const mavlink_set_position_target_global_int_t* set_position_target_global_int); // coordinate_frame, type_mask, lat_int, lon_int, alt, vx, vy, vz, afx, afy, afz, yaw, yaw_rate
     static void send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired_attitude_target);                                                         // type_mask, *q, body_roll_rate, body_pitch_rate, body_yaw_rate, thrust, *thrust_body
     static void send_cmd_set_position_target_local_ned(mavlink_set_position_target_local_ned_t *desired_target);
 

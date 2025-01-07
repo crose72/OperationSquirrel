@@ -222,20 +222,19 @@ int SystemController::init(void)
 
     led_init();
     led_init_blink();
-
+    /*
     if (!Video::init() ||
         !Detection::init() ||
         !Track::init() ||
         !Localize::init() ||
-        !Follow::init() ||
-        !VehicleController::init())
+        !Follow::init())
     {
         led_bad_blink();
         return 1;
     }
 
     led_init_blink();
-
+    */
     if (!MavMsg::init() ||
         !DataLogger::init() ||
         !VehicleController::init())
