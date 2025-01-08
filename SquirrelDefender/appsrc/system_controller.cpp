@@ -58,11 +58,12 @@ int system_state_machine(void)
 
         prearm_checks = ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && valid_image_rcvd);
 
-#elif WSL
+#else
 
         prearm_checks = ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0);
 
 #endif // ENABLE_CV
+
        // Switch case determines how we transition from one state to another
         switch (system_state)
         {
@@ -222,7 +223,7 @@ int SystemController::init(void)
 
     led_init();
     led_init_blink();
-    /*
+    
     if (!Video::init() ||
         !Detection::init() ||
         !Track::init() ||
@@ -234,7 +235,7 @@ int SystemController::init(void)
     }
 
     led_init_blink();
-    */
+    
     if (!MavMsg::init() ||
         !DataLogger::init() ||
         !VehicleController::init())

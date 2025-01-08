@@ -115,12 +115,12 @@ int main(void)
 
 #ifdef ENABLE_CV
 
-        //Video::in_loop();
-        //Detection::loop();
-        //Track::loop();
-        //Localize::loop();
-        //Follow::loop();
-        //Video::out_loop();
+        Video::in_loop();
+        Detection::loop();
+        Track::loop();
+        Localize::loop();
+        Follow::loop();
+        Video::out_loop();
 
 #endif // ENABLE_CV
 

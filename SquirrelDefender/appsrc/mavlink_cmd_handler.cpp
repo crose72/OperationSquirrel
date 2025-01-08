@@ -55,6 +55,7 @@ enum class FlightMode : uint8_t
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
+mavlink_command_long_t arm_command;
 
 /********************************************************************************
  * Calibration definitions
@@ -107,12 +108,6 @@ void MavCmd::takeoff_GPS_long(uint8_t sender_sys_id, uint8_t sender_comp_id, uin
     command_long.target_component = target_comp_id;
     command_long.command = MAV_CMD_NAV_TAKEOFF;
     command_long.confirmation = 0;
-    command_long.param1 = 0;
-    command_long.param2 = 0;
-    command_long.param3 = 0;
-    command_long.param4 = 0;
-    command_long.param5 = 0;
-    command_long.param6 = 0;
     command_long.param7 = alt;
 
     send_cmd_long(sender_sys_id, sender_comp_id, command_long);
