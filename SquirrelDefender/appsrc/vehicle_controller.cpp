@@ -110,13 +110,13 @@ void VehicleController::loop(void)
     }
     else if (system_state == SYSTEM_STATE::STANDBY)
     {
-        //MavCmd::takeoff_GPS_long(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, (float)4.0);
+        MavCmd::takeoff_GPS_long(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, (float)4.0);
     }
     else if (system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
     {
         
         /* Debounce counter to avoid sending vehicle commands before the vehicle is in position */
-        /*
+        
         if (takeoff_dbc_cnt > 0)
         {
             takeoff_dbc_cnt--;
@@ -136,7 +136,7 @@ void VehicleController::loop(void)
         {
             follow_mode();
             //test_flight();
-        }*/
+        }
     }
 }
 

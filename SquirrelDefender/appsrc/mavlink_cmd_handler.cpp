@@ -98,19 +98,11 @@ void MavCmd::takeoff_LOCAL(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_
 
 /********************************************************************************
  * Function: takeoff_GPS_long
- * Description: Takekoff to specified height using command_long.
+ * Description: Takekoff to specified height using command_long->
  ********************************************************************************/
 void MavCmd::takeoff_GPS_long(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float alt)
 {
-    mavlink_command_long_t command_long;
-
-    command_long.target_system = target_sys_id;
-    command_long.target_component = target_comp_id;
-    command_long.command = MAV_CMD_NAV_TAKEOFF;
-    command_long.confirmation = 0;
-    command_long.param7 = alt;
-
-    send_cmd_long(sender_sys_id, sender_comp_id, command_long);
+    send_cmd_long(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, alt);
 }
 
 /********************************************************************************
@@ -121,21 +113,7 @@ void MavCmd::arm_vehicle(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t 
 {
     // Arm throttle - param2 = 0 requires safety checks, param2 = 21196 allows
     // arming to override preflight checks and disarming in flight
-    mavlink_command_long_t command_long;
-
-    command_long.target_system = target_sys_id;
-    command_long.target_component = target_comp_id;
-    command_long.command = MAV_CMD_COMPONENT_ARM_DISARM;
-    command_long.confirmation = 0;
-    command_long.param1 = 1;
-    command_long.param2 = 0;
-    command_long.param3 = 0;
-    command_long.param4 = 0;
-    command_long.param5 = 0;
-    command_long.param6 = 0;
-    command_long.param7 = 0;
-
-    send_cmd_long(sender_sys_id, sender_comp_id, command_long);
+    send_cmd_long(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, MAV_CMD_COMPONENT_ARM_DISARM, 0, 1, 0, 0, 0, 0, 0, 0);
 }
 
 /********************************************************************************
@@ -146,14 +124,7 @@ void MavCmd::disarm_vehicle(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8
 {
     // Disarm throttle - param2 = 0 requires safety checks, param2 = 21196 allows
     // arming to override preflight checks and disarming in flight
-    mavlink_command_long_t command_long;
-
-    command_long.target_system = target_sys_id;
-    command_long.target_component = target_comp_id;
-    command_long.command = MAV_CMD_COMPONENT_ARM_DISARM;
-    command_long.param2 = 1;
-
-    send_cmd_long(sender_sys_id, sender_comp_id, command_long);
+    send_cmd_long(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, MAV_CMD_COMPONENT_ARM_DISARM, 0, 0, 1, 0, 0, 0, 0, 0);
 }
 
 /********************************************************************************
@@ -224,17 +195,7 @@ void MavCmd::go_to_waypoint(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8
 void MavCmd::set_flight_mode(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, 
                              uint8_t confirmation, float mode, float custom_mode, float custom_submode)
 {
-    mavlink_command_long_t command_long;
-
-    command_long.target_system = target_sys_id;
-    command_long.target_component = target_comp_id;
-    command_long.command = MAV_CMD_DO_SET_MODE;
-    command_long.confirmation = confirmation;
-    command_long.param1 = mode;
-    command_long.param2 = custom_mode;
-    command_long.param3 = custom_submode;
-
-    send_cmd_long(sender_sys_id, sender_comp_id, command_long);
+    send_cmd_long(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, MAV_CMD_DO_SET_MODE, confirmation, mode, custom_mode, custom_submode, 0, 0, 0, 0);
 }
 
 /********************************************************************************
@@ -245,16 +206,7 @@ void MavCmd::set_flight_mode(uint8_t sender_sys_id, uint8_t sender_comp_id, uint
  ********************************************************************************/
 void MavCmd::set_mav_msg_rate(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, uint16_t msg_id, float msg_interval)
 {
-    mavlink_command_long_t command_long;
-
-    command_long.target_system = target_sys_id;
-    command_long.target_component = target_comp_id;
-    command_long.command = MAV_CMD_SET_MESSAGE_INTERVAL;
-    command_long.param1 = msg_id;
-    command_long.param2 = msg_interval;
-    command_long.param7 = 1;
-
-    send_cmd_long(sender_sys_id, sender_comp_id, command_long);
+    send_cmd_long(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, MAV_CMD_SET_MESSAGE_INTERVAL, 0, msg_id, msg_interval, 0, 0, 0, 0, 1);
 }
 
 /********************************************************************************
@@ -265,15 +217,15 @@ void MavCmd::set_mav_msg_rate(uint8_t sender_sys_id, uint8_t sender_comp_id, uin
  ********************************************************************************/
 void MavCmd::req_mav_msg(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, uint16_t msg_id)
 {
-    mavlink_command_long_t command_long;
+    mavlink_command_long_t* command_long;
 
-    command_long.target_system = target_sys_id;
-    command_long.target_component = target_comp_id;
-    command_long.command = MAV_CMD_REQUEST_MESSAGE;
-    command_long.param1 = msg_id;
-    command_long.param7 = 1;
+    command_long->target_system = target_sys_id;
+    command_long->target_component = target_comp_id;
+    command_long->command = MAV_CMD_REQUEST_MESSAGE;
+    command_long->param1 = msg_id;
+    command_long->param7 = 1;
 
-    send_cmd_long(sender_sys_id, sender_comp_id, command_long);
+    send_cmd_long(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, MAV_CMD_REQUEST_MESSAGE, 0, msg_id, 0, 0, 0, 0, 0, 1);
 }
 
 /********************************************************************************
@@ -298,9 +250,25 @@ void MavCmd::send_cmd_int(uint8_t sender_sys_id, uint8_t sender_comp_id, const m
  *              long which can do a mode change, takeoff, ARM throttle,
  *              and more.
  ********************************************************************************/
-void MavCmd::send_cmd_long(uint8_t sender_sys_id, uint8_t sender_comp_id, const mavlink_command_long_t& command_long)
+void MavCmd::send_cmd_long(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, 
+                           uint16_t mavlink_command, uint8_t confirmation,
+                           float cmd_long_param1, float cmd_long_param2, float cmd_long_param3, float cmd_long_param4, 
+                           float cmd_long_param5, float cmd_long_param6, float cmd_long_param7)
 {
     mavlink_message_t msg;
+    mavlink_command_long_t command_long;
+
+    command_long.target_system = TARGET_SYS_ID;
+    command_long.target_component = TARGET_COMP_ID;
+    command_long.command = mavlink_command;
+    command_long.confirmation = confirmation;
+    command_long.param1 = cmd_long_param1;
+    command_long.param2 = cmd_long_param2;
+    command_long.param3 = cmd_long_param3;
+    command_long.param4 = cmd_long_param4;
+    command_long.param5 = cmd_long_param5;
+    command_long.param6 = cmd_long_param6;
+    command_long.param7 = cmd_long_param7;
 
     mavlink_msg_command_long_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, &command_long);
     send_mav_cmd(msg);
