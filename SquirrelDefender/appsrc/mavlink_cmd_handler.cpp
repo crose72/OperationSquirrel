@@ -304,15 +304,96 @@ void MavCmd::send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired
 }
 
 /********************************************************************************
+ * Function: send_cmd_position_target
+ * Description: This function accepts an x, y, z vector target and sends a
+ *              request to move to move the drone to that desired position.
+ ********************************************************************************/
+void MavCmd::send_cmd_position_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component, 
+                                      float x, float y, float z, float yaw, uint16_t type_mask, uint8_t coordinate_frame)
+{
+    mavlink_message_t msg;
+    mavlink_set_position_target_local_ned_t command_position_target;
+
+    command_position_target.x = x;
+    command_position_target.y = y;
+    command_position_target.z = z;
+    command_position_target.yaw = yaw;
+    command_position_target.type_mask = type_mask;
+    command_position_target.target_system = target_system;
+    command_position_target.target_component = target_component;
+    command_position_target.coordinate_frame = coordinate_frame;
+
+    mavlink_msg_set_position_target_local_ned_encode(sender_sys_id, sender_comp_id, &msg, &command_position_target);
+    send_mav_cmd(msg);
+}
+
+/********************************************************************************
+ * Function: send_cmd_position_target
+ * Description: This function accepts an x, y, z vector target and sends a
+ *              request to move to move the drone to that desired position.
+ ********************************************************************************/
+void MavCmd::send_cmd_velocity_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component, 
+                                      float vx, float vy, float vz, float yaw, uint16_t type_mask, uint8_t coordinate_frame)
+{
+    mavlink_message_t msg;
+    mavlink_set_position_target_local_ned_t command_position_target;
+
+    command_position_target.vx = vx;
+    command_position_target.vy = vy;
+    command_position_target.vz = vz;
+    command_position_target.yaw = yaw;
+    command_position_target.type_mask = type_mask;
+    command_position_target.target_system = target_system;
+    command_position_target.target_component = target_component;
+    command_position_target.coordinate_frame = coordinate_frame;
+
+    mavlink_msg_set_position_target_local_ned_encode(sender_sys_id, sender_comp_id, &msg, &command_position_target);
+    send_mav_cmd(msg);
+}
+
+/********************************************************************************
+ * Function: send_cmd_position_target
+ * 
+ * Description: This function accepts an x, y, z vector target and sends a
+ *              request to move to move the drone to that desired position.
+ ********************************************************************************/
+void MavCmd::send_cmd_acccel_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component, 
+                                      float ax, float ay, float az, float yaw, float yaw_rate, uint16_t type_mask, uint8_t coordinate_frame)
+{
+    send_cmd_set_position_target_local_ned(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, ax, ay, az, 
+                                           yaw, yaw_rate,type_mask, target_system, target_component, coordinate_frame);
+}
+
+/********************************************************************************
  * Function: send_cmd_set_position_target_local_ned
  * Description: This function uses the mavlink message set position target to
  *              allow for manually controlling the position, velocity, or
  *              acceleration of a vehicle using an external controller.
  ********************************************************************************/
-void MavCmd::send_cmd_set_position_target_local_ned(mavlink_set_position_target_local_ned_t *desired_target)
+void MavCmd::send_cmd_set_position_target_local_ned(float x, float y, float z, float vx, float vy, float vz, 
+                                                    float afx, float afy, float afz, float yaw, float yaw_rate,
+                                                    uint16_t type_mask, uint8_t target_system, uint8_t target_component, 
+                                                    uint8_t coordinate_frame)
 {
     mavlink_message_t msg;
+    mavlink_set_position_target_local_ned_t command_position_target;
 
-    mavlink_msg_set_position_target_local_ned_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, desired_target);
+    command_position_target.x = x;
+    command_position_target.y = y;
+    command_position_target.z = z;
+    command_position_target.vx = vx;
+    command_position_target.vy = vy;
+    command_position_target.vz = vz;
+    command_position_target.afx = afx;
+    command_position_target.afy = afy;
+    command_position_target.afz = afz;
+    command_position_target.yaw = yaw;
+    command_position_target.yaw_rate = yaw_rate;
+    command_position_target.type_mask = type_mask;
+    command_position_target.target_system = target_system;
+    command_position_target.target_component = target_component;
+    command_position_target.coordinate_frame = coordinate_frame;
+
+    mavlink_msg_set_position_target_local_ned_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, &command_position_target);
     send_mav_cmd(msg);
 }

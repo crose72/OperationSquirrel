@@ -83,14 +83,8 @@ void VelocityController::cmd_position_NED(float position_target[3])
 
     yaw_target = calc_yaw_target(position_target[0], position_target[1]);
 
-    desired_position_target.x = position_target[0];
-    desired_position_target.y = position_target[1];
-    desired_position_target.z = position_target[2];
-    desired_position_target.yaw = yaw_target;
-    desired_position_target.type_mask = options;
-    desired_position_target.coordinate_frame = MAV_FRAME_BODY_OFFSET_NED; // MAV_FRAME_BODY_OFFSET_NED
-
-    MavCmd::send_cmd_set_position_target_local_ned(&desired_position_target);
+    MavCmd::send_cmd_velocity_target(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, 
+                                      position_target[0], position_target[1], position_target[2], yaw_target, options, MAV_FRAME_BODY_OFFSET_NED);
 }
 
 /********************************************************************************
@@ -108,14 +102,8 @@ void VelocityController::cmd_velocity_NED(float velocity_target[3])
 
     yaw_target = calc_yaw_target(velocity_target[0], velocity_target[1]);
 
-    desired_velocity_target.vx = velocity_target[0];
-    desired_velocity_target.vy = velocity_target[1];
-    desired_velocity_target.vz = velocity_target[2];    
-    desired_velocity_target.yaw = yaw_target;
-    desired_velocity_target.type_mask = options;
-    desired_velocity_target.coordinate_frame = MAV_FRAME_BODY_OFFSET_NED; // MAV_FRAME_BODY_OFFSET_NED
-
-    MavCmd::send_cmd_set_position_target_local_ned(&desired_velocity_target);
+    MavCmd::send_cmd_velocity_target(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, 
+                                      velocity_target[0], velocity_target[1], velocity_target[2], yaw_target, options, MAV_FRAME_BODY_OFFSET_NED);
 }
 
 /********************************************************************************
@@ -124,17 +112,16 @@ void VelocityController::cmd_velocity_NED(float velocity_target[3])
  ********************************************************************************/
 void VelocityController::cmd_velocity_xy_NED(float velocity_target[3])
 {
+    float yaw_target = 0.0;
     uint16_t options = 0;
 
     options |= POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE | 
             POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
 
-    desired_velocity_target.vx = velocity_target[0];
-    desired_velocity_target.vy = velocity_target[1];
-    desired_velocity_target.type_mask = options;
-    desired_velocity_target.coordinate_frame = MAV_FRAME_BODY_OFFSET_NED; // MAV_FRAME_BODY_OFFSET_NED
+    yaw_target = calc_yaw_target(velocity_target[0], velocity_target[1]);
 
-    MavCmd::send_cmd_set_position_target_local_ned(&desired_velocity_target);
+    MavCmd::send_cmd_velocity_target(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, 
+                                      velocity_target[0], velocity_target[1], 0.0, yaw_target, options, MAV_FRAME_BODY_OFFSET_NED);
 }
 
 /********************************************************************************
@@ -148,11 +135,8 @@ void VelocityController::cmd_velocity_x_NED(float velocity_target)
     options |= POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE | 
             POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
 
-    desired_velocity_target.vx = velocity_target;
-    desired_velocity_target.type_mask = options;
-    desired_velocity_target.coordinate_frame = MAV_FRAME_BODY_OFFSET_NED; // MAV_FRAME_BODY_OFFSET_NED
-
-    MavCmd::send_cmd_set_position_target_local_ned(&desired_velocity_target);
+    MavCmd::send_cmd_velocity_target(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, 
+                                      velocity_target, 0.0, 0.0, 0.0, options, MAV_FRAME_BODY_OFFSET_NED);
 }
 
 /********************************************************************************
@@ -168,35 +152,25 @@ void VelocityController::cmd_velocity_y_NED(float velocity_target)
             POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE | 
             POSITION_TARGET_TYPEMASK_YAW_IGNORE | POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
 
-    desired_velocity_target.vy = velocity_target;
-    desired_velocity_target.type_mask = options;
-    desired_velocity_target.coordinate_frame = MAV_FRAME_BODY_OFFSET_NED; // MAV_FRAME_BODY_OFFSET_NED
-
-    MavCmd::send_cmd_set_position_target_local_ned(&desired_velocity_target);
+    MavCmd::send_cmd_velocity_target(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, 
+                                      0.0, velocity_target, 0.0, 0.0, options, MAV_FRAME_BODY_OFFSET_NED);
 }
 
 /********************************************************************************
- * Function: cmd_acceleration_NED
- * Description: Move in direction of vector ax,ay,az in the NED frame.
+ * Function: cmd_velocity_y_NED
+ * Description: Move in direction of vector vy in the NED frame.
  ********************************************************************************/
-void VelocityController::cmd_acceleration_NED(float acceleration_target[3])
+void VelocityController::cmd_velocity_z_NED(float velocity_target)
 {
-    float yaw_target = 0.0;
     uint16_t options = 0;
 
     options |= POSITION_TARGET_TYPEMASK_X_IGNORE | POSITION_TARGET_TYPEMASK_Y_IGNORE | POSITION_TARGET_TYPEMASK_Z_IGNORE | 
-        POSITION_TARGET_TYPEMASK_VX_IGNORE | POSITION_TARGET_TYPEMASK_VY_IGNORE | POSITION_TARGET_TYPEMASK_VZ_IGNORE;
+            POSITION_TARGET_TYPEMASK_VX_IGNORE | POSITION_TARGET_TYPEMASK_VY_IGNORE | 
+            POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE | 
+            POSITION_TARGET_TYPEMASK_YAW_IGNORE | POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
 
-    yaw_target = calc_yaw_target(acceleration_target[0], acceleration_target[1]);
-
-    desired_acceleration_target.afx = acceleration_target[0];
-    desired_acceleration_target.afy = acceleration_target[1];
-    desired_acceleration_target.afz = acceleration_target[2];
-    desired_acceleration_target.yaw_rate = yaw_target;
-    desired_acceleration_target.type_mask = options;
-    desired_acceleration_target.coordinate_frame = MAV_FRAME_BODY_OFFSET_NED; // MAV_FRAME_BODY_OFFSET_NED
-
-    MavCmd::send_cmd_set_position_target_local_ned(&desired_acceleration_target);
+    MavCmd::send_cmd_velocity_target(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, 
+                                      0.0, 0.0, velocity_target, 0.0, options, MAV_FRAME_BODY_OFFSET_NED);
 }
 
 /********************************************************************************
