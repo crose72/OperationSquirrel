@@ -1,39 +1,29 @@
 #pragma once
 
+#ifdef BLD_JETSON_B01
+
 /********************************************************************************
- * @file    attitude_controller.h
+ * @file    json_utils.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef ATTITUDE_CONTROLLER_H
-#define ATTITUDE_CONTROLLER_H
+#ifndef JSON_UTILS_H
+#define JSON_UTILS_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "mavlink_cmd_handler.h"
-#include "mavlink_msg_handler.h"
+#include <stdint.h>
+#include <iostream>
+#include <fstream>
+#include <map>
+#include <string>
+#include <sstream>
+#include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern float mav_veh_q1_target;
-extern float mav_veh_q2_target;
-extern float mav_veh_q3_target;
-extern float mav_veh_q4_target;
-extern float mav_veh_roll_rate_target;
-extern float mav_veh_pitch_rate_target;
-extern float mav_veh_yaw_rate_target;
-extern float mav_veh_thrust_target;
-
-extern float mav_veh_q1_actual;
-extern float mav_veh_q2_actual;
-extern float mav_veh_q3_actual;
-extern float mav_veh_q4_actual;
-extern float mav_veh_roll_rate_actual;
-extern float mav_veh_pitch_rate_actual;
-extern float mav_veh_yaw_rate_actual;
 
 /********************************************************************************
  * Exported objects
@@ -42,9 +32,20 @@ extern float mav_veh_yaw_rate_actual;
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-bool dtrmn_attitude_target_error(void);
-void brake(void);
-void move_forward(void);
-void attitude_yaw(float yaw_pos, float yaw_rate);
+class json_utils
+{
+public:
+    json_utils(const std::string &filename);
+    ~json_utils();
 
-#endif // ATTITUDE_CONTROLLER_H
+    float get_float_param(const std::string &group, const std::string &key) const;
+    uint32_t get_uint32_param(const std::string &group, const std::string &key) const;
+    bool get_bool_param(const std::string &group, const std::string &key) const;
+
+private:
+    Json::Value root;
+};
+
+#endif // JSON_UTILS_H
+
+#endif // BLD_JETSON_B01

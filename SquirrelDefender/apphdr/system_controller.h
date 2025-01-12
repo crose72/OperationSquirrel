@@ -13,7 +13,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "mavlink_msg_handler.h"
-#include "mavlink_cmd_handler.h"
+#include "mav_utils.h"
 #include "datalog.h"
 #include "video_io.h"
 #include "jetson_io.h"

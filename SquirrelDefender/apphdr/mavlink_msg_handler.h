@@ -12,8 +12,7 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "mavlink_print_info.h"
-#include "mavlink_cmd_handler.h"
+#include "mav_utils.h"
 #include "uart_utils.h"
 #include <mavlink.h>
 #include <common.h>

@@ -18,7 +18,7 @@
 #include "video_io.h"
 #include "system_controller.h"
 #include "mavlink_msg_handler.h"
-#include "mavlink_cmd_handler.h"
+#include "mav_utils.h"
 #include "vehicle_controller.h"
 #include "detect_target.h"
 #include "track_target.h"

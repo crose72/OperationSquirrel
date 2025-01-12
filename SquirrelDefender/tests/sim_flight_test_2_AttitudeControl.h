@@ -11,8 +11,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "mavlink_msg_handler.h"
-#include "mavlink_cmd_handler.h"
-#include "attitude_controller.h"
+#include "mav_utils.h"
 
 /********************************************************************************
  * Imported objects

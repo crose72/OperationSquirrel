@@ -55,15 +55,15 @@ void follow_mode(void)
 
     if (target_valid && target_too_close)
     {
-        VelocityController::cmd_velocity_xy_NED(target_velocity);
+        mav_motion::cmd_velocity_xy_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
     }
     else if (target_valid && !target_too_close)
     {
-        VelocityController::cmd_velocity_NED(target_velocity);
+        mav_motion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
     }
     else
     {
-        VelocityController::cmd_velocity_NED(target_velocity);
+        mav_motion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
     }
 }
 
