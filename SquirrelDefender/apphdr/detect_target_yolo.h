@@ -15,7 +15,7 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "video_IO.h"
+#include "video_io.h"
 #include "parameters.h"
 #include "yolo_net.h"
 #include <opencv2/opencv.hpp>

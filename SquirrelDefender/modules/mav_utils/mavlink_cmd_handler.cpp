@@ -78,17 +78,17 @@ MavCmd::MavCmd() {};
 MavCmd::~MavCmd() {};
 
 /********************************************************************************
- * Function: takeoff_LOCAL
+ * Function: takeoff_local
  * Description: Takekoff to specified height.
  ********************************************************************************/
-void MavCmd::takeoff_LOCAL(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, int32_t x, int32_t y, float z)
+void MavCmd::takeoff_local(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, int32_t x, int32_t y, float z)
 {
     mavlink_command_int_t command_int;
 
     command_int.target_system = target_sys_id;
     command_int.target_component = target_sys_id;
     command_int.frame = MAV_FRAME_BODY_OFFSET_NED;
-    command_int.command = MAV_CMD_NAV_TAKEOFF_LOCAL;
+    command_int.command = MAV_CMD_NAV_takeoff_local;
     command_int.x = x;
     command_int.y = y;
     command_int.z = z;
@@ -97,10 +97,10 @@ void MavCmd::takeoff_LOCAL(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_
 }
 
 /********************************************************************************
- * Function: takeoff_GPS_long
+ * Function: takeoff_gps
  * Description: Takekoff to specified height using command_long->
  ********************************************************************************/
-void MavCmd::takeoff_GPS_long(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float alt)
+void MavCmd::takeoff_gps(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float alt)
 {
     send_cmd_long(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, MAV_CMD_NAV_TAKEOFF, 0, 0, 0, 0, 0, 0, 0, alt);
 }
@@ -128,40 +128,40 @@ void MavCmd::disarm_vehicle(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8
 }
 
 /********************************************************************************
- * Function: set_mode_LAND
+ * Function: set_mode_land
  * Description: Change mode to LAND.
  ********************************************************************************/
-void MavCmd::set_mode_LAND(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
+void MavCmd::set_mode_land(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
 {
     set_flight_mode(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, 
                              0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::LAND, 0);
 }
 
 /********************************************************************************
- * Function: set_mode_GUIDED
+ * Function: set_mode_guided
  * Description: Change mode to GUIDED to allow control from a companion computer.
  ********************************************************************************/
-void MavCmd::set_mode_GUIDED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
+void MavCmd::set_mode_guided(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
 {
     set_flight_mode(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, 
                             0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::GUIDED, 0);
 }
 
 /********************************************************************************
- * Function: set_mode_GUIDED_NOGPS
+ * Function: set_mode_guided_nogps
  * Description: Change mode to GUIDED_NOGPS to allow control from a companion computer.
  ********************************************************************************/
-void MavCmd::set_mode_GUIDED_NOGPS(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
+void MavCmd::set_mode_guided_nogps(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
 {
     set_flight_mode(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, 
                             0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::GUIDED_NOGPS, 0);
 }
 
 /********************************************************************************
- * Function: set_mode_RTL
+ * Function: set_mode_rtl
  * Description: Change mode to RTL and vehicle will return to launch location.
  ********************************************************************************/
-void MavCmd::set_mode_RTL(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
+void MavCmd::set_mode_rtl(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
 {
     set_flight_mode(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, 
                             0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::RTL, 0);
@@ -185,7 +185,7 @@ void MavCmd::go_to_waypoint(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8
     position_target_glob_int.type_mask = (uint16_t)0b111111111000;
 
    
-    send_cmd_set_position_target_global_int (sender_sys_id, sender_comp_id, &position_target_glob_int); // mavlink_msg_command_int_pack(SENDER_SYS_ID, SENDER_COMP_ID, &msg, TARGET_SYS_ID, TARGET_COMP_ID, MAV_CMD_DO_SET_MODE, 0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, 6, 0, 0, -35.3671 * 1e7, 149.1649 * 1e7, 0); is used for AUTO mode?
+    send_cmd_set_position_target_global_int (sender_sys_id, sender_comp_id, &position_target_glob_int); // mavlink_msg_command_int_pack(sender_sys_id, sender_comp_id, &msg, TARGET_SYS_ID, TARGET_COMP_ID, MAV_CMD_DO_SET_MODE, 0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, 6, 0, 0, -35.3671 * 1e7, 149.1649 * 1e7, 0); is used for AUTO mode?
 }
 
 /********************************************************************************
@@ -258,8 +258,8 @@ void MavCmd::send_cmd_long(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_
     mavlink_message_t msg;
     mavlink_command_long_t command_long;
 
-    command_long.target_system = TARGET_SYS_ID;
-    command_long.target_component = TARGET_COMP_ID;
+    command_long.target_system = target_sys_id;
+    command_long.target_component = target_comp_id;
     command_long.command = mavlink_command;
     command_long.confirmation = confirmation;
     command_long.param1 = cmd_long_param1;
@@ -270,7 +270,7 @@ void MavCmd::send_cmd_long(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_
     command_long.param6 = cmd_long_param6;
     command_long.param7 = cmd_long_param7;
 
-    mavlink_msg_command_long_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, &command_long);
+    mavlink_msg_command_long_encode(sender_sys_id, sender_comp_id, &msg, &command_long);
     send_mav_cmd(msg);
 }
 
@@ -299,7 +299,7 @@ void MavCmd::send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired
 {
     mavlink_message_t msg;
 
-    mavlink_msg_set_attitude_target_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, desired_attitude_target);
+    //mavlink_msg_set_attitude_target_encode(sender_sys_id, sender_comp_id, &msg, desired_attitude_target);
     send_mav_cmd(msg);
 }
 
@@ -360,8 +360,8 @@ void MavCmd::send_cmd_velocity_target(uint8_t sender_sys_id, uint8_t sender_comp
 void MavCmd::send_cmd_acccel_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component, 
                                       float ax, float ay, float az, float yaw, float yaw_rate, uint16_t type_mask, uint8_t coordinate_frame)
 {
-    send_cmd_set_position_target_local_ned(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, ax, ay, az, 
-                                           yaw, yaw_rate,type_mask, target_system, target_component, coordinate_frame);
+    send_cmd_set_position_target_local_ned(sender_sys_id, sender_comp_id, target_system, target_component, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, ax, ay, az, 
+                                           yaw, yaw_rate, type_mask, coordinate_frame);
 }
 
 /********************************************************************************
@@ -370,10 +370,11 @@ void MavCmd::send_cmd_acccel_target(uint8_t sender_sys_id, uint8_t sender_comp_i
  *              allow for manually controlling the position, velocity, or
  *              acceleration of a vehicle using an external controller.
  ********************************************************************************/
-void MavCmd::send_cmd_set_position_target_local_ned(float x, float y, float z, float vx, float vy, float vz, 
+void MavCmd::send_cmd_set_position_target_local_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, 
+                                                    uint8_t target_system, uint8_t target_component,
+                                                    float x, float y, float z, float vx, float vy, float vz, 
                                                     float afx, float afy, float afz, float yaw, float yaw_rate,
-                                                    uint16_t type_mask, uint8_t target_system, uint8_t target_component, 
-                                                    uint8_t coordinate_frame)
+                                                    uint16_t type_mask, uint8_t coordinate_frame)
 {
     mavlink_message_t msg;
     mavlink_set_position_target_local_ned_t command_position_target;
@@ -394,6 +395,6 @@ void MavCmd::send_cmd_set_position_target_local_ned(float x, float y, float z, f
     command_position_target.target_component = target_component;
     command_position_target.coordinate_frame = coordinate_frame;
 
-    mavlink_msg_set_position_target_local_ned_encode(SENDER_SYS_ID, SENDER_COMP_ID, &msg, &command_position_target);
+    mavlink_msg_set_position_target_local_ned_encode(sender_sys_id, sender_comp_id, &msg, &command_position_target);
     send_mav_cmd(msg);
 }

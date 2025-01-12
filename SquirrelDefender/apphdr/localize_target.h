@@ -14,9 +14,11 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "video_IO.h"
+#include "video_io.h"
 #include "detect_target.h"
 #include "parameters.h"
+#include "interpolate.h"
+
 
 /********************************************************************************
  * Imported objects

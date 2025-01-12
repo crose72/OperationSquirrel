@@ -87,6 +87,6 @@ void test_flight(void)
 
     if (timerVal > 29 && stage == 4)
     {
-        MavCmd::set_mode_RTL(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+        MavCmd::set_mode_rtl(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
     }
 }

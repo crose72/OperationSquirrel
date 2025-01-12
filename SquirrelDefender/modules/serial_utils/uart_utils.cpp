@@ -1,5 +1,5 @@
 /********************************************************************************
- * @file    serial_port_handler.cpp
+ * @file    uart_utils.cpp
  * @author  Cameron Rose
  * @date    6/7/2023
  * @brief   Configure and enable serial ports for simulated and real serial
@@ -9,7 +9,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "serial_comm.h"
+#include "uart_utils.h"
 
 /********************************************************************************
  * Typedefs

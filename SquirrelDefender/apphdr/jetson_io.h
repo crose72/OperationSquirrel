@@ -1,95 +1,57 @@
 #pragma once
 
-#ifdef ENABLE_CV
+#ifdef BLD_JETSON_B01
 
 /********************************************************************************
- * @file    video_IO.h
+ * @file    jetson_io.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef VIDEO_IO_H
-#define VIDEO_IO_H
+#ifndef JETSON_IO_H
+#define JETSON_IO_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include <string>
-#include <fstream>
-
-#ifdef BLD_JETSON_B01
-
-#include "video_nv_IO.h"
-
-#elif BLD_WIN
-
-#include "video_win_IO.h"
-
-#else
-
-#error "Please define a build platform."
-
-#endif // BLD_JETSON_B01
-
+#include <JetsonGPIO.h>
+#include <thread>
+#include <chrono>
+#include <unistd.h>
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-#ifdef BLD_JETSON_B01
-
-extern detectNet *net;
-
-#elif BLD_WIN
-
-/* No imported objects */
-
-#else
-
-#error "Please define a build platform."
-
-#endif // BLD_JETSON_B01
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-#ifdef BLD_JETSON_B01
-
-extern bool valid_image_rcvd;
-extern videoSource *input;
-extern uchar3 *image;
-extern float input_video_width;
-extern float input_video_height;
-
-#elif BLD_WIN
-
-extern bool valid_image_rcvd;
-extern cv::Mat image;
-extern float input_video_width;
-extern float input_video_height;
-
-#else
-
-#error "Please define a build platform."
-
-#endif // BLD_JETSON_B01
+extern bool save_button_press;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class Video
+class StatusIndicators
 {
 public:
-    Video();
-    ~Video();
+    StatusIndicators();
+    ~StatusIndicators();
 
     static bool init(void);
-    static void in_loop(void);
-    static void out_loop(void);
+    static void loop(void);
     static void shutdown(void);
+
+    static void status_initializing(void);
+    static void status_program_complete(void);
+    static void status_good(void);
+    static void status_bad(void);
+    static void status_bad_blink(void);
+    static void clear_all_leds(void);
+    static void save_video_button_state(void);
 
 private:
 };
 
-#endif // VIDEO_IO_H
+#endif // JETSON_IO_H
 
-#endif // ENABLE_CV
+#endif // BLD_JETSON_B01

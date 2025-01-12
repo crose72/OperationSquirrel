@@ -1,17 +1,16 @@
 #pragma once
 
 /********************************************************************************
- * @file    serial_comm.h
+ * @file    uart_utils.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef SERIAL_COMM_H
-#define SERIAL_COMM_H
+#ifndef UART_UTILS_H
+#define UART_UTILS_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
 #include <cstdint> // for uint8_t, uint16_t, etc.
 #include <mavlink.h>
 #include <common.h>
@@ -69,4 +68,4 @@ private:
     static void clear_buffer(uint8_t *buffer, uint16_t len);
 };
 
-#endif // SERIAL_COMM_H
+#endif // UART_UTILS_H

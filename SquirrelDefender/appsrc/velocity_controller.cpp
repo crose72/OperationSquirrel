@@ -44,9 +44,6 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-mavlink_set_position_target_local_ned_t desired_position_target;
-mavlink_set_position_target_local_ned_t desired_velocity_target;
-mavlink_set_position_target_local_ned_t desired_acceleration_target;
 
 /********************************************************************************
  * Calibration definitions

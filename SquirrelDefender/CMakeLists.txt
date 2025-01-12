@@ -45,6 +45,10 @@ project(SquirrelDefender)
 #     - Windows: Additional DLL dependencies might be in System32
 #=============================================================================
 
+#=============================================================================
+# Build Options (manually choose the options for your build)
+#=============================================================================
+
 # Option to use environment variables for library paths
 option(USE_ENV_VAR "Use environment variables for library paths" OFF)
 
@@ -87,7 +91,6 @@ endif()
 if(POLICY CMP0146)
     cmake_policy(SET CMP0146 OLD)  # Allows the use of find_package(CUDA)
 endif()
-
 
 # Define valid build types
 set(VALID_BUILD_TYPES Debug Release)
@@ -182,10 +185,9 @@ else()
     message(FATAL_ERROR "Invalid build options.")
 endif()
 
-# Directories common to all builds
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tests)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr/mavlink/v2.0/common)
+#=============================================================================
+# Find External Libraries and Headers
+#=============================================================================
 
 # Environment variable validation and inclusion based on platform
 if(USE_ENV_VAR)
@@ -277,6 +279,29 @@ if(BLD_JETSON_B01)
     find_library(JETSON_GPIO_LIB JetsonGPIO)
 endif()
 
+#=============================================================================
+# Modules
+#=============================================================================
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/mavlink/v2.0/common)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils)
+
+file(GLOB MAV_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.cpp)
+file(GLOB MAV_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.h)
+file(GLOB SERIAL_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils/*.cpp)
+file(GLOB SERIAL_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils/*.h)
+file(GLOB MATH_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils/*.cpp)
+file(GLOB MATH_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils/*.h)
+
+#=============================================================================
+# Set Source files and locations
+#=============================================================================
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tests)
+
 # squirreldefender and source file paths
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/appsrc)
 set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
@@ -284,6 +309,13 @@ set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
 # List all source files with .cpp extension
 file(GLOB SOURCES ${SOURCE_DIR}/*.cpp)
 file(GLOB HEADERS ${HEADER_DIR}/*.h)
+
+list(APPEND SOURCES ${MAV_UTILS_SOURCES} ${SERIAL_UTILS_SOURCES} ${MATH_UTILS_SOURCES})
+list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HEADERS})
+
+#=============================================================================
+# Build Executable
+#=============================================================================
 
 # Compile the squirreldefender program
 if (BLD_JETSON_B01)
@@ -310,8 +342,8 @@ elseif(BLD_WIN)
             NO_DEFAULT_PATH)  # Only look in specified paths
     else()
         find_package(OpenCV REQUIRED
-            PATHS "C:/opencv/opencv-4.10.0/install"
-                  "C:/opencv/opencv-4.10.0/install/x64/vc17"
+            PATHS "C:/opencv/4.10.0/install"
+                  "C:/opencv/4.10.0/install/x64/vc17"
             NO_DEFAULT_PATH)
     endif()
 

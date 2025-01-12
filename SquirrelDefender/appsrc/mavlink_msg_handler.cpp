@@ -23,14 +23,6 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-#ifdef DEBUG_BUILD
-
-DebugTerm MavCmdAck("/dev/pts/0");
-DebugTerm SysStatInfo("/dev/pts/0");
-DebugTerm HeartbeatInfo("/dev/pts/0");
-
-#endif // DEBUG_BUILD
-
 uint16_t mav_veh_command_id;              /*<  Command ID (of acknowledged command).*/
 uint8_t mav_veh_command_result;           /*<  Result of command.*/
 uint8_t mav_veh_command_progress;         /*< [%] The progress percentage when result is MAV_RESULT_IN_PROGRESS. Values: [0-100],
@@ -161,25 +153,25 @@ void req_mav_msg(uint16_t msg_id) { MavCmd::req_mav_msg(SENDER_SYS_ID, SENDER_CO
 bool start_message_subscriptions(void);
 void parse_mav_msgs(void);
 
-void proc_mav_heartbeat_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_gps_int_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_system_time_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_sys_status_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_statustext_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_param_value_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_autopilot_version_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_scaled_imu_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_local_position_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_position_target_local_ned_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_set_position_target_local_ned_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_attitude_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_attitude_target_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_set_attitude_target_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_attitude_quaternion_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_command_ack_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_optical_flow_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_distance_sensor_msg(const mavlink_message_t *msg, const char *term);
-void proc_mav_position_local_ned_msg(const mavlink_message_t *msg, const char *term);
+void proc_mav_heartbeat_msg(const mavlink_message_t *msg);
+void proc_mav_gps_int_msg(const mavlink_message_t *msg);
+void proc_mav_system_time_msg(const mavlink_message_t *msg);
+void proc_mav_sys_status_msg(const mavlink_message_t *msg);
+void proc_mav_statustext_msg(const mavlink_message_t *msg);
+void proc_mav_param_value_msg(const mavlink_message_t *msg);
+void proc_mav_autopilot_version_msg(const mavlink_message_t *msg);
+void proc_mav_scaled_imu_msg(const mavlink_message_t *msg);
+void proc_mav_local_position_msg(const mavlink_message_t *msg);
+void proc_mav_position_target_local_ned_msg(const mavlink_message_t *msg);
+void proc_mav_set_position_target_local_ned_msg(const mavlink_message_t *msg);
+void proc_mav_attitude_msg(const mavlink_message_t *msg);
+void proc_mav_attitude_target_msg(const mavlink_message_t *msg);
+void proc_mav_set_attitude_target_msg(const mavlink_message_t *msg);
+void proc_mav_attitude_quaternion_msg(const mavlink_message_t *msg);
+void proc_mav_command_ack_msg(const mavlink_message_t *msg);
+void proc_mav_optical_flow_msg(const mavlink_message_t *msg);
+void proc_mav_distance_sensor_msg(const mavlink_message_t *msg);
+void proc_mav_position_local_ned_msg(const mavlink_message_t *msg);
 
 /********************************************************************************
  * Function: subscribe
@@ -196,7 +188,7 @@ void subscribe(uint16_t msg_id, float msg_interval)
  * Function: proc_heartbeat
  * Description: Decode heartbeat message and pass along the desired information.
  ********************************************************************************/
-void proc_mav_heartbeat_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_heartbeat_msg(const mavlink_message_t *msg)
 {
     mavlink_heartbeat_t heartbeat;
     mavlink_msg_heartbeat_decode(msg, &heartbeat);
@@ -214,7 +206,7 @@ void proc_mav_heartbeat_msg(const mavlink_message_t *msg, const char *term)
 
 #ifdef DEBUG_BUILD
 
-    print_heartbeat(heartbeat, term);
+    print_heartbeat(heartbeat);
 
 #endif // DEBUG_BUILD
 }
@@ -223,7 +215,7 @@ void proc_mav_heartbeat_msg(const mavlink_message_t *msg, const char *term)
  * Function: proc_mav_gps_int
  * Description: Decode gps message and pass along the desired information.
  ********************************************************************************/
-void proc_mav_gps_int_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_gps_int_msg(const mavlink_message_t *msg)
 {
     mavlink_global_position_int_t global_pos_int;
     mavlink_msg_global_position_int_decode(msg, &global_pos_int);
@@ -239,7 +231,7 @@ void proc_mav_gps_int_msg(const mavlink_message_t *msg, const char *term)
 
 #ifdef DEBUG_BUILD
 
-    print_global_position_int(global_pos_int, term);
+    print_global_position_int(global_pos_int);
 
 #endif // DEBUG_BUILD
 }
@@ -249,14 +241,14 @@ void proc_mav_gps_int_msg(const mavlink_message_t *msg, const char *term)
  * Description: Decode system time message and optionally print the
  *              information.
  ********************************************************************************/
-void proc_mav_system_time_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_system_time_msg(const mavlink_message_t *msg)
 {
     mavlink_system_time_t system_time;
     mavlink_msg_system_time_decode(msg, &system_time);
 
 #ifdef DEBUG_BUILD
 
-    print_system_time(system_time, term);
+    print_system_time(system_time);
 
 #endif // DEBUG_BUILD
 }
@@ -266,7 +258,7 @@ void proc_mav_system_time_msg(const mavlink_message_t *msg, const char *term)
  * Description: Decode system status message and optionally print the
  *              information.
  ********************************************************************************/
-void proc_mav_sys_status_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_sys_status_msg(const mavlink_message_t *msg)
 {
     mavlink_sys_status_t sys_status;
     mavlink_msg_sys_status_decode(msg, &sys_status);
@@ -290,7 +282,7 @@ void proc_mav_sys_status_msg(const mavlink_message_t *msg, const char *term)
 
 #ifdef DEBUG_BUILD
 
-    print_sys_status(sys_status, term);
+    print_sys_status(sys_status);
 
 #endif // DEBUG_BUILD
 }
@@ -300,14 +292,14 @@ void proc_mav_sys_status_msg(const mavlink_message_t *msg, const char *term)
  * Description: Decode status text message and optionally print the
  *              information.
  ********************************************************************************/
-void proc_mav_statustext_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_statustext_msg(const mavlink_message_t *msg)
 {
     mavlink_statustext_t statustext;
     mavlink_msg_statustext_decode(msg, &statustext);
 
 #ifdef DEBUG_BUILD
 
-    print_statustext(statustext, term);
+    print_statustext(statustext);
 
 #endif // DEBUG_BUILD
 }
@@ -317,14 +309,14 @@ void proc_mav_statustext_msg(const mavlink_message_t *msg, const char *term)
  * Description: Decode parameter value message and optionally print the
  *              information.
  ********************************************************************************/
-void proc_mav_param_value_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_param_value_msg(const mavlink_message_t *msg)
 {
     mavlink_param_value_t param_value;
     mavlink_msg_param_value_decode(msg, &param_value);
 
 #ifdef DEBUG_BUILD
 
-    print_param_value(param_value, term);
+    print_param_value(param_value);
 
 #endif // DEBUG_BUILD
 }
@@ -334,14 +326,14 @@ void proc_mav_param_value_msg(const mavlink_message_t *msg, const char *term)
  * Description: Decode autopilot version message and optionally print the
  *              information.
  ********************************************************************************/
-void proc_mav_autopilot_version_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_autopilot_version_msg(const mavlink_message_t *msg)
 {
     mavlink_autopilot_version_t autopilot_version;
     mavlink_msg_autopilot_version_decode(msg, &autopilot_version);
 
 #ifdef DEBUG_BUILD
 
-    print_autopilot_version(autopilot_version, term);
+    print_autopilot_version(autopilot_version);
 
 #endif // DEBUG_BUILD
 }
@@ -350,7 +342,7 @@ void proc_mav_autopilot_version_msg(const mavlink_message_t *msg, const char *te
  * Function: proc_mav_scaled_imu_msg
  * Description: Decode scaled IMU message and optionally print the information.
  ********************************************************************************/
-void proc_mav_scaled_imu_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_scaled_imu_msg(const mavlink_message_t *msg)
 {
     mavlink_scaled_imu_t scaled_imu;
     mavlink_msg_scaled_imu_decode(msg, &scaled_imu);
@@ -367,7 +359,7 @@ void proc_mav_scaled_imu_msg(const mavlink_message_t *msg, const char *term)
 
 #ifdef DEBUG_BUILD
 
-    print_scaled_imu(scaled_imu, term);
+    print_scaled_imu(scaled_imu);
 
 #endif // DEBUG_BUILD
 }
@@ -377,14 +369,14 @@ void proc_mav_scaled_imu_msg(const mavlink_message_t *msg, const char *term)
  * Description: Decode local position message and optionally print the
  *              information.
  ********************************************************************************/
-void proc_mav_local_position_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_local_position_msg(const mavlink_message_t *msg)
 {
     mavlink_local_position_ned_t local_position;
     mavlink_msg_local_position_ned_decode(msg, &local_position);
 
 #ifdef DEBUG_BUILD
 
-    print_local_position(local_position, term);
+    print_local_position(local_position);
 
 #endif // DEBUG_BUILD
 }
@@ -394,14 +386,14 @@ void proc_mav_local_position_msg(const mavlink_message_t *msg, const char *term)
  * Description: Decode position target local NED message and optionally print the
  *              information.
  ********************************************************************************/
-void proc_mav_position_target_local_ned_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_position_target_local_ned_msg(const mavlink_message_t *msg)
 {
     mavlink_position_target_local_ned_t position_target_local_ned;
     mavlink_msg_position_target_local_ned_decode(msg, &position_target_local_ned);
 
 #ifdef DEBUG_BUILD
 
-    print_position_target_local_ned(position_target_local_ned, term);
+    print_position_target_local_ned(position_target_local_ned);
 
 #endif // DEBUG_BUILD
 }
@@ -411,14 +403,14 @@ void proc_mav_position_target_local_ned_msg(const mavlink_message_t *msg, const 
  * Description: Decode set position target local NED message and optionally print
  *              the information.
  ********************************************************************************/
-void proc_mav_set_position_target_local_ned_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_set_position_target_local_ned_msg(const mavlink_message_t *msg)
 {
     mavlink_set_position_target_local_ned_t set_position_target_local_ned;
     mavlink_msg_set_position_target_local_ned_decode(msg, &set_position_target_local_ned);
 
 #ifdef DEBUG_BUILD
 
-    print_set_position_target_local_ned(set_position_target_local_ned, term);
+    print_set_position_target_local_ned(set_position_target_local_ned);
 
 #endif // DEBUG_BUILD
 }
@@ -428,7 +420,7 @@ void proc_mav_set_position_target_local_ned_msg(const mavlink_message_t *msg, co
  * Description: Decode local position NED message and optionally print the
  *              information.
  ********************************************************************************/
-void proc_mav_position_local_ned_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_position_local_ned_msg(const mavlink_message_t *msg)
 {
     mavlink_local_position_ned_t position_local_ned;
     mavlink_msg_local_position_ned_decode(msg, &position_local_ned);
@@ -442,7 +434,7 @@ void proc_mav_position_local_ned_msg(const mavlink_message_t *msg, const char *t
 
 #ifdef DEBUG_BUILD
 
-    print_position_local_ned(position_local_ned, term);
+    print_position_local_ned(position_local_ned);
 
 #endif // DEBUG_BUILD
 }
@@ -451,7 +443,7 @@ void proc_mav_position_local_ned_msg(const mavlink_message_t *msg, const char *t
  * Function: proc_mav_attitude_msg
  * Description: Decode attitude message and optionally print the information.
  ********************************************************************************/
-void proc_mav_attitude_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_attitude_msg(const mavlink_message_t *msg)
 {
     mavlink_attitude_t attitude;
     mavlink_msg_attitude_decode(msg, &attitude);
@@ -465,7 +457,7 @@ void proc_mav_attitude_msg(const mavlink_message_t *msg, const char *term)
 
 #ifdef DEBUG_BUILD
 
-    print_attitude(attitude, term);
+    print_attitude(attitude);
 
 #endif // DEBUG_BUILD
 }
@@ -475,14 +467,14 @@ void proc_mav_attitude_msg(const mavlink_message_t *msg, const char *term)
  * Description: Decode attitude target message and optionally print the
  *              information.
  ********************************************************************************/
-void proc_mav_attitude_target_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_attitude_target_msg(const mavlink_message_t *msg)
 {
     mavlink_attitude_target_t attitude_target;
     mavlink_msg_attitude_target_decode(msg, &attitude_target);
 
 #ifdef DEBUG_BUILD
 
-    print_attitude_target(attitude_target, term);
+    print_attitude_target(attitude_target);
 
 #endif // DEBUG_BUILD
 }
@@ -492,14 +484,14 @@ void proc_mav_attitude_target_msg(const mavlink_message_t *msg, const char *term
  * Description: Decode set attitude target message and optionally print the
  *              information.
  ********************************************************************************/
-void proc_mav_set_attitude_target_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_set_attitude_target_msg(const mavlink_message_t *msg)
 {
     mavlink_set_attitude_target_t set_attitude_target;
     mavlink_msg_set_attitude_target_decode(msg, &set_attitude_target);
 
 #ifdef DEBUG_BUILD
 
-    print_set_attitude_target(set_attitude_target, term);
+    print_set_attitude_target(set_attitude_target);
 
 #endif // DEBUG_BUILD
 }
@@ -509,7 +501,7 @@ void proc_mav_set_attitude_target_msg(const mavlink_message_t *msg, const char *
  * Description: Decode attitude quaternion message and optionally print the
  *              information.
  ********************************************************************************/
-void proc_mav_attitude_quaternion_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_attitude_quaternion_msg(const mavlink_message_t *msg)
 {
     mavlink_attitude_quaternion_t attitude_quaternion;
     mavlink_msg_attitude_quaternion_decode(msg, &attitude_quaternion);
@@ -525,7 +517,7 @@ void proc_mav_attitude_quaternion_msg(const mavlink_message_t *msg, const char *
 
 #ifdef DEBUG_BUILD
 
-    print_attitude_quaternion(attitude_quaternion, term);
+    print_attitude_quaternion(attitude_quaternion);
 
 #endif // DEBUG_BUILD
 }
@@ -535,7 +527,7 @@ void proc_mav_attitude_quaternion_msg(const mavlink_message_t *msg, const char *
  * Description: Decode command acknowledgment message and optionally print the
  *              information.
  ********************************************************************************/
-void proc_mav_command_ack_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_command_ack_msg(const mavlink_message_t *msg)
 {
     mavlink_command_ack_t command_ack;
     mavlink_msg_command_ack_decode(msg, &command_ack);
@@ -547,14 +539,14 @@ void proc_mav_command_ack_msg(const mavlink_message_t *msg, const char *term)
     mav_veh_command_target_system = command_ack.target_system;
     mav_veh_command_target_component = command_ack.target_component;
 
-    print_command_ack(command_ack, term);
+    print_command_ack(command_ack);
 }
 
 /********************************************************************************
  * Function: proc_mav_optical_flow_msg
  * Description: Decode optical flow message and optionally print the information.
  ********************************************************************************/
-void proc_mav_optical_flow_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_optical_flow_msg(const mavlink_message_t *msg)
 {
     mavlink_optical_flow_t optical_flow;
     mavlink_msg_optical_flow_decode(msg, &optical_flow);
@@ -571,7 +563,7 @@ void proc_mav_optical_flow_msg(const mavlink_message_t *msg, const char *term)
 
 #ifdef DEBUG_BUILD
 
-    print_optical_flow(optical_flow, term);
+    print_optical_flow(optical_flow);
 
 #endif // DEBUG_BUILD
 }
@@ -581,7 +573,7 @@ void proc_mav_optical_flow_msg(const mavlink_message_t *msg, const char *term)
  * Description: Decode distance sensor message and optionally print the
  *              information.
  ********************************************************************************/
-void proc_mav_distance_sensor_msg(const mavlink_message_t *msg, const char *term)
+void proc_mav_distance_sensor_msg(const mavlink_message_t *msg)
 {
     mavlink_distance_sensor_t distance_sensor;
     mavlink_msg_distance_sensor_decode(msg, &distance_sensor);
@@ -600,7 +592,7 @@ void proc_mav_distance_sensor_msg(const mavlink_message_t *msg, const char *term
 
 #ifdef DEBUG_BUILD
 
-    print_distance_sensor(distance_sensor, term);
+    print_distance_sensor(distance_sensor);
 
 #endif // DEBUG_BUILD
 }
@@ -656,58 +648,58 @@ void parse_mav_msgs(void)
             switch (msg.msgid)
             {
             case MAVLINK_MSG_ID_HEARTBEAT:
-                proc_mav_heartbeat_msg(&msg, "/dev/pts/0");
+                proc_mav_heartbeat_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
-                proc_mav_gps_int_msg(&msg, "/dev/pts/0");
+                proc_mav_gps_int_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_SYSTEM_TIME:
-                proc_mav_system_time_msg(&msg, "/dev/pts/0");
+                proc_mav_system_time_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_SCALED_IMU:
-                proc_mav_scaled_imu_msg(&msg, "/dev/pts/0");
+                proc_mav_scaled_imu_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_OPTICAL_FLOW:
-                proc_mav_optical_flow_msg(&msg, "/dev/pts/0");
+                proc_mav_optical_flow_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_DISTANCE_SENSOR:
-                proc_mav_distance_sensor_msg(&msg, "/dev/pts/0");
+                proc_mav_distance_sensor_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_ATTITUDE:
-                proc_mav_attitude_msg(&msg, "/dev/pts/0");
+                proc_mav_attitude_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_ATTITUDE_TARGET:
-                proc_mav_attitude_target_msg(&msg, "/dev/pts/0");
+                proc_mav_attitude_target_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_ATTITUDE_QUATERNION:
-                proc_mav_attitude_quaternion_msg(&msg, "/dev/pts/0");
+                proc_mav_attitude_quaternion_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_AUTOPILOT_VERSION:
-                proc_mav_autopilot_version_msg(&msg, "/dev/pts/0");
+                proc_mav_autopilot_version_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED:
-                proc_mav_position_target_local_ned_msg(&msg, "/dev/pts/0");
+                proc_mav_position_target_local_ned_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED:
-                proc_mav_set_position_target_local_ned_msg(&msg, "/dev/pts/0");
+                proc_mav_set_position_target_local_ned_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_LOCAL_POSITION_NED:
-                proc_mav_position_local_ned_msg(&msg, "/dev/pts/0");
+                proc_mav_position_local_ned_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_SYS_STATUS:
-                proc_mav_sys_status_msg(&msg, "/dev/pts/0");
+                proc_mav_sys_status_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_STATUSTEXT:
-                proc_mav_statustext_msg(&msg, "/dev/pts/0");
+                proc_mav_statustext_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_PARAM_VALUE:
-                proc_mav_param_value_msg(&msg, "/dev/pts/0");
+                proc_mav_param_value_msg(&msg);
                 break;
             case MAVLINK_MSG_ID_COMMAND_ACK:
-                proc_mav_command_ack_msg(&msg, "/dev/pts/0");
+                proc_mav_command_ack_msg(&msg);
                 break;
             default:
-                PrintPass::c_printf("Received message with ID: %d\n", (int)msg.msgid);
+                printf("Received message with ID: %u\n",msg.msgid);
             }
         }
     }
