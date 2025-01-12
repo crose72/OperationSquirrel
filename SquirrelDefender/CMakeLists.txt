@@ -287,6 +287,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/mavlink/v2.0/c
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils)
 
 file(GLOB MAV_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.cpp)
 file(GLOB MAV_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.h)
@@ -294,6 +295,8 @@ file(GLOB SERIAL_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils/
 file(GLOB SERIAL_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils/*.h)
 file(GLOB MATH_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils/*.cpp)
 file(GLOB MATH_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils/*.h)
+file(GLOB JSON_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils/*.cpp)
+file(GLOB JSON_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils/*.h)
 
 #=============================================================================
 # Set Source files and locations
@@ -310,8 +313,8 @@ set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
 file(GLOB SOURCES ${SOURCE_DIR}/*.cpp)
 file(GLOB HEADERS ${HEADER_DIR}/*.h)
 
-list(APPEND SOURCES ${MAV_UTILS_SOURCES} ${SERIAL_UTILS_SOURCES} ${MATH_UTILS_SOURCES})
-list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HEADERS})
+list(APPEND SOURCES ${MAV_UTILS_SOURCES} ${SERIAL_UTILS_SOURCES} ${MATH_UTILS_SOURCES} ${JSON_UTILS_SOURCES})
+list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HEADERS} ${JSON_UTILS_HEADERS})
 
 #=============================================================================
 # Build Executable

@@ -16,7 +16,7 @@
 #include "common_inc.h"
 #include "video_io.h"
 #include "detect_target.h"
-#include "parameters.h"
+#include "json_utils.h"
 #include "interpolate.h"
 
 

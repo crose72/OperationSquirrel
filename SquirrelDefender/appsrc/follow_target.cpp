@@ -137,7 +137,7 @@ void get_control_params(void)
 {
 #ifdef DEBUG_BUILD
 
-    Parameters veh_params("../params.json");
+    json_utils veh_params("../params.json");
     
     // Accessing Vel_PID_x parameters
     Kp_x = veh_params.get_float_param("Vel_PID_x", "Kp");
@@ -184,7 +184,7 @@ void calc_follow_error(void)
 #ifdef BLD_JETSON_B01
 #ifdef DEBUG_BUILD
 
-    Parameters target_params("../params.json");
+    json_utils target_params("../params.json");
 
     x_desired = target_params.get_float_param("Target", "Desired_X_offset");
 

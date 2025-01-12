@@ -22,7 +22,7 @@
 #include <jetson-inference/objectTrackerIOU.h>
 #include <jetson-inference/objectTrackerKLT.h>
 #include "video_io.h"
-#include "parameters.h"
+#include "json_utils.h"
 
 /********************************************************************************
  * Imported objects
