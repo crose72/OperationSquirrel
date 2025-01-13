@@ -11,7 +11,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "mav_cmd.h"
+#include "uart_utils.h"
 
 /********************************************************************************
  * Imported objects
@@ -50,8 +50,10 @@ class mav_motion
         static void send_cmd_set_position_target_local_ned(mavlink_set_position_target_local_ned_t *desired_target);
         static void send_cmd_set_position_target_global_int(uint8_t sender_sys_id, uint8_t sender_comp_id, const mavlink_set_position_target_global_int_t* set_position_target_global_int); // coordinate_frame, type_mask, lat_int, lon_int, alt, vx, vy, vz, afx, afy, afz, yaw, yaw_rate
         static void send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired_attitude_target); // type_mask, *q, body_roll_rate, body_pitch_rate, body_yaw_rate, thrust, *thrust_body
-
+        static void go_to_waypoint(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, int32_t lat, int32_t lon, float alt);
+        
     private:
+        static void send_mav_cmd(mavlink_message_t &msg) { SerialComm::write_uart(msg); };
         static float calc_yaw_target(float x, float y);
         static float calc_yaw_rate_target(float x, float y);
 };

@@ -249,12 +249,12 @@ void attitude_yaw(float yaw_pos, float yaw_rate)
  *              allow for manually controlling the roll, pitch, yaw, and thrust
  *              of a vehicle using an external controller.
  ********************************************************************************/
-void send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired_attitude_target)
+void mav_motion::send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired_attitude_target)
 {
     mavlink_message_t msg;
 
     //mavlink_msg_set_attitude_target_encode(sender_sys_id, sender_comp_id, &msg, desired_attitude_target);
-    SerialComm::write_uart(msg);
+    send_mav_cmd(msg);
 }
 
 /********************************************************************************
@@ -262,7 +262,7 @@ void send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired_attitud
  * Description: This function accepts an x, y, z vector target and sends a
  *              request to move to move the drone to that desired position.
  ********************************************************************************/
-void send_cmd_position_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component, 
+void mav_motion::send_cmd_position_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component, 
                                       float x, float y, float z, float yaw, uint16_t type_mask, uint8_t coordinate_frame)
 {
     mavlink_message_t msg;
@@ -278,7 +278,7 @@ void send_cmd_position_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uin
     command_position_target.coordinate_frame = coordinate_frame;
 
     mavlink_msg_set_position_target_local_ned_encode(sender_sys_id, sender_comp_id, &msg, &command_position_target);
-    SerialComm::write_uart(msg);
+    send_mav_cmd(msg);
 }
 
 /********************************************************************************
@@ -302,7 +302,7 @@ void mav_motion::send_cmd_velocity_target(uint8_t sender_sys_id, uint8_t sender_
     command_position_target.coordinate_frame = coordinate_frame;
 
     mavlink_msg_set_position_target_local_ned_encode(sender_sys_id, sender_comp_id, &msg, &command_position_target);
-    SerialComm::write_uart(msg);
+    send_mav_cmd(msg);
 }
 
 /********************************************************************************
@@ -311,7 +311,7 @@ void mav_motion::send_cmd_velocity_target(uint8_t sender_sys_id, uint8_t sender_
  * Description: This function accepts an x, y, z vector target and sends a
  *              request to move to move the drone to that desired position.
  ********************************************************************************/
-void send_cmd_acccel_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component, 
+void mav_motion::send_cmd_acccel_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component, 
                                       float ax, float ay, float az, float yaw, float yaw_rate, uint16_t type_mask, uint8_t coordinate_frame)
 {
     //send_cmd_set_position_target_local_ned(sender_sys_id, sender_comp_id, target_system, target_component, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, ax, ay, az, 
@@ -324,7 +324,7 @@ void send_cmd_acccel_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8
  *              allow for manually controlling the position, velocity, or
  *              acceleration of a vehicle using an external controller.
  ********************************************************************************/
-void send_cmd_set_position_target_local_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, 
+void mav_motion::send_cmd_set_position_target_local_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, 
                                                     uint8_t target_system, uint8_t target_component,
                                                     float x, float y, float z, float vx, float vy, float vz, 
                                                     float afx, float afy, float afz, float yaw, float yaw_rate,
@@ -350,7 +350,7 @@ void send_cmd_set_position_target_local_ned(uint8_t sender_sys_id, uint8_t sende
     command_position_target.coordinate_frame = coordinate_frame;
 
     mavlink_msg_set_position_target_local_ned_encode(sender_sys_id, sender_comp_id, &msg, &command_position_target);
-    SerialComm::write_uart(msg);
+    send_mav_cmd(msg);
 }
 
 /********************************************************************************
@@ -358,7 +358,7 @@ void send_cmd_set_position_target_local_ned(uint8_t sender_sys_id, uint8_t sende
  * Description: Commmand vehicle to move to a specified GPS location with
  *              specific latitude, longtitude, and altitude.
  ********************************************************************************/
-void go_to_waypoint(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, int32_t lat, int32_t lon, float alt)
+void mav_motion::go_to_waypoint(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, int32_t lat, int32_t lon, float alt)
 {
     mavlink_set_position_target_global_int_t position_target_glob_int;
 
@@ -380,11 +380,11 @@ void go_to_waypoint(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t targe
  *              global int message to send a vehicle to a specific GPS location
  *              using an external controller.
  ********************************************************************************/
-void send_cmd_set_position_target_global_int(uint8_t sender_sys_id, uint8_t sender_comp_id, const mavlink_set_position_target_global_int_t* set_position_target_global_int)
+void mav_motion::send_cmd_set_position_target_global_int(uint8_t sender_sys_id, uint8_t sender_comp_id, const mavlink_set_position_target_global_int_t* set_position_target_global_int)
 {
     mavlink_message_t msg;
 
     // There should be an _encode function we want to use instead of the pack function
     mavlink_msg_set_position_target_global_int_encode(sender_sys_id, sender_comp_id, &msg, set_position_target_global_int);
-    SerialComm::write_uart(msg);
+    send_mav_cmd(msg);
 }
