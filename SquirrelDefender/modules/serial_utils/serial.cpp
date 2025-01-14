@@ -1,5 +1,5 @@
 /********************************************************************************
- * @file    uart_utils.cpp
+ * @file    serial.cpp
  * @author  Cameron Rose
  * @date    6/7/2023
  * @brief   Configure and enable serial ports for simulated and real serial
@@ -9,7 +9,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "uart_utils.h"
+#include "serial.h"
 
 /********************************************************************************
  * Typedefs
@@ -73,22 +73,22 @@ int sock;
  ********************************************************************************/
 
 /********************************************************************************
- * Function: SerialComm
+ * Function: Serial
  * Description: Class constructor
  ********************************************************************************/
-SerialComm::SerialComm(void) {}
+Serial::Serial(void) {}
 
 /********************************************************************************
- * Function: ~SerialComm
+ * Function: ~Serial
  * Description: Class destructor
  ********************************************************************************/
-SerialComm::~SerialComm(void) {}
+Serial::~Serial(void) {}
 
 /********************************************************************************
  * Function: start_uart_comm
  * Description: Configure and make available the serial port for UART or TCP comms.
  ********************************************************************************/
-bool SerialComm::start_uart_comm(void)
+bool Serial::start_uart_comm(void)
 {
 #ifdef BLD_JETSON_B01_SERIAL
 
@@ -220,9 +220,9 @@ bool SerialComm::start_uart_comm(void)
 
 /********************************************************************************
  * Function: send_uart
- * Description: Send a buffer of bytes on the UART serial port or TCP connection.
+ * Description: Send a buffer of bytes on the UART Serial port or TCP connection.
  ********************************************************************************/
-void SerialComm::write_uart(mavlink_message_t &msg)
+void Serial::write_uart(mavlink_message_t &msg)
 {
     uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
     uint16_t len = 0;
@@ -266,7 +266,7 @@ void SerialComm::write_uart(mavlink_message_t &msg)
  * Function: read_uart
  * Description: Read some bytes from the UART serial port or TCP connection.
  ********************************************************************************/
-uint8_t SerialComm::read_uart(void)
+uint8_t Serial::read_uart(void)
 {
     uint8_t byte = 0;
     int n = 0; // Declare n to avoid undeclared identifier error
@@ -313,9 +313,9 @@ uint8_t SerialComm::read_uart(void)
 
 /********************************************************************************
  * Function: stop_uart_comm
- * Description: Close the serial port or TCP connection.
+ * Description: Close the Serial port or TCP connection.
  ********************************************************************************/
-void SerialComm::stop_uart_comm(void)
+void Serial::stop_uart_comm(void)
 {
 
 #ifdef BLD_JETSON_B01_SERIAL
@@ -347,7 +347,7 @@ void SerialComm::stop_uart_comm(void)
  * Function: bytes_available
  * Description: Check how many bytes are available for reading.
  ********************************************************************************/
-int SerialComm::bytes_available(void)
+int Serial::bytes_available(void)
 {
     int bytes = 0;
 
@@ -394,7 +394,7 @@ int SerialComm::bytes_available(void)
  * Function: offset_buffer
  * Description: Offset the buffer by its length to avoid overlapping buffers.
  ********************************************************************************/
-void SerialComm::offset_buffer(uint8_t *buffer, uint16_t &len, mavlink_message_t &msg)
+void Serial::offset_buffer(uint8_t *buffer, uint16_t &len, mavlink_message_t &msg)
 {
     len = len + mavlink_msg_to_send_buffer(&buffer[len], &msg);
 }
@@ -403,7 +403,7 @@ void SerialComm::offset_buffer(uint8_t *buffer, uint16_t &len, mavlink_message_t
  * Function: clear_buffer
  * Description: Clear the buffer.
  ********************************************************************************/
-void SerialComm::clear_buffer(uint8_t *buffer, uint16_t len)
+void Serial::clear_buffer(uint8_t *buffer, uint16_t len)
 {
     memset(buffer, 0, len);
 }

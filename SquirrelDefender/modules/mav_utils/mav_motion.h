@@ -11,7 +11,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "uart_utils.h"
+#include "serial.h"
 
 /********************************************************************************
  * Imported objects
@@ -24,10 +24,10 @@
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class mav_motion
+class MavMotion
 {
-    mav_motion();
-    ~mav_motion();
+    MavMotion();
+    ~MavMotion();
 
     public:
         static void cmd_position_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float position_target[3]);
@@ -53,7 +53,7 @@ class mav_motion
         static void go_to_waypoint(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, int32_t lat, int32_t lon, float alt);
         
     private:
-        static void send_mav_cmd(mavlink_message_t &msg) { SerialComm::write_uart(msg); };
+        static void send_mav_cmd(mavlink_message_t &msg) { Serial::write_uart(msg); };
         static float calc_yaw_target(float x, float y);
         static float calc_yaw_rate_target(float x, float y);
 };

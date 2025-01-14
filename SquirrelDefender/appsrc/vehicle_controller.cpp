@@ -55,15 +55,15 @@ void follow_mode(void)
 
     if (target_valid && target_too_close)
     {
-        mav_motion::cmd_velocity_xy_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
+        MavMotion::cmd_velocity_xy_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
     }
     else if (target_valid && !target_too_close)
     {
-        mav_motion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
     }
     else
     {
-        mav_motion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
     }
 }
 
@@ -102,15 +102,15 @@ void VehicleController::loop(void)
 {
     if (system_state == SYSTEM_STATE::INIT)
     {
-        mav_cmd::set_mode_guided(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+        MavCmd::set_mode_guided(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
     }
     else if (system_state == SYSTEM_STATE::PRE_ARM_GOOD)
     {
-        mav_cmd::arm_vehicle(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+        MavCmd::arm_vehicle(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
     }
     else if (system_state == SYSTEM_STATE::STANDBY)
     {
-        mav_cmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, (float)4.0);
+        MavCmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, (float)4.0);
     }
     else if (system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
     {
@@ -146,5 +146,5 @@ void VehicleController::loop(void)
  ********************************************************************************/
 void VehicleController::shutdown(void)
 {
-    mav_cmd::set_mode_land(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+    MavCmd::set_mode_land(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
 }

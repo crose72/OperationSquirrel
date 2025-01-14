@@ -53,7 +53,7 @@ void test_flight(void)
         target_velocity[0] = 87.0;
         target_velocity[1] = 0;
         target_velocity[2] = 0;
-        mav_motion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
         stage = 1;
     }
 
@@ -62,7 +62,7 @@ void test_flight(void)
         target_velocity[0] = 0.0;
         target_velocity[1] = -87.0;
         target_velocity[2] = 0.0;
-        mav_motion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
         stage = 2;
     }
 
@@ -71,7 +71,7 @@ void test_flight(void)
         target_velocity[0] = -6.0;
         target_velocity[1] = 4.0;
         target_velocity[2] = -11.0;
-        mav_motion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
         stage = 3;
     }
 
@@ -80,12 +80,12 @@ void test_flight(void)
         target_velocity[0] = -6.0;
         target_velocity[1] = 4.0;
         target_velocity[2] = -11.0;
-        mav_motion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
         stage = 4;
     }
 
     if (timerVal > 29 && stage == 4)
     {
-        mav_cmd::set_mode_rtl(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+        MavCmd::set_mode_rtl(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
     }
 }

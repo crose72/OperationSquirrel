@@ -13,7 +13,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "mav_utils.h"
-#include "uart_utils.h"
+#include "serial.h"
 #include <mavlink.h>
 #include <common.h>
 

@@ -1,12 +1,12 @@
 #pragma once
 
 /********************************************************************************
- * @file    uart_utils.h
+ * @file    serial.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef UART_UTILS_H
-#define UART_UTILS_H
+#ifndef SERIAL_H
+#define SERIAL_H
 
 /********************************************************************************
  * Includes
@@ -51,11 +51,11 @@
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class SerialComm
+class Serial
 {
 public:
-    SerialComm();
-    ~SerialComm();
+    Serial();
+    ~Serial();
 
     static bool start_uart_comm(void);
     static void stop_uart_comm(void);
@@ -68,4 +68,4 @@ private:
     static void clear_buffer(uint8_t *buffer, uint16_t len);
 };
 
-#endif // UART_UTILS_H
+#endif // SERIAL_H

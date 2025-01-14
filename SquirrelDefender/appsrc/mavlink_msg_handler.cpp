@@ -144,12 +144,12 @@ float mav_veh_local_ned_vz; /*< [m/s] Z Speed*/
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-bool start_mav_comm(void) { return SerialComm::start_uart_comm(); }; // Open up uart port for mavlink messages
-void stop_mav_comm(void) { SerialComm::stop_uart_comm(); };          // Stop mavlink comms on uart port
-uint8_t read_mav_msg(void) { return SerialComm::read_uart(); };      // Read a byte
+bool start_mav_comm(void) { return Serial::start_uart_comm(); }; // Open up uart port for mavlink messages
+void stop_mav_comm(void) { Serial::stop_uart_comm(); };          // Stop mavlink comms on uart port
+uint8_t read_mav_msg(void) { return Serial::read_uart(); };      // Read a byte
 void subscribe(uint16_t msg_id, float msg_interval);                 // Subscribe to a mavlink message at desired rate
-void set_mav_msg_rate(uint16_t msg_id, float msg_interval) { mav_cmd::set_mav_msg_rate(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, msg_id, msg_interval); };
-void req_mav_msg(uint16_t msg_id) { mav_cmd::req_mav_msg(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, msg_id); };
+void set_mav_msg_rate(uint16_t msg_id, float msg_interval) { MavCmd::set_mav_msg_rate(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, msg_id, msg_interval); };
+void req_mav_msg(uint16_t msg_id) { MavCmd::req_mav_msg(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, msg_id); };
 bool start_message_subscriptions(void);
 void parse_mav_msgs(void);
 
@@ -634,7 +634,7 @@ void parse_mav_msgs(void)
     mavlink_status_t status = {}; // Initialize the Mavlink status
     uint8_t byte;
 
-    int n = SerialComm::bytes_available();
+    int n = Serial::bytes_available();
 
     const char *term = "/dev/pts/0";
 

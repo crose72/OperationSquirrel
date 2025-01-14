@@ -12,7 +12,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "uart_utils.h"
+#include "serial.h"
 #include <mavlink.h>
 #include <common.h>
 
@@ -27,11 +27,11 @@
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class mav_cmd
+class MavCmd
 {
 public:
-    mav_cmd();
-    ~mav_cmd();
+    MavCmd();
+    ~MavCmd();
 
     // Public member functions
     static void arm_vehicle(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id);
@@ -53,10 +53,10 @@ public:
     static void send_cmd_int(uint8_t sender_sys_id, uint8_t sender_comp_id, const mavlink_command_int_t& command_int);
     
 private:
-    static void send_mav_cmd(mavlink_message_t &msg) { SerialComm::write_uart(msg); };
-    static bool start_mav_comm(void) { return SerialComm::start_uart_comm(); }; // Open up uart port for mavlink messages
-    static void stop_mav_comm(void) { SerialComm::stop_uart_comm(); };          // Stop mavlink comms on uart port
-    static uint8_t read_mav_msg(void) { return SerialComm::read_uart(); };      // Read a byte
+    static void send_mav_cmd(mavlink_message_t &msg) { Serial::write_uart(msg); };
+    static bool start_mav_comm(void) { return Serial::start_uart_comm(); }; // Open up uart port for mavlink messages
+    static void stop_mav_comm(void) { Serial::stop_uart_comm(); };          // Stop mavlink comms on uart port
+    static uint8_t read_mav_msg(void) { return Serial::read_uart(); };      // Read a byte
     static void subscribe(uint16_t msg_id, float msg_interval);                 // Subscribe to a mavlink message at desired rate
 };
 
