@@ -30,7 +30,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm LocalizeData("");
+PrintTerm LocalizeData("");
 
 float d_object_h;
 float d_object_w;

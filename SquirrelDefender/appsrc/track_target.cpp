@@ -24,7 +24,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm TrackingData("");
+PrintTerm TrackingData("");
 
 bool target_tracked;
 bool tracking;

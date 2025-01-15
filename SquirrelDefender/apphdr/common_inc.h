@@ -21,6 +21,6 @@
 
 // Custom libraries
 #include "time_calc.h"
-#include "debugger.h"
+#include "custom_print.h"
 
 #endif // COMMON_INC

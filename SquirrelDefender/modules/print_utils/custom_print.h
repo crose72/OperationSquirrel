@@ -1,7 +1,7 @@
 #pragma once
 
 /********************************************************************************
- * @file    debugger.h
+ * @file    custom_print.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
@@ -29,12 +29,12 @@
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class DebugTerm 
+class PrintTerm 
 {
     public:
-        DebugTerm(void);
-        DebugTerm(const std::string& terminal);
-        ~DebugTerm(void);
+        PrintTerm(void);
+        PrintTerm(const std::string& terminal);
+        ~PrintTerm(void);
 
         void cpp_cout(const std::string& message);
         void cpp_cout_oneline(const std::string& message);

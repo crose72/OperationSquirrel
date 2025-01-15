@@ -25,7 +25,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm VehStateInfo("");
+PrintTerm VehStateInfo("");
 bool takeoff_dbc;
 bool start_follow_mode;
 uint16_t takeoff_dbc_cnt;

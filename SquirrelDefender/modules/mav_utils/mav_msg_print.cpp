@@ -36,7 +36,7 @@
  ********************************************************************************/
 void print_heartbeat(mavlink_heartbeat_t &heartbeat)
 {
-    /* DebugTerm PrintHeartbeat(term);*/
+    /* PrintTerm PrintHeartbeat(term);*/
 
     printf("Heartbeat:\n");
     printf("\tType: %d\n", heartbeat.type);
@@ -53,7 +53,7 @@ void print_heartbeat(mavlink_heartbeat_t &heartbeat)
  ********************************************************************************/
 void print_system_time(mavlink_system_time_t &system_time)
 {
-    /* DebugTerm PrintSysTm(term); */
+    /* PrintTerm PrintSysTm(term); */
 
     printf("System Time:\n");
     printf("\tUnix timestamp (us): %lu\n", system_time.time_unix_usec);
@@ -66,7 +66,7 @@ void print_system_time(mavlink_system_time_t &system_time)
  ********************************************************************************/
 void print_sys_status(mavlink_sys_status_t &sys_status)
 {
-    /* DebugTerm PrintSysStat(term); */
+    /* PrintTerm PrintSysStat(term); */
 
     printf("System status:\n");
     printf("\tOnboard control sensors present: %u\n", sys_status.onboard_control_sensors_present);
@@ -90,7 +90,7 @@ void print_sys_status(mavlink_sys_status_t &sys_status)
  ********************************************************************************/
 void print_statustext(mavlink_statustext_t &statustext)
 {
-    /* DebugTerm PrintStatTxt(term); */
+    /* PrintTerm PrintStatTxt(term); */
 
     printf("STATUSTEXT message:\n");
     printf("\tSeverity: %u\n", statustext.severity);
@@ -103,7 +103,7 @@ void print_statustext(mavlink_statustext_t &statustext)
  ********************************************************************************/
 void print_param_value(mavlink_param_value_t &param_value)
 {
-    /* DebugTerm PrintParamVal(term); */
+    /* PrintTerm PrintParamVal(term); */
 
     printf("Parameter Name: %s\n", param_value.param_id);
     printf("\tValue: %.4f\n", param_value.param_value);
@@ -118,7 +118,7 @@ void print_param_value(mavlink_param_value_t &param_value)
  ********************************************************************************/
 void print_autopilot_version(mavlink_autopilot_version_t &autopilot_version)
 {
-    /* DebugTerm PrintAutopilotVrsn(term); */
+    /* PrintTerm PrintAutopilotVrsn(term); */
 
     printf("Autopilot Version:\n");
     printf("\tCapabilities: %lu\n", autopilot_version.capabilities);
@@ -137,7 +137,7 @@ void print_autopilot_version(mavlink_autopilot_version_t &autopilot_version)
  ********************************************************************************/
 void print_gps_global_origin(mavlink_gps_global_origin_t &gps_global_origin)
 {
-    /* DebugTerm PrintGlobOrig(term); */
+    /* PrintTerm PrintGlobOrig(term); */
 
     printf("GPS_GLOBAL_ORIGIN message:\n");
     printf("\tLatitude: %f\n", (double)gps_global_origin.latitude);
@@ -151,7 +151,7 @@ void print_gps_global_origin(mavlink_gps_global_origin_t &gps_global_origin)
  ********************************************************************************/
 void print_home_position(mavlink_home_position_t &home_position)
 {
-    /* DebugTerm PrintHomePos(term);*/
+    /* PrintTerm PrintHomePos(term);*/
 
     printf("HOME_POSITION message:\n");
     printf("\tLatitude: %f\n", (double)home_position.latitude);
@@ -165,7 +165,7 @@ void print_home_position(mavlink_home_position_t &home_position)
  ********************************************************************************/
 void print_global_position_int(mavlink_global_position_int_t &global_pos_int)
 {
-    /* DebugTerm PrintGPS(term); */
+    /* PrintTerm PrintGPS(term); */
 
     printf("Global position:\n");
     printf("\tLatitude: %d degrees (1e-7)\n", global_pos_int.lat);
@@ -184,7 +184,7 @@ void print_global_position_int(mavlink_global_position_int_t &global_pos_int)
  ********************************************************************************/
 void print_scaled_imu(mavlink_scaled_imu_t &scaled_imu)
 {
-    /* DebugTerm PrintScaledIMU(term); */
+    /* PrintTerm PrintScaledIMU(term); */
 
     printf("Scaled IMU data:\n");
     printf("\tX acceleration: %d\n", scaled_imu.xacc);
@@ -204,7 +204,7 @@ void print_scaled_imu(mavlink_scaled_imu_t &scaled_imu)
  ********************************************************************************/
 void print_optical_flow(mavlink_optical_flow_t &optical_flow)
 {
-    /* DebugTerm PrintOptFlow(term); */
+    /* PrintTerm PrintOptFlow(term); */
 
     printf("Optical Flow data:\n");
     printf("\tTimestamp: %llu us\n", optical_flow.time_usec);
@@ -225,7 +225,7 @@ void print_optical_flow(mavlink_optical_flow_t &optical_flow)
  ********************************************************************************/
 void print_distance_sensor(mavlink_distance_sensor_t &distance_sensor)
 {
-    /* DebugTerm DistSnsrInfo(term); */
+    /* PrintTerm DistSnsrInfo(term); */
 
     printf("Distance Sensor data:\n");
     printf("\tTimestamp: %ums\n", distance_sensor.time_boot_ms);
@@ -252,7 +252,7 @@ void print_distance_sensor(mavlink_distance_sensor_t &distance_sensor)
  ********************************************************************************/
 void print_local_position(mavlink_local_position_ned_t &local_position)
 {
-    /* DebugTerm PrintLocPos(term); */
+    /* PrintTerm PrintLocPos(term); */
 
     printf("Local Position:\n");
     printf("\tTimestamp: %u\n", local_position.time_boot_ms);
@@ -272,7 +272,7 @@ void print_local_position(mavlink_local_position_ned_t &local_position)
  ********************************************************************************/
 void print_position_target_local_ned(mavlink_position_target_local_ned_t &position_target_local_ned)
 {
-    /* DebugTerm PrintPosTrgt(term); */
+    /* PrintTerm PrintPosTrgt(term); */
 
     printf("Position target local NED: %u\n", position_target_local_ned.time_boot_ms);
     printf("\tTime since boot (ms): %u\n", position_target_local_ned.time_boot_ms);
@@ -291,7 +291,7 @@ void print_position_target_local_ned(mavlink_position_target_local_ned_t &positi
  ********************************************************************************/
 void print_set_position_target_local_ned(mavlink_set_position_target_local_ned_t &set_position_target_local_ned)
 {
-    /* DebugTerm PrintSetPosTrgt(term); */
+    /* PrintTerm PrintSetPosTrgt(term); */
 
     printf("\tTime since boot (ms): %u\n", set_position_target_local_ned.time_boot_ms);
     printf("\tPosition (X, Y, Z): %.3f, %.3f, %.3f\n", set_position_target_local_ned.x, set_position_target_local_ned.y, set_position_target_local_ned.z);
@@ -311,7 +311,7 @@ void print_set_position_target_local_ned(mavlink_set_position_target_local_ned_t
  ********************************************************************************/
 void print_attitude(mavlink_attitude_t &attitude)
 {
-    /* DebugTerm PrintAtt(term); */
+    /* PrintTerm PrintAtt(term); */
 
     printf("Attitude:\n");
     printf("\tRoll: %.4f radians\n", attitude.roll);
@@ -328,7 +328,7 @@ void print_attitude(mavlink_attitude_t &attitude)
  ********************************************************************************/
 void print_attitude_target(mavlink_attitude_target_t &attitude_target)
 {
-    /*DebugTerm PrintAttTrgt(term); */
+    /*PrintTerm PrintAttTrgt(term); */
 
     printf("Attitude Target:\n");
     printf("\tTime Boot (ms): %lu\n", attitude_target.time_boot_ms);
@@ -346,7 +346,7 @@ void print_attitude_target(mavlink_attitude_target_t &attitude_target)
  ********************************************************************************/
 void print_set_attitude_target(mavlink_set_attitude_target_t &set_attitude_target)
 {
-    /* DebugTerm PrintSetAttTrgt(term); */
+    /* PrintTerm PrintSetAttTrgt(term); */
 
     printf("Set Attitude Target:\n");
     printf("\tTime Boot (ms): %lu\n", set_attitude_target.time_boot_ms);
@@ -366,7 +366,7 @@ void print_set_attitude_target(mavlink_set_attitude_target_t &set_attitude_targe
  ********************************************************************************/
 void print_attitude_quaternion(mavlink_attitude_quaternion_t &attitude_quaternion)
 {
-    /* DebugTerm PrintAttQuat(term); */
+    /* PrintTerm PrintAttQuat(term); */
 
     printf("Attitude Quaternion:\n");
     printf("\tTime Boot (ms): %ul\n", attitude_quaternion.time_boot_ms);
@@ -383,7 +383,7 @@ void print_attitude_quaternion(mavlink_attitude_quaternion_t &attitude_quaternio
  ********************************************************************************/
 void print_position_local_ned(const mavlink_local_position_ned_t &local_position)
 {
-    /* DebugTerm PrintLocalPos(term); */
+    /* PrintTerm PrintLocalPos(term); */
 
     printf("Local Position NED:\n");
     printf("\tX Position (m): %f\n", local_position.x);

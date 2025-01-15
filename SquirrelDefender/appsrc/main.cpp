@@ -45,7 +45,7 @@
  ********************************************************************************/
 bool stop_program;
 std::mutex mutex_main;
-DebugTerm MainTerm("");
+PrintTerm MainTerm("");
 
 /********************************************************************************
  * Calibration definitions

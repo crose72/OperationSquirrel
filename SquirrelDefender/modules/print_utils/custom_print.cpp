@@ -8,7 +8,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "debugger.h"
+#include "custom_print.h"
 
 /********************************************************************************
  * Typedefs
@@ -31,10 +31,10 @@
  ********************************************************************************/
 
 /********************************************************************************
- * Function: DebugTerm
+ * Function: PrintTerm
  * Description: Default constructor that defaults to the standard output.
  ********************************************************************************/
-DebugTerm::DebugTerm() : use_default_term(true)
+PrintTerm::PrintTerm() : use_default_term(true)
 {
 #ifdef DEBUG_BUILD
     // No need to do anything as use_default_terminal is already set to true
@@ -42,10 +42,10 @@ DebugTerm::DebugTerm() : use_default_term(true)
 }
 
 /********************************************************************************
- * Function: DebugTerm
+ * Function: PrintTerm
  * Description: Class constructor.
  ********************************************************************************/
-DebugTerm::DebugTerm(const std::string &terminal) : debug_terminal(terminal), use_default_term(false)
+PrintTerm::PrintTerm(const std::string &terminal) : debug_terminal(terminal), use_default_term(false)
 {
     if (!debug_terminal.is_open())
     {
@@ -55,10 +55,10 @@ DebugTerm::DebugTerm(const std::string &terminal) : debug_terminal(terminal), us
 }
 
 /********************************************************************************
- * Function: ~DebugTerm
+ * Function: ~PrintTerm
  * Description: Class destructor.
  ********************************************************************************/
-DebugTerm::~DebugTerm(void)
+PrintTerm::~PrintTerm(void)
 {
     if (debug_terminal.is_open())
     {
@@ -70,7 +70,7 @@ DebugTerm::~DebugTerm(void)
  * Function: cpp_cout
  * Description: Print statements to the additional terminal.
  ********************************************************************************/
-void DebugTerm::cpp_cout(const std::string &message)
+void PrintTerm::cpp_cout(const std::string &message)
 {
     if (debug_terminal.is_open())
     {
@@ -87,7 +87,7 @@ void DebugTerm::cpp_cout(const std::string &message)
  * Function: cpp_cout_oneline
  * Description: Print statements to the additional terminal with no newline char.
  ********************************************************************************/
-void DebugTerm::cpp_cout_oneline(const std::string &message)
+void PrintTerm::cpp_cout_oneline(const std::string &message)
 {
     if (debug_terminal.is_open())
     {
@@ -104,7 +104,7 @@ void DebugTerm::cpp_cout_oneline(const std::string &message)
  * Function: cpp_cerr
  * Description: Print statements to the additional terminal.
  ********************************************************************************/
-void DebugTerm::cpp_cerr(const std::string &message)
+void PrintTerm::cpp_cerr(const std::string &message)
 {
     if (debug_terminal.is_open())
     {
@@ -121,7 +121,7 @@ void DebugTerm::cpp_cerr(const std::string &message)
  * Function: cpp_cerr_oneline
  * Description: Print statements to the additional terminal with no newline char.
  ********************************************************************************/
-void DebugTerm::cpp_cerr_oneline(const std::string &message)
+void PrintTerm::cpp_cerr_oneline(const std::string &message)
 {
     if (debug_terminal.is_open())
     {

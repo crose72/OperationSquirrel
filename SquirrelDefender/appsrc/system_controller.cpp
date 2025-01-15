@@ -24,7 +24,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm SysStat("");
+PrintTerm SysStat("");
 bool systems_initialized;
 SYSTEM_STATE system_state;
 
