@@ -195,8 +195,8 @@ void VideoWin::out_loop(void)
  ********************************************************************************/
 void VideoWin::shutdown(void)
 {
-    PrintPass::cpp_cout("video:  shutting down...");
-    PrintPass::cpp_cout("video:  shutdown complete.\n");
+    Print::cpp_cout("video:  shutting down...");
+    Print::cpp_cout("video:  shutdown complete.\n");
 }
 
 #endif // BLD_WIN

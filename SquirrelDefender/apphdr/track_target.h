@@ -47,7 +47,7 @@ extern float input_video_height;
 #ifdef BLD_WIN
 
 extern cv::dnn::Net net;
-extern std::vector<yolo_net::detection> yolo_detections;
+extern std::vector<YoloNet::detection> yolo_detections;
 extern int yolo_detection_count;
 extern cv::Mat image;
 extern float input_video_width;

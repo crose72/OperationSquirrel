@@ -45,7 +45,6 @@
  ********************************************************************************/
 bool stop_program;
 std::mutex mutex_main;
-PrintTerm MainTerm("");
 
 /********************************************************************************
  * Calibration definitions
@@ -64,7 +63,7 @@ void sig_handler(int signo)
     if (signo == SIGINT)
     {
         stop_program = true;
-        PrintPass::c_fprintf("received SIGINT\n");
+        Print::c_fprintf("received SIGINT\n");
     }
 }
 
@@ -76,7 +75,7 @@ void attach_sig_handler(void)
 {
     if (signal(SIGINT, sig_handler) == SIG_ERR)
     {
-        PrintPass::c_fprintf("can't catch SIGINT");
+        Print::c_fprintf("can't catch SIGINT");
     }
 }
 

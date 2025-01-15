@@ -138,7 +138,7 @@ bool SSD::init(void)
 
     if (!create_detection_network())
     {
-        PrintPass::c_fprintf("Failed to create detection network");
+        Print::c_fprintf("Failed to create detection network");
         return false;
     }
 

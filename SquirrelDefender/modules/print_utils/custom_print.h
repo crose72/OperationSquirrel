@@ -46,11 +46,11 @@ class PrintTerm
         std::ofstream debug_terminal;
 };
 
-class PrintPass
+class Print
 {
     public:
-        PrintPass(void);
-        ~PrintPass(void);
+        Print(void);
+        ~Print(void);
 
         static int c_printf(const char *format, ...);
         static int c_fprintf(const char *format, ...);

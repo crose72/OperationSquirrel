@@ -29,7 +29,7 @@ extern uchar3* image;
 
 extern cv::Mat image;
 extern cv::dnn::Net net;
-extern std::vector<yolo_net::detection> yolo_detections;
+extern std::vector<YoloNet::detection> yolo_detections;
 extern int yolo_detection_count;
 
 #else
@@ -51,7 +51,7 @@ extern int detection_count;
 
 #elif BLD_WIN
 
-extern std::vector<yolo_net::detection> yolo_detections;
+extern std::vector<YoloNet::detection> yolo_detections;
 extern int yolo_detection_count;
 
 #else

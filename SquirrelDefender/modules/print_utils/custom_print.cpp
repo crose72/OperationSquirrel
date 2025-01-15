@@ -49,7 +49,7 @@ PrintTerm::PrintTerm(const std::string &terminal) : debug_terminal(terminal), us
 {
     if (!debug_terminal.is_open())
     {
-        PrintPass::cpp_cerr("Failed to open terminal: " + terminal);
+        Print::cpp_cerr("Failed to open terminal: " + terminal);
         use_default_term = true;
     }
 }
@@ -79,7 +79,7 @@ void PrintTerm::cpp_cout(const std::string &message)
 
     if (use_default_term)
     {
-        PrintPass::cpp_cout(message);
+        Print::cpp_cout(message);
     }
 }
 
@@ -96,7 +96,7 @@ void PrintTerm::cpp_cout_oneline(const std::string &message)
 
     if (use_default_term)
     {
-        PrintPass::cpp_cout_oneline(message);
+        Print::cpp_cout_oneline(message);
     }
 }
 
@@ -113,7 +113,7 @@ void PrintTerm::cpp_cerr(const std::string &message)
 
     if (use_default_term)
     {
-        PrintPass::cpp_cerr(message);
+        Print::cpp_cerr(message);
     }
 }
 
@@ -130,27 +130,27 @@ void PrintTerm::cpp_cerr_oneline(const std::string &message)
 
     if (use_default_term)
     {
-        PrintPass::cpp_cerr_oneline(message);
+        Print::cpp_cerr_oneline(message);
     }
 }
 
 /********************************************************************************
- * Function: PrintPass
+ * Function: Print
  * Description: Class constructor.
  ********************************************************************************/
-PrintPass::PrintPass(void) {}
+Print::Print(void) {}
 
 /********************************************************************************
- * Function: ~PrintPass
+ * Function: ~Print
  * Description: Class destructor.
  ********************************************************************************/
-PrintPass::~PrintPass(void) {}
+Print::~Print(void) {}
 
 /********************************************************************************
  * Function: c_printf
  * Description: Use c printf to print formatted strings to the default terminal.
  ********************************************************************************/
-int PrintPass::c_printf(const char *format, ...)
+int Print::c_printf(const char *format, ...)
 {
     va_list args;
     va_start(args, format);
@@ -164,7 +164,7 @@ int PrintPass::c_printf(const char *format, ...)
  * Description: Use c fprintf to print formatted error strings to the default
  *              terminal.
  ********************************************************************************/
-int PrintPass::c_fprintf(const char *format, ...)
+int Print::c_fprintf(const char *format, ...)
 {
     va_list args;
     va_start(args, format);
@@ -177,7 +177,7 @@ int PrintPass::c_fprintf(const char *format, ...)
  * Function: cpp_cout
  * Description: Use c++ function cout to print to terminal.
  ********************************************************************************/
-void PrintPass::cpp_cout(const std::string &message)
+void Print::cpp_cout(const std::string &message)
 {
     std::cout << message << std::endl;
 }
@@ -186,7 +186,7 @@ void PrintPass::cpp_cout(const std::string &message)
  * Function: cpp_cout_oneline
  * Description: Use c++ function cout to print to terminal with no newline char.
  ********************************************************************************/
-void PrintPass::cpp_cout_oneline(const std::string &message)
+void Print::cpp_cout_oneline(const std::string &message)
 {
     std::cout << message;
 }
@@ -195,7 +195,7 @@ void PrintPass::cpp_cout_oneline(const std::string &message)
  * Function: cpp_cerr
  * Description: Use c++ function cerr to print errors to terminal.
  ********************************************************************************/
-void PrintPass::cpp_cerr(const std::string &message)
+void Print::cpp_cerr(const std::string &message)
 {
     std::cerr << message << std::endl;
 }
@@ -205,7 +205,7 @@ void PrintPass::cpp_cerr(const std::string &message)
  * Description: Use c++ function cerr to print errors to terminal with no
  *              newline char.
  ********************************************************************************/
-void PrintPass::cpp_cerr_oneline(const std::string &message)
+void Print::cpp_cerr_oneline(const std::string &message)
 {
     std::cerr << message;
 }

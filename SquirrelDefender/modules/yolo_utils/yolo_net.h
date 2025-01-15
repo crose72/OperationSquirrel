@@ -3,7 +3,7 @@
 #ifdef ENABLE_CV
 
 /********************************************************************************
- * @file    detect_target_yolo.h
+ * @file    yolo_net.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
@@ -34,11 +34,11 @@
  * Function prototypes and Class Definitions
  ********************************************************************************/
 
-class yolo_net
+class YoloNet
 {
 public:
-    yolo_net(void);
-    ~yolo_net(void);
+    YoloNet(void);
+    ~YoloNet(void);
 
     struct detection
     {
@@ -66,7 +66,7 @@ public:
     };
 
     static cv::dnn::Net create(const std::string& model, const std::string& class_list_path, int backend_id, int target_id);
-    static void detect(cv::Mat& input, cv::dnn::Net net, std::vector<yolo_net::detection>& detections);
+    static void detect(cv::Mat& input, cv::dnn::Net net, std::vector<YoloNet::detection>& detections);
 
 private:
     static const float INPUT_WIDTH;
@@ -87,17 +87,17 @@ private:
     //static std::vector<std::string> class_list;
 
     static std::vector<cv::Mat> pre_process(cv::Mat& input, cv::dnn::Net& net);
-    static void clear_prev_detections(std::vector<yolo_net::detection>& detections);
+    static void clear_prev_detections(std::vector<YoloNet::detection>& detections);
     static void unwrap_detections(float* data, int rows, float x_factor, float y_factor,
         std::vector<int>& class_ids, std::vector<float>& confidences,
-        std::vector<cv::Rect>& boxes, std::vector<yolo_net::detection>& detections,
+        std::vector<cv::Rect>& boxes, std::vector<YoloNet::detection>& detections,
         const std::vector<std::string>& class_list);
     static void draw_bounding_boxes(cv::Mat& input, const std::vector<int>& indices,
         const std::vector<cv::Rect>& boxes, const std::vector<float>& confidences,
         const std::vector<int>& class_ids, const std::vector<std::string>& class_list,
-        std::vector<yolo_net::detection>& detections);
+        std::vector<YoloNet::detection>& detections);
     static void nms_suppression(const std::vector<cv::Rect>& boxes, const std::vector<float>& confidences, std::vector<int>& indices);
-    static void post_process(cv::Mat& input, std::vector<cv::Mat>& outputs, std::vector<yolo_net::detection>& detections, const std::vector<std::string>& class_list);
+    static void post_process(cv::Mat& input, std::vector<cv::Mat>& outputs, std::vector<YoloNet::detection>& detections, const std::vector<std::string>& class_list);
     static void draw_label(cv::Mat& input, std::string label, int left, int top);
 
 };

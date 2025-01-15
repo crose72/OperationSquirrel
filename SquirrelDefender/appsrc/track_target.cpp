@@ -24,8 +24,6 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-PrintTerm TrackingData("");
-
 bool target_tracked;
 bool tracking;
 bool initialized_cv_image;
@@ -285,7 +283,7 @@ void track_target(void)
             tracker_init(target_tracker, image, target_bounding_box);
         }
 
-        PrintPass::cpp_cout("My code made it this far!");
+        Print::cpp_cout("My code made it this far!");
           
         target_bounding_box = cv::Rect(target_left, target_top, target_width, target_height);
         target_tracked = tracker_update(target_tracker, image, target_bounding_box);
