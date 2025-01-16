@@ -23,7 +23,7 @@
 
 #elif BLD_WIN
 
-#include "video_win_io.h"
+#include "video_io_win.h"
 
 #else
 
