@@ -2,7 +2,7 @@
 #ifdef BLD_WIN
 
 /********************************************************************************
- * @file    video_win_IO.cpp
+ * @file    video_win_io.cpp
  * @author  Cameron Rose
  * @date    5/22/2024
  * @brief   Configure and start video streams for other software components.
