@@ -2,7 +2,7 @@
 #ifdef BLD_JETSON_B01
 
 /********************************************************************************
- * @file    video_nv_IO.cpp
+ * @file    video_io_nv.cpp
  * @author  Cameron Rose
  * @date    5/22/2024
  * @brief   Configure and start video streams for other software components.
@@ -11,7 +11,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "video_nv_io.h"
+#include "video_io_nv.h"
 
 /********************************************************************************
  * Typedefs

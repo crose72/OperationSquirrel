@@ -19,7 +19,7 @@
 
 #ifdef BLD_JETSON_B01
 
-#include "video_nv_io.h"
+#include "video_io_nv.h"
 
 #elif BLD_WIN
 

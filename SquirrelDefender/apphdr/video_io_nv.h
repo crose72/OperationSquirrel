@@ -4,12 +4,12 @@
 #ifdef BLD_JETSON_B01
 
 /********************************************************************************
- * @file    video_nv_IO.h
+ * @file    video_io_nv.h
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef VIDEO_NV_IO_H
-#define VIDEO_NV_IO_H
+#ifndef VIDEO_IO_NV_H
+#define VIDEO_IO_NV_H
 
 /********************************************************************************
  * Includes
@@ -56,7 +56,7 @@ public:
 private:
 };
 
-#endif // VIDEO_NV_IO_H
+#endif // VIDEO_IO_NV_H
 
 #endif // BLD_JETSON_B01
 #endif // ENABLE_CV

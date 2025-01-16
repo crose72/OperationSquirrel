@@ -8,8 +8,8 @@
  * @author  Cameron Rose
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef VIDEO_WIN_IO_H
-#define VIDEO_WIN_IO_H
+#ifndef VIDEO_IO_WIN_H
+#define VIDEO_IO_WIN_H
 
 /********************************************************************************
  * Includes
@@ -48,7 +48,7 @@ public:
 private:
 };
 
-#endif // VIDEO_WIN_IO_H
+#endif // VIDEO_IO_WIN_H
 
 #endif // BLD_WIN
 #endif // ENABLE_CV
