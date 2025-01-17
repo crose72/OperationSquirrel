@@ -56,7 +56,7 @@ extern float g_input_video_height;
 #endif // BLD_WIN
 
 extern bool g_valid_image_rcvd;
-extern bool target_valid;
+extern bool g_target_valid;
 extern int target_detection_ID;
 extern int target_track_ID;
 extern float target_height;
@@ -70,7 +70,7 @@ extern float target_bottom;
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool target_valid;
+extern bool g_target_valid;
 extern int target_detection_ID;
 extern int target_track_ID;
 extern float target_cntr_offset_x;

@@ -27,9 +27,9 @@
  * Imported objects
  ********************************************************************************/
 extern bool g_valid_image_rcvd;
-extern uint16_t mav_veh_rngfdr_current_distance;
-extern int32_t mav_veh_rel_alt;
-extern float dt_25ms;
+extern uint16_t g_mav_veh_rngfdr_current_distance;
+extern int32_t g_mav_veh_rel_alt;
+extern float g_dt_25ms;
 extern bool save_button_press;
 
 /********************************************************************************

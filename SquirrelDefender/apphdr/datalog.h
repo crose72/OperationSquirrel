@@ -33,7 +33,7 @@ extern uint16_t mav_veh_sys_stat_voltage_battery;
 extern int16_t mav_veh_sys_stat_current_battery;
 extern int8_t mav_veh_sys_stat_battery_remaining;
 
-extern int32_t mav_veh_rel_alt;
+extern int32_t g_mav_veh_rel_alt;
 extern int16_t mav_veh_gps_vx;
 extern int16_t mav_veh_gps_vy;
 extern int16_t mav_veh_gps_vz;
@@ -52,7 +52,7 @@ extern int16_t mav_veh_imu_xgyro;
 extern int16_t mav_veh_imu_ygyro;
 extern int16_t mav_veh_imu_zgyro;
 
-extern uint16_t mav_veh_rngfdr_current_distance;
+extern uint16_t g_mav_veh_rngfdr_current_distance;
 extern uint8_t mav_veh_rngfdr_signal_quality;
 
 extern float mav_veh_flow_comp_m_x;
@@ -87,7 +87,7 @@ extern uint8_t mav_veh_state;
 extern uint8_t mav_veh_mavlink_version;
 
 /* Detect/Track target variables */
-extern bool target_valid;
+extern bool g_target_valid;
 extern int target_detection_ID;
 extern int target_track_ID;
 extern float target_cntr_offset_x;
@@ -115,10 +115,10 @@ extern float delta_d_x;
 extern float delta_d_z;
 
 /* Follow target variables */
-extern bool target_too_close;
-extern float vx_adjust;
-extern float vy_adjust;
-extern float vz_adjust;
+extern bool g_target_too_close;
+extern float g_vx_adjust;
+extern float g_vy_adjust;
+extern float g_vz_adjust;
 
 /* System variables */
 extern SYSTEM_STATE system_state;

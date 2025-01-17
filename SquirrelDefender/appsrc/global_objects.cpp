@@ -15,4 +15,4 @@
  * Object definitions
  ********************************************************************************/
 bool first_loop_after_start = true;
-float dt_25ms = 0.025;
+float g_dt_25ms = 0.025;

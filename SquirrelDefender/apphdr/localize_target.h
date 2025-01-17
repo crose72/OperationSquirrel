@@ -25,9 +25,9 @@
  ********************************************************************************/
 extern uint16_t mav_veh_rngfdr_min_distance;
 extern uint16_t mav_veh_rngfdr_max_distance;
-extern uint16_t mav_veh_rngfdr_current_distance;
+extern uint16_t g_mav_veh_rngfdr_current_distance;
 extern float mav_veh_pitch;
-extern bool target_valid;
+extern bool g_target_valid;
 extern int target_detection_ID;
 extern int target_track_ID;
 extern float target_cntr_offset_x;

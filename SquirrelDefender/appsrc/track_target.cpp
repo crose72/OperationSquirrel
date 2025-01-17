@@ -28,7 +28,7 @@ bool target_tracked;
 bool tracking;
 bool initialized_cv_image;
 bool initialized_tracker;
-bool target_valid;
+bool g_target_valid;
 bool target_valid_prv;
 int target_detection_ID;
 int target_track_ID;
@@ -191,11 +191,11 @@ void validate_target(void)
        implimented. */
     if (target_detection_ID >= 0 && target_track_ID >= 0 && target_height > 1 && target_width > 1)
     {
-        target_valid = true;
+        g_target_valid = true;
     }
     else
     {
-        target_valid = false;
+        g_target_valid = false;
     }
 
 #elif BLD_WIN
@@ -204,11 +204,11 @@ void validate_target(void)
    implimented. */
     if (target_detection_ID >= 0 && target_height > 1 && target_width > 1)
     {
-        target_valid = true;
+        g_target_valid = true;
 }
     else
     {
-        target_valid = false;
+        g_target_valid = false;
     }
 
 #else
@@ -217,7 +217,7 @@ void validate_target(void)
 
 #endif // BLD_JETSON_B01
 
-    target_valid_prv = target_valid;
+    target_valid_prv = g_target_valid;
 }
 
 /********************************************************************************
@@ -238,7 +238,7 @@ void track_target(void)
     }
     else if (g_valid_image_rcvd && initialized_cv_image)
     {
-        if (target_valid && !initialized_tracker)
+        if (g_target_valid && !initialized_tracker)
         {
             target_bounding_box = cv::Rect(target_left, target_top, target_width, target_height);
             tracker_init(target_tracker, image_cv_wrapped, target_bounding_box);
@@ -277,7 +277,7 @@ void track_target(void)
     }
     else if (g_valid_image_rcvd && initialized_cv_image)
     {
-        if (target_valid_prv && !target_valid)
+        if (target_valid_prv && !g_target_valid)
         {
             target_bounding_box = cv::Rect(target_left, target_top, target_width, target_height);
             tracker_init(target_tracker, g_image, target_bounding_box);
@@ -349,7 +349,7 @@ Track::~Track(void) {};
  ********************************************************************************/
 bool Track::init(void)
 {
-    target_valid = false;
+    g_target_valid = false;
     target_valid_prv = false;
     target_cntr_offset_x = 0.0f;
     target_cntr_offset_y = 0.0f;

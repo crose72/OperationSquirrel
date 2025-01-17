@@ -26,12 +26,12 @@
 PID pid_forwd;
 PID pid_rev;
 
-bool target_too_close;
+bool g_target_too_close;
 float x_error;
 float y_error;
-float vx_adjust;
-float vy_adjust;
-float vz_adjust;
+float g_vx_adjust;
+float g_vy_adjust;
+float g_vz_adjust;
 
 /********************************************************************************
  * Calibration definitions
@@ -209,30 +209,30 @@ void calc_follow_error(void)
  ********************************************************************************/
 void dtrmn_follow_vector(void)
 {
-    target_too_close = (x_error < 0.0);
+    g_target_too_close = (x_error < 0.0);
 
-    if (target_valid && target_too_close)
+    if (g_target_valid && g_target_too_close)
     {
-        vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev,
+        g_vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev,
                                               x_error, 0.0, 0.0,
                                               w1_x_rev, 0.0, 0.0, CONTROL_DIM::X);
-        vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev,
+        g_vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev,
                                               y_error, 0.0, 0.0,
                                               w1_y_rev, 0.0, 0.0, CONTROL_DIM::Y);
     }
-    else if (target_valid && !target_too_close)
+    else if (g_target_valid && !g_target_too_close)
     {
-        vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
+        g_vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
                                                 x_error, 0.0, 0.0,
                                                 w1_x, 0.0, 0.0, CONTROL_DIM::X);
-        vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
+        g_vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
                                                 y_error, 0.0, 0.0,
                                                 w1_y, 0.0, 0.0, CONTROL_DIM::Y);
     }
     else
     {
-        vx_adjust = 0.0f;
-        vy_adjust = 0.0f;
+        g_vx_adjust = 0.0f;
+        g_vy_adjust = 0.0f;
     }
 }
 
@@ -255,12 +255,12 @@ Follow::~Follow(void) {};
  ********************************************************************************/
 bool Follow::init(void)
 {
-    target_too_close = false;
+    g_target_too_close = false;
     x_error = 0.0f;
     y_error = 0.0f;
-    vx_adjust = 0.0f;
-    vy_adjust = 0.0f;
-    vz_adjust = 0.0f;
+    g_vx_adjust = 0.0f;
+    g_vy_adjust = 0.0f;
+    g_vz_adjust = 0.0f;
 
     return true;
 }

@@ -65,7 +65,7 @@ extern uint8_t mav_veh_mavlink_version;
 extern int32_t mav_veh_lat;
 extern int32_t mav_veh_lon;
 extern int32_t mav_veh_alt;
-extern int32_t mav_veh_rel_alt;
+extern int32_t g_mav_veh_rel_alt;
 extern int16_t mav_veh_gps_vx;
 extern int16_t mav_veh_gps_vy;
 extern int16_t mav_veh_gps_vz;
@@ -107,7 +107,7 @@ extern float mav_veh_repr_offset_q[4];
 
 extern uint16_t mav_veh_rngfdr_min_distance;
 extern uint16_t mav_veh_rngfdr_max_distance;
-extern uint16_t mav_veh_rngfdr_current_distance;
+extern uint16_t g_mav_veh_rngfdr_current_distance;
 extern uint8_t mav_veh_rngfdr_type;
 extern uint8_t mav_veh_rngfdr_id;
 extern uint8_t mav_veh_rngfdr_orientation;

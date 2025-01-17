@@ -48,15 +48,15 @@ void follow_mode(void)
 {
     float target_velocity[3] = {0.0, 0.0, 0.0};
 
-    target_velocity[0] = vx_adjust;
-    target_velocity[1] = vy_adjust;
-    target_velocity[2] = vz_adjust;
+    target_velocity[0] = g_vx_adjust;
+    target_velocity[1] = g_vy_adjust;
+    target_velocity[2] = g_vz_adjust;
 
-    if (target_valid && target_too_close)
+    if (g_target_valid && g_target_too_close)
     {
         MavMotion::cmd_velocity_xy_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
     }
-    else if (target_valid && !target_too_close)
+    else if (g_target_valid && !g_target_too_close)
     {
         MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
     }
@@ -126,7 +126,7 @@ void VehicleController::loop(void)
             takeoff_dbc = true;
         }
 
-        if (takeoff_dbc && mav_veh_rngfdr_current_distance > 300 || mav_veh_rel_alt > 3000)
+        if (takeoff_dbc && g_mav_veh_rngfdr_current_distance > 300 || g_mav_veh_rel_alt > 3000)
         {
             start_follow_mode = true;
         }

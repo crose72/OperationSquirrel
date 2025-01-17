@@ -20,14 +20,14 @@
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern bool target_too_close;
-extern bool target_valid;
-extern float vx_adjust;
-extern float vy_adjust;
-extern float vz_adjust;
-extern float dt_25ms;
-extern uint16_t mav_veh_rngfdr_current_distance;
-extern int32_t mav_veh_rel_alt;
+extern bool g_target_too_close;
+extern bool g_target_valid;
+extern float g_vx_adjust;
+extern float g_vy_adjust;
+extern float g_vz_adjust;
+extern float g_dt_25ms;
+extern uint16_t g_mav_veh_rngfdr_current_distance;
+extern int32_t g_mav_veh_rel_alt;
 
 /********************************************************************************
  * Exported objects

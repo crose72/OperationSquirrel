@@ -246,7 +246,7 @@ bool Localize::init(void)
  ********************************************************************************/
 void Localize::loop(void)
 {
-    if (target_valid)
+    if (g_target_valid)
     {
         calc_target_offest();
     }
