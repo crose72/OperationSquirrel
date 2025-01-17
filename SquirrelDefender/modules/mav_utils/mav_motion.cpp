@@ -201,13 +201,13 @@ float MavMotion::calc_yaw_rate_target(float x, float y)
 bool dtrmn_attitude_target_error(void)
 {
     /*
-    if (std::fabs(mav_veh_q1_actual - mav_veh_q1_target) > error_cal ||
-        std::fabs(mav_veh_q2_actual - mav_veh_q2_target) > error_cal ||
-        std::fabs(mav_veh_q3_actual - mav_veh_q3_target) > error_cal ||
-        std::fabs(mav_veh_q4_actual - mav_veh_q4_target) > error_cal ||
-        std::fabs(mav_veh_roll_rate_actual - mav_veh_roll_rate_target) > error_cal ||
-        std::fabs(mav_veh_pitch_rate_actual - mav_veh_pitch_rate_target) > error_cal ||
-        std::fabs(mav_veh_yaw_rate_actual - mav_veh_yaw_rate_target) > error_cal)
+    if (std::fabs(g_mav_veh_q1_actual - g_mav_veh_q1_target) > error_cal ||
+        std::fabs(g_mav_veh_q2_actual - g_mav_veh_q2_target) > error_cal ||
+        std::fabs(g_mav_veh_q3_actual - g_mav_veh_q3_target) > error_cal ||
+        std::fabs(g_mav_veh_q4_actual - g_mav_veh_q4_target) > error_cal ||
+        std::fabs(g_mav_veh_roll_rate_actual - g_mav_veh_roll_rate_target) > error_cal ||
+        std::fabs(g_mav_veh_pitch_rate_actual - g_mav_veh_pitch_rate_target) > error_cal ||
+        std::fabs(g_mav_veh_yaw_rate_actual - g_mav_veh_yaw_rate_target) > error_cal)
     {
         attitude_target_error = true;
     }

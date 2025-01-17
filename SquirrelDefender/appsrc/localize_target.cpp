@@ -150,7 +150,7 @@ void calc_target_offest(void)
 
     /* Calculate true camera angle relative to the ground, adjusting for pitch. */
     camera_comp_angle = (PI / 2.0f) - camera_fixed_angle;
-    camera_tilt_angle = mav_veh_pitch - camera_fixed_angle;
+    camera_tilt_angle = g_mav_veh_pitch - camera_fixed_angle;
 
     /* Calculate the x and z distances of the target relative to the drone camera (positive z is down).*/
     if (camera_tilt_angle <= 0.0f && camera_tilt_angle >= -camera_comp_angle)
@@ -168,7 +168,7 @@ void calc_target_offest(void)
        adjustment of the target position estimate in the z direction. Make adjustments when
        drone pitch is less than or equal to the camera tilt angle (brings the camera parallel
        to the ground) and greater than a calibratable value. */
-    delta_angle = camera_comp_angle + mav_veh_pitch;
+    delta_angle = camera_comp_angle + g_mav_veh_pitch;
 
     if (delta_angle > 0.0f && delta_angle < camera_fixed_angle)
     {

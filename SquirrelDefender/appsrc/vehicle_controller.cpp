@@ -126,7 +126,7 @@ void VehicleController::loop(void)
             takeoff_dbc = true;
         }
 
-        if (takeoff_dbc && g_mav_veh_rngfdr_current_distance > 300 || g_mav_veh_rel_alt > 3000)
+        if (takeoff_dbc && g_g_mav_veh_rngfdr_current_distance > 300 || g_g_mav_veh_rel_alt > 3000)
         {
             start_follow_mode = true;
         }

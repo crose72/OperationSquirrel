@@ -50,16 +50,16 @@ int system_state_machine(void)
     }
     else
     {
-        bool mav_type_is_quad = (mav_veh_type == MAV_TYPE_QUADROTOR && mav_veh_autopilot_type == MAV_AUTOPILOT_ARDUPILOTMEGA);
+        bool mav_type_is_quad = (g_mav_veh_type == MAV_TYPE_QUADROTOR && g_mav_veh_autopilot_type == MAV_AUTOPILOT_ARDUPILOTMEGA);
         bool prearm_checks = false;
 
 #ifdef ENABLE_CV
 
-        prearm_checks = ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && g_valid_image_rcvd);
+        prearm_checks = ((g_mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && g_valid_image_rcvd);
 
 #else
 
-        prearm_checks = ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0);
+        prearm_checks = ((g_mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0);
 
 #endif // ENABLE_CV
 
@@ -82,18 +82,18 @@ int system_state_machine(void)
             break;
         // Pre arm good means that the data is from a drone and pre arm checks are good
         case SYSTEM_STATE::PRE_ARM_GOOD:
-            if (mav_type_is_quad && mav_veh_state == MAV_STATE_STANDBY)
+            if (mav_type_is_quad && g_mav_veh_state == MAV_STATE_STANDBY)
             {
                 g_system_state = SYSTEM_STATE::STANDBY;
             }
-            else if (g_mav_veh_rel_alt > 1000 && mav_type_is_quad && mav_veh_state == MAV_STATE_ACTIVE)
+            else if (g_g_mav_veh_rel_alt > 1000 && mav_type_is_quad && g_mav_veh_state == MAV_STATE_ACTIVE)
             {
                 g_system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
             }
             break;
         // Standby means we are ready to takeoff
         case SYSTEM_STATE::STANDBY:
-            if ((g_mav_veh_rel_alt > 1000 || g_mav_veh_rngfdr_current_distance > 100) && mav_veh_state == MAV_STATE_ACTIVE)
+            if ((g_g_mav_veh_rel_alt > 1000 || g_g_mav_veh_rngfdr_current_distance > 100) && g_mav_veh_state == MAV_STATE_ACTIVE)
             {
                 g_system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
             }
