@@ -27,7 +27,7 @@
  * Imported objects
  ********************************************************************************/
 /* Mavlink variables */
-extern float app_elapsed_time;
+extern float g_app_elapsed_time;
 
 extern uint16_t mav_veh_sys_stat_voltage_battery;
 extern int16_t mav_veh_sys_stat_current_battery;
@@ -121,7 +121,7 @@ extern float g_vy_adjust;
 extern float g_vz_adjust;
 
 /* System variables */
-extern SYSTEM_STATE system_state;
+extern SYSTEM_STATE g_system_state;
 
 /********************************************************************************
  * Exported objects

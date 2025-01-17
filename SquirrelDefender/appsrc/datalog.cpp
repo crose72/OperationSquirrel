@@ -102,8 +102,8 @@ void save_to_csv(const std::string &filename, const std::vector<std::vector<std:
  ********************************************************************************/
 void write_headers(void)
 {
-    data.push_back({"app_elapsed_time",
-                    "system_state",
+    data.push_back({"g_app_elapsed_time",
+                    "g_system_state",
                     "g_target_too_close",
                     "g_target_valid",
                     "g_target_detection_id",
@@ -239,8 +239,8 @@ void DataLogger::loop(void)
 {
     data.clear();
 
-    data.push_back({{std::to_string(app_elapsed_time),
-                     std::to_string(system_state),
+    data.push_back({{std::to_string(g_app_elapsed_time),
+                     std::to_string(g_system_state),
                      std::to_string(g_target_too_close),
                      std::to_string(g_target_valid),
                      std::to_string(g_target_detection_id),

@@ -24,7 +24,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool save_button_press;
+bool g_save_button_press;
 int button_state_prv;
 
 /********************************************************************************
@@ -148,11 +148,11 @@ void StatusIndicators::save_video_button_state(void)
 
     if (button_state_prv == GPIO::LOW && button_state == GPIO::HIGH)
     {
-        save_button_press = true;
+        g_save_button_press = true;
     }
     else
     {
-        save_button_press = false;
+        g_save_button_press = false;
     }
 
     button_state_prv = button_state;
@@ -199,7 +199,7 @@ bool StatusIndicators::init(void)
     GPIO::setup(GREEN_LED_PIN, GPIO::OUT, GPIO::LOW);
     GPIO::setup(RED_LED_PIN, GPIO::OUT, GPIO::LOW);
     GPIO::setup(SAVE_BUTTON_PIN2, GPIO::IN); // starts low, matches SAVE_BUTTON_PIN1
-    save_button_press = false;
+    g_save_button_press = false;
     button_state_prv = GPIO::LOW;
 
     return true;

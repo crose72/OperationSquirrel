@@ -21,7 +21,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-float app_elapsed_time = (float)0.0;
+float g_app_elapsed_time = (float)0.0;
 const float time_step = (float)0.025;
 std::chrono::time_point<std::chrono::steady_clock> start_time;
 std::chrono::time_point<std::chrono::steady_clock> current_time;
@@ -110,7 +110,7 @@ void TimeCalc::calc_elapsed_time(void)
 {
     if (first_loop_after_start == true)
     {
-        app_elapsed_time = 0.0f;
+        g_app_elapsed_time = 0.0f;
     }
     else
     {
@@ -124,9 +124,9 @@ void TimeCalc::calc_elapsed_time(void)
         float app_elapsed_time_tmp = elapsed_time.count() / 1000.0f;
 
         // Truncate the number to three decimal places
-        app_elapsed_time = (std::floor(app_elapsed_time_tmp * 1000.0f) / 1000.0f);
+        g_app_elapsed_time = (std::floor(app_elapsed_time_tmp * 1000.0f) / 1000.0f);
 
         // Print program run time
-        // Print::c_printf("Elapsed Time: %0.3f\n", app_elapsed_time);
+        // Print::c_printf("Elapsed Time: %0.3f\n", g_app_elapsed_time);
     }
 }
