@@ -86,14 +86,14 @@ int system_state_machine(void)
             {
                 g_system_state = SYSTEM_STATE::STANDBY;
             }
-            else if (g_g_mav_veh_rel_alt > 1000 && mav_type_is_quad && g_mav_veh_state == MAV_STATE_ACTIVE)
+            else if (g_mav_veh_rel_alt > 1000 && mav_type_is_quad && g_mav_veh_state == MAV_STATE_ACTIVE)
             {
                 g_system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
             }
             break;
         // Standby means we are ready to takeoff
         case SYSTEM_STATE::STANDBY:
-            if ((g_g_mav_veh_rel_alt > 1000 || g_g_mav_veh_rngfdr_current_distance > 100) && g_mav_veh_state == MAV_STATE_ACTIVE)
+            if ((g_mav_veh_rel_alt > 1000 || g_mav_veh_rngfdr_current_distance > 100) && g_mav_veh_state == MAV_STATE_ACTIVE)
             {
                 g_system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
             }

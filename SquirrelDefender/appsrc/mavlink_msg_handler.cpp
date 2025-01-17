@@ -66,7 +66,7 @@ uint8_t g_mav_veh_mavlink_version;                          /*<  MAVLink version
 int32_t g_mav_veh_lat;      /*< [degE7] Latitude, expressed*/
 int32_t g_mav_veh_lon;      /*< [degE7] Longitude, expressed*/
 int32_t g_mav_veh_alt;      /*< [mm] Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.*/
-int32_t g_g_mav_veh_rel_alt;  /*< [mm] Altitude above ground*/
+int32_t g_mav_veh_rel_alt;  /*< [mm] Altitude above ground*/
 int16_t g_mav_veh_gps_vx;   /*< [cm/s] Ground X Speed (Latitude, positive north)*/
 int16_t g_mav_veh_gps_vy;   /*< [cm/s] Ground Y Speed (Longitude, positive east)*/
 int16_t g_mav_veh_gps_vz;   /*< [cm/s] Ground Z Speed (Altitude, positive down)*/
@@ -110,7 +110,7 @@ float g_mav_veh_repr_offset_q[4];  /*<  Collective thrust, normalized to 0 .. 1 
 
 uint16_t g_mav_veh_rngfdr_min_distance;     /*< [cm] Minimum distance the sensor can measure*/
 uint16_t g_mav_veh_rngfdr_max_distance;     /*< [cm] Maximum distance the sensor can measure*/
-uint16_t g_g_mav_veh_rngfdr_current_distance; /*< [cm] Current distance reading*/
+uint16_t g_mav_veh_rngfdr_current_distance; /*< [cm] Current distance reading*/
 uint8_t g_mav_veh_rngfdr_type;              /*<  Type of distance sensor.*/
 uint8_t g_mav_veh_rngfdr_id;                /*<  Onboard ID of the sensor*/
 uint8_t g_mav_veh_rngfdr_orientation;       /*<  Direction the sensor faces. downward-facing: ROTATION_PITCH_270, upward-facing: ROTATION_PITCH_90, backward-facing: ROTATION_PITCH_180, forward-facing: ROTATION_NONE, left-facing: ROTATION_YAW_90, right-facing: ROTATION_YAW_270*/
@@ -223,7 +223,7 @@ void proc_mav_gps_int_msg(const mavlink_message_t *msg)
     g_mav_veh_lat = global_pos_int.lat;
     g_mav_veh_lon = global_pos_int.lon;
     g_mav_veh_alt = global_pos_int.alt;
-    g_g_mav_veh_rel_alt = global_pos_int.relative_alt;
+    g_mav_veh_rel_alt = global_pos_int.relative_alt;
     g_mav_veh_gps_vx = global_pos_int.vx;
     g_mav_veh_gps_vy = global_pos_int.vy;
     g_mav_veh_gps_vz = global_pos_int.vz;
@@ -580,7 +580,7 @@ void proc_mav_distance_sensor_msg(const mavlink_message_t *msg)
 
     g_mav_veh_rngfdr_min_distance = distance_sensor.min_distance;
     g_mav_veh_rngfdr_max_distance = distance_sensor.max_distance;
-    g_g_mav_veh_rngfdr_current_distance = distance_sensor.current_distance;
+    g_mav_veh_rngfdr_current_distance = distance_sensor.current_distance;
     g_mav_veh_rngfdr_type = distance_sensor.type;
     g_mav_veh_rngfdr_id = distance_sensor.id;
     g_mav_veh_rngfdr_orientation = distance_sensor.orientation;
@@ -758,7 +758,7 @@ bool MavMsg::init(void)
     g_mav_veh_lat = 0;
     g_mav_veh_lon = 0;
     g_mav_veh_alt = 0;
-    g_g_mav_veh_rel_alt = 0;
+    g_mav_veh_rel_alt = 0;
     g_mav_veh_gps_vx = 0;
     g_mav_veh_gps_vy = 0;
     g_mav_veh_gps_vz = 0;
@@ -805,7 +805,7 @@ bool MavMsg::init(void)
 
     g_mav_veh_rngfdr_min_distance = 0;
     g_mav_veh_rngfdr_max_distance = 0;
-    g_g_mav_veh_rngfdr_current_distance = 0;
+    g_mav_veh_rngfdr_current_distance = 0;
     g_mav_veh_rngfdr_type = 0;
     g_mav_veh_rngfdr_id = 0;
     g_mav_veh_rngfdr_orientation = 0;
