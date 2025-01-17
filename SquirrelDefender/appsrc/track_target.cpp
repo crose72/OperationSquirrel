@@ -63,8 +63,8 @@ void get_target_info(void);
 void validate_target(void);
 void track_target(void);
 void update_target_info(void);
-bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &image, cv::Rect &bounding_box);
-bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &image, cv::Rect &bounding_box);
+bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &g_image, cv::Rect &bounding_box);
+bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &g_image, cv::Rect &bounding_box);
 
 /********************************************************************************
  * Function: tracker_init
@@ -231,12 +231,12 @@ void track_target(void)
 
 /* Don't wrap the image from jetson inference until a valid image has been received.
    That way we know the memory has been allocaed and is ready. */
-    if (valid_image_rcvd && !initialized_cv_image)
+    if (g_valid_image_rcvd && !initialized_cv_image)
     {
-        image_cv_wrapped = cv::Mat(input_video_height, input_video_width, CV_8UC3, image); // Directly wrap uchar3*
+        image_cv_wrapped = cv::Mat(g_input_video_height, g_input_video_width, CV_8UC3, g_image); // Directly wrap uchar3*
         initialized_cv_image = true;
     }
-    else if (valid_image_rcvd && initialized_cv_image)
+    else if (g_valid_image_rcvd && initialized_cv_image)
     {
         if (target_valid && !initialized_tracker)
         {
@@ -269,30 +269,30 @@ void track_target(void)
 
     /* Don't wrap the image from jetson inference until a valid image has been received.
    That way we know the memory has been allocaed and is ready. */
-    if (valid_image_rcvd && !initialized_cv_image)
+    if (g_valid_image_rcvd && !initialized_cv_image)
     {
-        // gpuImage = cv::cuda::GpuMat(input_video_height, input_video_width, CV_8UC3);
-        //image_cv_wrapped = image;
+        // gpuImage = cv::cuda::GpuMat(g_input_video_height, g_input_video_width, CV_8UC3);
+        //image_cv_wrapped = g_image;
         initialized_cv_image = true;
     }
-    else if (valid_image_rcvd && initialized_cv_image)
+    else if (g_valid_image_rcvd && initialized_cv_image)
     {
         if (target_valid_prv && !target_valid)
         {
             target_bounding_box = cv::Rect(target_left, target_top, target_width, target_height);
-            tracker_init(target_tracker, image, target_bounding_box);
+            tracker_init(target_tracker, g_image, target_bounding_box);
         }
 
         Print::cpp_cout("My code made it this far!");
           
         target_bounding_box = cv::Rect(target_left, target_top, target_width, target_height);
-        target_tracked = tracker_update(target_tracker, image, target_bounding_box);
-        //cv::rectangle(image, target_bounding_box, cv::Scalar(255, 0, 0), 2, 1);
+        target_tracked = tracker_update(target_tracker, g_image, target_bounding_box);
+        //cv::rectangle(g_image, target_bounding_box, cv::Scalar(255, 0, 0), 2, 1);
         
         if (target_tracked)
         {
             // Draw the target_tracked box
-            cv::rectangle(image, target_bounding_box, cv::Scalar(255, 0, 0), 2, 1);
+            cv::rectangle(g_image, target_bounding_box, cv::Scalar(255, 0, 0), 2, 1);
             tracking = true;
         }
         else

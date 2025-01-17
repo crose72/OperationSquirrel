@@ -55,7 +55,7 @@ int system_state_machine(void)
 
 #ifdef ENABLE_CV
 
-        prearm_checks = ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && valid_image_rcvd);
+        prearm_checks = ((mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && g_valid_image_rcvd);
 
 #else
 

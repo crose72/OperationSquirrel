@@ -290,6 +290,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolo_utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/pid)
 
 file(GLOB MAV_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.cpp)
 file(GLOB MAV_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.h)
@@ -303,6 +304,8 @@ file(GLOB YOLO_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/yolo_utils/*.cp
 file(GLOB YOLO_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/yolo_utils/*.h)
 file(GLOB PRINT_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils/*.cpp)
 file(GLOB PRINT_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils/*.h)
+file(GLOB PID_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/pid/*.cpp)
+file(GLOB PID_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/pid/*.h)
 
 #=============================================================================
 # Set Source files and locations
@@ -319,8 +322,13 @@ set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
 file(GLOB SOURCES ${SOURCE_DIR}/*.cpp)
 file(GLOB HEADERS ${HEADER_DIR}/*.h)
 
-list(APPEND SOURCES ${MAV_UTILS_SOURCES} ${SERIAL_UTILS_SOURCES} ${MATH_UTILS_SOURCES} ${JSON_UTILS_SOURCES} ${PRINT_UTILS_SOURCES} ${YOLO_UTILS_SOURCES} ${PRINT_UTILS_SOURCES})
-list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HEADERS} ${JSON_UTILS_HEADERS} ${PRINT_UTILS_HEADERS} ${YOLO_UTILS_HEADERS} ${PRINT_UTILS_HEADERS})
+# Additional source files to compile together
+list(APPEND SOURCES ${MAV_UTILS_SOURCES} ${SERIAL_UTILS_SOURCES} ${MATH_UTILS_SOURCES} 
+                    ${JSON_UTILS_SOURCES} ${PRINT_UTILS_SOURCES} ${YOLO_UTILS_SOURCES} 
+                    ${PID_SOURCES})
+list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HEADERS} 
+                    ${JSON_UTILS_HEADERS} ${PRINT_UTILS_HEADERS} ${YOLO_UTILS_HEADERS} 
+                    ${PID_HEADERS})
 
 #=============================================================================
 # Build Executable

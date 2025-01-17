@@ -28,16 +28,16 @@
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern detectNet *net;
+extern detectNet *g_net;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool valid_image_rcvd;
-extern videoSource *input;
-extern uchar3 *image;
-extern float input_video_width;
-extern float input_video_height;
+extern bool g_valid_image_rcvd;
+extern videoSource *g_input;
+extern uchar3 *g_image;
+extern float g_input_video_width;
+extern float g_input_video_height;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

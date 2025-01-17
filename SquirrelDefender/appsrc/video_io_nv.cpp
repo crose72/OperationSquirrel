@@ -24,16 +24,16 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool valid_image_rcvd;
+bool g_valid_image_rcvd;
 std::string base_path = "../data/";
 bool display_stream_created;
 bool file_stream_created;
-videoSource *input;
+videoSource *g_input;
 videoOutput *output_vid_file;
 videoOutput *output_vid_disp;
-uchar3 *image;
-float input_video_width;
-float input_video_height;
+uchar3 *g_image;
+float g_input_video_width;
+float g_input_video_height;
 
 /********************************************************************************
  * Calibration definitions
@@ -104,9 +104,9 @@ bool create_input_video_stream(void)
     // if using IMX219-160 stereo camera or H136 V1.3 and need to use option FLIP_ROTATE_180 then
     // you must compile jetson inference with cmake-DENABLE_NVMM=off
 
-    input = videoSource::Create(options);
+    g_input = videoSource::Create(options);
 
-    if (!input)
+    if (!g_input)
     {
         LogError("detectnet:  failed to create input stream\n");
         return false;
@@ -196,7 +196,7 @@ bool capture_image(void)
 {
     int status = 0;
 
-    if (!input->Capture(&image, &status))
+    if (!g_input->Capture(&g_image, &status))
     {
         if (status != videoSource::TIMEOUT)
         {
@@ -204,14 +204,14 @@ bool capture_image(void)
         }
     }
 
-    // Checking for valid image, Capture may return true while image may still be NULL
-    if (image == NULL)
+    // Checking for valid g_image, Capture may return true while g_image may still be NULL
+    if (g_image == NULL)
     {
-        valid_image_rcvd = false;
-        return false; // Return false if the image is not valid
+        g_valid_image_rcvd = false;
+        return false; // Return false if the g_image is not valid
     }
 
-    valid_image_rcvd = true;
+    g_valid_image_rcvd = true;
 
     return true;
 }
@@ -225,7 +225,7 @@ bool save_video(void)
     // render output_vid_disp to the display
     if (output_vid_file != NULL)
     {
-        output_vid_file->Render(image, input->GetWidth(), input->GetHeight());
+        output_vid_file->Render(g_image, g_input->GetWidth(), g_input->GetHeight());
 
         // check if the user quit
         if (!output_vid_file->IsStreaming())
@@ -239,20 +239,20 @@ bool save_video(void)
 
 /********************************************************************************
  * Function: display_video
- * Description: Display the image on the screen.
+ * Description: Display the g_image on the screen.
  ********************************************************************************/
 bool display_video(void)
 {
     // render output_vid_disp to the display
     if (output_vid_disp != NULL)
     {
-        output_vid_disp->Render(image, input->GetWidth(), input->GetHeight());
+        output_vid_disp->Render(g_image, g_input->GetWidth(), g_input->GetHeight());
 
 #ifdef DEBUG_BUILD
 
         // update the status bar
         char str[256];
-        sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(net->GetPrecision()), net->GetNetworkFPS());
+        sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(g_net->GetPrecision()), g_net->GetNetworkFPS());
         output_vid_disp->SetStatus(str);
 
 #endif // DEBUG_BUILD
@@ -273,8 +273,8 @@ bool display_video(void)
  ********************************************************************************/
 void calc_video_res(void)
 {
-    input_video_width = static_cast<float>(input->GetWidth());
-    input_video_height = static_cast<float>(input->GetHeight());
+    g_input_video_width = static_cast<float>(g_input->GetWidth());
+    g_input_video_height = static_cast<float>(g_input->GetHeight());
 }
 
 /********************************************************************************
@@ -283,7 +283,7 @@ void calc_video_res(void)
  ********************************************************************************/
 void delete_input_video_stream(void)
 {
-    SAFE_DELETE(input);
+    SAFE_DELETE(g_input);
 }
 
 /********************************************************************************
@@ -339,8 +339,8 @@ VideoNV::~VideoNV(void) {}
  ********************************************************************************/
 bool VideoNV::init(void)
 {
-    valid_image_rcvd = false;
-    image = NULL;
+    g_valid_image_rcvd = false;
+    g_image = NULL;
 
     if (!create_input_video_stream() ||
         !create_output_vid_stream())

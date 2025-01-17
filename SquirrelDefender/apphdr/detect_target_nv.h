@@ -27,13 +27,13 @@
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern videoSource *input;
-extern uchar3 *image;
+extern videoSource *g_input;
+extern uchar3 *g_image;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern detectNet *net;
+extern detectNet *g_net;
 extern detectNet::Detection *detections;
 extern int detection_count;
 

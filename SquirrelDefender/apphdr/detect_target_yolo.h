@@ -30,11 +30,11 @@
  ********************************************************************************/
 #ifdef BLD_JETSON_B01
 
-extern uchar3* image;
+extern uchar3* g_image;
 
 #elif BLD_WIN
 
-extern cv::Mat image;
+extern cv::Mat g_image;
 
 #else
 

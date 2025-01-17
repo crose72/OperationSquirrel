@@ -22,13 +22,13 @@
  ********************************************************************************/
 #ifdef BLD_JETSON_B01
 
-extern videoSource* input;
-extern uchar3* image;
+extern videoSource* g_input;
+extern uchar3* g_image;
 
 #elif BLD_WIN
 
-extern cv::Mat image;
-extern cv::dnn::Net net;
+extern cv::Mat g_image;
+extern cv::dnn::Net g_net;
 extern std::vector<YoloNet::detection> yolo_detections;
 extern int yolo_detection_count;
 
@@ -44,7 +44,7 @@ extern int yolo_detection_count;
  ********************************************************************************/
 #ifdef BLD_JETSON_B01
 
-extern detectNet *net;
+extern detectNet *g_net;
 extern detectNet::Detection *detections;
 extern int detection_count;
 

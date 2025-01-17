@@ -25,7 +25,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-detectNet *net;
+detectNet *g_net;
 detectNet::Detection *detections;
 int detection_count;
 
@@ -76,12 +76,12 @@ bool create_detection_network(void)
     Dims3 inputDims(3, 720, 1280);
     const char *output_count = "NMS_1";
 
-    net = detectNet::Create("SSD_Inception_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
-    // net = detectNet::Create("SSD_Mobilenet_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
-    //net = detectNet::Create(model, class_labels, thresh, input_blob, inputDims, output_blob, output_count); // load model from specific path
-    net->SetTracker(objectTrackerIOU::Create(min_frames, drop_frames, overlap_thresh));
+    g_net = detectNet::Create("SSD_Inception_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
+    // g_net = detectNet::Create("SSD_Mobilenet_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
+    //g_net = detectNet::Create(model, class_labels, thresh, input_blob, inputDims, output_blob, output_count); // load model from specific path
+    g_net->SetTracker(objectTrackerIOU::Create(min_frames, drop_frames, overlap_thresh));
 
-    if (!net)
+    if (!g_net)
     {
         LogError("detectnet:  failed to load detectNet model\n");
         return false;
@@ -100,13 +100,13 @@ void detect_objects(void)
 
     overlay_flags = overlay_flags | detectNet::OVERLAY_LABEL | detectNet::OVERLAY_CONFIDENCE | detectNet::OVERLAY_TRACKING | detectNet::OVERLAY_LINES;
 
-    if (overlay_flags > 0 && image != NULL)
+    if (overlay_flags > 0 && g_image != NULL)
     {
-        detection_count = net->Detect(image, input->GetWidth(), input->GetHeight(), &detections, overlay_flags);
+        detection_count = g_net->Detect(g_image, g_input->GetWidth(), g_input->GetHeight(), &detections, overlay_flags);
     }
-    else if (image != NULL)
+    else if (g_image != NULL)
     {
-        detection_count = net->Detect(image, input->GetWidth(), input->GetHeight(), &detections);
+        detection_count = g_net->Detect(g_image, g_input->GetWidth(), g_input->GetHeight(), &detections);
     }
     else
     {
@@ -132,7 +132,7 @@ SSD::~SSD(void) {};
  ********************************************************************************/
 bool SSD::init(void)
 {
-    net = NULL;
+    g_net = NULL;
     detections = NULL;
     detection_count = 0;
 
@@ -161,7 +161,7 @@ void SSD::loop(void)
 void SSD::shutdown(void)
 {
     LogVerbose("detectnet:  shutting down...\n");
-    SAFE_DELETE(net);
+    SAFE_DELETE(g_net);
     LogVerbose("detectnet:  shutdown complete.\n");
 }
 

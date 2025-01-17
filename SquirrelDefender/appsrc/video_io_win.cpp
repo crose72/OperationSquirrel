@@ -24,18 +24,18 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool valid_image_rcvd;
+bool g_valid_image_rcvd;
 
 std::string base_path = "../data/";
 
-cv::Mat image;
+cv::Mat g_image;
 cv::VideoCapture cap;
 
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-float input_video_width;
-float input_video_height;
+float g_input_video_width;
+float g_input_video_height;
 
 /********************************************************************************
  * Function definitions
@@ -105,14 +105,14 @@ bool create_input_video_stream(void)
  ********************************************************************************/
 bool capture_image(void)
 {
-    cap >> image;  // Capture image from the webcam
+    cap >> g_image;  // Capture g_image from the webcam
 
-    if (image.empty()) {
+    if (g_image.empty()) {
         std::cout << "Error: Could not capture image" << std::endl;
         return false;
     }
 
-    valid_image_rcvd = true;
+    g_valid_image_rcvd = true;
 
     return true;
 }
@@ -123,7 +123,7 @@ bool capture_image(void)
  ********************************************************************************/
 bool display_video(void)
 {
-    cv::imshow("MyVid", image);
+    cv::imshow("MyVid", g_image);
     cv::waitKey(1);
 
     return true;
@@ -135,8 +135,8 @@ bool display_video(void)
  ********************************************************************************/
 void calc_video_res(void)
 {
-    input_video_width = 1280.0;
-    input_video_height = 720.0;
+    g_input_video_width = 1280.0;
+    g_input_video_height = 720.0;
 }
 
 /********************************************************************************
@@ -158,8 +158,8 @@ VideoWin::~VideoWin(void) {}
  ********************************************************************************/
 bool VideoWin::init(void)
 {
-    valid_image_rcvd = false;
-    image = NULL;
+    g_valid_image_rcvd = false;
+    g_image = NULL;
 
     if (!create_input_video_stream())
     {

@@ -37,7 +37,7 @@
  ********************************************************************************/
 #ifdef BLD_JETSON_B01
 
-extern detectNet *net;
+extern detectNet *g_net;
 
 #elif BLD_WIN
 
@@ -54,18 +54,18 @@ extern detectNet *net;
  ********************************************************************************/
 #ifdef BLD_JETSON_B01
 
-extern bool valid_image_rcvd;
-extern videoSource *input;
-extern uchar3 *image;
-extern float input_video_width;
-extern float input_video_height;
+extern bool g_valid_image_rcvd;
+extern videoSource *g_input;
+extern uchar3 *g_image;
+extern float g_input_video_width;
+extern float g_input_video_height;
 
 #elif BLD_WIN
 
-extern bool valid_image_rcvd;
-extern cv::Mat image;
-extern float input_video_width;
-extern float input_video_height;
+extern bool g_valid_image_rcvd;
+extern cv::Mat g_image;
+extern float g_input_video_width;
+extern float g_input_video_height;
 
 #else
 

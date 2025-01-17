@@ -35,27 +35,27 @@
 
 #ifdef BLD_JETSON_B01
 
-extern detectNet *net;
+extern detectNet *g_net;
 extern detectNet::Detection *detections;
-extern uchar3 *image;
+extern uchar3 *g_image;
 extern int detection_count;
-extern float input_video_width;
-extern float input_video_height;
+extern float g_input_video_width;
+extern float g_input_video_height;
 
 #endif //BLD_JETSON_B01
 
 #ifdef BLD_WIN
 
-extern cv::dnn::Net net;
+extern cv::dnn::Net g_net;
 extern std::vector<YoloNet::detection> yolo_detections;
 extern int yolo_detection_count;
-extern cv::Mat image;
-extern float input_video_width;
-extern float input_video_height;
+extern cv::Mat g_image;
+extern float g_input_video_width;
+extern float g_input_video_height;
 
 #endif // BLD_WIN
 
-extern bool valid_image_rcvd;
+extern bool g_valid_image_rcvd;
 extern bool target_valid;
 extern int target_detection_ID;
 extern int target_track_ID;
