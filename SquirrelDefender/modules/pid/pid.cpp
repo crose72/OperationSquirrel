@@ -1,5 +1,5 @@
 /********************************************************************************
- * @file    pid_controller.cpp
+ * @file    pid.cpp
  * @author  Cameron Rose
  * @date    6/7/2023
  * @brief   Provide methods for implementing PID controllers from basic to
@@ -9,7 +9,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "pid_controller.h"
+#include "pid.h"
 
 /********************************************************************************
  * Typedefs
@@ -52,7 +52,7 @@ PID::~PID(void) {}
 
 /********************************************************************************
  * Function: pid_controller_3d
- * Description: PID controller with up to 2 parameters to control.
+ * Description: PID controller with up to 3 parameters to control.
  ********************************************************************************/
 float PID::pid_controller_3d(float Kp, float Ki, float Kd,
                              float err1, float err2, float err3,

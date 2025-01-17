@@ -15,7 +15,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "json_utils.h"
-#include "pid_controller.h"
+#include "pid.h"
 #include "localize_target.h"
 
 /********************************************************************************
