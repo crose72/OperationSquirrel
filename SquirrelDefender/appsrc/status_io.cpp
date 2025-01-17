@@ -1,7 +1,7 @@
 #ifdef BLD_JETSON_B01
 
 /********************************************************************************
- * @file    jetson_IO.cpp
+ * @file    status_io.cpp
  * @author  Cameron Rose
  * @date    5/22/2024
  * @brief   Configure Jetson GPIO and provide methods for using the pins on the
@@ -11,7 +11,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "jetson_io.h"
+#include "status_io.h"
 
 /********************************************************************************
  * Typedefs

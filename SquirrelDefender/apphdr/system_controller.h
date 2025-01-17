@@ -16,7 +16,7 @@
 #include "mav_utils.h"
 #include "datalog.h"
 #include "video_io.h"
-#include "jetson_io.h"
+#include "status_io.h"
 #include "vehicle_controller.h"
 #include "detect_target.h"
 #include "track_target.h"
