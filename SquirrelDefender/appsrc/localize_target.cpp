@@ -130,12 +130,12 @@ void calc_target_offest(void)
     float delta_d;
 
     /* Calculate distance from camera offset */
-    d_idx_h = get_float_index(target_height, &height_index[0], MAX_IDX_D_HEIGHT, false);
-    d_idx_w = get_float_index(target_width, &width_index[0], MAX_IDX_D_WIDTH, false);
+    d_idx_h = get_float_index(g_target_height, &height_index[0], MAX_IDX_D_HEIGHT, false);
+    d_idx_w = get_float_index(g_target_width, &width_index[0], MAX_IDX_D_WIDTH, false);
     d_object_h = get_interpolated_value(d_idx_h, &d_offset_h[0], MAX_IDX_D_HEIGHT);
     d_object_w = get_interpolated_value(d_idx_w, &d_offset_w[0], MAX_IDX_D_WIDTH);
 
-    if (target_aspect > 0.4f)
+    if (g_target_aspect > 0.4f)
     {
         d_object = d_object_w;
     }
@@ -173,14 +173,14 @@ void calc_target_offest(void)
     if (delta_angle > 0.0f && delta_angle < camera_fixed_angle)
     {
         delta_idx_d = get_float_index(d_object, &delta_offset_d[0], MAX_IDX_DELTA_D_OFFSET, true);
-        delta_idx_pix = get_float_index(std::abs(target_cntr_offset_x), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
+        delta_idx_pix = get_float_index(std::abs(g_target_cntr_offset_x), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
         delta_d = get_2d_interpolated_value(&delta_offset[0][0], MAX_IDX_DELTA_PIXEL_OFFSET, MAX_IDX_DELTA_D_OFFSET, y_idx_pix, y_idx_d);
 
         delta_d_x = delta_d * cos(delta_angle);
         delta_d_z = delta_d * sin(delta_angle);
 
         /* If object center is below the center of the frame */
-        if (target_cntr_offset_x > center_of_frame_height)
+        if (g_target_cntr_offset_x > center_of_frame_height)
         {
             delta_d_x = -delta_d_x;
             delta_d_z = -delta_d_z;
@@ -194,10 +194,10 @@ void calc_target_offest(void)
     /* Calculate target y offset from the center line of view of the camera based on calibrated forward distance and the
        offset of the center of the target to the side of the center of the video frame in pixels */
     y_idx_d = get_float_index(d_object, &y_offset_d[0], MAX_IDX_Y_D_OFFSET, true);
-    y_idx_pix = get_float_index(std::abs(target_cntr_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
+    y_idx_pix = get_float_index(std::abs(g_target_cntr_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
     y_object = get_2d_interpolated_value(&y_offset[0][0], MAX_IDX_Y_PIXEL_OFFSET, MAX_IDX_Y_D_OFFSET, y_idx_pix, y_idx_d);
 
-    if (target_cntr_offset_y < 0.0f)
+    if (g_target_cntr_offset_y < 0.0f)
     {
         y_object = -y_object;
     }

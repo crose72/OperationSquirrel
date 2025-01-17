@@ -52,8 +52,8 @@ extern cv::Mat g_image;
 
 #elif BLD_WIN
 
-extern std::vector<yolo_net::detection> yolo_detections;
-extern int yolo_detection_count;
+extern std::vector<yolo_net::detection> g_yolo_detections;
+extern int g_yolo_detection_count;
 
 #else
 

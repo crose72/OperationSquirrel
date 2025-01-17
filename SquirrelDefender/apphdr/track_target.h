@@ -47,8 +47,8 @@ extern float g_input_video_height;
 #ifdef BLD_WIN
 
 extern cv::dnn::Net g_net;
-extern std::vector<YoloNet::detection> yolo_detections;
-extern int yolo_detection_count;
+extern std::vector<YoloNet::detection> g_yolo_detections;
+extern int g_yolo_detection_count;
 extern cv::Mat g_image;
 extern float g_input_video_width;
 extern float g_input_video_height;
@@ -57,31 +57,31 @@ extern float g_input_video_height;
 
 extern bool g_valid_image_rcvd;
 extern bool g_target_valid;
-extern int target_detection_ID;
-extern int target_track_ID;
-extern float target_height;
-extern float target_width;
-extern float target_aspect;
-extern float target_left;
-extern float target_right;
-extern float target_top;
-extern float target_bottom;
+extern int g_target_detection_id;
+extern int g_target_track_id;
+extern float g_target_height;
+extern float g_target_width;
+extern float g_target_aspect;
+extern float g_target_left;
+extern float g_target_right;
+extern float g_target_top;
+extern float g_target_bottom;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
 extern bool g_target_valid;
-extern int target_detection_ID;
-extern int target_track_ID;
-extern float target_cntr_offset_x;
-extern float target_cntr_offset_y;
-extern float target_height;
-extern float target_width;
-extern float target_aspect;
-extern float target_left;
-extern float target_right;
-extern float target_top;
-extern float target_bottom;
+extern int g_target_detection_id;
+extern int g_target_track_id;
+extern float g_target_cntr_offset_x;
+extern float g_target_cntr_offset_y;
+extern float g_target_height;
+extern float g_target_width;
+extern float g_target_aspect;
+extern float g_target_left;
+extern float g_target_right;
+extern float g_target_top;
+extern float g_target_bottom;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

@@ -26,8 +26,8 @@
 * Object definitions
 ********************************************************************************/
 cv::dnn::Net g_net;
-std::vector<YoloNet::detection> yolo_detections;
-int yolo_detection_count;
+std::vector<YoloNet::detection> g_yolo_detections;
+int g_yolo_detection_count;
 
 /********************************************************************************
  * Calibration definitions
@@ -58,8 +58,8 @@ bool YOLO::init(void)
     const std::string class_list_path = "../../networks/yolov5m/coco.names";
     const std::string model = "../../networks/yolov5m/yolov5m.onnx";
     g_net = YoloNet::create(model, class_list_path, cv::dnn::DNN_BACKEND_CUDA, cv::dnn::DNN_TARGET_CUDA);
-    yolo_detections = std::vector<YoloNet::detection>();
-    yolo_detections.reserve(100);
+    g_yolo_detections = std::vector<YoloNet::detection>();
+    g_yolo_detections.reserve(100);
 
     return true;
 }
@@ -70,8 +70,8 @@ bool YOLO::init(void)
  ********************************************************************************/
 void YOLO::loop(void)
 {
-    YoloNet::detect(g_image, g_net, yolo_detections);
-    yolo_detection_count = yolo_detections.size();
+    YoloNet::detect(g_image, g_net, g_yolo_detections);
+    g_yolo_detection_count = g_yolo_detections.size();
 }
 
 /********************************************************************************

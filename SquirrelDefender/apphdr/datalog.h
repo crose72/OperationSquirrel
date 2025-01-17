@@ -88,17 +88,17 @@ extern uint8_t mav_veh_mavlink_version;
 
 /* Detect/Track target variables */
 extern bool g_target_valid;
-extern int target_detection_ID;
-extern int target_track_ID;
-extern float target_cntr_offset_x;
-extern float target_cntr_offset_y;
-extern float target_height;
-extern float target_width;
-extern float target_aspect;
-extern float target_left;
-extern float target_right;
-extern float target_top;
-extern float target_bottom;
+extern int g_target_detection_id;
+extern int g_target_track_id;
+extern float g_target_cntr_offset_x;
+extern float g_target_cntr_offset_y;
+extern float g_target_height;
+extern float g_target_width;
+extern float g_target_aspect;
+extern float g_target_left;
+extern float g_target_right;
+extern float g_target_top;
+extern float g_target_bottom;
 
 /* Localize target variables*/
 extern float d_object_h;
