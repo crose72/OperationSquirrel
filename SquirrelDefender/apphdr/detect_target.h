@@ -15,7 +15,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "detect_target_yolo.h"
-#include "detect_target_jetson_inference.h"
+#include "detect_target_nv.h"
 
 /********************************************************************************
  * Imported objects

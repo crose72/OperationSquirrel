@@ -2,7 +2,7 @@
 #ifdef BLD_JETSON_B01
 
 /********************************************************************************
- * @file    detect_target_jetson_inference.cpp
+ * @file    detect_target_nv.cpp
  * @author  Cameron Rose
  * @date    6/7/2023
  * @brief   This file contains the functions to initialize, run, and clean up
@@ -12,7 +12,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "detect_target_jetson_inference.h"
+#include "detect_target_nv.h"
 
 /********************************************************************************
  * Typedefs
@@ -47,7 +47,7 @@ bool create_detection_network(void)
 {
 #ifdef DEBUG_BUILD
 
-    detect_target_jetson_inference.h detection_params("../params.json");
+    detect_target_nv.h detection_params("../params.json");
 
     float detection_thresh = detection_params.get_float_param("Detection_tracking", "Detect_Thresh");
     uint32_t max_batch_size = detection_params.get_uint32_param("Detection_tracking", "Max_Batch_Size");
