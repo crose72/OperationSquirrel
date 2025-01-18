@@ -22,6 +22,7 @@
 #include "track_target.h"
 #include "localize_target.h"
 #include "detect_target.h"
+#include "time_calc.h"
 
 /********************************************************************************
  * Imported objects

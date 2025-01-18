@@ -106,7 +106,7 @@ int main(void)
 
     {
         std::lock_guard<std::mutex> lock(mutex_main);
-        TimeCalc::loop();
+        Time::loop();
         SystemController::loop();
         MavMsg::loop();
 

@@ -28,28 +28,15 @@ extern float g_app_elapsed_time;
  * Function prototypes and Class Definitions
  ********************************************************************************/
 
-class TimeCalc
+class Time
 {
     public:
-        TimeCalc();
-        ~TimeCalc();
-
-        std::chrono::time_point<std::chrono::steady_clock> app_start_time;
-        std::chrono::time_point<std::chrono::steady_clock> app_end_time;
-        std::chrono::time_point<std::chrono::steady_clock> loop_start_time;
-        std::chrono::time_point<std::chrono::steady_clock> loop_end_time;
-        std::chrono::milliseconds loop_duration;
+        Time();
+        ~Time();
 
         static bool init(void);
         static void loop(void);
         static void shutdown(void);
-
-        void calc_app_start_time(void);
-        void calc_app_end_time(void);
-        void calc_loop_start_time(void);
-        void calc_loop_end_time(void);
-        void loop_rate_controller(void);
-        void calc_elapsed_time(void);
 
     private:
     };

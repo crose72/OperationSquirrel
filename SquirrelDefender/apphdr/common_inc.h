@@ -20,7 +20,6 @@
 #include "global_types.h"
 
 // Custom libraries
-#include "time_calc.h"
 #include "custom_print.h"
 
 #endif // COMMON_INC
