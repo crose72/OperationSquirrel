@@ -51,10 +51,10 @@ extern float g_z_object;
 extern float d_object;
 extern float g_x_error;
 extern float g_y_error;
-extern float delta_angle;
-extern float camera_tilt_angle;
-extern float delta_d_x;
-extern float delta_d_z;
+extern float g_delta_angle;
+extern float g_camera_tilt_angle;
+extern float g_delta_d_x;
+extern float g_delta_d_z;
 extern float camera_comp_angle;
 
 /********************************************************************************
