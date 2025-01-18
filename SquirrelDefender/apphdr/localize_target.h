@@ -45,12 +45,12 @@ extern float g_target_bottom;
  ********************************************************************************/
 extern float d_object_h;
 extern float d_object_w;
-extern float x_object;
-extern float y_object;
-extern float z_object;
+extern float g_x_object;
+extern float g_y_object;
+extern float g_z_object;
 extern float d_object;
-extern float x_error;
-extern float y_error;
+extern float g_x_error;
+extern float g_y_error;
 extern float delta_angle;
 extern float camera_tilt_angle;
 extern float delta_d_x;

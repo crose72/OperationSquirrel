@@ -26,16 +26,16 @@ extern uint16_t g_mav_veh_rngfdr_max_distance;
 extern uint16_t g_mav_veh_rngfdr_current_distance;
 extern float g_mav_veh_pitch;
 extern bool g_target_valid;
-extern float x_object;
-extern float y_object;
-extern float z_object;
+extern float g_x_object;
+extern float g_y_object;
+extern float g_z_object;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
 extern bool g_target_too_close;
-extern float x_error;
-extern float y_error;
+extern float g_x_error;
+extern float g_y_error;
 extern float g_vx_adjust;
 extern float g_vy_adjust;
 extern float g_vz_adjust;

@@ -32,9 +32,9 @@
  ********************************************************************************/
 float d_object_h;
 float d_object_w;
-float x_object;
-float y_object;
-float z_object;
+float g_x_object;
+float g_y_object;
+float g_z_object;
 float d_object;
 float delta_angle;       //
 float camera_tilt_angle; // Angle of the camera relative to the ground, compensating for pitch
@@ -157,8 +157,8 @@ void calc_target_offest(void)
     {
         float camera_comp_angle_abs = abs(camera_tilt_angle);
 
-        x_object = d_object * cos(camera_comp_angle_abs);
-        z_object = d_object * sin(camera_comp_angle_abs);
+        g_x_object = d_object * cos(camera_comp_angle_abs);
+        g_z_object = d_object * sin(camera_comp_angle_abs);
     }
 
     /* Calculate shift in target location in the x and z directions based on camera tilt
@@ -188,18 +188,18 @@ void calc_target_offest(void)
     }
 
     /* Adjust x and z distances based on camera tilt angle */
-    x_object = x_object + delta_d_x;
-    x_object = x_object + delta_d_x;
+    g_x_object = g_x_object + delta_d_x;
+    g_x_object = g_x_object + delta_d_x;
 
     /* Calculate target y offset from the center line of view of the camera based on calibrated forward distance and the
        offset of the center of the target to the side of the center of the video frame in pixels */
     y_idx_d = get_float_index(d_object, &y_offset_d[0], MAX_IDX_Y_D_OFFSET, true);
     y_idx_pix = get_float_index(std::abs(g_target_cntr_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
-    y_object = get_2d_interpolated_value(&y_offset[0][0], MAX_IDX_Y_PIXEL_OFFSET, MAX_IDX_Y_D_OFFSET, y_idx_pix, y_idx_d);
+    g_y_object = get_2d_interpolated_value(&y_offset[0][0], MAX_IDX_Y_PIXEL_OFFSET, MAX_IDX_Y_D_OFFSET, y_idx_pix, y_idx_d);
 
     if (g_target_cntr_offset_y < 0.0f)
     {
-        y_object = -y_object;
+        g_y_object = -g_y_object;
     }
 }
 
@@ -224,12 +224,12 @@ bool Localize::init(void)
 {
     d_object_h = 0.0f;
     d_object_w = 0.0f;
-    x_object = 0.0f;
-    y_object = 0.0f;
-    z_object = 0.0f;
+    g_x_object = 0.0f;
+    g_y_object = 0.0f;
+    g_z_object = 0.0f;
     d_object = 0.0f;
-    x_error = 0.0f;
-    y_error = 0.0f;
+    g_x_error = 0.0f;
+    g_y_error = 0.0f;
     delta_angle = 0.0f;
     camera_tilt_angle = 0.0f;
     delta_d_x = 0.0f;

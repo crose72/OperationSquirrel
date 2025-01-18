@@ -27,8 +27,8 @@ PID pid_forwd;
 PID pid_rev;
 
 bool g_target_too_close;
-float x_error;
-float y_error;
+float g_x_error;
+float g_y_error;
 float g_vx_adjust;
 float g_vy_adjust;
 float g_vz_adjust;
@@ -192,14 +192,14 @@ void calc_follow_error(void)
 
     if (d_object < 0.001f)
     {
-        x_error = 0.0f;
+        g_x_error = 0.0f;
     }
     else
     {
-        x_error = x_object - x_desired;
+        g_x_error = g_x_object - x_desired;
     }
 
-    y_error = y_object - y_desired;
+    g_y_error = g_y_object - y_desired;
 }
 
 /********************************************************************************
@@ -209,24 +209,24 @@ void calc_follow_error(void)
  ********************************************************************************/
 void dtrmn_follow_vector(void)
 {
-    g_target_too_close = (x_error < 0.0);
+    g_target_too_close = (g_x_error < 0.0);
 
     if (g_target_valid && g_target_too_close)
     {
         g_vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                              x_error, 0.0, 0.0,
+                                              g_x_error, 0.0, 0.0,
                                               w1_x_rev, 0.0, 0.0, CONTROL_DIM::X);
         g_vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                              y_error, 0.0, 0.0,
+                                              g_y_error, 0.0, 0.0,
                                               w1_y_rev, 0.0, 0.0, CONTROL_DIM::Y);
     }
     else if (g_target_valid && !g_target_too_close)
     {
         g_vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
-                                                x_error, 0.0, 0.0,
+                                                g_x_error, 0.0, 0.0,
                                                 w1_x, 0.0, 0.0, CONTROL_DIM::X);
         g_vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
-                                                y_error, 0.0, 0.0,
+                                                g_y_error, 0.0, 0.0,
                                                 w1_y, 0.0, 0.0, CONTROL_DIM::Y);
     }
     else
@@ -256,8 +256,8 @@ Follow::~Follow(void) {};
 bool Follow::init(void)
 {
     g_target_too_close = false;
-    x_error = 0.0f;
-    y_error = 0.0f;
+    g_x_error = 0.0f;
+    g_y_error = 0.0f;
     g_vx_adjust = 0.0f;
     g_vy_adjust = 0.0f;
     g_vz_adjust = 0.0f;
