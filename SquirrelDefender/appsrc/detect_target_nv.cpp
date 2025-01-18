@@ -26,8 +26,8 @@
  * Object definitions
  ********************************************************************************/
 detectNet *g_net;
-detectNet::Detection *detections;
-int detection_count;
+detectNet::Detection *g_detections;
+int g_detection_count;
 
 /********************************************************************************
  * Calibration definitions
@@ -102,11 +102,11 @@ void detect_objects(void)
 
     if (overlay_flags > 0 && g_image != NULL)
     {
-        detection_count = g_net->Detect(g_image, g_input->GetWidth(), g_input->GetHeight(), &detections, overlay_flags);
+        g_detection_count = g_net->Detect(g_image, g_input->GetWidth(), g_input->GetHeight(), &g_detections, overlay_flags);
     }
     else if (g_image != NULL)
     {
-        detection_count = g_net->Detect(g_image, g_input->GetWidth(), g_input->GetHeight(), &detections);
+        g_detection_count = g_net->Detect(g_image, g_input->GetWidth(), g_input->GetHeight(), &g_detections);
     }
     else
     {
@@ -133,8 +133,8 @@ SSD::~SSD(void) {};
 bool SSD::init(void)
 {
     g_net = NULL;
-    detections = NULL;
-    detection_count = 0;
+    g_detections = NULL;
+    g_detection_count = 0;
 
     if (!create_detection_network())
     {

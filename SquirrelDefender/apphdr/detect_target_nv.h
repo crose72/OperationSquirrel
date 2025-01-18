@@ -34,8 +34,8 @@ extern uchar3 *g_image;
  * Exported objects
  ********************************************************************************/
 extern detectNet *g_net;
-extern detectNet::Detection *detections;
-extern int detection_count;
+extern detectNet::Detection *g_detections;
+extern int g_detection_count;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

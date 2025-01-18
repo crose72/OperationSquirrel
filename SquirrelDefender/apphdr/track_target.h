@@ -36,9 +36,9 @@
 #ifdef BLD_JETSON_B01
 
 extern detectNet *g_net;
-extern detectNet::Detection *detections;
+extern detectNet::Detection *g_detections;
 extern uchar3 *g_image;
-extern int detection_count;
+extern int g_detection_count;
 extern float g_input_video_width;
 extern float g_input_video_height;
 

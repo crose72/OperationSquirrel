@@ -45,8 +45,8 @@ extern int g_yolo_detection_count;
 #ifdef BLD_JETSON_B01
 
 extern detectNet *g_net;
-extern detectNet::Detection *detections;
-extern int detection_count;
+extern detectNet::Detection *g_detections;
+extern int g_detection_count;
 
 
 #elif BLD_WIN
