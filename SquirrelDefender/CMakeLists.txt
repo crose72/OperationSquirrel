@@ -291,6 +291,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolo_utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/pid)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/timer)
 
 file(GLOB MAV_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.cpp)
 file(GLOB MAV_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.h)
@@ -306,6 +307,8 @@ file(GLOB PRINT_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils/*.
 file(GLOB PRINT_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils/*.h)
 file(GLOB PID_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/pid/*.cpp)
 file(GLOB PID_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/pid/*.h)
+file(GLOB TIMER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/timer/*.cpp)
+file(GLOB TIMER_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/timer/*.h)
 
 #=============================================================================
 # Set Source files and locations
@@ -325,10 +328,10 @@ file(GLOB HEADERS ${HEADER_DIR}/*.h)
 # Additional source files to compile together
 list(APPEND SOURCES ${MAV_UTILS_SOURCES} ${SERIAL_UTILS_SOURCES} ${MATH_UTILS_SOURCES} 
                     ${JSON_UTILS_SOURCES} ${PRINT_UTILS_SOURCES} ${YOLO_UTILS_SOURCES} 
-                    ${PID_SOURCES})
+                    ${PID_SOURCES} ${TIMER_SOURCES})
 list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HEADERS} 
                     ${JSON_UTILS_HEADERS} ${PRINT_UTILS_HEADERS} ${YOLO_UTILS_HEADERS} 
-                    ${PID_HEADERS})
+                    ${PID_HEADERS} ${TIMER_HEADERS})
 
 #=============================================================================
 # Build Executable
