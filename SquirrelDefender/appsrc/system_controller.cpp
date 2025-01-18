@@ -237,7 +237,8 @@ int SystemController::init(void)
     
     if (!MavMsg::init() ||
         !DataLogger::init() ||
-        !VehicleController::init())
+        !VehicleController::init() ||
+        !TimeCalc::init())
     {
         led_bad_blink();
         return 1;

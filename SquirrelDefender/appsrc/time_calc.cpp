@@ -130,3 +130,49 @@ void TimeCalc::calc_elapsed_time(void)
         // Print::c_printf("Elapsed Time: %0.3f\n", g_app_elapsed_time);
     }
 }
+
+/********************************************************************************
+ * Function: init
+ * Description: Initialize time calculation.
+ ********************************************************************************/
+bool TimeCalc::init(void)
+{
+    g_app_elapsed_time = 0.0f;
+    start_time = std::chrono::steady_clock::now();
+    return true;
+}
+
+
+/********************************************************************************
+ * Function: loop
+ * Description: Main time calculation loop.
+ ********************************************************************************/
+void TimeCalc::loop(void)
+{
+    if (!first_loop_after_start)
+    {
+        // Get the current timestamp
+        current_time = std::chrono::steady_clock::now();
+
+        // Calculate the elapsed time since the start of the program
+        elapsed_time = current_time - start_time;
+
+        // Convert elapsed time to seconds with millisecond precision
+        float app_elapsed_time_tmp = elapsed_time.count() / 1000.0f;
+
+        // Truncate the number to three decimal places
+        g_app_elapsed_time = (std::floor(app_elapsed_time_tmp * 1000.0f) / 1000.0f);
+
+        // Print program run time
+        // Print::c_printf("Elapsed Time: %0.3f\n", g_app_elapsed_time);
+    }
+}
+
+/********************************************************************************
+ * Function: shutdown
+ * Description: Shutdown time calculation.
+ ********************************************************************************/
+void TimeCalc::shutdown(void)
+{
+    
+}

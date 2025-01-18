@@ -40,6 +40,10 @@ class TimeCalc
         std::chrono::time_point<std::chrono::steady_clock> loop_end_time;
         std::chrono::milliseconds loop_duration;
 
+        static bool init(void);
+        static void loop(void);
+        static void shutdown(void);
+
         void calc_app_start_time(void);
         void calc_app_end_time(void);
         void calc_loop_start_time(void);

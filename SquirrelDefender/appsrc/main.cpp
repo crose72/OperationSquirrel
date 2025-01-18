@@ -24,6 +24,7 @@
 #include "track_target.h"
 #include "localize_target.h"
 #include "follow_target.h"
+#include "time_calc.h"
 
 #ifdef BLD_JETSON_B01
 
@@ -85,9 +86,6 @@ void attach_sig_handler(void)
  ********************************************************************************/
 int main(void)
 {
-    TimeCalc MainAppTime;
-
-    MainAppTime.calc_app_start_time();
     attach_sig_handler();
     stop_program = false;
 
@@ -107,8 +105,8 @@ int main(void)
 #endif // BLD_JETSON_B01
 
     {
-        MainAppTime.calc_elapsed_time();
         std::lock_guard<std::mutex> lock(mutex_main);
+        TimeCalc::loop();
         SystemController::loop();
         MavMsg::loop();
 
@@ -125,9 +123,6 @@ int main(void)
 
         VehicleController::loop();
         DataLogger::loop();
-
-        MainAppTime.loop_rate_controller();
-        MainAppTime.calc_loop_start_time();
     }
 
     SystemController::shutdown();
