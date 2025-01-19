@@ -100,7 +100,7 @@ bool create_input_video_stream(void)
     options.frameRate = 30;
     options.numBuffers = 4;
     options.zeroCopy = true;
-    options.flipMethod = videoOptions::FlipMethod::FLIP_NONE; // if using IMX219-83 stereo camera
+    options.flipMethod = videoOptions::FlipMethod::FLIP_ROTATE_180; // if using IMX219-83 stereo camera
     // if using IMX219-160 stereo camera or H136 V1.3 and need to use option FLIP_ROTATE_180 then
     // you must compile jetson inference with cmake-DENABLE_NVMM=off
 

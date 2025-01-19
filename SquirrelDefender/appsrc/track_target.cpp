@@ -46,7 +46,7 @@ float g_target_bottom;
 
 cv::cuda::GpuMat gpuImage;
 cv::Mat image_cv_wrapped;
-cv::Ptr<cv::TrackerCSRT> target_tracker;
+//cv::Ptr<cv::TrackerCSRT> target_tracker;
 cv::Rect target_bounding_box;
 
 /********************************************************************************
@@ -63,26 +63,26 @@ void get_target_info(void);
 void validate_target(void);
 void track_target(void);
 void update_target_info(void);
-bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &g_image, cv::Rect &bounding_box);
-bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &g_image, cv::Rect &bounding_box);
+//bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &g_image, cv::Rect &bounding_box);
+//bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &g_image, cv::Rect &bounding_box);
 
 /********************************************************************************
  * Function: tracker_init
  * Description: Initialize the tracker by resetting the bounding box to zeros.
  ********************************************************************************/
 
-bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
+/*bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
 {
     tracker->init(cv_image, bounding_box);
 
     return true;
-}
+}*/
 
 /********************************************************************************
  * Function: tracker_update
  * Description: Update the bounding box around the tracked target.
  ********************************************************************************/
-bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
+/*bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
 {
     bool success;
     try {
@@ -96,7 +96,7 @@ bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Re
     }
 
     return success;
-}
+}*/
 
 /********************************************************************************
  * Function: identify_target
@@ -231,6 +231,7 @@ void track_target(void)
 
 /* Don't wrap the image from jetson inference until a valid image has been received.
    That way we know the memory has been allocaed and is ready. */
+   /*
     if (g_valid_image_rcvd && !initialized_cv_image)
     {
         image_cv_wrapped = cv::Mat(g_input_video_height, g_input_video_width, CV_8UC3, g_image); // Directly wrap uchar3*
@@ -263,7 +264,7 @@ void track_target(void)
             initialized_tracker = false;
             tracking = false;
         }
-    }
+    }*/
 
 #elif BLD_WIN
 
@@ -366,7 +367,7 @@ bool Track::init(void)
     target_tracked = false;
     tracking = false;
     target_bounding_box = cv::Rect(0.0, 0.0, 0.0, 0.0);
-    target_tracker = cv::TrackerCSRT::create();
+    //target_tracker = cv::TrackerCSRT::create();
 
     return true;
 }

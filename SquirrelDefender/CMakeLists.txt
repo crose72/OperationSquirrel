@@ -253,7 +253,6 @@ else()
         )
     elseif(BLD_JETSON_B01)
         include_directories(
-            /usr/local/include/JetsonGPIO
             /usr/local/include/jetson-inference
             /usr/local/include/jetson-utils
             /usr/local/cuda/include
@@ -275,8 +274,6 @@ if(BLD_JETSON_B01)
     find_package(jetson-utils REQUIRED)
     find_package(jetson-inference REQUIRED)
     
-    message(STATUS "Attempting to find JetsonGPIO library...")
-    find_library(JETSON_GPIO_LIB JetsonGPIO)
 endif()
 
 #=============================================================================
@@ -343,8 +340,7 @@ if (BLD_JETSON_B01)
     set_target_debug_flags(squirreldefender)
 
     target_link_libraries(squirreldefender 
-                        ${OpenCV_LIBS} 
-                        ${JETSON_GPIO_LIB}
+                        ${OpenCV_LIBS}
                         jetson-inference
                         jetson-utils
                         jsoncpp)

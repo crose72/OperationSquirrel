@@ -28,7 +28,7 @@
 
 #ifdef BLD_JETSON_B01
 
-#include "status_io.h"
+//#include "status_io.h"
 #include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 
 #endif // BLD_JETSON_B01
@@ -96,7 +96,7 @@ int main(void)
 
 #ifdef BLD_JETSON_B01
 
-    while (!stop_program && !g_save_button_press)
+    while (!stop_program)
 
 #else
 

@@ -18,9 +18,9 @@
 #include "detect_target.h"
 #include "json_utils.h"
 #include <opencv2/opencv.hpp>
-#include <opencv2/tracking.hpp>
+#include <opencv2/video/tracking.hpp>
 #include <opencv2/core/utility.hpp>
-#include <opencv2/cudawarping.hpp>
+//#include <opencv2/cudawarping.hpp>
 
 #ifdef BLD_JETSON_B01
 

@@ -120,7 +120,7 @@ void led_init(void)
 {
 #ifdef BLD_JETSON_B01
 
-    StatusIndicators::init();
+    //StatusIndicators::init();
 
 #endif // BLD_JETSON_B01
 }
@@ -133,7 +133,7 @@ void led_init_blink(void)
 {
 #ifdef BLD_JETSON_B01
 
-    StatusIndicators::status_initializing();
+    //StatusIndicators::status_initializing();
 
 #endif // BLD_JETSON_B01
 }
@@ -146,7 +146,7 @@ void led_bad_blink(void)
 {
 #ifdef BLD_JETSON_B01
 
-        StatusIndicators::status_bad_blink();
+        //StatusIndicators::status_bad_blink();
 
 #endif // BLD_JETSON_B01
 }
@@ -164,11 +164,11 @@ void led_system_indicators(void)
         g_system_state == SYSTEM_STATE::PRE_ARM_GOOD ||
         g_system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
     {
-        StatusIndicators::status_good();
+        //StatusIndicators::status_good();
     }
     else
     {
-        StatusIndicators::status_good();
+        //StatusIndicators::status_good();
     }
 
 #endif // BLD_JETSON_B01
@@ -210,11 +210,11 @@ int SystemController::init(void)
     systems_initialized = false;
     
 #ifdef BLD_JETSON_B01
-
+    /*
     if (g_save_button_press)
     {
         return 2;
-    }
+    }*/
 
 #endif // BLD_JETSON_B01
 
@@ -272,7 +272,7 @@ void SystemController::loop(void)
 
 #ifdef BLD_JETSON_B01
 
-    StatusIndicators::loop();
+    //StatusIndicators::loop();
 
 #endif // BLD_JETSON_B01
 }
@@ -295,8 +295,8 @@ void SystemController::shutdown(void)
 
 #ifdef BLD_JETSON_B01
 
-    StatusIndicators::status_program_complete();
-    StatusIndicators::shutdown();
+    //StatusIndicators::status_program_complete();
+    //StatusIndicators::shutdown();
 
 #endif // BLD_JETSON_B01
 
