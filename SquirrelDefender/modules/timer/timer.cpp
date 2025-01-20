@@ -34,7 +34,7 @@
  * Function: Timer
  * Description: Class constructor
  ********************************************************************************/
-Timer::Timer(void) {}
+Timer::Timer(std::chrono::milliseconds loop_rate_desired) : loop_rate_desired(loop_rate_desired) {}
 
 /********************************************************************************
  * Function: ~Timer
@@ -43,34 +43,34 @@ Timer::Timer(void) {}
 Timer::~Timer(void) {}
 
 /********************************************************************************
- * Function: calc_loop_start_time
+ * Function: start_time
  * Description: Get loop start time.
  ********************************************************************************/
-void Timer::calc_loop_start_time(void)
+void Timer::start_time(void)
 {
     loop_start_time = std::chrono::steady_clock::now();
 }
 
 /********************************************************************************
- * Function: calc_loop_end_time
+ * Function: end_time
  * Description: Get loop end time.
  ********************************************************************************/
-void Timer::calc_loop_end_time(void)
+void Timer::end_time(void)
 {
     loop_end_time = std::chrono::steady_clock::now();
 }
 
 /********************************************************************************
- * Function: loop_rate_controller
+ * Function: wait
  * Description: If loop finished early wait until the desired frequency is
  *              achieved before executing the next loop.
  ********************************************************************************/
-void Timer::loop_rate_controller(void)
+void Timer::wait(void)
 {
-    calc_loop_end_time();
+    end_time();
 
     std::chrono::milliseconds loop_duration = std::chrono::duration_cast<std::chrono::milliseconds>(loop_end_time - loop_start_time);
-    while (loop_duration < std::chrono::milliseconds(25))
+    while (loop_duration < loop_rate_desired)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1)); // wait in small increments
         loop_end_time = std::chrono::steady_clock::now();

@@ -21,7 +21,8 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-float g_app_elapsed_time = (float)0.0;
+float g_app_elapsed_time;
+float app_elapsed_time_prv;
 std::chrono::time_point<std::chrono::steady_clock> start_time;
 std::chrono::duration<float, std::milli> elapsed_time((float)0.0);
 

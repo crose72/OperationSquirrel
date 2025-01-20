@@ -196,14 +196,6 @@ void MavCmd::set_mav_msg_rate(uint8_t sender_sys_id, uint8_t sender_comp_id, uin
  ********************************************************************************/
 void MavCmd::req_mav_msg(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, uint16_t msg_id)
 {
-    mavlink_command_long_t* command_long;
-
-    command_long->target_system = target_sys_id;
-    command_long->target_component = target_comp_id;
-    command_long->command = MAV_CMD_REQUEST_MESSAGE;
-    command_long->param1 = msg_id;
-    command_long->param7 = 1;
-
     send_cmd_long(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, MAV_CMD_REQUEST_MESSAGE, 0, msg_id, 0, 0, 0, 0, 0, 1);
 }
 

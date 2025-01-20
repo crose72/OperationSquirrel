@@ -25,6 +25,7 @@
 #include "localize_target.h"
 #include "follow_target.h"
 #include "time_calc.h"
+#include "timer.h"
 
 #ifdef BLD_JETSON_B01
 
@@ -86,6 +87,7 @@ void attach_sig_handler(void)
  ********************************************************************************/
 int main(void)
 {
+    Timer main_loop(std::chrono::milliseconds(25));
     attach_sig_handler();
     stop_program = false;
 
@@ -106,6 +108,7 @@ int main(void)
 
     {
         std::lock_guard<std::mutex> lock(mutex_main);
+        main_loop.start_time();
         Time::loop();
         SystemController::loop();
         MavMsg::loop();
@@ -123,6 +126,8 @@ int main(void)
 
         VehicleController::loop();
         DataLogger::loop();
+        main_loop.end_time();
+        main_loop.wait();
     }
 
     SystemController::shutdown();

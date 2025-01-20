@@ -282,8 +282,6 @@ void track_target(void)
             target_bounding_box = cv::Rect(g_target_left, g_target_top, g_target_width, g_target_height);
             tracker_init(target_tracker, g_image, target_bounding_box);
         }
-
-        Print::cpp_cout("My code made it this far!");
           
         target_bounding_box = cv::Rect(g_target_left, g_target_top, g_target_width, g_target_height);
         target_tracked = tracker_update(target_tracker, g_image, target_bounding_box);

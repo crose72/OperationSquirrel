@@ -4,8 +4,8 @@
  * @file    timer.h
  * @date    6/7/2023
  ********************************************************************************/
-#ifndef TIME_CALC_H
-#define TIME_CALC_H
+#ifndef TIMER_H
+#define TIMER_H
 
 /********************************************************************************
  * Includes
@@ -29,19 +29,19 @@
 class Timer
 {
     public:
-        Timer();
+        Timer(std::chrono::milliseconds loop_rate_desired);
         ~Timer();
 
         std::chrono::time_point<std::chrono::steady_clock> loop_start_time;
         std::chrono::time_point<std::chrono::steady_clock> loop_end_time;
         std::chrono::milliseconds loop_duration;
 
-        void calc_loop_start_time(void);
-        void calc_loop_end_time(void);
-        void loop_rate_controller(void);
-        void calc_elapsed_time(void);
+        void start_time(void);
+        void end_time(void);
+        void wait(void);
 
     private:
-    };
+        std::chrono::milliseconds loop_rate_desired;
+ };
 
-#endif // TIME_CALC_H
+#endif // TIMER_H
