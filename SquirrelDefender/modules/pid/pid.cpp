@@ -56,19 +56,19 @@ PID::~PID(void) {}
  ********************************************************************************/
 float PID::pid_controller_3d(float Kp, float Ki, float Kd,
                              float err1, float err2, float err3,
-                             float w1, float w2, float w3, CONTROL_DIM dim)
+                             float w1, float w2, float w3, CONTROL_DIM dim, float dt)
 {
     float err = (err1 * w1) + (err2 * w2) + (err3 * w3);
     float err_sum_local = 0.0;
     float err_prv_local = 0.0;
 
     float proportional_term = Kp * err;
-    float integral_term = Ki * (err_sum[dim] + err * g_dt_25ms);
-    float derivative_term = Kd * (err - err_prv[dim]) / g_dt_25ms;
+    float integral_term = Ki * (err_sum[dim] + err * dt);
+    float derivative_term = Kd * (err - err_prv[dim]) / dt;
     float control = proportional_term + integral_term + derivative_term;
 
     // Apply clamping and decay on integrall sum
-    err_sum[dim] = integral_decay * (err_sum[dim] + err * g_dt_25ms);
+    err_sum[dim] = integral_decay * (err_sum[dim] + err * dt);
 
     if (err_sum[dim] > max_integral)
     {

@@ -109,7 +109,6 @@ int main(void)
     {
         std::lock_guard<std::mutex> lock(mutex_main);
         main_loop.start_time();
-        Time::loop();
         SystemController::loop();
         MavMsg::loop();
 
@@ -126,6 +125,7 @@ int main(void)
 
         VehicleController::loop();
         DataLogger::loop();
+        Time::loop();
         main_loop.end_time();
         main_loop.wait();
     }

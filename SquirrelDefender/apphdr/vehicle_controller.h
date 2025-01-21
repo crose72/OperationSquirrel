@@ -25,7 +25,6 @@ extern bool g_target_valid;
 extern float g_vx_adjust;
 extern float g_vy_adjust;
 extern float g_vz_adjust;
-extern float g_dt_25ms;
 extern uint16_t g_mav_veh_rngfdr_current_distance;
 extern int32_t g_mav_veh_rel_alt;
 

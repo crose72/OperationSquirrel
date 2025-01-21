@@ -23,6 +23,8 @@
  * Exported objects
  ********************************************************************************/
 extern float g_app_elapsed_time;
+extern float g_dt;
+extern bool g_first_loop_after_start;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

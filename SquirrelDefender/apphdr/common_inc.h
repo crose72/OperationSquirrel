@@ -15,7 +15,6 @@
 #include <stdint.h>
 
 // Global objects
-#include "global_objects.h"
 #include "global_calibrations.h"
 #include "global_types.h"
 

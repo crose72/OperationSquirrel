@@ -44,7 +44,7 @@ void led_system_indicators(void);
 int system_state_machine(void)
 {
     // Initialize system status on startup
-    if (first_loop_after_start)
+    if (g_first_loop_after_start)
     {
         g_system_state = SYSTEM_STATE::DEFAULT;
     }
@@ -174,21 +174,6 @@ void led_system_indicators(void)
 #endif // BLD_JETSON_B01
 }
 
-
-
-/********************************************************************************
- * Function: app_first_init
- * Description: Updates variable for rest of program to know that the first loop
- * 				is over.
- ********************************************************************************/
-void app_first_init(void)
-{
-    if (first_loop_after_start == true)
-    {
-        first_loop_after_start = false;
-    }
-}
-
 /********************************************************************************
  * Function: SystemController
  * Description: Class constructor
@@ -267,7 +252,6 @@ int SystemController::init(void)
 void SystemController::loop(void)
 {
     system_state_machine();
-    app_first_init();
     led_system_indicators();
 
 #ifdef BLD_JETSON_B01

@@ -17,6 +17,7 @@
 #include "json_utils.h"
 #include "pid.h"
 #include "localize_target.h"
+#include "time_calc.h"
 
 /********************************************************************************
  * Imported objects
@@ -29,6 +30,7 @@ extern bool g_target_valid;
 extern float g_x_object;
 extern float g_y_object;
 extern float g_z_object;
+extern float g_dt;
 
 /********************************************************************************
  * Exported objects
