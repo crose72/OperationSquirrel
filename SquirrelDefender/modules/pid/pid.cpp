@@ -37,7 +37,7 @@
  ********************************************************************************/
 PID::PID()
 {
-    for (int i = 0; i < CONTROL_DIM::N_DIMS; ++i)
+    for (int i = 0; i < 3; ++i)
     {
         err_sum[i] = 0.0;
         err_prv[i] = 0.0;
@@ -51,12 +51,12 @@ PID::PID()
 PID::~PID(void) {}
 
 /********************************************************************************
- * Function: pid_controller_3d
+ * Function: pid3
  * Description: PID controller with up to 3 parameters to control.
  ********************************************************************************/
-float PID::pid_controller_3d(float Kp, float Ki, float Kd,
+float PID::pid3(float Kp, float Ki, float Kd,
                              float err1, float err2, float err3,
-                             float w1, float w2, float w3, CONTROL_DIM dim, float dt)
+                             float w1, float w2, float w3, int dim, float dt)
 {
     float err = (err1 * w1) + (err2 * w2) + (err3 * w3);
     float err_sum_local = 0.0;

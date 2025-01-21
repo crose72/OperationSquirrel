@@ -25,7 +25,7 @@
  * Object definitions
  ********************************************************************************/
 bool systems_initialized;
-SYSTEM_STATE g_system_state;
+SystemState g_system_state;
 
 /********************************************************************************
  * Calibration definitions
@@ -46,7 +46,7 @@ int system_state_machine(void)
     // Initialize system status on startup
     if (g_first_loop_after_start)
     {
-        g_system_state = SYSTEM_STATE::DEFAULT;
+        g_system_state = SystemState::DEFAULT;
     }
     else
     {
@@ -67,43 +67,43 @@ int system_state_machine(void)
         switch (g_system_state)
         {
         // Default state is the first state, nothing is initialialized, no systems are active
-        case SYSTEM_STATE::DEFAULT:
+        case SystemState::DEFAULT:
             if (systems_initialized)
             {
-                g_system_state = SYSTEM_STATE::INIT;
+                g_system_state = SystemState::INIT;
             }
             break;
         // After video, inference, SLAM, and other systems have successfully initialized we are in the init state
-        case SYSTEM_STATE::INIT:
+        case SystemState::INIT:
             if (prearm_checks)
             {
-                g_system_state = SYSTEM_STATE::PRE_ARM_GOOD;
+                g_system_state = SystemState::PRE_ARM_GOOD;
             }
             break;
         // Pre arm good means that the data is from a drone and pre arm checks are good
-        case SYSTEM_STATE::PRE_ARM_GOOD:
+        case SystemState::PRE_ARM_GOOD:
             if (mav_type_is_quad && g_mav_veh_state == MAV_STATE_STANDBY)
             {
-                g_system_state = SYSTEM_STATE::STANDBY;
+                g_system_state = SystemState::STANDBY;
             }
             else if (g_mav_veh_rel_alt > 1000 && mav_type_is_quad && g_mav_veh_state == MAV_STATE_ACTIVE)
             {
-                g_system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
+                g_system_state = SystemState::IN_FLIGHT_GOOD;
             }
             break;
         // Standby means we are ready to takeoff
-        case SYSTEM_STATE::STANDBY:
+        case SystemState::STANDBY:
             if ((g_mav_veh_rel_alt > 1000 || g_mav_veh_rngfdr_current_distance > 100) && g_mav_veh_state == MAV_STATE_ACTIVE)
             {
-                g_system_state = SYSTEM_STATE::IN_FLIGHT_GOOD;
+                g_system_state = SystemState::IN_FLIGHT_GOOD;
             }
             break;
         // In flight good means the vehicle is in the air and has no system failures
-        case SYSTEM_STATE::IN_FLIGHT_GOOD:
+        case SystemState::IN_FLIGHT_GOOD:
 
             break;
         // In flight good means the vehicle is in the air with some system failures (e.g. video feed stopped)
-        case SYSTEM_STATE::IN_FLIGHT_ERROR:
+        case SystemState::IN_FLIGHT_ERROR:
 
             break;
         }
@@ -159,10 +159,10 @@ void led_system_indicators(void)
 {
 #ifdef BLD_JETSON_B01
 
-    if (g_system_state == SYSTEM_STATE::DEFAULT ||
-        g_system_state == SYSTEM_STATE::INIT ||
-        g_system_state == SYSTEM_STATE::PRE_ARM_GOOD ||
-        g_system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
+    if (g_system_state == SystemState::DEFAULT ||
+        g_system_state == SystemState::INIT ||
+        g_system_state == SystemState::PRE_ARM_GOOD ||
+        g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
         StatusIndicators::status_good();
     }

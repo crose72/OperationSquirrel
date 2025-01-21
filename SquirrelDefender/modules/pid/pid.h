@@ -31,10 +31,10 @@ public:
     PID();
     ~PID();
 
-    float pid_controller_3d(float Kp, float Ki, float Kd,
-                            float err1, float err2, float err3,
-                            float w1, float w2, float w3, CONTROL_DIM dim, 
-                            float dt);
+    float pid3(float Kp, float Ki, float Kd,
+               float err1, float err2, float err3,
+               float w1, float w2, float w3, int dim, 
+               float dt);
 
 private:
     float err_sum[3];                  // Array to hold integral sums for x, y, z

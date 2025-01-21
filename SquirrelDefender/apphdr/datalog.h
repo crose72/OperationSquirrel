@@ -122,7 +122,7 @@ extern float g_vy_adjust;
 extern float g_vz_adjust;
 
 /* System variables */
-extern SYSTEM_STATE g_system_state;
+extern SystemState g_system_state;
 
 /********************************************************************************
  * Exported objects

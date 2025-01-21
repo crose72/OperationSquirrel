@@ -99,19 +99,19 @@ bool VehicleController::init(void)
  ********************************************************************************/
 void VehicleController::loop(void)
 {
-    if (g_system_state == SYSTEM_STATE::INIT)
+    if (g_system_state == SystemState::INIT)
     {
         MavCmd::set_mode_guided(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
     }
-    else if (g_system_state == SYSTEM_STATE::PRE_ARM_GOOD)
+    else if (g_system_state == SystemState::PRE_ARM_GOOD)
     {
         MavCmd::arm_vehicle(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
     }
-    else if (g_system_state == SYSTEM_STATE::STANDBY)
+    else if (g_system_state == SystemState::STANDBY)
     {
         MavCmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, (float)4.0);
     }
-    else if (g_system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
+    else if (g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
         
         /* Debounce counter to avoid sending vehicle commands before the vehicle is in position */

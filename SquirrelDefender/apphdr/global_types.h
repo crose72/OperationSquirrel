@@ -17,7 +17,7 @@
  * Global type declarations
  ********************************************************************************/
 
-enum SYSTEM_STATE
+enum SystemState
 {
     DEFAULT,
     INIT,
@@ -27,7 +27,7 @@ enum SYSTEM_STATE
     IN_FLIGHT_ERROR
 };
 
-enum CONTROL_DIM
+enum ControlDim
 {
     X,
     Y,

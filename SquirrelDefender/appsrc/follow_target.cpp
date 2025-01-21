@@ -213,21 +213,21 @@ void dtrmn_follow_vector(void)
 
     if (g_target_valid && g_target_too_close)
     {
-        g_vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev,
+        g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
                                               g_x_error, 0.0, 0.0,
-                                              w1_x_rev, 0.0, 0.0, CONTROL_DIM::X, g_dt);
-        g_vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev,
+                                              w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
+        g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
                                               g_y_error, 0.0, 0.0,
-                                              w1_y_rev, 0.0, 0.0, CONTROL_DIM::Y, g_dt);
+                                              w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
     }
     else if (g_target_valid && !g_target_too_close)
     {
-        g_vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
+        g_vx_adjust = pid_forwd.pid3(Kp_x, Ki_x, Kd_x,
                                                 g_x_error, 0.0, 0.0,
-                                                w1_x, 0.0, 0.0, CONTROL_DIM::X, g_dt);
-        g_vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
+                                                w1_x, 0.0, 0.0, ControlDim::X, g_dt);
+        g_vy_adjust = pid_forwd.pid3(Kp_y, Ki_y, Kd_y,
                                                 g_y_error, 0.0, 0.0,
-                                                w1_y, 0.0, 0.0, CONTROL_DIM::Y, g_dt);
+                                                w1_y, 0.0, 0.0, ControlDim::Y, g_dt);
     }
     else
     {

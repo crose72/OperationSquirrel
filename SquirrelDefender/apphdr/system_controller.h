@@ -35,7 +35,7 @@ extern bool g_save_button_press;
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern SYSTEM_STATE g_system_state;
+extern SystemState g_system_state;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
