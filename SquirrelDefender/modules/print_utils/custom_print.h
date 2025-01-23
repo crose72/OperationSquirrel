@@ -3,10 +3,10 @@
 /********************************************************************************
  * @file    custom_print.h
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  ********************************************************************************/
-#ifndef DEBUGGER_H
-#define DEBUGGER_H
+#ifndef CUSTOM_PRINT_H
+#define CUSTOM_PRINT_H
 
 /********************************************************************************
  * Includes
@@ -61,4 +61,4 @@ class Print
 
 };
 
-#endif // DEBUGGER_H
+#endif // CUSTOM_PRINT_H

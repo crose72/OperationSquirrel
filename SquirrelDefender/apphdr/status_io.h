@@ -5,7 +5,7 @@
 /********************************************************************************
  * @file    status_io.h
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  ********************************************************************************/
 #ifndef JETSON_IO_H
 #define JETSON_IO_H
@@ -31,11 +31,11 @@ extern bool g_save_button_press;
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class StatusIndicators
+class StatusIO
 {
 public:
-    StatusIndicators();
-    ~StatusIndicators();
+    StatusIO();
+    ~StatusIO();
 
     static bool init(void);
     static void loop(void);

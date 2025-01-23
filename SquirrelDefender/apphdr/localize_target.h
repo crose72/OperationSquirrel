@@ -5,7 +5,7 @@
 /********************************************************************************
  * @file    localize_target.h
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  ********************************************************************************/
 #ifndef LOCALIZE_TARGET_H
 #define LOCALIZE_TARGET_H
@@ -55,7 +55,7 @@ extern float g_delta_angle;
 extern float g_camera_tilt_angle;
 extern float g_delta_d_x;
 extern float g_delta_d_z;
-extern float camera_comp_angle;
+extern float g_camera_comp_angle;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

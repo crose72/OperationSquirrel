@@ -1,8 +1,8 @@
 /********************************************************************************
  * @file    mavlink_print_info.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
- * @brief   Formatted print statements for mavlink messages.
+ * @date    1/22/2025
+ * @brief   Print statements for mavlink messages.
  ********************************************************************************/
 
 /********************************************************************************

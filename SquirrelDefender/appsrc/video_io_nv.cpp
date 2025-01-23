@@ -4,8 +4,8 @@
 /********************************************************************************
  * @file    video_io_nv.cpp
  * @author  Cameron Rose
- * @date    5/22/2024
- * @brief   Configure and start video streams for other software components.
+ * @date    1/22/2025
+ * @brief   Configure and start video streams using Jetson Inference library.
  ********************************************************************************/
 
 /********************************************************************************

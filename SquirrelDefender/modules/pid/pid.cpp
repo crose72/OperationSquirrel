@@ -1,9 +1,8 @@
 /********************************************************************************
  * @file    pid.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
- * @brief   Provide methods for implementing PID controllers from basic to
- *          complex.
+ * @date    1/22/2025
+ * @brief   PID controller implementation from basic to complex.
  ********************************************************************************/
 
 /********************************************************************************
@@ -55,8 +54,8 @@ PID::~PID(void) {}
  * Description: PID controller with up to 3 parameters to control.
  ********************************************************************************/
 float PID::pid3(float Kp, float Ki, float Kd,
-                             float err1, float err2, float err3,
-                             float w1, float w2, float w3, int dim, float dt)
+                float err1, float err2, float err3,
+                float w1, float w2, float w3, int dim, float dt)
 {
     float err = (err1 * w1) + (err2 * w2) + (err3 * w3);
     float err_sum_local = 0.0;

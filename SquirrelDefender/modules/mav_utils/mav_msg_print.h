@@ -1,12 +1,12 @@
 #pragma once
 
 /********************************************************************************
- * @file    mavlink_msg_handler.h
+ * @file    mav_msg_print.h
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  ********************************************************************************/
-#ifndef MAVLINK_PRINT_INFO_H
-#define MAVLINK_PRINT_INFO_H
+#ifndef MAV_MSG_PRINT_H
+#define MAV_MSG_PRINT_H
 
 /********************************************************************************
  * Includes
@@ -55,4 +55,4 @@ void print_position_target_local_ned(mavlink_position_target_local_ned_t &positi
 void print_optical_flow(mavlink_optical_flow_t &optical_flow);
 void print_position_local_ned(const mavlink_local_position_ned_t &local_position);
 
-#endif // MAVLINK_PRINT_INFO_H
+#endif // MAV_MSG_PRINT_H

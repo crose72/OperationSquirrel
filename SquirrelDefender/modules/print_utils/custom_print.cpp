@@ -1,8 +1,8 @@
 /********************************************************************************
- * @file    debugger.cpp
+ * @file    custom_print.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
- * @brief   Provide interfaces to
+ * @date    1/22/2025
+ * @brief   Custom print statements using c formatted print statements or c++ IO.
  ********************************************************************************/
 
 /********************************************************************************

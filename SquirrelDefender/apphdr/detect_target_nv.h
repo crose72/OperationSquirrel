@@ -6,10 +6,10 @@
 /********************************************************************************
  * @file    detect_target_nv.h
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  ********************************************************************************/
-#ifndef DETECT_TARGET_SSD_H
-#define DETECT_TARGET_SSD_H
+#ifndef DETECT_TARGET_NV_H
+#define DETECT_TARGET_NV_H
 
 /********************************************************************************
  * Includes
@@ -54,7 +54,7 @@ public:
 private:
 };
 
-#endif // DETECT_TARGET_SSD_H
+#endif // DETECT_TARGET_NV_H
 
 #endif // BLD_JETSON_B01
 #endif // ENABLE_CV

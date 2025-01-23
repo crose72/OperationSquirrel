@@ -3,10 +3,10 @@
 /********************************************************************************
  * @file    mav_motion_utils.h
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  ********************************************************************************/
-#ifndef MAV_MOTION_UTILS_H
-#define MAV_MOTION_UTILS_H
+#ifndef MAV_MOTION_H
+#define MAV_MOTION_H
 
 /********************************************************************************
  * Includes
@@ -64,4 +64,4 @@ void move_forward(void);
 void attitude_yaw(float yaw_pos, float yaw_rate);
 
 
-#endif // MAV_MOTION_UTILS_H
+#endif // MAV_MOTION_H

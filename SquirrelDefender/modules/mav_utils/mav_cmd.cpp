@@ -1,9 +1,8 @@
 /********************************************************************************
- * @file    mavlink_cmd_handler.cpp
+ * @file    mav_cmd.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
- * @brief   Abstracts and simplifies the mavlink commands for use throughout the
- *          program.
+ * @date    1/22/2025
+ * @brief   Utilities for sending mavlink commands over UART serial pins.
  ********************************************************************************/
 
 /********************************************************************************

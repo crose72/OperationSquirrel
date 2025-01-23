@@ -1,11 +1,10 @@
 #ifdef BLD_JETSON_B01
 
 /********************************************************************************
- * @file    parameters.cpp
+ * @file    json_utils.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
- * @brief   Provide utilities for accessing various parameters from a json or
- *           other type of file.
+ * @date    1/22/2025
+ * @brief   Provide utilities for accessing parameters from a json file.
  ********************************************************************************/
 
 /********************************************************************************

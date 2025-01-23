@@ -1,13 +1,12 @@
 #pragma once
 
 /********************************************************************************
- * @file    mavlink_cmd_handler.h
+ * @file    mav_cmd.h
  * @author  Cameron Rose
- * @date    6/7/2023
- * @brief   Mavlink command handler header
+ * @date    1/22/2025
  ********************************************************************************/
-#ifndef MAVLINK_COMMAND_HANDLER_H
-#define MAVLINK_COMMAND_HANDLER_H
+#ifndef MAV_CMD_H
+#define MAV_CMD_H
 
 /********************************************************************************
  * Includes
@@ -60,4 +59,4 @@ private:
     static void subscribe(uint16_t msg_id, float msg_interval);                 // Subscribe to a mavlink message at desired rate
 };
 
-#endif // MAVLINK_COMMAND_HANDLER_H
+#endif // MAV_CMD_H

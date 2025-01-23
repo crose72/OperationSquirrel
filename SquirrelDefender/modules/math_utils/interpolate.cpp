@@ -1,8 +1,8 @@
 /********************************************************************************
  * @file    interpolate.cpp
  * @author  Cameron Rose
- * @date    5/22/2024
- * @brief   Utilities for various custom math operations.
+ * @date    1/22/2025
+ * @brief   Utilities for interpolating within 1D and 2D arrays.
  ********************************************************************************/
 
 /********************************************************************************

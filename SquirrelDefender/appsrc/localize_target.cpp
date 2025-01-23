@@ -3,8 +3,8 @@
 /********************************************************************************
  * @file    localize_target.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
- * @brief   Localize the target and maintain a specified x, y, z offset.
+ * @date    1/22/2025
+ * @brief   Localize the x, y, z offset of the target relative to the vehicle.
  ********************************************************************************/
 
 /********************************************************************************
@@ -40,7 +40,7 @@ float g_delta_angle;       //
 float g_camera_tilt_angle; // Angle of the camera relative to the ground, compensating for pitch
 float g_delta_d_x;
 float g_delta_d_z;
-float camera_comp_angle;
+float g_camera_comp_angle;
 
 /********************************************************************************
  * Calibration definitions
@@ -149,11 +149,11 @@ void calc_target_offest(void)
     }
 
     /* Calculate true camera angle relative to the ground, adjusting for pitch. */
-    camera_comp_angle = (PI / 2.0f) - camera_fixed_angle;
+    g_camera_comp_angle = (PI / 2.0f) - camera_fixed_angle;
     g_camera_tilt_angle = g_mav_veh_pitch - camera_fixed_angle;
 
     /* Calculate the x and z distances of the target relative to the drone camera (positive z is down).*/
-    if (g_camera_tilt_angle <= 0.0f && g_camera_tilt_angle >= -camera_comp_angle)
+    if (g_camera_tilt_angle <= 0.0f && g_camera_tilt_angle >= -g_camera_comp_angle)
     {
         float camera_comp_angle_abs = abs(g_camera_tilt_angle);
 
@@ -168,7 +168,7 @@ void calc_target_offest(void)
        adjustment of the target position estimate in the z direction. Make adjustments when
        drone pitch is less than or equal to the camera tilt angle (brings the camera parallel
        to the ground) and greater than a calibratable value. */
-    g_delta_angle = camera_comp_angle + g_mav_veh_pitch;
+    g_delta_angle = g_camera_comp_angle + g_mav_veh_pitch;
 
     if (g_delta_angle > 0.0f && g_delta_angle < camera_fixed_angle)
     {
@@ -234,7 +234,7 @@ bool Localize::init(void)
     g_camera_tilt_angle = 0.0f;
     g_delta_d_x = 0.0f;
     g_delta_d_z = 0.0f;
-    camera_comp_angle = 0.0f;
+    g_camera_comp_angle = 0.0f;
 
     return true;
 }

@@ -1,22 +1,37 @@
+#pragma once
+
 /********************************************************************************
- * @file    global_calibrations.cpp
+ * @file    global_types.h
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   
+ * @dateGlobal typedefs to be shared throughout the program.
  ********************************************************************************/
+#ifndef GLOBAL_TYPES_H
+#define GLOBAL_TYPES_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "global_calibrations.h"
 
 /********************************************************************************
- * Calibration definitions
+ * Global type declarations
  ********************************************************************************/
-const uint8_t SENDER_SYS_ID = 0;
-const uint8_t SENDER_COMP_ID = 0;
-const uint8_t TARGET_SYS_ID = 1;
-const uint8_t TARGET_COMP_ID = 1;
-const int32_t MESSAGE_RATE_DEFAULT = 0;
-const int32_t MESSAGE_RATE_40Hz = 25000;
-const int32_t MESSAGE_RATE_1Hz = 1000000;
+enum SystemState
+{
+    DEFAULT,
+    INIT,
+    PRE_ARM_GOOD,
+    STANDBY,
+    IN_FLIGHT_GOOD,
+    IN_FLIGHT_ERROR
+};
+
+enum ControlDim
+{
+    X,
+    Y,
+    Z,
+    N_DIMS
+};
+
+#endif // GLOBAL_TYPES_H

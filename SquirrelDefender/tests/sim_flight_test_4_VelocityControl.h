@@ -1,7 +1,7 @@
 /********************************************************************************
  * @file    sim_flight_test_4_VelocityControl.h
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    1/22/2025
  * @brief   Command the drone to follow a NED velocity vector where +x is
  *          forward, +y is right, and +z is down.
  ********************************************************************************/

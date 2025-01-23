@@ -1,7 +1,7 @@
 /********************************************************************************
  * @file    sim_flight_test_1_GPSWaypoints.h
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    1/22/2025
  * @brief   Command the drone to follow a move to specified GPS lat, lon, and 
  *          alt.
  ********************************************************************************/

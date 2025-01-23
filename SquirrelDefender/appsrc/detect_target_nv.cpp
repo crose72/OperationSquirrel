@@ -4,7 +4,7 @@
 /********************************************************************************
  * @file    detect_target_nv.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  * @brief   This file contains the functions to initialize, run, and clean up
             object detection code.
  ********************************************************************************/

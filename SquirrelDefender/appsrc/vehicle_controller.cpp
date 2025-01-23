@@ -1,11 +1,9 @@
 /********************************************************************************
  * @file    vehicle_controller.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
- * @brief   Control the position, velocity, and acceleration of the drone by
- *          sending the following MAVLINK message to the drone.  Control the
- *          vector position, velocity, acceleration, and yaw/yaw rate.
- *
+ * @date    1/22/2025
+ * @brief   Send vehicle motion requests or commands based on the state of 
+ *          the system and feedback loop.
  ********************************************************************************/
 
 /********************************************************************************

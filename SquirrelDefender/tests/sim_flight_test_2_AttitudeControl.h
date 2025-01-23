@@ -1,7 +1,7 @@
 /********************************************************************************
  * @file    sim_flight_test_2_AttitudeControl.h
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    1/22/2025
  * @brief   A test to understand the set attitude target message for controlling
  *          the drone.
  ********************************************************************************/

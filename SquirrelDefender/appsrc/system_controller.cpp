@@ -1,11 +1,11 @@
 /********************************************************************************
  * @file    system_controller.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
- * @brief   Control the position, velocity, and acceleration of the drone by
- *          sending the following MAVLINK message to the drone.  Control the
- *          vector position, velocity, acceleration, and yaw/yaw rate.
- *
+ * @date    1/22/2025
+ * @brief   High level state machine monitoring the state of flight, video 
+ *          readiness and other signals to determine if the vehicle is ready to
+ *          proceed with a course of action (e.g. ready to takeoff, error need to
+ *          land).
  ********************************************************************************/
 
 /********************************************************************************
@@ -120,7 +120,7 @@ void led_init(void)
 {
 #ifdef BLD_JETSON_B01
 
-    StatusIndicators::init();
+    StatusIO::init();
 
 #endif // BLD_JETSON_B01
 }
@@ -133,7 +133,7 @@ void led_init_blink(void)
 {
 #ifdef BLD_JETSON_B01
 
-    StatusIndicators::status_initializing();
+    StatusIO::status_initializing();
 
 #endif // BLD_JETSON_B01
 }
@@ -146,7 +146,7 @@ void led_bad_blink(void)
 {
 #ifdef BLD_JETSON_B01
 
-        StatusIndicators::status_bad_blink();
+        StatusIO::status_bad_blink();
 
 #endif // BLD_JETSON_B01
 }
@@ -164,11 +164,11 @@ void led_system_indicators(void)
         g_system_state == SystemState::PRE_ARM_GOOD ||
         g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
-        StatusIndicators::status_good();
+        StatusIO::status_good();
     }
     else
     {
-        StatusIndicators::status_good();
+        StatusIO::status_good();
     }
 
 #endif // BLD_JETSON_B01
@@ -256,7 +256,7 @@ void SystemController::loop(void)
 
 #ifdef BLD_JETSON_B01
 
-    StatusIndicators::loop();
+    StatusIO::loop();
 
 #endif // BLD_JETSON_B01
 }
@@ -279,8 +279,8 @@ void SystemController::shutdown(void)
 
 #ifdef BLD_JETSON_B01
 
-    StatusIndicators::status_program_complete();
-    StatusIndicators::shutdown();
+    StatusIO::status_program_complete();
+    StatusIO::shutdown();
 
 #endif // BLD_JETSON_B01
 

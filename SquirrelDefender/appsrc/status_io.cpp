@@ -3,9 +3,9 @@
 /********************************************************************************
  * @file    status_io.cpp
  * @author  Cameron Rose
- * @date    5/22/2024
+ * @date    1/22/2025
  * @brief   Configure Jetson GPIO and provide methods for using the pins on the
- *          jetson.
+ *          Jetson B0!.
  ********************************************************************************/
 
 /********************************************************************************
@@ -40,22 +40,22 @@ const int SAVE_BUTTON_PIN2 = 22;
  ********************************************************************************/
 
 /********************************************************************************
- * Function: StatusIndicators
+ * Function: StatusIO
  * Description: Constructor
  ********************************************************************************/
-StatusIndicators::StatusIndicators(void) {}
+StatusIO::StatusIO(void) {}
 
 /********************************************************************************
  * Function: Video
  * Description: Destructor
  ********************************************************************************/
-StatusIndicators::~StatusIndicators(void) {}
+StatusIO::~StatusIO(void) {}
 
 /********************************************************************************
  * Function: status_initializing
  * Description: Use this sequence to indicate program is still in the init phase.
  ********************************************************************************/
-void StatusIndicators::status_initializing(void)
+void StatusIO::status_initializing(void)
 {
     for (int j = 0; j < 3; j++)
     {
@@ -82,7 +82,7 @@ void StatusIndicators::status_initializing(void)
  * Function: status_good
  * Description: Indicate that the system is good with a green led.
  ********************************************************************************/
-void StatusIndicators::status_good(void)
+void StatusIO::status_good(void)
 {
     GPIO::output(GREEN_LED_PIN, GPIO::HIGH);
     GPIO::output(RED_LED_PIN, GPIO::LOW);
@@ -92,7 +92,7 @@ void StatusIndicators::status_good(void)
  * Function: status_bad
  * Description: Indicate that the system is bad with a red led.
  ********************************************************************************/
-void StatusIndicators::status_bad(void)
+void StatusIO::status_bad(void)
 {
     GPIO::output(RED_LED_PIN, GPIO::HIGH);
     GPIO::output(GREEN_LED_PIN, GPIO::LOW);
@@ -102,7 +102,7 @@ void StatusIndicators::status_bad(void)
  * Function: status_bad_blink
  * Description: Indicate that the system is bad with a red led.
  ********************************************************************************/
-void StatusIndicators::status_bad_blink(void)
+void StatusIO::status_bad_blink(void)
 {
     GPIO::output(GREEN_LED_PIN, GPIO::LOW);
 
@@ -130,7 +130,7 @@ void StatusIndicators::status_bad_blink(void)
  * Function: clear_all_leds
  * Description: All leds are turned off.
  ********************************************************************************/
-void StatusIndicators::clear_all_leds(void)
+void StatusIO::clear_all_leds(void)
 {
     GPIO::output(GREEN_LED_PIN, GPIO::LOW);
     GPIO::output(RED_LED_PIN, GPIO::LOW);
@@ -141,7 +141,7 @@ void StatusIndicators::clear_all_leds(void)
  * Description: This function will monitor the state of the button.
  *********************************
  ***********************************************/
-void StatusIndicators::save_video_button_state(void)
+void StatusIO::save_video_button_state(void)
 {
     unsigned int button_state;
     button_state = GPIO::input(SAVE_BUTTON_PIN2);
@@ -162,7 +162,7 @@ void StatusIndicators::save_video_button_state(void)
  * Function: status_program_complete
  * Description: Use this sequence to indicate program is has completed.
  ********************************************************************************/
-void StatusIndicators::status_program_complete(void)
+void StatusIO::status_program_complete(void)
 {
     for (int j = 0; j < 3; j++)
     {
@@ -193,7 +193,7 @@ void StatusIndicators::status_program_complete(void)
  * Function: init
  * Description: Initialize the pins on the jetson.
  ********************************************************************************/
-bool StatusIndicators::init(void)
+bool StatusIO::init(void)
 {
     GPIO::setmode(GPIO::BOARD);
     GPIO::setup(GREEN_LED_PIN, GPIO::OUT, GPIO::LOW);
@@ -209,7 +209,7 @@ bool StatusIndicators::init(void)
  * Function: loop
  * Description: Loop for all IO that needs to be monitored continuously.
  ********************************************************************************/
-void StatusIndicators::loop(void)
+void StatusIO::loop(void)
 {
     save_video_button_state();
 }
@@ -218,7 +218,7 @@ void StatusIndicators::loop(void)
  * Function: shutdown
  * Description: Cleanup tasks for jetson io.
  ********************************************************************************/
-void StatusIndicators::shutdown(void)
+void StatusIO::shutdown(void)
 {
     GPIO::cleanup();
 }

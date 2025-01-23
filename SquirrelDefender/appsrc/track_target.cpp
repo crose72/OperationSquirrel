@@ -3,9 +3,9 @@
 /********************************************************************************
  * @file    track_target.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
- * @brief   Target tracking implementation for when the detection model
- *          fails.
+ * @date    1/22/2025
+ * @brief   Maintain bounding box around a detected target, even when object 
+ *          detection fails.
  ********************************************************************************/
 
 /********************************************************************************
