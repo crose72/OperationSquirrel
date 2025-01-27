@@ -1,11 +1,9 @@
 /********************************************************************************
  * @file    vehicle_controller.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
- * @brief   Control the position, velocity, and acceleration of the drone by
- *          sending the following MAVLINK message to the drone.  Control the
- *          vector position, velocity, acceleration, and yaw/yaw rate.
- *
+ * @date    1/22/2025
+ * @brief   Send vehicle motion requests or commands based on the state of 
+ *          the system and feedback loop.
  ********************************************************************************/
 
 /********************************************************************************
@@ -25,7 +23,6 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm VehStateInfo("");
 bool takeoff_dbc;
 bool start_follow_mode;
 uint16_t takeoff_dbc_cnt;
@@ -49,21 +46,21 @@ void follow_mode(void)
 {
     float target_velocity[3] = {0.0, 0.0, 0.0};
 
-    target_velocity[0] = vx_adjust;
-    target_velocity[1] = vy_adjust;
-    target_velocity[2] = vz_adjust;
+    target_velocity[0] = g_vx_adjust;
+    target_velocity[1] = g_vy_adjust;
+    target_velocity[2] = g_vz_adjust;
 
-    if (target_valid && target_too_close)
+    if (g_target_valid && g_target_too_close)
     {
-        VelocityController::cmd_velocity_xy_NED(target_velocity);
+        MavMotion::cmd_velocity_xy_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
     }
-    else if (target_valid && !target_too_close)
+    else if (g_target_valid && !g_target_too_close)
     {
-        VelocityController::cmd_velocity_NED(target_velocity);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
     }
     else
     {
-        VelocityController::cmd_velocity_NED(target_velocity);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
     }
 }
 
@@ -100,21 +97,23 @@ bool VehicleController::init(void)
  ********************************************************************************/
 void VehicleController::loop(void)
 {
-    if (system_state == SYSTEM_STATE::INIT)
+    if (g_system_state == SystemState::INIT)
     {
-        MavCmd::set_mode_GUIDED();
+        MavCmd::set_mode_guided(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
     }
-    else if (system_state == SYSTEM_STATE::PRE_ARM_GOOD)
+    else if (g_system_state == SystemState::PRE_ARM_GOOD)
     {
-        MavCmd::arm_vehicle();
+        MavCmd::arm_vehicle(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
     }
-    else if (system_state == SYSTEM_STATE::STANDBY)
+    else if (g_system_state == SystemState::STANDBY)
     {
-        MavCmd::takeoff_GPS_long((float)4.0);
+        MavCmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, (float)4.0);
     }
-    else if (system_state == SYSTEM_STATE::IN_FLIGHT_GOOD)
+    else if (g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
+        
         /* Debounce counter to avoid sending vehicle commands before the vehicle is in position */
+        
         if (takeoff_dbc_cnt > 0)
         {
             takeoff_dbc_cnt--;
@@ -125,7 +124,7 @@ void VehicleController::loop(void)
             takeoff_dbc = true;
         }
 
-        if (takeoff_dbc && mav_veh_rngfdr_current_distance > 300 || mav_veh_rel_alt > 3000)
+        if (takeoff_dbc && g_mav_veh_rngfdr_current_distance > 300 || g_mav_veh_rel_alt > 3000)
         {
             start_follow_mode = true;
         }
@@ -144,5 +143,5 @@ void VehicleController::loop(void)
  ********************************************************************************/
 void VehicleController::shutdown(void)
 {
-    MavCmd::set_mode_LAND();
+    MavCmd::set_mode_land(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
 }

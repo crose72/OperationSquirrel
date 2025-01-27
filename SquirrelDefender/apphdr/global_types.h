@@ -3,8 +3,7 @@
 /********************************************************************************
  * @file    global_types.h
  * @author  Cameron Rose
- * @date    6/7/2023
- * @brief   Global typedefs to be shared throughout the program
+ * @date    1/22/2025
  ********************************************************************************/
 #ifndef GLOBAL_TYPES_H
 #define GLOBAL_TYPES_H
@@ -16,8 +15,7 @@
 /********************************************************************************
  * Global type declarations
  ********************************************************************************/
-
-enum SYSTEM_STATE
+enum SystemState
 {
     DEFAULT,
     INIT,
@@ -27,7 +25,7 @@ enum SYSTEM_STATE
     IN_FLIGHT_ERROR
 };
 
-enum CONTROL_DIM
+enum ControlDim
 {
     X,
     Y,

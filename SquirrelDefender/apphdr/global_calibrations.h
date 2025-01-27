@@ -3,7 +3,7 @@
 /********************************************************************************
  * @file    global_calibrations.h
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  ********************************************************************************/
 #ifndef GLOBAL_CALIBRATIONS_H
 #define GLOBAL_CALIBRATIONS_H
@@ -20,7 +20,7 @@ extern const uint8_t SENDER_SYS_ID;
 extern const uint8_t SENDER_COMP_ID;
 extern const uint8_t TARGET_SYS_ID;
 extern const uint8_t TARGET_COMP_ID;
-extern const int32_t MESSAGE_RATE_DEFAULT; // microseconds
+extern const int32_t MESSAGE_RATE_DEFAULT;
 extern const int32_t MESSAGE_RATE_1Hz;
 extern const int32_t MESSAGE_RATE_40Hz;
 

@@ -3,7 +3,7 @@
 /********************************************************************************
  * @file    vehicle_controller.h
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  ********************************************************************************/
 #ifndef VEHICLE_CONTROLLER_H
 #define VEHICLE_CONTROLLER_H
@@ -12,24 +12,21 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "mavlink_cmd_handler.h"
 #include "mavlink_msg_handler.h"
-#include "velocity_controller.h"
-#include "attitude_controller.h"
+#include "mav_utils.h"
 #include "follow_target.h"
 #include "system_controller.h"
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern bool target_too_close;
-extern bool target_valid;
-extern float vx_adjust;
-extern float vy_adjust;
-extern float vz_adjust;
-extern float dt_25ms;
-extern uint16_t mav_veh_rngfdr_current_distance;
-extern int32_t mav_veh_rel_alt;
+extern bool g_target_too_close;
+extern bool g_target_valid;
+extern float g_vx_adjust;
+extern float g_vy_adjust;
+extern float g_vz_adjust;
+extern uint16_t g_mav_veh_rngfdr_current_distance;
+extern int32_t g_mav_veh_rel_alt;
 
 /********************************************************************************
  * Exported objects

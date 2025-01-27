@@ -5,7 +5,7 @@
 /********************************************************************************
  * @file    track_target.h
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  ********************************************************************************/
 #ifndef TRACK_TARGET_H
 #define TRACK_TARGET_H
@@ -14,9 +14,9 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "video_IO.h"
+#include "video_io.h"
 #include "detect_target.h"
-#include "parameters.h"
+#include "json_utils.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/tracking.hpp>
 #include <opencv2/core/utility.hpp>
@@ -35,53 +35,53 @@
 
 #ifdef BLD_JETSON_B01
 
-extern detectNet *net;
-extern detectNet::Detection *detections;
-extern uchar3 *image;
-extern int detection_count;
-extern float input_video_width;
-extern float input_video_height;
+extern detectNet *g_net;
+extern detectNet::Detection *g_detections;
+extern uchar3 *g_image;
+extern int g_detection_count;
+extern float g_input_video_width;
+extern float g_input_video_height;
 
 #endif //BLD_JETSON_B01
 
 #ifdef BLD_WIN
 
-extern cv::dnn::Net net;
-extern std::vector<yolo_net::detection> yolo_detections;
-extern int yolo_detection_count;
-extern cv::Mat image;
-extern float input_video_width;
-extern float input_video_height;
+extern cv::dnn::Net g_net;
+extern std::vector<YoloNet::detection> g_yolo_detections;
+extern int g_yolo_detection_count;
+extern cv::Mat g_image;
+extern float g_input_video_width;
+extern float g_input_video_height;
 
 #endif // BLD_WIN
 
-extern bool valid_image_rcvd;
-extern bool target_valid;
-extern int target_detection_ID;
-extern int target_track_ID;
-extern float target_height;
-extern float target_width;
-extern float target_aspect;
-extern float target_left;
-extern float target_right;
-extern float target_top;
-extern float target_bottom;
+extern bool g_valid_image_rcvd;
+extern bool g_target_valid;
+extern int g_target_detection_id;
+extern int g_target_track_id;
+extern float g_target_height;
+extern float g_target_width;
+extern float g_target_aspect;
+extern float g_target_left;
+extern float g_target_right;
+extern float g_target_top;
+extern float g_target_bottom;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool target_valid;
-extern int target_detection_ID;
-extern int target_track_ID;
-extern float target_cntr_offset_x;
-extern float target_cntr_offset_y;
-extern float target_height;
-extern float target_width;
-extern float target_aspect;
-extern float target_left;
-extern float target_right;
-extern float target_top;
-extern float target_bottom;
+extern bool g_target_valid;
+extern int g_target_detection_id;
+extern int g_target_track_id;
+extern float g_target_cntr_offset_x;
+extern float g_target_cntr_offset_y;
+extern float g_target_height;
+extern float g_target_width;
+extern float g_target_aspect;
+extern float g_target_left;
+extern float g_target_right;
+extern float g_target_top;
+extern float g_target_bottom;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

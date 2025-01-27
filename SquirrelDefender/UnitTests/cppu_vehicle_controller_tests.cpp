@@ -13,9 +13,9 @@ TEST(ExampleGroup, FirstTest)
 
     float control = 0.0;
 
-    control = vc.pid_controller_3d(0.1, 0.0, 0.0,
+    control = vc.pid3(0.1, 0.0, 0.0,
                                    5, 0.0, 0.0,
-                                   1.0, 0.0, 0.0, CONTROL_DIM::X);
+                                   1.0, 0.0, 0.0, ControlDim::X);
     CHECK_EQUAL(control, 0.7);
 }
 

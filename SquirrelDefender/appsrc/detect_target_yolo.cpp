@@ -4,7 +4,7 @@
 /********************************************************************************
  * @file    detect_target_yolo.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  * @brief   All methods needed to initialize and create a detection network and
             choose a target.
 ********************************************************************************/
@@ -25,9 +25,9 @@
 /********************************************************************************
 * Object definitions
 ********************************************************************************/
-cv::dnn::Net net;
-std::vector<yolo_net::detection> yolo_detections;
-int yolo_detection_count;
+cv::dnn::Net g_net;
+std::vector<YoloNet::detection> g_yolo_detections;
+int g_yolo_detection_count;
 
 /********************************************************************************
  * Calibration definitions
@@ -57,9 +57,9 @@ bool YOLO::init(void)
 {
     const std::string class_list_path = "../../networks/yolov5m/coco.names";
     const std::string model = "../../networks/yolov5m/yolov5m.onnx";
-    net = yolo_net::create(model, class_list_path, cv::dnn::DNN_BACKEND_CUDA, cv::dnn::DNN_TARGET_CUDA);
-    yolo_detections = std::vector<yolo_net::detection>();
-    yolo_detections.reserve(100);
+    g_net = YoloNet::create(model, class_list_path, cv::dnn::DNN_BACKEND_CUDA, cv::dnn::DNN_TARGET_CUDA);
+    g_yolo_detections = std::vector<YoloNet::detection>();
+    g_yolo_detections.reserve(100);
 
     return true;
 }
@@ -70,8 +70,8 @@ bool YOLO::init(void)
  ********************************************************************************/
 void YOLO::loop(void)
 {
-    yolo_net::detect(image, net, yolo_detections);
-    yolo_detection_count = yolo_detections.size();
+    YoloNet::detect(g_image, g_net, g_yolo_detections);
+    g_yolo_detection_count = g_yolo_detections.size();
 }
 
 /********************************************************************************

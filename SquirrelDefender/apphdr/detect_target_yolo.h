@@ -6,7 +6,7 @@
 /********************************************************************************
  * @file    detect_target_yolo.h
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  ********************************************************************************/
 #ifndef DETECT_TARGET_YOLO_H
 #define DETECT_TARGET_YOLO_H
@@ -15,8 +15,8 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "video_IO.h"
-#include "parameters.h"
+#include "video_io.h"
+#include "json_utils.h"
 #include "yolo_net.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/dnn.hpp>
@@ -30,11 +30,11 @@
  ********************************************************************************/
 #ifdef BLD_JETSON_B01
 
-extern uchar3* image;
+extern uchar3* g_image;
 
 #elif BLD_WIN
 
-extern cv::Mat image;
+extern cv::Mat g_image;
 
 #else
 
@@ -52,8 +52,8 @@ extern cv::Mat image;
 
 #elif BLD_WIN
 
-extern std::vector<yolo_net::detection> yolo_detections;
-extern int yolo_detection_count;
+extern std::vector<YoloNet::detection> g_yolo_detections;
+extern int g_yolo_detection_count;
 
 #else
 

@@ -3,8 +3,8 @@
 /********************************************************************************
  * @file    localize_target.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
- * @brief   Localize the target and maintain a specified x, y, z offset.
+ * @date    1/22/2025
+ * @brief   Localize the x, y, z offset of the target relative to the vehicle.
  ********************************************************************************/
 
 /********************************************************************************
@@ -30,19 +30,17 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm LocalizeData("");
-
 float d_object_h;
 float d_object_w;
-float x_object;
-float y_object;
-float z_object;
+float g_x_object;
+float g_y_object;
+float g_z_object;
 float d_object;
-float delta_angle;       //
-float camera_tilt_angle; // Angle of the camera relative to the ground, compensating for pitch
-float delta_d_x;
-float delta_d_z;
-float camera_comp_angle;
+float g_delta_angle;       //
+float g_camera_tilt_angle; // Angle of the camera relative to the ground, compensating for pitch
+float g_delta_d_x;
+float g_delta_d_z;
+float g_camera_comp_angle;
 
 /********************************************************************************
  * Calibration definitions
@@ -132,12 +130,12 @@ void calc_target_offest(void)
     float delta_d;
 
     /* Calculate distance from camera offset */
-    d_idx_h = get_float_index(target_height, &height_index[0], MAX_IDX_D_HEIGHT, false);
-    d_idx_w = get_float_index(target_width, &width_index[0], MAX_IDX_D_WIDTH, false);
+    d_idx_h = get_float_index(g_target_height, &height_index[0], MAX_IDX_D_HEIGHT, false);
+    d_idx_w = get_float_index(g_target_width, &width_index[0], MAX_IDX_D_WIDTH, false);
     d_object_h = get_interpolated_value(d_idx_h, &d_offset_h[0], MAX_IDX_D_HEIGHT);
     d_object_w = get_interpolated_value(d_idx_w, &d_offset_w[0], MAX_IDX_D_WIDTH);
 
-    if (target_aspect > 0.4f)
+    if (g_target_aspect > 0.4f)
     {
         d_object = d_object_w;
     }
@@ -151,16 +149,16 @@ void calc_target_offest(void)
     }
 
     /* Calculate true camera angle relative to the ground, adjusting for pitch. */
-    camera_comp_angle = (PI / 2.0f) - camera_fixed_angle;
-    camera_tilt_angle = mav_veh_pitch - camera_fixed_angle;
+    g_camera_comp_angle = (PI / 2.0f) - camera_fixed_angle;
+    g_camera_tilt_angle = g_mav_veh_pitch - camera_fixed_angle;
 
     /* Calculate the x and z distances of the target relative to the drone camera (positive z is down).*/
-    if (camera_tilt_angle <= 0.0f && camera_tilt_angle >= -camera_comp_angle)
+    if (g_camera_tilt_angle <= 0.0f && g_camera_tilt_angle >= -g_camera_comp_angle)
     {
-        float camera_comp_angle_abs = abs(camera_tilt_angle);
+        float camera_comp_angle_abs = abs(g_camera_tilt_angle);
 
-        x_object = d_object * cos(camera_comp_angle_abs);
-        z_object = d_object * sin(camera_comp_angle_abs);
+        g_x_object = d_object * cos(camera_comp_angle_abs);
+        g_z_object = d_object * sin(camera_comp_angle_abs);
     }
 
     /* Calculate shift in target location in the x and z directions based on camera tilt
@@ -170,38 +168,38 @@ void calc_target_offest(void)
        adjustment of the target position estimate in the z direction. Make adjustments when
        drone pitch is less than or equal to the camera tilt angle (brings the camera parallel
        to the ground) and greater than a calibratable value. */
-    delta_angle = camera_comp_angle + mav_veh_pitch;
+    g_delta_angle = g_camera_comp_angle + g_mav_veh_pitch;
 
-    if (delta_angle > 0.0f && delta_angle < camera_fixed_angle)
+    if (g_delta_angle > 0.0f && g_delta_angle < camera_fixed_angle)
     {
         delta_idx_d = get_float_index(d_object, &delta_offset_d[0], MAX_IDX_DELTA_D_OFFSET, true);
-        delta_idx_pix = get_float_index(std::abs(target_cntr_offset_x), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
+        delta_idx_pix = get_float_index(std::abs(g_target_cntr_offset_x), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
         delta_d = get_2d_interpolated_value(&delta_offset[0][0], MAX_IDX_DELTA_PIXEL_OFFSET, MAX_IDX_DELTA_D_OFFSET, y_idx_pix, y_idx_d);
 
-        delta_d_x = delta_d * cos(delta_angle);
-        delta_d_z = delta_d * sin(delta_angle);
+        g_delta_d_x = delta_d * cos(g_delta_angle);
+        g_delta_d_z = delta_d * sin(g_delta_angle);
 
         /* If object center is below the center of the frame */
-        if (target_cntr_offset_x > center_of_frame_height)
+        if (g_target_cntr_offset_x > center_of_frame_height)
         {
-            delta_d_x = -delta_d_x;
-            delta_d_z = -delta_d_z;
+            g_delta_d_x = -g_delta_d_x;
+            g_delta_d_z = -g_delta_d_z;
         }
     }
 
     /* Adjust x and z distances based on camera tilt angle */
-    x_object = x_object + delta_d_x;
-    x_object = x_object + delta_d_x;
+    g_x_object = g_x_object + g_delta_d_x;
+    g_x_object = g_x_object + g_delta_d_x;
 
     /* Calculate target y offset from the center line of view of the camera based on calibrated forward distance and the
        offset of the center of the target to the side of the center of the video frame in pixels */
     y_idx_d = get_float_index(d_object, &y_offset_d[0], MAX_IDX_Y_D_OFFSET, true);
-    y_idx_pix = get_float_index(std::abs(target_cntr_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
-    y_object = get_2d_interpolated_value(&y_offset[0][0], MAX_IDX_Y_PIXEL_OFFSET, MAX_IDX_Y_D_OFFSET, y_idx_pix, y_idx_d);
+    y_idx_pix = get_float_index(std::abs(g_target_cntr_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
+    g_y_object = get_2d_interpolated_value(&y_offset[0][0], MAX_IDX_Y_PIXEL_OFFSET, MAX_IDX_Y_D_OFFSET, y_idx_pix, y_idx_d);
 
-    if (target_cntr_offset_y < 0.0f)
+    if (g_target_cntr_offset_y < 0.0f)
     {
-        y_object = -y_object;
+        g_y_object = -g_y_object;
     }
 }
 
@@ -226,17 +224,17 @@ bool Localize::init(void)
 {
     d_object_h = 0.0f;
     d_object_w = 0.0f;
-    x_object = 0.0f;
-    y_object = 0.0f;
-    z_object = 0.0f;
+    g_x_object = 0.0f;
+    g_y_object = 0.0f;
+    g_z_object = 0.0f;
     d_object = 0.0f;
-    x_error = 0.0f;
-    y_error = 0.0f;
-    delta_angle = 0.0f;
-    camera_tilt_angle = 0.0f;
-    delta_d_x = 0.0f;
-    delta_d_z = 0.0f;
-    camera_comp_angle = 0.0f;
+    g_x_error = 0.0f;
+    g_y_error = 0.0f;
+    g_delta_angle = 0.0f;
+    g_camera_tilt_angle = 0.0f;
+    g_delta_d_x = 0.0f;
+    g_delta_d_z = 0.0f;
+    g_camera_comp_angle = 0.0f;
 
     return true;
 }
@@ -248,7 +246,7 @@ bool Localize::init(void)
  ********************************************************************************/
 void Localize::loop(void)
 {
-    if (target_valid)
+    if (g_target_valid)
     {
         calc_target_offest();
     }
