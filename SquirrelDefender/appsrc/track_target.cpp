@@ -108,7 +108,7 @@ void identify_target(void)
 
 #if defined(BLD_JETSON_B01)
 
-    for (int n = 0; n < g_detection_count; n++)
+    for (int n = 0; n < g_detection_count; ++n)
     {
         /* A tracked object, classified as a person with some confidence level */
         if (g_detections[n].TrackID >= 0 && g_detections[n].ClassID == 1 && g_detections[n].Confidence > 0.5)
@@ -119,18 +119,25 @@ void identify_target(void)
 
 #elif defined(BLD_JETSON_ORIN_NANO)
 
-#warning "Code needed for Orin build."
+    for (int n = 0; n < g_yolo_detection_count; ++n)
+    {
+        /* A tracked object, classified as a person with some confidence level */
+        if (g_yolo_detections[n].label == 0 && g_yolo_detections[n].probability > 0.5)
+        {
+            g_target_detection_id = n;
+        }
+    }
 
 #elif defined(BLD_WIN)
 
-    for (int n = 0; n < g_yolo_detection_count; n++)
+    for (int n = 0; n < g_yolo_detection_count; ++n)
     {
         /* A tracked object, classified as a person with some confidence level */
         if (g_yolo_detections[n].ClassID == 0 && g_yolo_detections[n].Confidence > 0.5)
         {
             g_target_detection_id = n;
         }
-}
+    }
 
 #else
 
@@ -148,37 +155,57 @@ void get_target_info(void)
 {
 #if defined(BLD_JETSON_B01)
 
-    g_target_height = g_detections[g_target_detection_id].Height();
-    g_target_width = g_detections[g_target_detection_id].Width();
-    g_target_track_id = g_detections[g_target_detection_id].TrackID;
-    g_target_left = g_detections[g_target_detection_id].Left;
-    g_target_right = g_detections[g_target_detection_id].Right;
-    g_target_top = g_detections[g_target_detection_id].Top;
-    g_target_bottom = g_detections[g_target_detection_id].Bottom;
-    target_center_y = (g_target_left + g_target_right) / 2.0f;
-    target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-    g_target_cntr_offset_y = target_center_y - center_of_frame_width;
-    g_target_cntr_offset_x = target_center_x - center_of_frame_height;
-    g_target_aspect = g_target_width / g_target_height;
+    if (g_target_detection_id >= 0)
+    {
+        g_target_height = g_detections[g_target_detection_id].Height();
+        g_target_width = g_detections[g_target_detection_id].Width();
+        g_target_track_id = g_detections[g_target_detection_id].TrackID;
+        g_target_left = g_detections[g_target_detection_id].Left;
+        g_target_right = g_detections[g_target_detection_id].Right;
+        g_target_top = g_detections[g_target_detection_id].Top;
+        g_target_bottom = g_detections[g_target_detection_id].Bottom;
+        target_center_y = (g_target_left + g_target_right) / 2.0f;
+        target_center_x = (g_target_bottom + g_target_top) / 2.0f;
+        g_target_cntr_offset_y = target_center_y - center_of_frame_width;
+        g_target_cntr_offset_x = target_center_x - center_of_frame_height;
+        g_target_aspect = g_target_width / g_target_height;
+    }
 
 #elif defined(BLD_JETSON_ORIN_NANO)
 
-#warning "Code needed for Orin build."
+    if (g_target_detection_id >= 0)
+    {
+        g_target_height = g_yolo_detections[g_target_detection_id].rect.height;
+        g_target_width = g_yolo_detections[g_target_detection_id].rect.width;
+        g_target_track_id = 0;
+        g_target_left = g_yolo_detections[g_target_detection_id].rect.x;
+        g_target_right = g_target_left + g_target_width;
+        g_target_top = g_yolo_detections[g_target_detection_id].rect.y;
+        g_target_bottom = g_target_top + g_target_height;
+        target_center_y = (g_target_left + g_target_right) / 2.0f;
+        target_center_x = (g_target_bottom + g_target_top) / 2.0f;
+        g_target_cntr_offset_y = target_center_y - center_of_frame_width;
+        g_target_cntr_offset_x = target_center_x - center_of_frame_height;
+        g_target_aspect = g_target_width / g_target_height; 
+    }
 
 #elif defined(BLD_WIN)
 
-    g_target_height = g_yolo_detections[g_target_detection_id].Height();
-    g_target_width = g_yolo_detections[g_target_detection_id].Width();
-    g_target_track_id = 0;
-    g_target_left = g_yolo_detections[g_target_detection_id].Left;
-    g_target_right = g_yolo_detections[g_target_detection_id].Right;
-    g_target_top = g_yolo_detections[g_target_detection_id].Top;
-    g_target_bottom = g_yolo_detections[g_target_detection_id].Bottom;
-    target_center_y = (g_target_left + g_target_right) / 2.0f;
-    target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-    g_target_cntr_offset_y = target_center_y - center_of_frame_width;
-    g_target_cntr_offset_x = target_center_x - center_of_frame_height;
-    g_target_aspect = g_target_width / g_target_height;
+    if (g_target_detection_id >= 0)
+    {
+        g_target_height = g_yolo_detections[g_target_detection_id].rect.height;
+        g_target_width = g_yolo_detections[g_target_detection_id].rect.width;
+        g_target_track_id = 0;
+        g_target_left = g_yolo_detections[g_target_detection_id].rect.x;
+        g_target_right = g_target_left + g_target_width;
+        g_target_top = g_yolo_detections[g_target_detection_id].rect.y;
+        g_target_bottom = g_target_top + g_target_height;
+        target_center_y = (g_target_left + g_target_right) / 2.0f;
+        target_center_x = (g_target_bottom + g_target_top) / 2.0f;
+        g_target_cntr_offset_y = target_center_y - center_of_frame_width;
+        g_target_cntr_offset_x = target_center_x - center_of_frame_height;
+        g_target_aspect = g_target_width / g_target_height; 
+    }
 
 #else
 
@@ -208,7 +235,16 @@ void validate_target(void)
 
 #elif defined(BLD_JETSON_ORIN_NANO)
 
-#warning "Code needed for Orin build."
+    /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
+   implimented. */
+    if (g_target_detection_id >= 0 && g_target_height > 1 && g_target_width > 1)
+    {
+        g_target_valid = true;
+    }
+    else
+    {
+        g_target_valid = false;
+    }
 
 #elif defined(BLD_WIN)
 
@@ -217,7 +253,7 @@ void validate_target(void)
     if (g_target_detection_id >= 0 && g_target_height > 1 && g_target_width > 1)
     {
         g_target_valid = true;
-}
+    }
     else
     {
         g_target_valid = false;

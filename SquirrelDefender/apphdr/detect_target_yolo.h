@@ -44,14 +44,15 @@ extern cv::Mat g_image;
 
 /********************************************************************************
  * Exported objects
- ********************./s    ************************************************************/
+ ********************************************************************************/
 #ifdef BLD_JETSON_B01
 
 /* None */
 
 #elif defined(BLD_JETSON_ORIN_NANO)
 
-#warning "Code needed for Orin build."
+extern std::vector<Object> g_yolo_detections;
+extern int g_yolo_detection_count;
 
 #elif defined(BLD_WIN)
 

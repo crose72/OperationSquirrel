@@ -26,8 +26,7 @@
 * Object definitions
 ********************************************************************************/
 YoloV8* yolov8_detector;
-cv::dnn::Net g_net;
-std::vector<YoloNet::detection> g_yolo_detections;
+std::vector<Object> g_yolo_detections;
 int g_yolo_detection_count;
 
 /********************************************************************************
@@ -61,8 +60,8 @@ bool YOLO::init(void)
     const std::string model_path = "../networks/yolov8s/yolov8s.onnx";
     yolov8_detector = new YoloV8(model_path, engine_path, config);
     
-    //g_yolo_detections = std::vector<YoloNet::detection>();
-    //g_yolo_detections.reserve(100);*/
+    g_yolo_detections = std::vector<Object>();
+    g_yolo_detections.reserve(100);
 
     return true;
 }
@@ -73,8 +72,9 @@ bool YOLO::init(void)
  ********************************************************************************/
 void YOLO::loop(void)
 {
-    const std::vector<Object> detections = yolov8_detector->detectObjects(g_image);
-    yolov8_detector->drawObjectLabels(g_image, detections);
+    g_yolo_detections = yolov8_detector->detectObjects(g_image);
+    yolov8_detector->drawObjectLabels(g_image, g_yolo_detections);
+    g_yolo_detection_count = g_yolo_detections.size();
     /*
     std::cout << "Number of detections: " << detections.size() << std::endl;
     for (int i = 0; i < detections.size(); ++i)
@@ -85,7 +85,6 @@ void YOLO::loop(void)
     }*/
     //cv::imshow("Object Detection", g_image);
     //cv::waitKey(1);
-    //g_yolo_detection_count = g_yolo_detections.size();
 }
 
 /********************************************************************************

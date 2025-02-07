@@ -209,7 +209,10 @@ int SystemController::init(void)
     led_init_blink();
     
     if (!Video::init() ||
-        !Detection::init())
+        !Detection::init() ||
+        !Track::init() ||
+        !Localize::init() ||
+        !Follow::init())
     {
         led_bad_blink();
         return 1;
