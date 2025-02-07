@@ -57,9 +57,7 @@ bool Detection::init(void)
 
 #elif defined(BLD_JETSON_ORIN_NANO)
 
-#warning "Code needed for Orin build."
-
-    return false;
+    return YOLO::init();
 
 #elif defined(BLD_WIN)
 
@@ -84,7 +82,7 @@ void Detection::loop(void)
 
 #elif defined(BLD_JETSON_ORIN_NANO)
 
-#warning "Code needed for Orin build."
+    return YOLO::loop();
 
 #elif defined(BLD_WIN)
 
@@ -109,7 +107,7 @@ void Detection::shutdown(void)
 
 #elif defined(BLD_JETSON_ORIN_NANO)
 
-#warning "Code needed for Orin build."
+    return YOLO::shutdown();
 
 #elif defined(BLD_WIN)
 

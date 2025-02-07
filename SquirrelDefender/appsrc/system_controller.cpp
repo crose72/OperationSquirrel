@@ -208,7 +208,8 @@ int SystemController::init(void)
     led_init();
     led_init_blink();
     
-    if (!Video::init())
+    if (!Video::init() ||
+        !Detection::init())
     {
         led_bad_blink();
         return 1;

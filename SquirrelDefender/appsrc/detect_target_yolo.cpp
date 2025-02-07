@@ -56,11 +56,13 @@ YOLO::~YOLO(void) {};
  ********************************************************************************/
 bool YOLO::init(void)
 {
-    const std::string engine = "../../networks/yolov8s/yolov8s.engine.Orin.fp16.1.1.-1.-1.-1";
-    const std::string model = "../../networks/yolov5m/yolov8s.onnx";
-    yolov8_detector = new YoloV8(model, trtModelPath, config);
-    g_yolo_detections = std::vector<YoloNet::detection>();
-    g_yolo_detections.reserve(100);
+    YoloV8Config config;
+    const std::string engine_path = "../networks/yolov8s/yolov8s.engine.Orin.fp16.1.1.-1.-1.-1";
+    const std::string model_path = "../networks/yolov8s/yolov8s.onnx";
+    yolov8_detector = new YoloV8(model_path, engine_path, config);
+    
+    //g_yolo_detections = std::vector<YoloNet::detection>();
+    //g_yolo_detections.reserve(100);*/
 
     return true;
 }
@@ -71,8 +73,11 @@ bool YOLO::init(void)
  ********************************************************************************/
 void YOLO::loop(void)
 {
-    const auto detections = yolov8_detector.detectObject(g_image);
-    g_yolo_detection_count = g_yolo_detections.size();
+    const auto detections = yolov8_detector->detectObjects(g_image);
+    yolov8_detector->drawObjectLabels(g_image, detections);
+    //cv::imshow("Object Detection", g_image);
+    //cv::waitKey(1);
+    //g_yolo_detection_count = g_yolo_detections.size();
 }
 
 /********************************************************************************
@@ -81,7 +86,8 @@ void YOLO::loop(void)
  ********************************************************************************/
 void YOLO::shutdown(void)
 {
-
+    delete yolov8_detector;
+    yolov8_detector = nullptr;
 }
 
 #endif // BLD_JETSON_ORIN_NANO

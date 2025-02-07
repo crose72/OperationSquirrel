@@ -33,12 +33,6 @@
 
 #endif // BLD_JETSON_B01
 
-#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
-
-#include <jsoncpp/json/json.h>
-
-#endif // BLD_JETSON_B01 || BLD_JETSON_ORIN_NANO
-
 /********************************************************************************
  * Typedefs
  ********************************************************************************/
@@ -120,7 +114,7 @@ int main(void)
 #ifdef ENABLE_CV
 
         Video::in_loop();
-        //Detection::loop();
+        Detection::loop();
         //Track::loop();
         //Localize::loop();
         //Follow::loop();

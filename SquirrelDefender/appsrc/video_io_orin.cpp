@@ -129,10 +129,15 @@ bool capture_image(void)
  ********************************************************************************/
 bool display_video(void)
 {
-    cv::imshow("MyVid", g_image);
-    cv::waitKey(1);
+    if (g_valid_image_rcvd)
+    {
+        cv::imshow("MyVid", g_image);
+        cv::waitKey(1);
 
-    return true;
+        return true;
+    }
+
+    return false;
 }
 
 /********************************************************************************

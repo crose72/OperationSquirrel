@@ -1,7 +1,6 @@
 #pragma once
 
 #ifdef ENABLE_CV
-#ifdef BLD_WIN
 
 /********************************************************************************
  * @file    detect_target_yolo.h
@@ -16,14 +15,9 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "video_io.h"
-#include "json_utils.h"
 #include "yolo_net.h"
-#include <opencv2/opencv.hpp>
-#include <opencv2/dnn.hpp>
-#include <vector>
-#include <string>
-#include <fstream>
-#include <string>
+#include "yolov8.h"
+#include <opencv2/cudaimgproc.hpp>
 
 /********************************************************************************
  * Imported objects
@@ -31,6 +25,10 @@
 #ifdef BLD_JETSON_B01
 
 extern uchar3* g_image;
+
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+extern cv::Mat g_image;
 
 #elif defined(BLD_WIN)
 
@@ -49,6 +47,10 @@ extern cv::Mat g_image;
 #ifdef BLD_JETSON_B01
 
 /* None */
+
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+#warning "Code needed for Orin build."
 
 #elif defined(BLD_WIN)
 
@@ -80,5 +82,4 @@ private:
 
 #endif // DETECT_TARGET_YOLO_H
 
-#endif // BLD_WIN
 #endif // ENABLE_CV

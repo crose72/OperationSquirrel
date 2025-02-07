@@ -320,6 +320,14 @@ else()
     endif()
 endif()
 
+# CMAKE modules path for Find* files and other cmake specific things
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
+# TODO: Specify the path to TensorRT root dir
+if (NOT TensorRT_DIR)
+    set(TensorRT_DIR /home/cyrus/work/libs/TensorRT-10.0.0.6/)
+endif()
+
 # Find required packages
 if(BLD_JETSON_B01)
     find_package(CUDA REQUIRED)
@@ -331,6 +339,7 @@ if(BLD_JETSON_B01)
 elseif(BLD_JETSON_ORIN_NANO)
     find_package(CUDA REQUIRED)
     find_package(OpenCV REQUIRED)
+    find_package(TensorRT REQUIRED)
 endif()
 
 #=============================================================================
@@ -363,6 +372,8 @@ file(GLOB PID_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/pid/*.cpp)
 file(GLOB PID_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/pid/*.h)
 file(GLOB TIMER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/timer/*.cpp)
 file(GLOB TIMER_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/timer/*.h)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt)
 
 #=============================================================================
 # Set Source files and locations
@@ -406,7 +417,10 @@ elseif (BLD_JETSON_ORIN_NANO)
     cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
     set_target_debug_flags(squirreldefender)
 
+    target_include_directories(squirreldefender PRIVATE modules/yolov8_tensorrt/src)
+
     target_link_libraries(squirreldefender 
+                        YoloV8_TRT 
                         ${OpenCV_LIBS} 
                         jsoncpp)
 elseif(BLD_WSL)
