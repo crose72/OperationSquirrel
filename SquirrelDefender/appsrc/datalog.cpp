@@ -206,11 +206,11 @@ DataLogger::~DataLogger() {};
  ********************************************************************************/
 bool DataLogger::init(void)
 {
-#ifdef BLD_JETSON_B01
+#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
 
     data_file_path = "../data/";
 
-#elif BLD_WIN
+#elif defined(BLD_WIN)
 
     data_file_path = "../../data/";
 

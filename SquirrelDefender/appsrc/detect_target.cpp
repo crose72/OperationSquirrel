@@ -55,7 +55,13 @@ bool Detection::init(void)
 
     return SSD::init();
 
-#elif BLD_WIN
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+#warning "Code needed for Orin build."
+
+    return false;
+
+#elif defined(BLD_WIN)
 
     return YOLO::init();
 
@@ -76,7 +82,11 @@ void Detection::loop(void)
 
     return SSD::loop();
 
-#elif BLD_WIN
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+#warning "Code needed for Orin build."
+
+#elif defined(BLD_WIN)
 
     return YOLO::loop();
 
@@ -97,7 +107,11 @@ void Detection::shutdown(void)
 
     return SSD::shutdown();
 
-#elif BLD_WIN
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+#warning "Code needed for Orin build."
+
+#elif defined(BLD_WIN)
 
     return YOLO::shutdown();
 

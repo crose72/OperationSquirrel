@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef BLD_JETSON_B01
+#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
 
 /********************************************************************************
  * @file    json_utils.h
@@ -48,4 +48,4 @@ private:
 
 #endif // JSON_UTILS_H
 
-#endif // BLD_JETSON_B01
+#endif // BLD_JETSON_B01 || BLD_JETSON_ORIN_NANO

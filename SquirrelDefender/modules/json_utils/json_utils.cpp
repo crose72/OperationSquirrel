@@ -1,4 +1,4 @@
-#ifdef BLD_JETSON_B01
+#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
 
 /********************************************************************************
  * @file    json_utils.cpp
@@ -81,4 +81,4 @@ bool json_utils::get_bool_param(const std::string &group, const std::string &key
     return root[group][key].asBool();
 }
 
-#endif // BLD_JETSON_B01
+#endif // BLD_JETSON_B01 || BLD_JETSON_ORIN_NANO

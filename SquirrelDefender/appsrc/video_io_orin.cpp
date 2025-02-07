@@ -1,17 +1,18 @@
 #ifdef ENABLE_CV
-#ifdef BLD_WIN
+#ifdef BLD_JETSON_ORIN_NANO
 
 /********************************************************************************
- * @file    video_io_win.cpp
+ * @file    video_io_orin.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Configure and start video streams on windows using opencv.
+ * @brief   Configure and start video streams on jetson orin using opencv and
+ *          gstreamer.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "video_io_win.h"
+#include "video_io_orin.h"
 
 /********************************************************************************
  * Typedefs
@@ -30,6 +31,7 @@ std::string base_path = "../data/";
 
 cv::Mat g_image;
 cv::VideoCapture cap;
+std::string gst_pipeline;
 
 /********************************************************************************
  * Calibration definitions
@@ -86,9 +88,13 @@ std::string generate_unique_file_name(const std::string &base_name, const std::s
  ********************************************************************************/
 bool create_input_video_stream(void)
 {
-    cap.open(0, cv::CAP_DSHOW);  // Open default webcam
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
+    gst_pipeline = 
+        "nvarguscamerasrc ! video/x-raw(memory:NVMM), "
+        "width=1280, height=720, framerate=30/1 ! nvvidconv ! "
+        "video/x-raw, format=(string)BGRx ! videoconvert ! "
+        "video/x-raw, format=(string)BGR ! appsink drop=true sync=false";
+
+    cap.open(gst_pipeline, cv::CAP_GSTREAMER);
 
     if (!cap.isOpened())
     {
@@ -143,20 +149,20 @@ void calc_video_res(void)
  * Function: Video
  * Description: Constructor of the Video class.
  ********************************************************************************/
-VideoWin::VideoWin(void) {}
+VideoCV::VideoCV(void) {}
 
 /********************************************************************************
  * Function: Video
  * Description: Constructor of the Video class.
  ********************************************************************************/
-VideoWin::~VideoWin(void) {}
+VideoCV::~VideoCV(void) {}
 
 /********************************************************************************
  * Function: init
  * Description: Code to initialize video streams to run onces at the start of the
  *              program.
  ********************************************************************************/
-bool VideoWin::init(void)
+bool VideoCV::init(void)
 {
     g_valid_image_rcvd = false;
     g_image = NULL;
@@ -175,7 +181,7 @@ bool VideoWin::init(void)
  * Function: in_loop
  * Description: Main video processing loop.
  ********************************************************************************/
-void VideoWin::in_loop(void)
+void VideoCV::in_loop(void)
 {
     capture_image();
 }
@@ -184,7 +190,7 @@ void VideoWin::in_loop(void)
  * Function: out_loop
  * Description: Code needed to run each loop to  provide the video output.
  ********************************************************************************/
-void VideoWin::out_loop(void)
+void VideoCV::out_loop(void)
 {
     display_video();
 }
@@ -193,11 +199,11 @@ void VideoWin::out_loop(void)
  * Function: shutdown
  * Description: Shutdown detection network
  ********************************************************************************/
-void VideoWin::shutdown(void)
+void VideoCV::shutdown(void)
 {
     Print::cpp_cout("video:  shutting down...");
     Print::cpp_cout("video:  shutdown complete.\n");
 }
 
-#endif // BLD_WIN
+#endif // BLD_JETSON_ORIN_NANO
 #endif // ENABLE_CV

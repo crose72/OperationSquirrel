@@ -32,7 +32,7 @@
 
 extern uchar3* g_image;
 
-#elif BLD_WIN
+#elif defined(BLD_WIN)
 
 extern cv::Mat g_image;
 
@@ -50,7 +50,7 @@ extern cv::Mat g_image;
 
 /* None */
 
-#elif BLD_WIN
+#elif defined(BLD_WIN)
 
 extern std::vector<YoloNet::detection> g_yolo_detections;
 extern int g_yolo_detection_count;

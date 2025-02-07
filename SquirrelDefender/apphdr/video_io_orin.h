@@ -1,14 +1,15 @@
 #pragma once
 
 #ifdef ENABLE_CV
+#ifdef BLD_JETSON_ORIN_NANO
 
 /********************************************************************************
- * @file    video_io.h
+ * @file    video_io_nv.h
  * @author  Cameron Rose
  * @date    1/22/2025
  ********************************************************************************/
-#ifndef VIDEO_IO_H
-#define VIDEO_IO_H
+#ifndef VIDEO_IO_ORIN_H
+#define VIDEO_IO_ORIN_H
 
 /********************************************************************************
  * Includes
@@ -16,86 +17,29 @@
 #include "common_inc.h"
 #include <string>
 #include <fstream>
-
-#ifdef BLD_JETSON_B01
-
-#include "video_io_nv.h"
-
-#elif defined(BLD_JETSON_ORIN_NANO)
-
-#include "video_io_orin.h"
-
-#elif defined(BLD_WIN)
-
-#include "video_io_win.h"
-
-#else
-
-#error "Please define a build platform."
-
-#endif // BLD_JETSON_B01
-
+#include <opencv2/cudaimgproc.hpp>
+#include <opencv2/opencv.hpp>
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-#ifdef BLD_JETSON_B01
-
-extern detectNet *g_net;
-
-#elif defined(BLD_JETSON_ORIN_NANO)
-
-#warning "Code needed for Orin build."
-
-#elif defined(BLD_WIN)
-
-/* No imported objects */
-
-#else
-
-#error "Please define a build platform."
-
-#endif // BLD_JETSON_B01
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-#ifdef BLD_JETSON_B01
-
-extern bool g_valid_image_rcvd;
-extern videoSource *g_input;
-extern uchar3 *g_image;
-extern float g_input_video_width;
-extern float g_input_video_height;
-
-#elif defined(BLD_JETSON_ORIN_NANO)
-
 extern bool g_valid_image_rcvd;
 extern cv::Mat g_image;
 extern float g_input_video_width;
 extern float g_input_video_height;
-
-#elif defined(BLD_WIN)
-
-extern bool g_valid_image_rcvd;
-extern cv::Mat g_image;
-extern float g_input_video_width;
-extern float g_input_video_height;
-
-#else
-
-#error "Please define a build platform."
-
-#endif // BLD_JETSON_B01
 
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class Video
+class VideoCV
 {
 public:
-    Video();
-    ~Video();
+    VideoCV();
+    ~VideoCV();
 
     static bool init(void);
     static void in_loop(void);
@@ -105,6 +49,7 @@ public:
 private:
 };
 
-#endif // VIDEO_IO_H
+#endif // VIDEO_IO_ORIN_H
 
+#endif // BLD_JETSON_ORIN_NANO
 #endif // ENABLE_CV

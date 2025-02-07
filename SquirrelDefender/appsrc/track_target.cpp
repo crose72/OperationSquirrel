@@ -106,7 +106,7 @@ void identify_target(void)
 {
     g_target_detection_id = -1;
 
-#ifdef BLD_JETSON_B01
+#if defined(BLD_JETSON_B01)
 
     for (int n = 0; n < g_detection_count; n++)
     {
@@ -117,7 +117,11 @@ void identify_target(void)
         }
     }
 
-#elif BLD_WIN
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+#warning "Code needed for Orin build."
+
+#elif defined(BLD_WIN)
 
     for (int n = 0; n < g_yolo_detection_count; n++)
     {
@@ -142,7 +146,7 @@ void identify_target(void)
  ********************************************************************************/
 void get_target_info(void)
 {
-#ifdef BLD_JETSON_B01
+#if defined(BLD_JETSON_B01)
 
     g_target_height = g_detections[g_target_detection_id].Height();
     g_target_width = g_detections[g_target_detection_id].Width();
@@ -157,7 +161,11 @@ void get_target_info(void)
     g_target_cntr_offset_x = target_center_x - center_of_frame_height;
     g_target_aspect = g_target_width / g_target_height;
 
-#elif BLD_WIN
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+#warning "Code needed for Orin build."
+
+#elif defined(BLD_WIN)
 
     g_target_height = g_yolo_detections[g_target_detection_id].Height();
     g_target_width = g_yolo_detections[g_target_detection_id].Width();
@@ -185,7 +193,7 @@ void get_target_info(void)
  ********************************************************************************/
 void validate_target(void)
 {
-#if BLD_JETSON_B01
+#if defined(BLD_JETSON_B01)
 
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
        implimented. */
@@ -198,7 +206,11 @@ void validate_target(void)
         g_target_valid = false;
     }
 
-#elif BLD_WIN
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+#warning "Code needed for Orin build."
+
+#elif defined(BLD_WIN)
 
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
    implimented. */
@@ -215,7 +227,7 @@ void validate_target(void)
 
 #error "Please define build platform."
 
-#endif // BLD_JETSON_B01
+#endif // defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
 
     target_valid_prv = g_target_valid;
 }
@@ -227,7 +239,7 @@ void validate_target(void)
  ********************************************************************************/
 void track_target(void)
 {
-#ifdef BLD_JETSON_B01
+#if defined(BLD_JETSON_B01)
 
 /* Don't wrap the image from jetson inference until a valid image has been received.
    That way we know the memory has been allocaed and is ready. */
@@ -265,7 +277,11 @@ void track_target(void)
         }
     }
 
-#elif BLD_WIN
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+#warning "Code needed for Orin build."
+
+#elif defined(BLD_WIN)
 
     /* Don't wrap the image from jetson inference until a valid image has been received.
    That way we know the memory has been allocaed and is ready. */
@@ -304,7 +320,7 @@ void track_target(void)
 
 #error "Please define build platform."
 
-#endif // BLD_JETSON_B01
+#endif // defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
 
 }
 

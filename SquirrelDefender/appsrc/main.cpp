@@ -30,9 +30,14 @@
 #ifdef BLD_JETSON_B01
 
 #include "status_io.h"
-#include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 
 #endif // BLD_JETSON_B01
+
+#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
+
+#include <jsoncpp/json/json.h>
+
+#endif // BLD_JETSON_B01 || BLD_JETSON_ORIN_NANO
 
 /********************************************************************************
  * Typedefs
@@ -115,10 +120,10 @@ int main(void)
 #ifdef ENABLE_CV
 
         Video::in_loop();
-        Detection::loop();
-        Track::loop();
-        Localize::loop();
-        Follow::loop();
+        //Detection::loop();
+        //Track::loop();
+        //Localize::loop();
+        //Follow::loop();
         Video::out_loop();
 
 #endif // ENABLE_CV

@@ -53,12 +53,14 @@ project(SquirrelDefender)
 option(USE_ENV_VAR "Use environment variables for library paths" OFF)
 
 # Choose ONLY ONE platform for the build (BLD_JETSON_B01, BLD_WSL, BLD_WIN) 
-option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" ON)
+option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" OFF)
+option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" ON)
 option(BLD_WSL "Compiling for BLD_WSL" OFF)
 option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
-option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" ON)
+option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
+option(DEBUG_BUILD_SET "Enable GNU debugging - TURN OFF FOR FINAL BUILD" ON)
 
 # Ensure only one build platform is selected
 set(BUILD_PLATFORMS 0)
@@ -79,9 +81,14 @@ if(BUILD_PLATFORMS GREATER 1)
     message(FATAL_ERROR "Error: More than one build platform option is selected. Please select only one of the following options: BLD_JETSON_B01, BLD_WSL, or other supported options.")
 endif()
 
-# Set the C++ standard
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+if(BLD_JETSON_B01 OR BLD_WIN)
+    # Set the C++ standard
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED True)
+else()
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED True)
+endif()
 
 # Set the policy for IN_LIST support
 if(POLICY CMP0057)
@@ -122,6 +129,12 @@ else()
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 endif()
 
+# Enable GNU debugger
+if (DEBUG_BUILD_SET)
+    set(CMAKE_BUILD_TYPE Debug)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+endif()
+
 # Function to set compilation flags for specific target
 function(set_target_debug_flags target)
     if(MSVC)
@@ -149,10 +162,13 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_definitions(-DRELEASE_BUILD)
 endif()
 
+# Computer Vision options
 if (BLD_JETSON_B01)
     add_definitions(-DENABLE_CV)
     message("Enabled video and computer vision functionality.")
-
+elseif (BLD_JETSON_ORIN_NANO)
+    add_definitions(-DENABLE_CV)
+    message("Enabled video and computer vision functionality.")
 elseif(BLD_WIN)
     if (WIN_ENABLE_CV)
         add_definitions(-DENABLE_CV)
@@ -165,8 +181,12 @@ endif()
 # Optionally include code that is specific to different platforms
 if (BLD_JETSON_B01)
     add_definitions(-DBLD_JETSON_B01)
-    add_definitions(-DBLD_JETSON_B01_SERIAL)
+    add_definitions(-DBLD_JETSON_SERIAL)
     message("Building for BLD_JETSON_B01 with serial comms.")
+elseif (BLD_JETSON_ORIN_NANO)
+    add_definitions(-DBLD_JETSON_ORIN_NANO)
+    add_definitions(-DBLD_JETSON_SERIAL)
+    message("Building for BLD_JETSON_ORIN_NANO with serial comms.")
 elseif(BLD_WSL)
     add_definitions(-DBLD_WSL)
     add_definitions(-DBLD_WSL_TCP)
@@ -234,6 +254,26 @@ if(USE_ENV_VAR)
         link_directories($ENV{LIB_OPENCV})
         link_directories($ENV{LIB_CUDA})
         link_directories($ENV{LIB_TEGRA})
+    elseif(BLD_JETSON_ORIN_NANO)
+        # Validate required Jetson environment variables
+        foreach(var LIB_JETSONINFERENCE LIB_JETSONUTILS LIB_OPENCV LIB_CUDA LIB_TEGRA
+                    HDR_JETSONINFERENCE HDR_JETSONUTILS HDR_OPENCV HDR_CUDA)
+            if(NOT DEFINED ENV{${var}})
+                message(FATAL_ERROR "Environment variable ${var} is not defined")
+            endif()
+        endforeach()
+
+        # Include Jetson-specific directories from environment variables
+        include_directories($ENV{HDR_JETSONINFERENCE})
+        include_directories($ENV{HDR_JETSONUTILS})
+        include_directories($ENV{HDR_OPENCV})
+        include_directories($ENV{HDR_CUDA})
+
+        link_directories($ENV{LIB_JETSONINFERENCE})
+        link_directories($ENV{LIB_JETSONUTILS})
+        link_directories($ENV{LIB_OPENCV})
+        link_directories($ENV{LIB_CUDA})
+        link_directories($ENV{LIB_TEGRA})
     endif()
 else()
     # Default paths when not using environment variables
@@ -265,6 +305,18 @@ else()
             /usr/local/cuda/lib64
             /usr/lib/aarch64-linux-gnu/tegra
         )
+
+    elseif(BLD_JETSON_ORIN_NANO)
+        include_directories(
+            /usr/local/cuda/include
+            /usr/include/opencv4
+        )
+
+        link_directories(
+            /usr/local/lib
+            /usr/local/cuda/lib64
+            /usr/lib/aarch64-linux-gnu/tegra
+        )
     endif()
 endif()
 
@@ -274,9 +326,11 @@ if(BLD_JETSON_B01)
     find_package(OpenCV REQUIRED)
     find_package(jetson-utils REQUIRED)
     find_package(jetson-inference REQUIRED)
-    
     message(STATUS "Attempting to find JetsonGPIO library...")
     find_library(JETSON_GPIO_LIB JetsonGPIO)
+elseif(BLD_JETSON_ORIN_NANO)
+    find_package(CUDA REQUIRED)
+    find_package(OpenCV REQUIRED)
 endif()
 
 #=============================================================================
@@ -347,6 +401,13 @@ if (BLD_JETSON_B01)
                         ${JETSON_GPIO_LIB}
                         jetson-inference
                         jetson-utils
+                        jsoncpp)
+elseif (BLD_JETSON_ORIN_NANO)
+    cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
+    set_target_debug_flags(squirreldefender)
+
+    target_link_libraries(squirreldefender 
+                        ${OpenCV_LIBS} 
                         jsoncpp)
 elseif(BLD_WSL)
     add_executable(squirreldefender ${SOURCES} ${HEADERS})
