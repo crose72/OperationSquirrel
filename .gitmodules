@@ -1,3 +1,6 @@
 [submodule "ThirdParty/CppUTest"]
 	path = ThirdParty/CppUTest
 	url = https://github.com/cpputest/cpputest.git
+[submodule "SquirrelDefender/modules/yolov8_tensorrt"]
+	path = SquirrelDefender/modules/yolov8_tensorrt
+	url = https://github.com/crose72/YOLOv8-TensorRT-CPP.git

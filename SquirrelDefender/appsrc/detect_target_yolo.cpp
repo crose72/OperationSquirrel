@@ -1,5 +1,5 @@
 #ifdef ENABLE_CV
-#ifdef BLD_WIN
+#ifdef BLD_JETSON_ORIN_NANO
 
 /********************************************************************************
  * @file    detect_target_yolo.cpp
@@ -25,6 +25,7 @@
 /********************************************************************************
 * Object definitions
 ********************************************************************************/
+YoloV8* yolov8_detector;
 cv::dnn::Net g_net;
 std::vector<YoloNet::detection> g_yolo_detections;
 int g_yolo_detection_count;
@@ -55,9 +56,9 @@ YOLO::~YOLO(void) {};
  ********************************************************************************/
 bool YOLO::init(void)
 {
-    const std::string class_list_path = "../../networks/yolov5m/coco.names";
-    const std::string model = "../../networks/yolov5m/yolov5m.onnx";
-    g_net = YoloNet::create(model, class_list_path, cv::dnn::DNN_BACKEND_CUDA, cv::dnn::DNN_TARGET_CUDA);
+    const std::string engine = "../../networks/yolov8s/yolov8s.engine.Orin.fp16.1.1.-1.-1.-1";
+    const std::string model = "../../networks/yolov5m/yolov8s.onnx";
+    yolov8_detector = new YoloV8(model, trtModelPath, config);
     g_yolo_detections = std::vector<YoloNet::detection>();
     g_yolo_detections.reserve(100);
 
@@ -70,7 +71,7 @@ bool YOLO::init(void)
  ********************************************************************************/
 void YOLO::loop(void)
 {
-    YoloNet::detect(g_image, g_net, g_yolo_detections);
+    const auto detections = yolov8_detector.detectObject(g_image);
     g_yolo_detection_count = g_yolo_detections.size();
 }
 
@@ -83,5 +84,5 @@ void YOLO::shutdown(void)
 
 }
 
-#endif // BLD_WIN
+#endif // BLD_JETSON_ORIN_NANO
 #endif // ENABLE_CV
