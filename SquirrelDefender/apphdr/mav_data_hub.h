@@ -1,12 +1,12 @@
 #pragma once
 
 /********************************************************************************
- * @file    mavlink_msg_handler.h
+ * @file    mav_data_hub.h
  * @author  Cameron Rose
  * @date    1/22/2025
  ********************************************************************************/
-#ifndef MAVLINK_MSG_HANDLER_H
-#define MAVLINK_MSG_HANDLER_H
+#ifndef MAV_DATA_HUB_H
+#define MAV_DATA_HUB_H
 
 /********************************************************************************
  * Includes
@@ -151,4 +151,4 @@ public:
 private:
 };
 
-#endif // MAVLINK_MSG_HANDLER_H
+#endif // MAV_DATA_HUB_H

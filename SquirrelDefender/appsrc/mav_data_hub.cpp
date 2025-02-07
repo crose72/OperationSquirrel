@@ -1,16 +1,16 @@
 /********************************************************************************
- * @file    mavlink_msg_handler.cpp
+ * @file    mav_data_hub.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Handles all incoming mavlink messages by setting the desired rate to
- *          receive each, and parsing the serial data to separate out
- *          specific messages.
+ * @brief   Handles all incoming mavlink messages: set the desired message rate,
+ *          parse serial data for mavlink messages, additional processing before
+ *          passing to the rest of the program.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "mavlink_msg_handler.h"
+#include "mav_data_hub.h"
 
 /********************************************************************************
  * Typedefs
@@ -140,6 +140,9 @@ float g_mav_veh_local_ned_vz; /*< [m/s] Z Speed*/
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
+const int32_t MESSAGE_RATE_DEFAULT = 0;
+const int32_t MESSAGE_RATE_40Hz = 25000;
+const int32_t MESSAGE_RATE_1Hz = 1000000;
 
 /********************************************************************************
  * Function definitions
@@ -635,8 +638,6 @@ void parse_mav_msgs(void)
     uint8_t byte;
 
     int n = Serial::bytes_available();
-
-    const char *term = "/dev/pts/0";
 
     for (int i = n; i > 0; i--)
     {

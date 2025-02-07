@@ -1,5 +1,4 @@
-export DISPLAY=:0 # or add this to your /.bashrc file and then source ~/.bashrc
-xhost +
+# make sure to define ${OS_WS}
 
 sudo docker run --runtime nvidia -it --rm --network host \
   --privileged --ipc=host \
@@ -25,6 +24,8 @@ sudo docker run --runtime nvidia -it --rm --network host \
   --device /dev/nvhost-nvjpg \
   --device /dev/nvhost-tsec \
   --device /dev/nvhost-isp \
+  --device /dev/ttyUSB0 \
+  --device /dev/ttyTHS1 \
   --volume /tmp/.X11-unix:/tmp/.X11-unix \
   --volume /tmp/argus_socket:/tmp/argus_socket \
   --volume /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra \

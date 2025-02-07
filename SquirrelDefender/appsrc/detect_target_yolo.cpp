@@ -73,8 +73,16 @@ bool YOLO::init(void)
  ********************************************************************************/
 void YOLO::loop(void)
 {
-    const auto detections = yolov8_detector->detectObjects(g_image);
+    const std::vector<Object> detections = yolov8_detector->detectObjects(g_image);
     yolov8_detector->drawObjectLabels(g_image, detections);
+    /*
+    std::cout << "Number of detections: " << detections.size() << std::endl;
+    for (int i = 0; i < detections.size(); ++i)
+    {
+        std::cout << "Label: " << detections[i].label << std::endl;
+        std::cout << "Bounding Box: " << detections[i].rect << std::endl;
+        std::cout << "Probability: " << detections[i].probability << std::endl;
+    }*/
     //cv::imshow("Object Detection", g_image);
     //cv::waitKey(1);
     //g_yolo_detection_count = g_yolo_detections.size();
