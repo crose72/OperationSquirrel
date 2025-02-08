@@ -1,5 +1,5 @@
 #ifdef ENABLE_CV
-#ifdef BLD_WIN
+#ifdef BLD_JETSON_B01
 
 /********************************************************************************
  * @file    video_io_nv.cpp

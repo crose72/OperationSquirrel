@@ -54,12 +54,12 @@ option(USE_ENV_VAR "Use environment variables for library paths" OFF)
 
 # Choose ONLY ONE platform for the build (BLD_JETSON_B01, BLD_WSL, BLD_WIN) 
 option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" OFF)
-option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" ON)
+option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" OFF)
 option(BLD_WSL "Compiling for BLD_WSL" OFF)
-option(BLD_WIN "Compiling for Windows environment" OFF)
-option(WIN_TCP "Compiling for Windows simulated environment" OFF)
+option(BLD_WIN "Compiling for Windows environment" ON)
+option(WIN_TCP "Compiling for Windows simulated environment" ON)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
-option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
+option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" ON)
 option(DEBUG_BUILD_SET "Enable GNU debugging - TURN OFF FOR FINAL BUILD" ON)
 
 # Ensure only one build platform is selected
@@ -81,7 +81,7 @@ if(BUILD_PLATFORMS GREATER 1)
     message(FATAL_ERROR "Error: More than one build platform option is selected. Please select only one of the following options: BLD_JETSON_B01, BLD_WSL, or other supported options.")
 endif()
 
-if(BLD_JETSON_B01 OR BLD_WIN)
+if(BLD_JETSON_B01)
     # Set the C++ standard
     set(CMAKE_CXX_STANDARD 11)
     set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -278,17 +278,17 @@ if(USE_ENV_VAR)
 else()
     # Default paths when not using environment variables
     if(BLD_WIN)
-        set(TENSORRT_INCLUDE_DIR "C:/TensorRT/TensorRT-10.4.0.26/include" CACHE PATH "Path to TensorRT include directory")
+        set(TensorRT_INCLUDE_DIR "C:/TensorRT/10.4.0.26/include" CACHE PATH "Path to TensorRT include directory")
         
         include_directories(
-            ${TENSORRT_INCLUDE_DIR}
+            ${TensorRT_INCLUDE_DIR}
             "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/include"
         )
         
-        set(TENSORRT_LIB_DIR "C:/TensorRT/TensorRT-10.4.0.26/lib" CACHE PATH "Path to TensorRT library directory")
+        set(TensorRT_LIBRARY_DIR "C:/TensorRT/10.4.0.26/lib" CACHE PATH "Path to TensorRT library directory")
         
         link_directories(
-            ${TENSORRT_LIB_DIR}
+            ${TensorRT_LIBRARY_DIR}
             "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.6/lib/x64"
         )
     elseif(BLD_JETSON_B01)
@@ -340,6 +340,8 @@ elseif(BLD_JETSON_ORIN_NANO)
     find_package(CUDA REQUIRED)
     find_package(OpenCV REQUIRED)
     find_package(TensorRT REQUIRED)
+elseif(BLD_WIN)
+    find_package(spdlog CONFIG REQUIRED)
 endif()
 
 #=============================================================================
@@ -398,6 +400,8 @@ list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HE
                     ${JSON_UTILS_HEADERS} ${PRINT_UTILS_HEADERS} ${YOLO_UTILS_HEADERS} 
                     ${PID_HEADERS} ${TIMER_HEADERS})
 
+message(STATUS "TensorRT_INCLUDE_DIR: ${TensorRT_INCLUDE_DIR}")
+
 #=============================================================================
 # Build Executable
 #=============================================================================
@@ -451,9 +455,18 @@ elseif(BLD_WIN)
 
     add_executable(squirreldefender ${SOURCES} ${HEADERS})
     set_target_debug_flags(squirreldefender)
+
+    target_include_directories(YoloV8_TRT PRIVATE ${TensorRT_INCLUDE_DIR})
+    target_include_directories(tensorrt_cpp_api PRIVATE ${TensorRT_INCLUDE_DIR})
     
+    target_include_directories(squirreldefender PRIVATE 
+        ${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt/src  # yolov8_tensorrt headers
+        ${TensorRT_INCLUDE_DIR}  # TensorRT include directory
+    )
     # Add include directories
     target_include_directories(squirreldefender PRIVATE ${OpenCV_INCLUDE_DIRS})
+
+    target_link_libraries(squirreldefender PRIVATE spdlog::spdlog)
     
     # Link with OpenCV first
     target_link_libraries(squirreldefender PRIVATE ${OpenCV_LIBS})
@@ -535,6 +548,10 @@ elseif(BLD_WIN)
         cudnn_ops_train
         cudnn_ops_train64_8
     )
+
+    target_link_libraries(squirreldefender PRIVATE 
+        YoloV8_TRT  # Link yolov8_tensorrt
+     )
 
     set_target_properties(squirreldefender PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 endif()
