@@ -1,15 +1,15 @@
 #pragma once
 
 #ifdef ENABLE_CV
-#ifdef BLD_JETSON_ORIN_NANO
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
 
 /********************************************************************************
- * @file    video_io_nv.h
+ * @file    video_io_cv.h
  * @author  Cameron Rose
  * @date    1/22/2025
  ********************************************************************************/
-#ifndef VIDEO_IO_ORIN_H
-#define VIDEO_IO_ORIN_H
+#ifndef VIDEO_IO_CV_H
+#define VIDEO_IO_CV_H
 
 /********************************************************************************
  * Includes
@@ -49,7 +49,7 @@ public:
 private:
 };
 
-#endif // VIDEO_IO_ORIN_H
+#endif // VIDEO_IO_CV_H
 
-#endif // BLD_JETSON_ORIN_NANO
+#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
 #endif // ENABLE_CV

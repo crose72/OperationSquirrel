@@ -1,8 +1,8 @@
 #ifdef ENABLE_CV
-#ifdef BLD_JETSON_ORIN_NANO
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
 
 /********************************************************************************
- * @file    video_io_orin.cpp
+ * @file    video_io_cv.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
  * @brief   Configure and start video streams on jetson orin using opencv and
@@ -12,7 +12,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "video_io_orin.h"
+#include "video_io_cv.h"
 
 /********************************************************************************
  * Typedefs
@@ -88,13 +88,28 @@ std::string generate_unique_file_name(const std::string &base_name, const std::s
  ********************************************************************************/
 bool create_input_video_stream(void)
 {
+    #ifdef BLD_JETSON_ORIN_NANO
+
     gst_pipeline = 
         "nvarguscamerasrc ! video/x-raw(memory:NVMM), "
         "width=1280, height=720, framerate=30/1 ! nvvidconv ! "
+        "nvvidconv flip-method=2 ! "
         "video/x-raw, format=(string)BGRx ! videoconvert ! "
         "video/x-raw, format=(string)BGR ! appsink drop=true sync=false";
 
     cap.open(gst_pipeline, cv::CAP_GSTREAMER);
+
+    #elif defined(BLD_WIN)
+
+    cap.open(0, cv::CAP_DSHOW);  // Open default webcam
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, 1280);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, 720);
+
+    #else
+
+    #error "Please define a build platform."
+
+    #endif
 
     if (!cap.isOpened())
     {
@@ -131,7 +146,7 @@ bool display_video(void)
 {
     if (g_valid_image_rcvd)
     {
-        cv::imshow("MyVid", g_image);
+        cv::imshow("Video", g_image);
         cv::waitKey(1);
 
         return true;
@@ -210,5 +225,5 @@ void VideoCV::shutdown(void)
     Print::cpp_cout("video:  shutdown complete.\n");
 }
 
-#endif // BLD_JETSON_ORIN_NANO
+#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
 #endif // ENABLE_CV

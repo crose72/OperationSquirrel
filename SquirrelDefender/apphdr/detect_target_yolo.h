@@ -1,6 +1,7 @@
 #pragma once
 
 #ifdef ENABLE_CV
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
 
 /********************************************************************************
  * @file    detect_target_yolo.h
@@ -23,33 +24,12 @@
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-#ifdef BLD_JETSON_B01
-
-extern uchar3* g_image;
-
-#elif defined(BLD_JETSON_ORIN_NANO)
-
 extern cv::Mat g_image;
-
-#elif defined(BLD_WIN)
-
-extern cv::Mat g_image;
-
-#else
-
-#error "Please define a build platform."
-
-#endif
-
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-#ifdef BLD_JETSON_B01
-
-/* None */
-
-#elif defined(BLD_JETSON_ORIN_NANO)
+#ifdef BLD_JETSON_ORIN_NANO
 
 extern std::vector<Object> g_yolo_detections;
 extern int g_yolo_detection_count;
@@ -84,4 +64,5 @@ private:
 
 #endif // DETECT_TARGET_YOLO_H
 
+#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
 #endif // ENABLE_CV

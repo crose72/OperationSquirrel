@@ -112,8 +112,8 @@ void VehicleController::loop(void)
     else if (g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
         
-        /* Debounce counter to avoid sending vehicle commands before the vehicle is in position */
-        
+        /* Debounce counter to avoid sending vehicle commands before the vehicle is 
+           at the desired height */
         if (takeoff_dbc_cnt > 0)
         {
             takeoff_dbc_cnt--;
@@ -132,7 +132,6 @@ void VehicleController::loop(void)
         if (start_follow_mode)
         {
             follow_mode();
-            //test_flight();
         }
     }
 }
