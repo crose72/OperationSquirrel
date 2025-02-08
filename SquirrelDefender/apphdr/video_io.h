@@ -41,7 +41,7 @@ extern detectNet *g_net;
 
 #elif defined(BLD_JETSON_ORIN_NANO)
 
-#warning "Code needed for Orin build."
+/* No imported objects */
 
 #elif defined(BLD_WIN)
 

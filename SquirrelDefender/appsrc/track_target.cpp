@@ -233,20 +233,7 @@ void validate_target(void)
         g_target_valid = false;
     }
 
-#elif defined(BLD_JETSON_ORIN_NANO)
-
-    /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
-   implimented. */
-    if (g_target_detection_id >= 0 && g_target_height > 1 && g_target_width > 1)
-    {
-        g_target_valid = true;
-    }
-    else
-    {
-        g_target_valid = false;
-    }
-
-#elif defined(BLD_WIN)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
 
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
    implimented. */
@@ -313,32 +300,28 @@ void track_target(void)
         }
     }
 
-#elif defined(BLD_JETSON_ORIN_NANO)
-
-#warning "Code needed for Orin build."
-
-#elif defined(BLD_WIN)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
 
     /* Don't wrap the image from jetson inference until a valid image has been received.
-   That way we know the memory has been allocaed and is ready. */
+    That way we know the memory has been allocaed and is ready. */
     if (g_valid_image_rcvd && !initialized_cv_image)
     {
-        // gpuImage = cv::cuda::GpuMat(g_input_video_height, g_input_video_width, CV_8UC3);
-        //image_cv_wrapped = g_image;
         initialized_cv_image = true;
     }
     else if (g_valid_image_rcvd && initialized_cv_image)
     {
-        if (target_valid_prv && !g_target_valid)
+        if (g_target_valid && !initialized_tracker)
         {
             target_bounding_box = cv::Rect(g_target_left, g_target_top, g_target_width, g_target_height);
             tracker_init(target_tracker, g_image, target_bounding_box);
+            initialized_tracker = true;
         }
-          
-        target_bounding_box = cv::Rect(g_target_left, g_target_top, g_target_width, g_target_height);
-        target_tracked = tracker_update(target_tracker, g_image, target_bounding_box);
-        //cv::rectangle(g_image, target_bounding_box, cv::Scalar(255, 0, 0), 2, 1);
         
+        if (initialized_tracker)
+        {
+            target_tracked = tracker_update(target_tracker, g_image, target_bounding_box);
+            std::cout << "target_tracked: " << target_tracked << std::endl;
+        }
         if (target_tracked)
         {
             // Draw the target_tracked box
@@ -393,8 +376,8 @@ Track::Track(void) {};
 Track::~Track(void) {};
 
 /********************************************************************************
- * Function: localize_target_init
- * Description: Initialize all Track target variables.  Run once at the start
+ * Function: init
+ * Description: Initialize all track target variables.  Run once at the start
  *              of the program.
  ********************************************************************************/
 bool Track::init(void)
@@ -422,15 +405,24 @@ bool Track::init(void)
 }
 
 /********************************************************************************
- * Function: localize_control_loop
- * Description: Return control parameters for the vehicle to Track a designated
- *              target at a distance.
+ * Function: loop
+ * Description: Determine target to be tracked and maintain identity of target
+ *              from loop to loop.
  ********************************************************************************/
 void Track::loop(void)
 {
     identify_target();
     get_target_info();
     validate_target();
+}
+
+/********************************************************************************
+ * Function: shutdown
+ * Description: Cleanup code to run at the end of the program.
+ ********************************************************************************/
+void Track::shutdown(void)
+{
+
 }
 
 #endif // ENABLE_CV
