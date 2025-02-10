@@ -9,7 +9,23 @@ mkdir -p "$LOG_DIR"
 export DISPLAY=:0
 export XDG_RUNTIME_DIR=/run/user/1000
 
-sudo docker run -d --runtime nvidia --rm --network host \
+CONTAINER_NAME="squirreldefender"
+
+if sudo docker ps --filter "name=$CONTAINER_NAME" --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
+    echo "Container '$CONTAINER_NAME' is already running."
+    exit 0
+fi
+
+# If an old stopped container exists, remove it
+if sudo docker ps -a --filter "name=$CONTAINER_NAME" --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
+    echo "Removing old container '$CONTAINER_NAME'"
+    sudo docker rm $CONTAINER_NAME
+fi
+
+# Start a new container
+echo "Starting container '$CONTAINER_NAME'"
+
+sudo docker run --rm --runtime nvidia --network host \
   --privileged --ipc=host \
   --env DISPLAY=$DISPLAY \
   --env XDG_RUNTIME_DIR=$XDG_RUNTIME_DIR \
@@ -44,5 +60,5 @@ sudo docker run -d --runtime nvidia --rm --network host \
   --volume /dev/dri:/dev/dri \
   --volume /run:/run \
   -v "$LOG_DIR":/workspace/OperationSquirrel/SquirrelDefender/data/ \
-  --name squirreldefender \
+  --name $CONTAINER_NAME \
   crose72/jetpack-r36.4.0:squirreldefender
