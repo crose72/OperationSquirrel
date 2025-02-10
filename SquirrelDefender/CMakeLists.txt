@@ -60,7 +60,7 @@ option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
-option(DEBUG_BUILD_SET "Enable GNU debugging - TURN OFF FOR FINAL BUILD" ON)
+option(ENABLE_GDB "Enable GNU debugging - TURN OFF FOR FINAL BUILD" OFF)
 
 # Ensure only one build platform is selected
 set(BUILD_PLATFORMS 0)
@@ -130,7 +130,7 @@ else()
 endif()
 
 # Enable GNU debugger
-if (DEBUG_BUILD_SET)
+if (ENABLE_GDB)
     set(CMAKE_BUILD_TYPE Debug)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 endif()
@@ -340,6 +340,7 @@ elseif(BLD_JETSON_ORIN_NANO)
     find_package(CUDA REQUIRED)
     find_package(OpenCV REQUIRED)
     find_package(TensorRT REQUIRED)
+    find_package(vpi 3.2 REQUIRED)
 endif()
 
 #=============================================================================
@@ -422,6 +423,10 @@ elseif (BLD_JETSON_ORIN_NANO)
     target_link_libraries(squirreldefender 
                         YoloV8_TRT 
                         ${OpenCV_LIBS} 
+                        vpi opencv_core
+                        opencv_imgproc 
+                        opencv_imgcodecs 
+                        opencv_videoio
                         jsoncpp)
 elseif(BLD_WSL)
     add_executable(squirreldefender ${SOURCES} ${HEADERS})

@@ -30,4 +30,5 @@ sudo docker run --runtime nvidia -it --rm --network host \
   --volume /tmp/argus_socket:/tmp/argus_socket \
   --volume /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra \
   --volume ${OS_WS}:/workspace \
+  --name squirreldefender \
   crose72/jetpack-r36.4.0:base
