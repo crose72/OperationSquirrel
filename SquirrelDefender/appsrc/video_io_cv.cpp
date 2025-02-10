@@ -146,7 +146,6 @@ bool display_video(void)
 {
     if (g_valid_image_rcvd)
     {
-        cv::imshow("Video", g_image);
         cv::waitKey(1);
 
         return true;

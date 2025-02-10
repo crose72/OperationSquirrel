@@ -175,6 +175,7 @@ void proc_mav_command_ack_msg(const mavlink_message_t *msg);
 void proc_mav_optical_flow_msg(const mavlink_message_t *msg);
 void proc_mav_distance_sensor_msg(const mavlink_message_t *msg);
 void proc_mav_position_local_ned_msg(const mavlink_message_t *msg);
+void proc_mav_unknown(const mavlink_message_t *msg);
 
 /********************************************************************************
  * Function: subscribe
@@ -542,7 +543,11 @@ void proc_mav_command_ack_msg(const mavlink_message_t *msg)
     g_mav_veh_command_target_system = command_ack.target_system;
     g_mav_veh_command_target_component = command_ack.target_component;
 
+#ifdef DEBUG_BUILD
+
     print_command_ack(command_ack);
+
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -599,6 +604,20 @@ void proc_mav_distance_sensor_msg(const mavlink_message_t *msg)
 
 #endif // DEBUG_BUILD
 }
+
+/********************************************************************************
+ * Function: proc_mav_unknown
+ * Description: Print message ID of mavlink messages that haven't been processed.
+ ********************************************************************************/
+void proc_mav_unknown(const mavlink_message_t *msg)
+{
+#ifdef DEBUG_BUILD
+
+    printf("Received message with ID: %u\n",msg.msgid);
+
+#endif // DEBUG_BUILD
+}
+
 
 /********************************************************************************
  * Function: start_message_subscriptions
@@ -700,7 +719,7 @@ void parse_mav_msgs(void)
                 proc_mav_command_ack_msg(&msg);
                 break;
             default:
-                printf("Received message with ID: %u\n",msg.msgid);
+                proc_mav_unknown(&msg);
             }
         }
     }
