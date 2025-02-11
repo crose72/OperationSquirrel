@@ -70,26 +70,36 @@ You must also specify a Debug or Release build.  Debug enables all print stateme
 
 ## Automatically run program on Jetson Nano by creating a systemd service
 
+    # Create ~/.xprofile
+        sudo nano ~/.xprofile
+
+    # Add these lines to it (they make it so that the docker container has acces to the xserver and the camera will work)                                                                                                     
+        export DISPLAY=:0
+        xhost +
+
     # Create a .service file (one is already included in this folder so you can just copy that)
-    sudo nano /etc/systemd/system/squirrel_defender.service
+        sudo nano /etc/systemd/system/squirrel_defender.service
 
     # Here's what the file looks like anyways:
         [Unit]
         Description=Squirrel Defender program
-        After=network.target nvargus-daemon.service
-
+        After=network.target nvargus-daemon.service graphical.target multi-user.target
+        Wants=graphical.target
+        
         [Service]
-        Type=simple
-        ExecStartPre=/bin/systemctl restart nvargus-daemon.service
-        ExecStart=<path-to-exe>/squirreldefender
-        WorkingDirectory=<path-to-build-folder>//SquirrelDefender/build
+        Environment="OS_WS=/home/crose72/workspaces/os-dev"
+        Restart=on-failure
+        RestartSec=5
+        ExecStartPre=/bin/bash -c 'sleep 5'
+        ExecStart=/bin/bash /home/crose72/workspaces/os-dev/OperationSquirrel/scripts/run_squirreldefender.sh
+        ExecStop=/usr/bin/docker stop squirreldefender
+        #ExecStopPost=/usr/bin/docker rm squirreldefender
         StandardOutput=journal
         StandardError=journal
-        Restart=always
         User=root
-
+        
         [Install]
-        WantedBy=multi-user.target                
+        WantedBy=multi-user.target               
     
     # Save the file and reload the daemon
     sudo systemctl daemon-reload
