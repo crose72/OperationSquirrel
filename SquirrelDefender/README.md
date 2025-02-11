@@ -2,6 +2,30 @@
 
 This folder contains the code for the Squirrel Defender and most of its dependencies.  Some dependencies for the Jetson Nano or other companion computer are found elsewhere, but instructions for how to set those up will be provided in a different file.  This readme will explain how to compile and run this code as well as provide an outline for how the code is structured.
 
+## ***These instructions will be updated soon to describe how to run operation squirrel on the Jetson Orin Nano.  For now I will include some simple notes***
+
+The way to develop or run the program on the Jetson Orin Nano workflow is similar to the Jetson Nano B01.  One key difference however is the use of docker containers.  I have two scripts for use with the program.  `./scripts/run_dev/sh` runs a container with all of the dependencies needed to compile and run the program and develop the program.  `./scripts/run_squirreldefender.sh` can be used to run the container whose sole purpose is to run the precompiled binary.  Before running these containers you should export the display environment variable (can add it to ~./bashrc and then `source ~/.bashrc`) and then allow the containers to have access to the display.  The following two commands will help with that.
+
+```
+export DISPLAY=:0
+xhost +
+```
+
+If your camera is having trouble make sure it is still working
+
+```
+nvgstcapture-1.0
+```
+
+And if it stops working try
+
+```
+sudo systemctl restart nvargus-daemon.service
+```
+
+The code is written to use the IMX219-83 CSI camera.  It should work with any CSI camera that is compatible with the Jetson devices.  If you want to use a different camera you'll have to update the code to access that camera (in the `video_io_cv.cpp` file).
+
+
 ## Follow the instructions in the scripts folder to set up swap and install the needed dependencies first
 
 ## Before compiling (specifically if linking ORB_SLAM)
@@ -46,28 +70,76 @@ You must also specify a Debug or Release build.  Debug enables all print stateme
 
 ## Automatically run program on Jetson Nano by creating a systemd service
 
+    # Create ~/.xprofile
+        sudo nano ~/.xprofile
+
+    # Add these lines to it (they make it so that the docker container has acces to the xserver and the camera will work)                                                                                                     
+        export DISPLAY=:0
+        xhost +
+
+    # Create a .service file (one is already included in this folder so you can just copy that)
+        sudo nano /etc/systemd/system/squirrel_defender.service
+
+    # Here's what the file looks like anyways:
+        [Unit]
+        Description=Squirrel Defender program
+        After=network.target nvargus-daemon.service graphical.target multi-user.target
+        Wants=graphical.target
+        
+        [Service]
+        Environment="OS_WS=/home/crose72/workspaces/os-dev"
+        Restart=on-failure
+        RestartSec=5
+        ExecStartPre=/bin/bash -c 'sleep 5'
+        ExecStart=/bin/bash /home/crose72/workspaces/os-dev/OperationSquirrel/scripts/run_squirreldefender.sh
+        ExecStop=/usr/bin/docker stop squirreldefender
+        #ExecStopPost=/usr/bin/docker rm squirreldefender
+        StandardOutput=journal
+        StandardError=journal
+        User=root
+        
+        [Install]
+        WantedBy=multi-user.target               
+    
+    # Save the file and reload the daemon
+    sudo systemctl daemon-reload
+
+    # Enable the service
+    sudo systemctl enable squirrel_defender.service
+
+    # Start the service
+    sudo systemctl start squirrel_defender.service
+    
+    # Restart the service
+    sudo systemctl restart squirrel_defender.service
+
+    # Check status of the service
+    sudo systemctl status squirrel_defender.service
+
+Additional example of a systemd service for the squirreldefender program on the Jetson Orin Nano.  This service runs a script in the OperationSquirrel repo which runs a container that only runs the executable.
+
     # Create a .service file (one is already included in this folder so you can just copy that)
     sudo nano /etc/systemd/system/squirrel_defender.service
 
-    # Here's what the file looks like anyways:
         [Unit]
         Description=Squirrel Defender program
         After=network.target nvargus-daemon.service
 
         [Service]
-        Type=simple
-        ExecStartPre=/bin/systemctl restart nvargus-daemon.service
-        ExecStart=<path-to-exe>/squirreldefender
-        WorkingDirectory=<path-to-build-folder>//SquirrelDefender/build
+        Environment="OS_WS=/home/crose72/workspaces/os-dev"
+        Restart=always
+        RestartSec=5
+        ExecStart=/bin/bash /home/crose72/workspaces/os-dev/OperationSquirrel/scripts/run_squirreldef>
+        ExecStop=/usr/bin/docker stop squirreldefender
+        ExecStopPost=/usr/bin/docker rm squirreldefender
         StandardOutput=journal
         StandardError=journal
-        Restart=always
         User=root
 
         [Install]
-        WantedBy=multi-user.target                
-    
-    # Save the file and reload the daemon
+        WantedBy=multi-user.target
+
+        # Save the file and reload the daemon
     sudo systemctl daemon-reload
 
     # Enable the service

@@ -21,9 +21,9 @@
 
 #include "video_io_nv.h"
 
-#elif BLD_WIN
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
 
-#include "video_io_win.h"
+#include "video_io_cv.h"
 
 #else
 
@@ -39,7 +39,11 @@
 
 extern detectNet *g_net;
 
-#elif BLD_WIN
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+/* No imported objects */
+
+#elif defined(BLD_WIN)
 
 /* No imported objects */
 
@@ -60,7 +64,7 @@ extern uchar3 *g_image;
 extern float g_input_video_width;
 extern float g_input_video_height;
 
-#elif BLD_WIN
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
 
 extern bool g_valid_image_rcvd;
 extern cv::Mat g_image;

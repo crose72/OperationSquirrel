@@ -42,9 +42,15 @@ extern int g_detection_count;
 extern float g_input_video_width;
 extern float g_input_video_height;
 
-#endif //BLD_JETSON_B01
+#elif defined(BLD_JETSON_ORIN_NANO)
 
-#ifdef BLD_WIN
+extern std::vector<Object> g_yolo_detections;
+extern int g_yolo_detection_count;
+extern cv::Mat g_image;
+extern float g_input_video_width;
+extern float g_input_video_height;
+
+#elif defined(BLD_WIN)
 
 extern cv::dnn::Net g_net;
 extern std::vector<YoloNet::detection> g_yolo_detections;
@@ -53,19 +59,13 @@ extern cv::Mat g_image;
 extern float g_input_video_width;
 extern float g_input_video_height;
 
-#endif // BLD_WIN
+#else
+
+#error "Please define a build platform."
+
+#endif // BLD_JETSON_B01
 
 extern bool g_valid_image_rcvd;
-extern bool g_target_valid;
-extern int g_target_detection_id;
-extern int g_target_track_id;
-extern float g_target_height;
-extern float g_target_width;
-extern float g_target_aspect;
-extern float g_target_left;
-extern float g_target_right;
-extern float g_target_top;
-extern float g_target_bottom;
 
 /********************************************************************************
  * Exported objects

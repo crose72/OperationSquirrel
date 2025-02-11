@@ -7,8 +7,8 @@
  * @author  Cameron Rose
  * @date    1/22/2025
  ********************************************************************************/
-#ifndef JETSON_IO_H
-#define JETSON_IO_H
+#ifndef JETSON_B01_IO_H
+#define JETSON_B01_IO_H
 
 /********************************************************************************
  * Includes
@@ -52,6 +52,6 @@ public:
 private:
 };
 
-#endif // JETSON_IO_H
+#endif // JETSON_B01_IO_H
 
 #endif // BLD_JETSON_B01

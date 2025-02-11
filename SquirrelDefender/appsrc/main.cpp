@@ -17,7 +17,7 @@
 #include "datalog.h"
 #include "video_io.h"
 #include "system_controller.h"
-#include "mavlink_msg_handler.h"
+#include "mav_data_hub.h"
 #include "mav_utils.h"
 #include "vehicle_controller.h"
 #include "detect_target.h"
@@ -30,7 +30,6 @@
 #ifdef BLD_JETSON_B01
 
 #include "status_io.h"
-#include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 
 #endif // BLD_JETSON_B01
 

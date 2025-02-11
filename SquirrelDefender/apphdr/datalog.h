@@ -17,7 +17,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "mavlink_msg_handler.h"
+#include "mav_data_hub.h"
 #include "follow_target.h"
 #include "track_target.h"
 #include "localize_target.h"

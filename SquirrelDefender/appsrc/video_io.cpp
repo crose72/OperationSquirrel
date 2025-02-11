@@ -55,7 +55,11 @@ bool Video::init(void)
 
     return VideoNV::init();
 
-#elif BLD_WIN
+#elif BLD_JETSON_ORIN_NANO
+
+    return VideoCV::init();
+
+#elif defined(BLD_WIN)
 
     return VideoWin::init();
 
@@ -76,7 +80,11 @@ void Video::in_loop(void)
 
     VideoNV::in_loop();
 
-#elif BLD_WIN
+#elif BLD_JETSON_ORIN_NANO
+
+    VideoCV::in_loop();
+
+#elif defined(BLD_WIN)
 
     VideoWin::in_loop();
 
@@ -97,7 +105,11 @@ void Video::out_loop(void)
 
     VideoNV::out_loop();
 
-#elif BLD_WIN
+#elif BLD_JETSON_ORIN_NANO
+
+    VideoCV::out_loop();
+
+#elif defined(BLD_WIN)
 
     VideoWin::out_loop();
 
@@ -118,7 +130,11 @@ void Video::shutdown(void)
 
     VideoNV::shutdown();
 
-#elif BLD_WIN
+#elif BLD_JETSON_ORIN_NANO
+
+    VideoCV::shutdown();
+
+#elif defined(BLD_WIN)
 
     VideoWin::shutdown();
 

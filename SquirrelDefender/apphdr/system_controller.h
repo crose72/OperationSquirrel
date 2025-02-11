@@ -12,7 +12,7 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "mavlink_msg_handler.h"
+#include "mav_data_hub.h"
 #include "mav_utils.h"
 #include "datalog.h"
 #include "video_io.h"
