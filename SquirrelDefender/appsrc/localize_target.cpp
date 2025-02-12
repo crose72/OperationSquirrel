@@ -189,7 +189,7 @@ void calc_target_offest(void)
 
     /* Adjust x and z distances based on camera tilt angle */
     g_x_object = g_x_object + g_delta_d_x;
-    g_x_object = g_x_object + g_delta_d_x;
+    g_z_object = g_z_object + g_delta_d_z;
 
     /* Calculate target y offset from the center line of view of the camera based on calibrated forward distance and the
        offset of the center of the target to the side of the center of the video frame in pixels */
