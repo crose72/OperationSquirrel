@@ -176,7 +176,7 @@ typedef enum {
  * a stack overrun
  */
 #ifndef MAVLINK_COMM_NUM_BUFFERS
-#if (defined linux) | (defined __linux) | (defined  __MACH__) | (defined BLD_WIN)
+#if (defined linux) | (defined __linux) | (defined  __MACH__) | (defined _WIN32)
 # define MAVLINK_COMM_NUM_BUFFERS 16
 #else
 # define MAVLINK_COMM_NUM_BUFFERS 4
