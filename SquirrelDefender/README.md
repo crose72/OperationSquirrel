@@ -27,6 +27,19 @@ There are two containers for development on the Jetson Orin Nano.  A dev contain
 
 Note: Defaults on the Orin are fine for all of these if you have JP6.1 or 6.2.  I would recommend installing the correct opencv version using the script provided, however.
 
+### Setup:
+
+Setup swap.  Either run [setup-swap.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/setup-swap.sh) or you can manually install some swap:
+
+```
+sudo fallocate -l 8G /mnt/8GB.swap
+sudo mkswap /mnt/8GB.swap
+sudo swapon /mnt/8GB.swap
+        
+Then add the following line to the end of /etc/fstab to make the change persistent:
+    /mnt/8GB.swap  none  swap  sw 0  0
+```
+
 Copy the script [Install-Jetson-Orin-Nano-dependencies.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/Install-Jetson-Orin-Nano-dependencies.sh) to your favorite GitHub folder because it will clone some repos wherever you run this script, so just make sure to put it wherever you are okay with having those repositories.
 
 ### Compile and run the program (on the host):
@@ -43,8 +56,6 @@ make -j$(nproc)
 # Run the executable
 sudo ./squirreldefender
 ```
-
-
 
 ### Prerequisites (docker method):
 
@@ -182,6 +193,17 @@ sudo systemctl status squirreldefender.service
 ### Setup:
 
 If you want to update your cmake version then you can run the script I made to install 3.28 [Install-CMake-3.28.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/Install-CMake-3.28.sh).
+
+Setup swap.  Either run [setup-swap.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/setup-swap.sh) or you can manually install some swap:
+
+```
+sudo fallocate -l 8G /mnt/8GB.swap
+sudo mkswap /mnt/8GB.swap
+sudo swapon /mnt/8GB.swap
+        
+Then add the following line to the end of /etc/fstab to make the change persistent:
+    /mnt/8GB.swap  none  swap  sw 0  0
+```
 
 Copy the script [Install-Jetson-Nano-B01-dependencies.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/Install-Jetson-Nano-B01-dependencies.sh) to your favorite GitHub folder because it will clone some repos wherever you run this script, so just make sure to put it wherever you are okay with having those repositories.
 

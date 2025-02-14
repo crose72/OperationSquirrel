@@ -33,7 +33,7 @@ Developer chat: <https://discord.gg/Uxg9tpVMP9>
 If you need help or the instructions are unclear, please reach out in the discord  :)
 
 ## Introduction (TL:DR)
-
+ 
 Some things you might be wondering about this project are "How do I use this?", "What does the code do?"  If you want to make an autonomous drone that is able to identify and follow a target based an object detector that is performing inference on a live camera feed, then the code in the SquirrelDefender folder is what you want.  
 
 You need two things for this project to work for you.  First you need a device on which to compile the code (Jetson Nano, Jetson Orin Nano, Windows laptop, microcontroller, etc).  Second you need a drone (real or simulated).
@@ -54,7 +54,9 @@ Okay now that I've told you many ways in which you can use this project I'll lea
 
 The above introduction hopefully provided some context for what this project is and how you can use it.  Next I'll point you in the direction of how to get it working.
 
-- Follow the instructions in [README](https://github.com/crose72/OperationSquirrel/blob/dev/SquirrelDefender/README.md) for instructions on how to compile and run the program
+If you want to understand how the software is written and the flow, look at `docs/diagrams/software-architecture`.
+
+- Follow the instructions in [README](https://github.com/crose72/OperationSquirrel/blob/dev/SquirrelDefender/README.md) to compile and run the program
 - Follow the instructions in [01-Setting-up-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/01-Setting-up-SITL.md) to setup the simulation environment.
 - Follow the instructions in [02-Connecting-to-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/02-Connecting-to-SITL.md) to control the simulated drone with your Jetson
 - (Optional) Follow the instructions in [03-Setting-up-AirSim-with-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/03-Setting-up-AirSim-with-SITL.md) to setup a photo-realistic simulation
