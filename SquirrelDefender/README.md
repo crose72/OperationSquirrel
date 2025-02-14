@@ -1,166 +1,295 @@
 # Description
 
-This folder contains the code for the Squirrel Defender and most of its dependencies.  Some dependencies for the Jetson Nano or other companion computer are found elsewhere, but instructions for how to set those up will be provided in a different file.  This readme will explain how to compile and run this code as well as provide an outline for how the code is structured.
+This folder contains the code for the `squirreldefender` program and instructions on how to compile it for different build platforms.  This code assumes use of a CSI camera on the jetson devices, and the default webcam if compiled on windows.
 
-## ***These instructions will be updated soon to describe how to run operation squirrel on the Jetson Orin Nano.  For now I will include some simple notes***
-
-The way to develop or run the program on the Jetson Orin Nano workflow is similar to the Jetson Nano B01.  One key difference however is the use of docker containers.  I have two scripts for use with the program.  `./scripts/run_dev/sh` runs a container with all of the dependencies needed to compile and run the program and develop the program.  `./scripts/run_squirreldefender.sh` can be used to run the container whose sole purpose is to run the precompiled binary.  Before running these containers you should export the display environment variable (can add it to ~./bashrc and then `source ~/.bashrc`) and then allow the containers to have access to the display.  The following two commands will help with that.
-
-```
-export DISPLAY=:0
-xhost +
-```
-
-If your camera is having trouble make sure it is still working
-
-```
-nvgstcapture-1.0
-```
-
-And if it stops working try
-
-```
-sudo systemctl restart nvargus-daemon.service
-```
-
-The code is written to use the IMX219-83 CSI camera.  It should work with any CSI camera that is compatible with the Jetson devices.  If you want to use a different camera you'll have to update the code to access that camera (in the `video_io_cv.cpp` file).
-
-
-## Follow the instructions in the scripts folder to set up swap and install the needed dependencies first
-
-## Before compiling (specifically if linking ORB_SLAM)
-
-- Follow the instructions in [Install-dependencies](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/Install-dependencies.md) to copy the contents of `jetson/usr-orin-nano` or the specific library files for your device to the correct path.
-- Update the shared library cache with `sudo ldconfig -v` (should be part of the steps for the bullet point above)
-- If you need to update the linker path for some reason <https://stackoverflow.com/questions/480764/linux-error-while-loading-shared-libraries-cannot-open-shared-object-file-no-s>
-
-## CMake instructions
-
-First you will want to update CMake to 3.28, the version we are currently using.  The Jetson Nano is arm64 or aarch64 so the appropriate file has been selected.  You only need to do this once.
-
-```
-# Remove old version of cmake and install a newer one
-	sudo apt-get remove cmake  # or your package manager's equivalent command
-
-# Replace <version> with the version number you downloaded
-	wget https://cmake.org/files/v3.28/cmake-3.28.0-linux-aarch64.sh
-	chmod +x cmake-3.28.0-linux-aarch64.sh
-	sudo ./cmake-3.28.0-linux-aarch64.sh --prefix=/usr/local --exclude-subdir
-```
-
-The CMake file allows you to choose the platform you are compiling for.  Currently the supported options are BLD_JETSON_B01 and WSL.  Enable one option at a time:
-- `option(BLD_JETSON_B01 "Enable Jetson Nano specific features" ON)`
-- `option(WSL "Enable WSL specific features" OFF)`
-
-You must also specify a Debug or Release build.  Debug enables all print statements.  Release disables most print statements to save throughtput for the program:
-- `cmake -DCMAKE_BUILD_TYPE=Release ..`
-
-#### Other preprocessing directives will be added to configure the code to enable or disable other features
-
-## How to compile and run the program
-
-1. Configure the CMakeLists.txt file
-2. Execute `mkdir build` to create a build directory
-3. Execute `cd build` to go to the build folder
-4. Execute `cmake ..` to generate build files (debug or release type)
-5. Execute `make -j$(nproc)` for fast builds or `make` for slow builds
-6. Execute `sudo ./squirreldefender` to run the program
-7. Execute `./unit_tests` to run the unit tests
-8. If the video doesn't display on your monitor, try executing `sudo systemctl restart nvargus-daemon`
-
-## Automatically run program on Jetson Nano by creating a systemd service
-
-    # Create ~/.xprofile
-        sudo nano ~/.xprofile
-
-    # Add these lines to it (they make it so that the docker container has acces to the xserver and the camera will work)                                                                                                     
-        export DISPLAY=:0
-        xhost +
-
-    # Create a .service file (one is already included in this folder so you can just copy that)
-        sudo nano /etc/systemd/system/squirrel_defender.service
-
-    # Here's what the file looks like anyways:
-        [Unit]
-        Description=Squirrel Defender program
-        After=network.target nvargus-daemon.service graphical.target multi-user.target
-        Wants=graphical.target
-        
-        [Service]
-        Environment="OS_WS=/home/crose72/workspaces/os-dev"
-        Restart=on-failure
-        RestartSec=5
-        ExecStartPre=/bin/bash -c 'sleep 5'
-        ExecStart=/bin/bash /home/crose72/workspaces/os-dev/OperationSquirrel/scripts/run_squirreldefender.sh
-        ExecStop=/usr/bin/docker stop squirreldefender
-        #ExecStopPost=/usr/bin/docker rm squirreldefender
-        StandardOutput=journal
-        StandardError=journal
-        User=root
-        
-        [Install]
-        WantedBy=multi-user.target               
-    
-    # Save the file and reload the daemon
-    sudo systemctl daemon-reload
-
-    # Enable the service
-    sudo systemctl enable squirrel_defender.service
-
-    # Start the service
-    sudo systemctl start squirrel_defender.service
-    
-    # Restart the service
-    sudo systemctl restart squirrel_defender.service
-
-    # Check status of the service
-    sudo systemctl status squirrel_defender.service
-
-Additional example of a systemd service for the squirreldefender program on the Jetson Orin Nano.  This service runs a script in the OperationSquirrel repo which runs a container that only runs the executable.
-
-    # Create a .service file (one is already included in this folder so you can just copy that)
-    sudo nano /etc/systemd/system/squirrel_defender.service
-
-        [Unit]
-        Description=Squirrel Defender program
-        After=network.target nvargus-daemon.service
-
-        [Service]
-        Environment="OS_WS=/home/crose72/workspaces/os-dev"
-        Restart=always
-        RestartSec=5
-        ExecStart=/bin/bash /home/crose72/workspaces/os-dev/OperationSquirrel/scripts/run_squirreldef>
-        ExecStop=/usr/bin/docker stop squirreldefender
-        ExecStopPost=/usr/bin/docker rm squirreldefender
-        StandardOutput=journal
-        StandardError=journal
-        User=root
-
-        [Install]
-        WantedBy=multi-user.target
-
-        # Save the file and reload the daemon
-    sudo systemctl daemon-reload
-
-    # Enable the service
-    sudo systemctl enable squirrel_defender.service
-
-    # Start the service
-    sudo systemctl start squirrel_defender.service
-    
-    # Restart the service
-    sudo systemctl restart squirrel_defender.service
-
-    # Check status of the service
-    sudo systemctl status squirrel_defender.service
 
 ## Folder structure
 
 - `appsrc` - source code files
 - `apphdr` - source header files
-- `inc` - header files for external libraries (currently Mavlink is the only one that actually needs to be in here as the rest are installed on the jetson in `/usr/local/include/`, but they are there for reference)
-- `lib` - external compiled libraries
+- `modules` - standalone code that is used in the main program, but is not the main functionality
 - `tests` - header files used to run flight tests, whatever behavior you want to hard code the drone to do (especially useful when testing in WSL with virtual jetson)
-- `UnitTests` - all the code for unit tests, including helper files
 - `params.json` - parameters defined here are adjustable at runtime (not recommended to use with real vehicle, hardcode all of the parameters when using real vehicle)
 - `.editorconfig` - should automatically format the code when saving (if it doesn't then check your settings in vs code)
+
+## Jetson Orin Nano
+
+There are two containers for development on the Jetson Orin Nano.  A dev container, used for compiling and testing the code, and a release container, used for just running the compiled executable.  All of the dependencies are inside the container so you just have to run them :)
+
+### Prerequisites (compiling on host):
+
+- Jetpack 6.1 (~r36.4 I reckon this should work with Jetpack 6.2, I will try it shortly but I haven't verified it yet)
+- CMake >= 3.28 (same rules as above apply for different versions, you have to troubleshoot)
+- OpenCV 4.10.0 with Cuda and cuDNN
+- Cuda 12.6 (should be default on the orin)
+- cuDNN 9.3.0 (default on )
+- Json (if you want to use the params file, otherwise optional)
+
+Note: Defaults on the Orin are fine for all of these if you have JP6.1 or 6.2.  I would recommend installing the correct opencv version using the script provided, however.
+
+Copy the script [Install-Jetson-Orin-Nano-dependencies.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/Install-Jetson-Orin-Nano-dependencies.sh) to your favorite GitHub folder because it will clone some repos wherever you run this script, so just make sure to put it wherever you are okay with having those repositories.
+
+### Compile and run the program (on the host):
+
+```
+# Clone the repository
+git clone https://github.com/crose72/OperationSquirrel.git --recursive
+cd OperationSquirrel/SquirrelDefender
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j$(nproc)
+
+# Run the executable
+sudo ./squirreldefender
+```
+
+
+
+### Prerequisites (docker method):
+
+- Docker
+- Nvidia container runtime (if not already installed can follow the instructions at [ISAAC-ROS-Setup.md](https://github.com/crose72/OperationSquirrel/blob/dev/docs/ISAAC-ROS-Setup))
+- Jetpack 6.1 (~r36.4 I reckon this should work with Jetpack 6.2, I will try it shortly but I haven't verified it yet)
+
+### Setup:
+
+Perform the following setup outside of the container and then verify the camera is working in the container.
+
+```
+# Create a workspace
+mkdir ~/workspaces/os-dev
+cd ~/workspaces/os-dev
+
+# Clone the repository
+git clone https://github.com/crose72/OperationSquirrel.git --recursive
+
+# Add the following to your ~/.bashrc file
+export DISPLAY=:0
+export OS_WS=/home/<user>/workspaces/os-dev/
+
+# Enable xserver and display access to the docker container 
+# Might need to do before each time running the container
+xhost +
+
+# Run the container
+./scripts/run_dev.sh
+
+# Test the camera inside the container
+nvgstcapture-1.0
+```
+
+### Dev container - compiling and running squirreldefender:
+
+Outside of the container edit `SquirrelDefender/CMakeLists.txt` file and enable `BLD_JETSON_ORIN_NANO`.
+
+```
+# Build
+cd workspaces/OperationSquirrel/SquirrelDefender
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j$(nproc)
+
+# Run the executable
+./squirreldefender
+```
+
+### Release container:
+
+If you don't need to change the code and just want to run the precompiled program then you can just do the setup and run `./run_squirreldefender.sh`
+
+If you want to have the program run as soon as you power on the jetson (for example when your jetson is mounted on your drone) then you need to add a systemd service and do a couple other things.  First enable xserver and display access for the container by default when you power on the jetson by adding it to your `.xprofile`.  Run these outside of the container.
+
+```
+sudo nano ~/.xprofile
+# And then add these lines to it
+export DISPLAY=:0
+xhost +
+
+# And make it executable
+chmod +x ~/.xprofile 
+```
+
+Next, create a systemd service file
+
+```
+# Create a .service file (one is already included in this folder so you can just copy that)
+sudo nano /etc/systemd/system/squirreldefender.service
+
+# Add this to the file
+
+    [Unit]fender program
+    After=network.target nvargus-daemon.service graphical.target multi-user.target
+    Wants=graphical.target
+
+    [Service]
+    Environment="OS_WS=/home/<user>/workspaces/os-dev"
+    Restart=on-failure
+    RestartSec=5
+    ExecStartPre=/bin/bash -c 'sleep 5'
+    ExecStart=/bin/bash /home/<user>/workspaces/os-dev/OperationSquirrel/scripts/run_squirreldefender.sh
+    ExecStop=/usr/bin/docker stop squirreldefender
+    #ExecStopPost=/usr/bin/docker rm squirreldefender
+    StandardOutput=journal
+    StandardError=journal
+    User=root
+
+    [Install]
+    WantedBy=multi-user.target  
+```
+
+Next, enable and start the systemd service you just created
+
+```
+sudo systemctl enable squirreldefender.service
+sudo systemctl start squirreldefender.service
+```
+
+Now your squirreldefender program should start running, and if your jetson is connected to the drone or the simulation on your laptop via FTDI they you'll see some action.  You can also stop, restart, or check the status of the program by using those commands if you need to troubleshoot.  These steps also mean that as soon as you power on your jetson this program will start running unless you disable it or stop it manually.  Log files from this release container are stored in `~/logs` by default.
+
+Some additional useful commands
+
+```
+# Some useful commands
+
+# Save the file and reload the daemon
+sudo systemctl daemon-reload
+
+# Enable the service
+sudo systemctl enable squirreldefender.service
+
+# Start the service
+sudo systemctl start squirreldefender.service
+
+# Restart the service
+sudo systemctl restart squirreldefender.service
+
+# Check status of the service
+sudo systemctl status squirreldefender.service
+```
+
+## Jetson Nano B01
+
+### Prerequisites:
+
+- OpenCV 4.10.0 with Cuda and cuDNN(will work with OpenCV 4.5.0 with some minor changes)
+- Jetson Inference
+- Json
+- CMake >= 3.28 (Earlier versions will likely work but you will have to troubleshoot that.  Probably don't use lower than version 3)
+- Jetpack 4.6 (r32.7.5, though it should work with some slightly earlier versions)
+
+### Setup:
+
+If you want to update your cmake version then you can run the script I made to install 3.28 [Install-CMake-3.28.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/Install-CMake-3.28.sh).
+
+Copy the script [Install-Jetson-Nano-B01-dependencies.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/Install-Jetson-Nano-B01-dependencies.sh) to your favorite GitHub folder because it will clone some repos wherever you run this script, so just make sure to put it wherever you are okay with having those repositories.
+
+Edit `SquirrelDefender/CMakeLists.txt` file and enable `BLD_JETSON_B01`.
+
+### Compile and run the program:
+
+```
+# Clone the repository
+git clone https://github.com/crose72/OperationSquirrel.git --recursive
+cd OperationSquirrel/SquirrelDefender
+mkdir build
+cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make -j$(nproc)
+
+# Run the executable
+sudo ./squirreldefender
+```
+
+If you run into issues with the camera try `sudo systemctl restart nvargus-daemon`.
+
+If you want to have the program run as soon as you power on the jetson (for example when your jetson is mounted on your drone) then you need to add a systemd service and do a couple other things.
+
+```
+# Create a .service file (one is already included in this folder so you can just copy that)
+sudo nano /etc/systemd/system/squirreldefender.service
+
+# Add this to the file
+
+    [Unit]
+    Description=Squirrel Defender program
+    After=network.target nvargus-daemon.service
+
+    [Service]
+    Type=simple
+    ExecStartPre=/bin/systemctl restart nvargus-daemon.service
+    ExecStart=<path-to-exe>/squirreldefender
+    WorkingDirectory=<path-to-build-folder>//SquirrelDefender/build
+    StandardOutput=journal
+    StandardError=journal
+    Restart=always
+    User=root
+
+    [Install]
+    WantedBy=multi-user.target    
+```
+
+Next, enable and start the systemd service you just created
+
+```
+sudo systemctl enable squirreldefender.service
+sudo systemctl start squirreldefender.service
+```
+
+Now your squirreldefender program should start running, and if your jetson is connected to the drone or the simulation on your laptop via FTDI they you'll see some action.  You can also stop, restart, or check the status of the program by using those commands if you need to troubleshoot.  These steps also mean that as soon as you power on your jetson this program will start running unless you disable it or stop it manually.  Log files from this release container are stored in `~/logs` by default.
+
+Some additional useful commands
+
+```
+# Some useful commands
+
+# Save the file and reload the daemon
+sudo systemctl daemon-reload
+
+# Enable the service
+sudo systemctl enable squirreldefender.service
+
+# Start the service
+sudo systemctl start squirreldefender.service
+
+# Restart the service
+sudo systemctl restart squirreldefender.service
+
+# Check status of the service
+sudo systemctl status squirreldefender.service
+```
+
+## Windows
+
+The main purpose of this program is to be run on the edge.  It can also be run on a laptop or desktop if you do not have a jetson edge device like the nano or the orin nano.  I won't go into great detail about these build platforms but I will tell you what's required.  If you have more questions feel free to reach out on the discord or try it on your own.  It's basically the same as above, but I use visual studio for my windows project
+
+### Prerequisites:
+
+- CMake >= 3.28 (same rules as above apply for different versions, you have to troubleshoot)
+- OpenCV 4.10.0 with Cuda and cuDNN
+- Cuda 12.6
+- cuDNN 8.9.7.29 (Can try a different version of cuDNN 8, and maybe cuDNN 9, but don't use 9.5.1.17, we tried, didn't work - known issue)
+- Json (if you want to use the params file, otherwise optional)
+
+### Setup:
+
+Follow the instructions to install OpenCV 4.10.0 with Cuda 12.6 and cuDNN 8.9 from this medium article I found https://medium.com/@jinscott/build-opencv-on-windows-with-cuda-f880270eadb0.  ***DO NOT COMPILE FOR STATIC LIBS***. You can, it's just that you'd then have to manually link every library file.  I compiled with dynamic libs.  But feel free to do it however is best for you.
+
+Install TensorRT 10.4 following the instructions on their website.
+
+Install CMake and the gui on your computer.
+
+Configure the CMakeList.txt file for your windows build.
+
+Open CMake gui and setup the project using the cmake file in `SquirrelDefender`.
+
+In Visual Studio choose a release type build (You can try debug but I have had issues with that one).
+
+Build the executable.
+
+Before you execute the program make sure the ArduPilot SITL is running.  The windows build depends on that before it can continue to execute.
+
+## Linux laptop or desktop
+
+I'm going to leave you to figure out how to compile it on your linux machine based on the instructions above.  It's pretty much the same thing.  Here is something to help you get started on installing opencv with cuda and cudnn on linux though https://medium.com/@juancrrn/installing-opencv-4-with-cuda-in-ubuntu-20-04-fde6d6a0a367.
