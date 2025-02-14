@@ -3,7 +3,7 @@
 /********************************************************************************
  * @file    follow_target.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  * @brief   Follow the target and maintain a specified x, y, z offset.
  ********************************************************************************/
 
@@ -23,16 +23,15 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-DebugTerm FollowData("");
 PID pid_forwd;
 PID pid_rev;
 
-bool target_too_close;
-float x_error;
-float y_error;
-float vx_adjust;
-float vy_adjust;
-float vz_adjust;
+bool g_target_too_close;
+float g_x_error;
+float g_y_error;
+float g_vx_adjust;
+float g_vy_adjust;
+float g_vz_adjust;
 
 /********************************************************************************
  * Calibration definitions
@@ -137,7 +136,7 @@ void get_control_params(void)
 {
 #ifdef DEBUG_BUILD
 
-    Parameters veh_params("../params.json");
+    json_utils veh_params("../params.json");
     
     // Accessing Vel_PID_x parameters
     Kp_x = veh_params.get_float_param("Vel_PID_x", "Kp");
@@ -184,7 +183,7 @@ void calc_follow_error(void)
 #ifdef BLD_JETSON_B01
 #ifdef DEBUG_BUILD
 
-    Parameters target_params("../params.json");
+    json_utils target_params("../params.json");
 
     x_desired = target_params.get_float_param("Target", "Desired_X_offset");
 
@@ -193,14 +192,14 @@ void calc_follow_error(void)
 
     if (d_object < 0.001f)
     {
-        x_error = 0.0f;
+        g_x_error = 0.0f;
     }
     else
     {
-        x_error = x_object - x_desired;
+        g_x_error = g_x_object - x_desired;
     }
 
-    y_error = y_object - y_desired;
+    g_y_error = g_y_object - y_desired;
 }
 
 /********************************************************************************
@@ -210,30 +209,30 @@ void calc_follow_error(void)
  ********************************************************************************/
 void dtrmn_follow_vector(void)
 {
-    target_too_close = (x_error < 0.0);
+    g_target_too_close = (g_x_error < 0.0);
 
-    if (target_valid && target_too_close)
+    if (g_target_valid && g_target_too_close)
     {
-        vx_adjust = pid_rev.pid_controller_3d(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                              x_error, 0.0, 0.0,
-                                              w1_x_rev, 0.0, 0.0, CONTROL_DIM::X);
-        vy_adjust = pid_rev.pid_controller_3d(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                              y_error, 0.0, 0.0,
-                                              w1_y_rev, 0.0, 0.0, CONTROL_DIM::Y);
+        g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
+                                              g_x_error, 0.0, 0.0,
+                                              w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
+        g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
+                                              g_y_error, 0.0, 0.0,
+                                              w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
     }
-    else if (target_valid && !target_too_close)
+    else if (g_target_valid && !g_target_too_close)
     {
-        vx_adjust = pid_forwd.pid_controller_3d(Kp_x, Ki_x, Kd_x,
-                                                x_error, 0.0, 0.0,
-                                                w1_x, 0.0, 0.0, CONTROL_DIM::X);
-        vy_adjust = pid_forwd.pid_controller_3d(Kp_y, Ki_y, Kd_y,
-                                                y_error, 0.0, 0.0,
-                                                w1_y, 0.0, 0.0, CONTROL_DIM::Y);
+        g_vx_adjust = pid_forwd.pid3(Kp_x, Ki_x, Kd_x,
+                                                g_x_error, 0.0, 0.0,
+                                                w1_x, 0.0, 0.0, ControlDim::X, g_dt);
+        g_vy_adjust = pid_forwd.pid3(Kp_y, Ki_y, Kd_y,
+                                                g_y_error, 0.0, 0.0,
+                                                w1_y, 0.0, 0.0, ControlDim::Y, g_dt);
     }
     else
     {
-        vx_adjust = 0.0f;
-        vy_adjust = 0.0f;
+        g_vx_adjust = 0.0f;
+        g_vy_adjust = 0.0f;
     }
 }
 
@@ -256,12 +255,12 @@ Follow::~Follow(void) {};
  ********************************************************************************/
 bool Follow::init(void)
 {
-    target_too_close = false;
-    x_error = 0.0f;
-    y_error = 0.0f;
-    vx_adjust = 0.0f;
-    vy_adjust = 0.0f;
-    vz_adjust = 0.0f;
+    g_target_too_close = false;
+    g_x_error = 0.0f;
+    g_y_error = 0.0f;
+    g_vx_adjust = 0.0f;
+    g_vy_adjust = 0.0f;
+    g_vz_adjust = 0.0f;
 
     return true;
 }

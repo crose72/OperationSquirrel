@@ -1,7 +1,7 @@
 /********************************************************************************
  * @file    main.cpp
  * @author  Cameron Rose
- * @date    6/7/2024
+ * @date    1/22/2025
  * @brief   Main entry point for the program, contains the loop functions for 
             each software component.
  ********************************************************************************/
@@ -15,20 +15,21 @@
 #include <thread>
 #include "common_inc.h"
 #include "datalog.h"
-#include "video_IO.h"
+#include "video_io.h"
 #include "system_controller.h"
-#include "mavlink_msg_handler.h"
-#include "mavlink_cmd_handler.h"
+#include "mav_data_hub.h"
+#include "mav_utils.h"
 #include "vehicle_controller.h"
 #include "detect_target.h"
 #include "track_target.h"
 #include "localize_target.h"
 #include "follow_target.h"
+#include "time_calc.h"
+#include "timer.h"
 
 #ifdef BLD_JETSON_B01
 
-#include "jetson_IO.h"
-#include <jsoncpp/json/json.h> // sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
+#include "status_io.h"
 
 #endif // BLD_JETSON_B01
 
@@ -45,7 +46,6 @@
  ********************************************************************************/
 bool stop_program;
 std::mutex mutex_main;
-DebugTerm MainTerm("");
 
 /********************************************************************************
  * Calibration definitions
@@ -64,7 +64,7 @@ void sig_handler(int signo)
     if (signo == SIGINT)
     {
         stop_program = true;
-        PrintPass::c_fprintf("received SIGINT\n");
+        Print::c_fprintf("received SIGINT\n");
     }
 }
 
@@ -76,7 +76,7 @@ void attach_sig_handler(void)
 {
     if (signal(SIGINT, sig_handler) == SIG_ERR)
     {
-        PrintPass::c_fprintf("can't catch SIGINT");
+        Print::c_fprintf("can't catch SIGINT");
     }
 }
 
@@ -86,9 +86,7 @@ void attach_sig_handler(void)
  ********************************************************************************/
 int main(void)
 {
-    TimeCalc MainAppTime;
-
-    MainAppTime.calc_app_start_time();
+    Timer main_loop(std::chrono::milliseconds(25));
     attach_sig_handler();
     stop_program = false;
 
@@ -99,7 +97,7 @@ int main(void)
 
 #ifdef BLD_JETSON_B01
 
-    while (!stop_program && !save_button_press)
+    while (!stop_program && !g_save_button_press)
 
 #else
 
@@ -108,8 +106,8 @@ int main(void)
 #endif // BLD_JETSON_B01
 
     {
-        MainAppTime.calc_elapsed_time();
         std::lock_guard<std::mutex> lock(mutex_main);
+        main_loop.start_time();
         SystemController::loop();
         MavMsg::loop();
 
@@ -126,9 +124,9 @@ int main(void)
 
         VehicleController::loop();
         DataLogger::loop();
-
-        MainAppTime.loop_rate_controller();
-        MainAppTime.calc_loop_start_time();
+        Time::loop();
+        main_loop.end_time();
+        main_loop.wait();
     }
 
     SystemController::shutdown();

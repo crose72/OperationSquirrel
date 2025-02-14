@@ -1,0 +1,17 @@
+FROM crose72/jetpack-r36.4.0:base
+
+# Set working directory
+WORKDIR /workspace/
+
+# Copy your program into the container (if it's built externally)
+# If the program is built inside the container, make sure it's installed properly
+COPY ../SquirrelDefender/ /workspace/OperationSquirrel/SquirrelDefender/
+
+# Make the binary executable
+RUN chmod +x /workspace/OperationSquirrel/SquirrelDefender/build/squirreldefender
+
+# Set working directory to the program's build directory
+WORKDIR /workspace/OperationSquirrel/SquirrelDefender/build/
+
+# Set the command to run your program when the container starts
+CMD ["./squirreldefender"]

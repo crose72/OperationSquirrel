@@ -1,7 +1,7 @@
 /********************************************************************************
  * @file    sim_flight_test_4_VelocityControl.h
  * @author  Cameron Rose
- * @date    12/27/2023
+ * @date    1/22/2025
  * @brief   Command the drone to follow a NED velocity vector where +x is
  *          forward, +y is right, and +z is down.
  ********************************************************************************/
@@ -10,9 +10,8 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "mavlink_msg_handler.h"
-#include "mavlink_cmd_handler.h"
-#include "velocity_controller.h"
+#include "mav_data_hub.h"
+#include "mav_utils.h"
 
 /********************************************************************************
  * Imported objects
@@ -54,7 +53,7 @@ void test_flight(void)
         target_velocity[0] = 87.0;
         target_velocity[1] = 0;
         target_velocity[2] = 0;
-        VelocityController::cmd_velocity_NED(target_velocity);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
         stage = 1;
     }
 
@@ -63,7 +62,7 @@ void test_flight(void)
         target_velocity[0] = 0.0;
         target_velocity[1] = -87.0;
         target_velocity[2] = 0.0;
-        VelocityController::cmd_velocity_NED(target_velocity);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
         stage = 2;
     }
 
@@ -72,7 +71,7 @@ void test_flight(void)
         target_velocity[0] = -6.0;
         target_velocity[1] = 4.0;
         target_velocity[2] = -11.0;
-        VelocityController::cmd_velocity_NED(target_velocity);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
         stage = 3;
     }
 
@@ -81,12 +80,12 @@ void test_flight(void)
         target_velocity[0] = -6.0;
         target_velocity[1] = 4.0;
         target_velocity[2] = -11.0;
-        VelocityController::cmd_velocity_NED(target_velocity);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
         stage = 4;
     }
 
     if (timerVal > 29 && stage == 4)
     {
-        MavCmd::set_mode_RTL();
+        MavCmd::set_mode_rtl(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
     }
 }

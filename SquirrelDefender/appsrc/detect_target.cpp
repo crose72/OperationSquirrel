@@ -3,7 +3,7 @@
 /********************************************************************************
  * @file    detect_target.cpp
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  * @brief   All methods needed to initialize and create a detection network and
             choose a target.
 ********************************************************************************/
@@ -55,7 +55,11 @@ bool Detection::init(void)
 
     return SSD::init();
 
-#elif BLD_WIN
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+    return YOLO::init();
+
+#elif defined(BLD_WIN)
 
     return YOLO::init();
 
@@ -76,7 +80,11 @@ void Detection::loop(void)
 
     return SSD::loop();
 
-#elif BLD_WIN
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+    return YOLO::loop();
+
+#elif defined(BLD_WIN)
 
     return YOLO::loop();
 
@@ -97,7 +105,11 @@ void Detection::shutdown(void)
 
     return SSD::shutdown();
 
-#elif BLD_WIN
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+    return YOLO::shutdown();
+
+#elif defined(BLD_WIN)
 
     return YOLO::shutdown();
 

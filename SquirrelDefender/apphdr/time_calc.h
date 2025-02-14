@@ -2,7 +2,7 @@
 
 /********************************************************************************
  * @file    time_calc.h
- * @date    6/7/2023
+ * @date    1/22/2025
  ********************************************************************************/
 #ifndef TIME_CALC_H
 #define TIME_CALC_H
@@ -22,30 +22,23 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern float app_elapsed_time;
+extern float g_app_elapsed_time;
+extern float g_dt;
+extern bool g_first_loop_after_start;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
 
-class TimeCalc
+class Time
 {
     public:
-        TimeCalc();
-        ~TimeCalc();
+        Time();
+        ~Time();
 
-        std::chrono::time_point<std::chrono::steady_clock> app_start_time;
-        std::chrono::time_point<std::chrono::steady_clock> app_end_time;
-        std::chrono::time_point<std::chrono::steady_clock> loop_start_time;
-        std::chrono::time_point<std::chrono::steady_clock> loop_end_time;
-        std::chrono::milliseconds loop_duration;
-
-        void calc_app_start_time(void);
-        void calc_app_end_time(void);
-        void calc_loop_start_time(void);
-        void calc_loop_end_time(void);
-        void loop_rate_controller(void);
-        void calc_elapsed_time(void);
+        static bool init(void);
+        static void loop(void);
+        static void shutdown(void);
 
     private:
     };

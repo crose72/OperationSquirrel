@@ -3,7 +3,7 @@
 /********************************************************************************
  * @file    datalog.h
  * @author  Cameron Rose
- * @date    6/7/2023
+ * @date    1/22/2025
  ********************************************************************************/
 #ifndef DATALOG_H
 #define DATALOG_H
@@ -17,111 +17,112 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "mavlink_msg_handler.h"
+#include "mav_data_hub.h"
 #include "follow_target.h"
 #include "track_target.h"
 #include "localize_target.h"
 #include "detect_target.h"
+#include "time_calc.h"
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
 /* Mavlink variables */
-extern float app_elapsed_time;
+extern float g_app_elapsed_time;
 
-extern uint16_t mav_veh_sys_stat_voltage_battery;
-extern int16_t mav_veh_sys_stat_current_battery;
-extern int8_t mav_veh_sys_stat_battery_remaining;
+extern uint16_t g_mav_veh_sys_stat_voltage_battery;
+extern int16_t g_mav_veh_sys_stat_current_battery;
+extern int8_t g_mav_veh_sys_stat_battery_remaining;
 
-extern int32_t mav_veh_rel_alt;
-extern int16_t mav_veh_gps_vx;
-extern int16_t mav_veh_gps_vy;
-extern int16_t mav_veh_gps_vz;
-extern uint16_t mav_veh_gps_hdg;
+extern int32_t g_mav_veh_rel_alt;
+extern int16_t g_mav_veh_gps_vx;
+extern int16_t g_mav_veh_gps_vy;
+extern int16_t g_mav_veh_gps_vz;
+extern uint16_t g_mav_veh_gps_hdg;
 
-extern float mav_veh_roll;
-extern float mav_veh_pitch;
-extern float mav_veh_yaw;
-extern float mav_veh_rollspeed;
-extern float mav_veh_pitchspeed;
-extern float mav_veh_yawspeed;
-extern int16_t mav_veh_imu_ax;
-extern int16_t mav_veh_imu_ay;
-extern int16_t mav_veh_imu_az;
-extern int16_t mav_veh_imu_xgyro;
-extern int16_t mav_veh_imu_ygyro;
-extern int16_t mav_veh_imu_zgyro;
+extern float g_mav_veh_roll;
+extern float g_mav_veh_pitch;
+extern float g_mav_veh_yaw;
+extern float g_mav_veh_rollspeed;
+extern float g_mav_veh_pitchspeed;
+extern float g_mav_veh_yawspeed;
+extern int16_t g_mav_veh_imu_ax;
+extern int16_t g_mav_veh_imu_ay;
+extern int16_t g_mav_veh_imu_az;
+extern int16_t g_mav_veh_imu_xgyro;
+extern int16_t g_mav_veh_imu_ygyro;
+extern int16_t g_mav_veh_imu_zgyro;
 
-extern uint16_t mav_veh_rngfdr_current_distance;
-extern uint8_t mav_veh_rngfdr_signal_quality;
+extern uint16_t g_mav_veh_rngfdr_current_distance;
+extern uint8_t g_mav_veh_rngfdr_signal_quality;
 
-extern float mav_veh_flow_comp_m_x;
-extern float mav_veh_flow_comp_m_y;
-extern int16_t mav_veh_flow_x;
-extern int16_t mav_veh_flow_y;
-extern uint8_t mav_veh_flow_quality;
-extern float mav_veh_flow_rate_x;
-extern float mav_veh_flow_rate_y;
+extern float g_mav_veh_flow_comp_m_x;
+extern float g_mav_veh_flow_comp_m_y;
+extern int16_t g_mav_veh_flow_x;
+extern int16_t g_mav_veh_flow_y;
+extern uint8_t g_mav_veh_flow_quality;
+extern float g_mav_veh_flow_rate_x;
+extern float g_mav_veh_flow_rate_y;
 
-extern float mav_veh_local_ned_x;
-extern float mav_veh_local_ned_y;
-extern float mav_veh_local_ned_z;
-extern float mav_veh_local_ned_vx;
-extern float mav_veh_local_ned_vy;
-extern float mav_veh_local_ned_vz;
+extern float g_mav_veh_local_ned_x;
+extern float g_mav_veh_local_ned_y;
+extern float g_mav_veh_local_ned_z;
+extern float g_mav_veh_local_ned_vx;
+extern float g_mav_veh_local_ned_vy;
+extern float g_mav_veh_local_ned_vz;
 
-extern float mav_veh_q1_actual;
-extern float mav_veh_q2_actual;
-extern float mav_veh_q3_actual;
-extern float mav_veh_q4_actual;
-extern float mav_veh_roll_rate_actual;
-extern float mav_veh_pitch_rate_actual;
-extern float mav_veh_yaw_rate_actual;
-extern float mav_veh_repr_offset_q[4];
+extern float g_mav_veh_q1_actual;
+extern float g_mav_veh_q2_actual;
+extern float g_mav_veh_q3_actual;
+extern float g_mav_veh_q4_actual;
+extern float g_mav_veh_roll_rate_actual;
+extern float g_mav_veh_pitch_rate_actual;
+extern float g_mav_veh_yaw_rate_actual;
+extern float g_mav_veh_repr_offset_q[4];
 
-extern uint8_t mav_veh_type;
-extern uint8_t mav_veh_autopilot_type;
-extern uint8_t mav_veh_base_mode;
-extern uint32_t mav_veh_custom_mode;
-extern uint8_t mav_veh_state;
-extern uint8_t mav_veh_mavlink_version;
+extern uint8_t g_mav_veh_type;
+extern uint8_t g_mav_veh_autopilot_type;
+extern uint8_t g_mav_veh_base_mode;
+extern uint32_t g_mav_veh_custom_mode;
+extern uint8_t g_mav_veh_state;
+extern uint8_t g_mav_veh_mavlink_version;
 
 /* Detect/Track target variables */
-extern bool target_valid;
-extern int target_detection_ID;
-extern int target_track_ID;
-extern float target_cntr_offset_x;
-extern float target_cntr_offset_y;
-extern float target_height;
-extern float target_width;
-extern float target_aspect;
-extern float target_left;
-extern float target_right;
-extern float target_top;
-extern float target_bottom;
+extern bool g_target_valid;
+extern int g_target_detection_id;
+extern int g_target_track_id;
+extern float g_target_cntr_offset_x;
+extern float g_target_cntr_offset_y;
+extern float g_target_height;
+extern float g_target_width;
+extern float g_target_aspect;
+extern float g_target_left;
+extern float g_target_right;
+extern float g_target_top;
+extern float g_target_bottom;
 
 /* Localize target variables*/
 extern float d_object_h;
 extern float d_object_w;
-extern float x_object;
-extern float y_object;
-extern float z_object;
+extern float g_x_object;
+extern float g_y_object;
+extern float g_z_object;
 extern float d_object;
-extern float x_error;
-extern float y_error;
-extern float delta_angle;
-extern float camera_tilt_angle;
-extern float delta_d_x;
-extern float delta_d_z;
+extern float g_x_error;
+extern float g_y_error;
+extern float g_delta_angle;
+extern float g_camera_tilt_angle;
+extern float g_delta_d_x;
+extern float g_delta_d_z;
 
 /* Follow target variables */
-extern bool target_too_close;
-extern float vx_adjust;
-extern float vy_adjust;
-extern float vz_adjust;
+extern bool g_target_too_close;
+extern float g_vx_adjust;
+extern float g_vy_adjust;
+extern float g_vz_adjust;
 
 /* System variables */
-extern SYSTEM_STATE system_state;
+extern SystemState g_system_state;
 
 /********************************************************************************
  * Exported objects

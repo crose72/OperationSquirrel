@@ -45,16 +45,22 @@ project(SquirrelDefender)
 #     - Windows: Additional DLL dependencies might be in System32
 #=============================================================================
 
+#=============================================================================
+# Build Options (manually choose the options for your build)
+#=============================================================================
+
 # Option to use environment variables for library paths
 option(USE_ENV_VAR "Use environment variables for library paths" OFF)
 
 # Choose ONLY ONE platform for the build (BLD_JETSON_B01, BLD_WSL, BLD_WIN) 
-option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" ON)
+option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" OFF)
+option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" ON)
 option(BLD_WSL "Compiling for BLD_WSL" OFF)
 option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
-option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" ON)
+option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
+option(ENABLE_GDB "Enable GNU debugging - TURN OFF FOR FINAL BUILD" OFF)
 
 # Ensure only one build platform is selected
 set(BUILD_PLATFORMS 0)
@@ -75,9 +81,14 @@ if(BUILD_PLATFORMS GREATER 1)
     message(FATAL_ERROR "Error: More than one build platform option is selected. Please select only one of the following options: BLD_JETSON_B01, BLD_WSL, or other supported options.")
 endif()
 
-# Set the C++ standard
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+if(BLD_JETSON_B01 OR BLD_WIN)
+    # Set the C++ standard
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED True)
+else()
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED True)
+endif()
 
 # Set the policy for IN_LIST support
 if(POLICY CMP0057)
@@ -87,7 +98,6 @@ endif()
 if(POLICY CMP0146)
     cmake_policy(SET CMP0146 OLD)  # Allows the use of find_package(CUDA)
 endif()
-
 
 # Define valid build types
 set(VALID_BUILD_TYPES Debug Release)
@@ -119,6 +129,12 @@ else()
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 endif()
 
+# Enable GNU debugger
+if (ENABLE_GDB)
+    set(CMAKE_BUILD_TYPE Debug)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+endif()
+
 # Function to set compilation flags for specific target
 function(set_target_debug_flags target)
     if(MSVC)
@@ -146,10 +162,13 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
     add_definitions(-DRELEASE_BUILD)
 endif()
 
+# Computer Vision options
 if (BLD_JETSON_B01)
     add_definitions(-DENABLE_CV)
     message("Enabled video and computer vision functionality.")
-
+elseif (BLD_JETSON_ORIN_NANO)
+    add_definitions(-DENABLE_CV)
+    message("Enabled video and computer vision functionality.")
 elseif(BLD_WIN)
     if (WIN_ENABLE_CV)
         add_definitions(-DENABLE_CV)
@@ -162,8 +181,12 @@ endif()
 # Optionally include code that is specific to different platforms
 if (BLD_JETSON_B01)
     add_definitions(-DBLD_JETSON_B01)
-    add_definitions(-DBLD_JETSON_B01_SERIAL)
+    add_definitions(-DBLD_JETSON_SERIAL)
     message("Building for BLD_JETSON_B01 with serial comms.")
+elseif (BLD_JETSON_ORIN_NANO)
+    add_definitions(-DBLD_JETSON_ORIN_NANO)
+    add_definitions(-DBLD_JETSON_SERIAL)
+    message("Building for BLD_JETSON_ORIN_NANO with serial comms.")
 elseif(BLD_WSL)
     add_definitions(-DBLD_WSL)
     add_definitions(-DBLD_WSL_TCP)
@@ -182,10 +205,9 @@ else()
     message(FATAL_ERROR "Invalid build options.")
 endif()
 
-# Directories common to all builds
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tests)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc/mavlink/v2.0/common)
+#=============================================================================
+# Find External Libraries and Headers
+#=============================================================================
 
 # Environment variable validation and inclusion based on platform
 if(USE_ENV_VAR)
@@ -232,6 +254,26 @@ if(USE_ENV_VAR)
         link_directories($ENV{LIB_OPENCV})
         link_directories($ENV{LIB_CUDA})
         link_directories($ENV{LIB_TEGRA})
+    elseif(BLD_JETSON_ORIN_NANO)
+        # Validate required Jetson environment variables
+        foreach(var LIB_JETSONINFERENCE LIB_JETSONUTILS LIB_OPENCV LIB_CUDA LIB_TEGRA
+                    HDR_JETSONINFERENCE HDR_JETSONUTILS HDR_OPENCV HDR_CUDA)
+            if(NOT DEFINED ENV{${var}})
+                message(FATAL_ERROR "Environment variable ${var} is not defined")
+            endif()
+        endforeach()
+
+        # Include Jetson-specific directories from environment variables
+        include_directories($ENV{HDR_JETSONINFERENCE})
+        include_directories($ENV{HDR_JETSONUTILS})
+        include_directories($ENV{HDR_OPENCV})
+        include_directories($ENV{HDR_CUDA})
+
+        link_directories($ENV{LIB_JETSONINFERENCE})
+        link_directories($ENV{LIB_JETSONUTILS})
+        link_directories($ENV{LIB_OPENCV})
+        link_directories($ENV{LIB_CUDA})
+        link_directories($ENV{LIB_TEGRA})
     endif()
 else()
     # Default paths when not using environment variables
@@ -263,7 +305,27 @@ else()
             /usr/local/cuda/lib64
             /usr/lib/aarch64-linux-gnu/tegra
         )
+
+    elseif(BLD_JETSON_ORIN_NANO)
+        include_directories(
+            /usr/local/cuda/include
+            /usr/include/opencv4
+        )
+
+        link_directories(
+            /usr/local/lib
+            /usr/local/cuda/lib64
+            /usr/lib/aarch64-linux-gnu/tegra
+        )
     endif()
+endif()
+
+# CMAKE modules path for Find* files and other cmake specific things
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
+# TODO: Specify the path to TensorRT root dir
+if (NOT TensorRT_DIR)
+    set(TensorRT_DIR /home/cyrus/work/libs/TensorRT-10.0.0.6/)
 endif()
 
 # Find required packages
@@ -272,10 +334,54 @@ if(BLD_JETSON_B01)
     find_package(OpenCV REQUIRED)
     find_package(jetson-utils REQUIRED)
     find_package(jetson-inference REQUIRED)
-    
     message(STATUS "Attempting to find JetsonGPIO library...")
     find_library(JETSON_GPIO_LIB JetsonGPIO)
+elseif(BLD_JETSON_ORIN_NANO)
+    find_package(CUDA REQUIRED)
+    find_package(OpenCV REQUIRED)
+    find_package(TensorRT REQUIRED)
+    find_package(vpi 3.2 REQUIRED)
 endif()
+
+#=============================================================================
+# Modules
+#=============================================================================
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/mavlink/v2.0/common)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolo_utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/pid)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/timer)
+
+file(GLOB MAV_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.cpp)
+file(GLOB MAV_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.h)
+file(GLOB SERIAL_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils/*.cpp)
+file(GLOB SERIAL_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils/*.h)
+file(GLOB MATH_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils/*.cpp)
+file(GLOB MATH_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils/*.h)
+file(GLOB JSON_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils/*.cpp)
+file(GLOB JSON_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils/*.h)
+file(GLOB YOLO_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/yolo_utils/*.cpp)
+file(GLOB YOLO_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/yolo_utils/*.h)
+file(GLOB PRINT_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils/*.cpp)
+file(GLOB PRINT_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils/*.h)
+file(GLOB PID_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/pid/*.cpp)
+file(GLOB PID_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/pid/*.h)
+file(GLOB TIMER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/timer/*.cpp)
+file(GLOB TIMER_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/timer/*.h)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt)
+
+#=============================================================================
+# Set Source files and locations
+#=============================================================================
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 
 # squirreldefender and source file paths
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/appsrc)
@@ -284,6 +390,18 @@ set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
 # List all source files with .cpp extension
 file(GLOB SOURCES ${SOURCE_DIR}/*.cpp)
 file(GLOB HEADERS ${HEADER_DIR}/*.h)
+
+# Additional source files to compile together
+list(APPEND SOURCES ${MAV_UTILS_SOURCES} ${SERIAL_UTILS_SOURCES} ${MATH_UTILS_SOURCES} 
+                    ${JSON_UTILS_SOURCES} ${PRINT_UTILS_SOURCES} ${YOLO_UTILS_SOURCES} 
+                    ${PID_SOURCES} ${TIMER_SOURCES})
+list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HEADERS} 
+                    ${JSON_UTILS_HEADERS} ${PRINT_UTILS_HEADERS} ${YOLO_UTILS_HEADERS} 
+                    ${PID_HEADERS} ${TIMER_HEADERS})
+
+#=============================================================================
+# Build Executable
+#=============================================================================
 
 # Compile the squirreldefender program
 if (BLD_JETSON_B01)
@@ -295,6 +413,20 @@ if (BLD_JETSON_B01)
                         ${JETSON_GPIO_LIB}
                         jetson-inference
                         jetson-utils
+                        jsoncpp)
+elseif (BLD_JETSON_ORIN_NANO)
+    cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
+    set_target_debug_flags(squirreldefender)
+
+    target_include_directories(squirreldefender PRIVATE modules/yolov8_tensorrt/src)
+
+    target_link_libraries(squirreldefender 
+                        YoloV8_TRT 
+                        ${OpenCV_LIBS} 
+                        vpi opencv_core
+                        opencv_imgproc 
+                        opencv_imgcodecs 
+                        opencv_videoio
                         jsoncpp)
 elseif(BLD_WSL)
     add_executable(squirreldefender ${SOURCES} ${HEADERS})
@@ -310,8 +442,8 @@ elseif(BLD_WIN)
             NO_DEFAULT_PATH)  # Only look in specified paths
     else()
         find_package(OpenCV REQUIRED
-            PATHS "C:/opencv/opencv-4.10.0/install"
-                  "C:/opencv/opencv-4.10.0/install/x64/vc17"
+            PATHS "C:/opencv/4.10.0/install"
+                  "C:/opencv/4.10.0/install/x64/vc17"
             NO_DEFAULT_PATH)
     endif()
 
