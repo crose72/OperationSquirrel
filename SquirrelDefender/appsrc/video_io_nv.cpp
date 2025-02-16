@@ -133,8 +133,8 @@ bool create_output_vid_stream(void)
     options.resource.location = file_name;
     options.deviceType = videoOptions::DeviceType::DEVICE_FILE;
     options.ioType = videoOptions::IoType::OUTPUT;
-    options.codec = videoOptions::Codec::CODEC_H264;
-    options.codecType = videoOptions::CodecType::CODEC_OMX;
+    //options.codec = videoOptions::Codec::CODEC_H264;
+    //options.codecType = videoOptions::CodecType::CODEC_OMX;
     options.width = 1280;
     options.height = 720;
     options.frameRate = 30;

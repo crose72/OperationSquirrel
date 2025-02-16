@@ -23,6 +23,8 @@
 #include <jetson-inference/objectTrackerKLT.h>
 #include "video_io.h"
 #include "json_utils.h"
+#include <NvInfer.h>
+#include <NvInferLegacyDims.h>
 
 /********************************************************************************
  * Imported objects

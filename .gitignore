@@ -9,3 +9,5 @@
 /SquirrelDefender/out/build/x64-Release
 /SquirrelDefender/build/x64-Release
 /SquirrelDefender/build
+/.vscode/settings.json
+/build

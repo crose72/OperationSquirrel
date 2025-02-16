@@ -67,18 +67,25 @@ bool create_detection_network(void)
 
     //const char *model = "../networks/SSD-Mobilenet-v2/ssd_mobilenet_v2_coco.uff";
     //const char *class_labels = "../networks/SSD-Mobilenet-v2/ssd_coco_labels.txt";
-    const char *model = "../networks/SSD-Inception-v2/ssd_inception_v2_coco.uff";
-    const char *class_labels = "../networks/SSD-Inception-v2/ssd_coco_labels.txt";
+    //const char *model = "../networks/SSD-Inception-v2/ssd_inception_v2_coco.uff";
+    const char *model = "../networks/yolov5m/yolov5m.onnx";
+    const char *class_labels = "../networks/yolov5m/coco.names";
     float thresh = (float)0.5;
-    const char *input_blob = "Input";
-    const char *output_blob = "NMS"; // for SSD
+    //const char *input_blob = "Input";
+    const char *input_blob = "images";
+    //const char *output_blob = "NMS"; // for SSD
+    const char *output_blob = "output0"; // for SSD
     //const char *output_blob = "MarkOutput_0"; // for yolo?
-    Dims3 inputDims(3, 720, 1280);
-    const char *output_count = "NMS_1";
+    //Dims3 inputDims(3, 720, 1280);
+    //Dims3 inputDims(3, 640, 640);
+    nvinfer1::Dims4 inputDims(1, 3, 640, 640);
+    //const char *output_count = "NMS_1";
+    const char *output_count = nullptr;
 
-    g_net = detectNet::Create("SSD_Inception_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
+    //g_net = detectNet::Create("SSD_Inception_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
     // g_net = detectNet::Create("SSD_Mobilenet_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
     //g_net = detectNet::Create(model, class_labels, thresh, input_blob, inputDims, output_blob, output_count); // load model from specific path
+    g_net = detectNet::Create(model, class_labels, thresh, input_blob, inputDims, output_blob, output_count); // load model from specific path
     g_net->SetTracker(objectTrackerIOU::Create(min_frames, drop_frames, overlap_thresh));
 
     if (!g_net)
@@ -136,8 +143,10 @@ bool SSD::init(void)
     g_detections = NULL;
     g_detection_count = 0;
 
+    std::cout << "\n\n\n made it here! \n\n\n" << std::endl;
     if (!create_detection_network())
     {
+        std::cout << "\n\n\n made it here! \n\n\n" << std::endl;
         Print::c_fprintf("Failed to create detection network");
         return false;
     }
