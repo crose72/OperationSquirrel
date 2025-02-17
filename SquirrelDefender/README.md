@@ -60,7 +60,7 @@ sudo ./squirreldefender
 ### Prerequisites (docker method):
 
 - Docker
-- Nvidia container runtime (if not already installed can follow the instructions at [ISAAC-ROS-Setup.md](https://github.com/crose72/OperationSquirrel/blob/dev/docs/ISAAC-ROS-Setup))
+- Nvidia container runtime (if not already installed can follow the instructions at [ISAAC-ROS-Setup.md](https://github.com/crose72/OperationSquirrel/blob/dev/docs/ISAAC-ROS-Setup.md))
 - Jetpack 6.1 (~r36.4 I reckon this should work with Jetpack 6.2, I will try it shortly but I haven't verified it yet)
 
 ### Setup:
@@ -79,9 +79,26 @@ git clone https://github.com/crose72/OperationSquirrel.git --recursive
 export DISPLAY=:0
 export OS_WS=/home/<user>/workspaces/os-dev/
 
+# Restart terminal, or source .bashrc:
+source ~/.bashrc
+
 # Enable xserver and display access to the docker container 
 # Might need to do before each time running the container
 xhost +
+
+# If you get an error, "unable to open dislay :0", try setting to :1 & repeat
+# If successfull, you should see something like this:
+~/workspaces/os-dev/OperationSquirrel$ xhost +
+access control disabled, clients can connect from any host
+
+# If you get an error opening your csi camera, and are running Jetpack 6.2, 
+# try following these instructions and enable the CSI camera for
+sudo /opt/nvidia/jetson-io/jetson-io.py
+Configure Jetson 24pin CSI Connector
+Configure for compatible hardware
+Camera IMX219 Dual (or whatever CSI camera you're using)
+(save, exit, reboot)
+
 
 # Run the container
 ./scripts/run_dev.sh
@@ -93,6 +110,7 @@ nvgstcapture-1.0
 ### Dev container - compiling and running squirreldefender:
 
 Outside of the container edit `SquirrelDefender/CMakeLists.txt` file and enable `BLD_JETSON_ORIN_NANO`.
+Inside the container, do the following:
 
 ```
 # Build

@@ -43,4 +43,4 @@ You have now successfully setup SITL
 
 ## How to use our code to communicate with SITL
 
-Read [02-Connecting-WSL-and-Jetson-Nano-to-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/Docs/02-Connecting-WSL-and-Jetson-Nano-to-SITL.md) to learn how to use control a simulated or real drone with the code.
+Read [02-Connecting-WSL-and-Jetson-Nano-to-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/02-Connecting-to-SITL.md) to learn how to use control a simulated or real drone with the code.
