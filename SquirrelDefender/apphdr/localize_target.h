@@ -14,18 +14,13 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "video_io.h"
-#include "detect_target.h"
+#include "track_target.h"
 #include "json_utils.h"
 #include "interpolate.h"
-
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern uint16_t g_mav_veh_rngfdr_min_distance;
-extern uint16_t g_mav_veh_rngfdr_max_distance;
-extern uint16_t g_mav_veh_rngfdr_current_distance;
 extern float g_mav_veh_pitch;
 extern bool g_target_valid;
 extern int g_target_detection_id;

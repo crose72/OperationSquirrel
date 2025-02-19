@@ -381,7 +381,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt)
 #=============================================================================
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tests)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/test_flights)
 
 # squirreldefender and source file paths
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/appsrc)
@@ -421,6 +421,29 @@ elseif (BLD_JETSON_ORIN_NANO)
     target_include_directories(squirreldefender PRIVATE modules/yolov8_tensorrt/src)
 
     target_link_libraries(squirreldefender 
+                        YoloV8_TRT 
+                        ${OpenCV_LIBS} 
+                        vpi opencv_core
+                        opencv_imgproc 
+                        opencv_imgcodecs 
+                        opencv_videoio
+                        jsoncpp)
+
+    # Localize target test code
+    list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/appsrc/main.cpp")
+    file(GLOB TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_utils/*.cpp)
+    file(GLOB TEST_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_utils/*.h)
+    list(APPEND SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_localize_target.cpp ${TEST_SOURCES})
+    list(APPEND HEADERS ${TEST_HEADERS})
+
+    message(STATUS "Final SOURCES list: ${SOURCES}")
+
+    cuda_add_executable(test_localize_target ${SOURCES} ${HEADERS})
+    set_target_debug_flags(test_localize_target)
+
+    target_include_directories(test_localize_target PRIVATE modules/yolov8_tensorrt/src)
+
+    target_link_libraries(test_localize_target 
                         YoloV8_TRT 
                         ${OpenCV_LIBS} 
                         vpi opencv_core
