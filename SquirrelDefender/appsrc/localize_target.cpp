@@ -137,12 +137,9 @@ void calc_target_offest(void)
     float delta_d;
     float target_bounding_box_rate;
 
-    g_target_center_y = (g_target_left + g_target_right) / 2.0f;
-    g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-
     if (g_target_valid && 
-        (!(g_target_center_x < 100.0 || g_target_center_x > 620) && 
-        !(g_target_center_y < 100.0 || g_target_center_x > 1180) && 
+        (!(g_target_center_x < 50.0 || g_target_center_x > 670) && 
+        !(g_target_center_y < 50.0 || g_target_center_x > 1230) && 
         !((g_target_width * g_target_height) < 11178.0)))
     {
         /* Calculate distance from camera offset */

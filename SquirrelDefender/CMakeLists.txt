@@ -431,15 +431,14 @@ elseif (BLD_JETSON_ORIN_NANO)
     # Test source base
     list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/appsrc/main.cpp")
     set(TEST_SOURCE_BASE ${SOURCES})
-    file(GLOB TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_utils/*.cpp)
-    file(GLOB TEST_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_utils/*.h)
+    file(GLOB TEST_UTIL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_utils/*.cpp)
+    file(GLOB TEST_UTIL_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_utils/*.h)
+    list(APPEND TEST_SOURCE_BASE ${TEST_UTIL_SOURCES})
 
     # Localize target test code
     set(LOC_TEST_SOURCES ${TEST_SOURCE_BASE})
-    list(APPEND LOC_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_localize_target.cpp ${TEST_SOURCES})
-    list(APPEND LOC_TEST_HEADERS ${TEST_HEADERS})
-
-    # message(STATUS "Final SOURCES list: ${SOURCES}")
+    list(APPEND LOC_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_localize_target.cpp)
+    list(APPEND LOC_TEST_HEADERS ${TEST_UTIL_HEADERS})
 
     cuda_add_executable(test_localize_target ${LOC_TEST_SOURCES} ${LOC_TEST_HEADERS})
     set_target_debug_flags(test_localize_target)
@@ -457,10 +456,9 @@ elseif (BLD_JETSON_ORIN_NANO)
 
     # Follow target test code
     set(FOLLOW_TEST_SOURCES ${TEST_SOURCE_BASE})
-    list(APPEND FOLLOW_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_follow_target.cpp ${TEST_SOURCES})
-    list(APPEND FOLLOW_TEST_HEADERS ${TEST_HEADERS})
+    list(APPEND FOLLOW_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_follow_target.cpp)
+    list(APPEND FOLLOW_TEST_HEADERS ${TEST_UTIL_HEADERS})
 
-    # Follow target test code
     cuda_add_executable(test_follow_target ${FOLLOW_TEST_SOURCES} ${FOLLOW_TEST_HEADERS})
     set_target_debug_flags(test_follow_target)
 

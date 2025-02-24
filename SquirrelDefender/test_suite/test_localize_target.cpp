@@ -57,7 +57,7 @@ void setup(void)
 void run(void)
 {
     // Create csv file to save outputs to
-    std::ofstream outputFile("localize_output_1_filtered.csv");
+    std::ofstream outputFile("localize_output_2_filtered.csv");
     if (!outputFile.is_open()) 
     {
         std::cerr << "Error opening output file!" << std::endl;
