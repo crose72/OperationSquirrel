@@ -1,11 +1,12 @@
 #include "test_utils/test_csv_utils.h"
 #include "localize_target.h"
+#include "follow_target.h"
 #include "time_calc.h"
 
 /********************************************************************************
  * Setup
  ********************************************************************************/
-std::string filename = "../test_suite/data_1.csv";
+std::string filename = "../test_suite/data.csv";
 std::vector<float> g_app_elapsed_time_arr;
 std::vector<float> g_mav_veh_pitch_arr;
 std::vector<float> g_target_valid_arr;
@@ -52,12 +53,14 @@ void setup(void)
 
     // Initialize all inputs to the software component  
     Localize::init();
+    Follow::init();
+    Time::init();
 }
 
 void run(void)
 {
     // Create csv file to save outputs to
-    std::ofstream outputFile("localize_output_1_filtered.csv");
+    std::ofstream outputFile("follow_output.csv");
     if (!outputFile.is_open()) 
     {
         std::cerr << "Error opening output file!" << std::endl;
@@ -91,7 +94,13 @@ void run(void)
                 << "g_camera_tilt_angle,"
                 << "g_delta_d_x,"
                 << "g_delta_d_z,"
-                << "g_camera_comp_angle\n";
+                << "g_camera_comp_angle,"
+                << "g_target_too_close,"
+                << "g_x_error,"
+                << "g_y_error,"
+                << "g_vx_adjust,"
+                << "g_vy_adjust,"
+                << "g_vz_adjust\n";
 
     // Get max number of rows to ensure all data is included
     size_t num_rows = g_app_elapsed_time_arr.size();
@@ -118,6 +127,8 @@ void run(void)
 
             // Call Localize::loop() to calculate it's outputs
             Localize::loop();
+            Follow::loop();
+            Time::loop();
             
             // Write the latest values of global variables directly to the CSV
             outputFile << g_app_elapsed_time << ","
@@ -146,7 +157,13 @@ void run(void)
                        << g_camera_tilt_angle << ","
                        << g_delta_d_x << ","
                        << g_delta_d_z << ","
-                       << g_camera_comp_angle << "\n";
+                       << g_camera_comp_angle << ","
+                       << g_target_too_close << ","
+                       << g_x_error << ","
+                       << g_y_error << ","
+                       << g_vx_adjust << ","
+                       << g_vy_adjust << ","
+                       << g_vz_adjust << "\n";
         }
        
     }

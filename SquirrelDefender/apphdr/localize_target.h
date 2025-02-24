@@ -17,6 +17,7 @@
 #include "track_target.h"
 #include "json_utils.h"
 #include "interpolate.h"
+#include "time_calc.h"
 
 /********************************************************************************
  * Imported objects
@@ -34,16 +35,18 @@ extern float g_target_left;
 extern float g_target_right;
 extern float g_target_top;
 extern float g_target_bottom;
+extern float g_target_center_x;
+extern float g_target_center_y;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern float d_object_h;
-extern float d_object_w;
-extern float g_x_object;
-extern float g_y_object;
-extern float g_z_object;
-extern float d_object;
+extern float d_target_h;
+extern float d_target_w;
+extern float g_x_target;
+extern float g_y_target;
+extern float g_z_target;
+extern float d_target;
 extern float g_x_error;
 extern float g_y_error;
 extern float g_delta_angle;

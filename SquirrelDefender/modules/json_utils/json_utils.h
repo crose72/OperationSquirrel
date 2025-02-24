@@ -32,11 +32,11 @@
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class json_utils
+class JSONUtils
 {
 public:
-    json_utils(const std::string &filename);
-    ~json_utils();
+    JSONUtils(const std::string &filename);
+    ~JSONUtils();
 
     float get_float_param(const std::string &group, const std::string &key) const;
     uint32_t get_uint32_param(const std::string &group, const std::string &key) const;
