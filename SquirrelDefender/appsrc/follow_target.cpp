@@ -75,17 +75,17 @@ float y_desired;
 #else // RELEASE_BUILD
 
 /* x forward */
-const float Kp_x = 0.75f;
+const float Kp_x = 0.5f;
 const float Ki_x = 0.009f;
-const float Kd_x = 0.25f;
+const float Kd_x = 0.1f;
 const float w1_x = 1.0f;
 const float w2_x = 0.0f;
 const float w3_x = 0.0f;
 
 /* y forward */
-const float Kp_y = 0.75f;
+const float Kp_y = 0.3f;
 const float Ki_y = 0.009f;
-const float Kd_y = 0.25f;
+const float Kd_y = 0.2f;
 const float w1_y = 1.0f;
 const float w2_y = 0.0f;
 const float w3_y = 0.0f;
@@ -115,7 +115,7 @@ const uint16_t vehicle_rel_height_err = 0.0f;
 const uint16_t vehicle_height_desired = 0.0f;
 const float target_height_desired = 0.0f;
 const float target_width_desired = 0.0f;
-const float x_desired = 1.0f; // Make const in the end
+const float x_desired = 2.0f; // Make const in the end
 const float y_desired = 0.0f; // Make const in the ends
 
 #endif // DEBUG_BUILD
