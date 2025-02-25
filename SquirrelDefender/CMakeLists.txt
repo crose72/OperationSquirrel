@@ -49,9 +49,6 @@ project(SquirrelDefender)
 # Build Options (manually choose the options for your build)
 #=============================================================================
 
-# Option to use environment variables for library paths
-option(USE_ENV_VAR "Use environment variables for library paths" OFF)
-
 # Choose ONLY ONE platform for the build (BLD_JETSON_B01, BLD_WSL, BLD_WIN) 
 option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" OFF)
 option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" ON)
@@ -60,7 +57,14 @@ option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
-option(ENABLE_GDB "Enable GNU debugging - TURN OFF FOR FINAL BUILD" ON)
+option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" ON)
+
+# Option to use environment variables for library paths
+option(USE_ENV_VAR "Use environment variables for library paths" OFF)
+
+#=============================================================================
+# Verify Build Combinations are Valid
+#=============================================================================
 
 # Ensure only one build platform is selected
 set(BUILD_PLATFORMS 0)
@@ -81,59 +85,37 @@ if(BUILD_PLATFORMS GREATER 1)
     message(FATAL_ERROR "Error: More than one build platform option is selected. Please select only one of the following options: BLD_JETSON_B01, BLD_WSL, or other supported options.")
 endif()
 
-if(BLD_JETSON_B01 OR BLD_WIN)
-    # Set the C++ standard
-    set(CMAKE_CXX_STANDARD 11)
-    set(CMAKE_CXX_STANDARD_REQUIRED True)
-else()
-    set(CMAKE_CXX_STANDARD 17)
-    set(CMAKE_CXX_STANDARD_REQUIRED True)
-endif()
+#=============================================================================
+# CMAKE specific settings
+#=============================================================================
 
-# Set the policy for IN_LIST support
+# Set C++ version
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Set the policy for IN_LIST support (since we are using the IN_LIST functionality in cmake)
 if(POLICY CMP0057)
   cmake_policy(SET CMP0057 NEW)
 endif()
 
+# Allow using find_package(CUDA)
 if(POLICY CMP0146)
-    cmake_policy(SET CMP0146 OLD)  # Allows the use of find_package(CUDA)
+    cmake_policy(SET CMP0146 OLD)
 endif()
 
-# Define valid build types
-set(VALID_BUILD_TYPES Debug Release)
+# CMAKE modules path for Find* files and other cmake specific things
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
+#=============================================================================
+# Debugging Settings
+#=============================================================================
 
 # Validate CMAKE_BUILD_TYPE
-if(NOT MSVC)
-    if(NOT CMAKE_BUILD_TYPE)
-        message(FATAL_ERROR "Invalid build type: ${CMAKE_BUILD_TYPE}. Choose either Debug or Release.")
-    endif()
+if(NOT CMAKE_BUILD_TYPE)
+    message(FATAL_ERROR "Invalid build type: ${CMAKE_BUILD_TYPE}. Choose either Debug or Release.")
 endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-
-# Modified compiler flags for different platforms
-if(MSVC)
-    # MSVC-specific flags
-    set(CMAKE_CXX_FLAGS_DEBUG "/Zi /Od /MDd")  # Debug symbols, no optimization
-    set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG /MT")  # Full optimization
-
-    # Correctly set iterator debug level based on configuration
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_definitions(-D_ITERATOR_DEBUG_LEVEL=2)
-    else()
-        add_definitions(-D_ITERATOR_DEBUG_LEVEL=0)
-    endif()
-else()
-    # GCC/Clang flags
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
-endif()
-
-# Enable GNU debugger
-if (ENABLE_GDB)
-    set(CMAKE_BUILD_TYPE Debug)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-endif()
 
 # Function to set compilation flags for specific target
 function(set_target_debug_flags target)
@@ -155,38 +137,23 @@ function(set_target_debug_flags target)
     endif()
 endfunction()
 
-# Optional include code into debug or release build
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_definitions(-DDEBUG_BUILD)
-elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_definitions(-DRELEASE_BUILD)
-endif()
-
-# Computer Vision options
-if (BLD_JETSON_B01)
-    add_definitions(-DENABLE_CV)
-    message("Enabled video and computer vision functionality.")
-elseif (BLD_JETSON_ORIN_NANO)
-    add_definitions(-DENABLE_CV)
-    message("Enabled video and computer vision functionality.")
-elseif(BLD_WIN)
-    if (WIN_ENABLE_CV)
-        add_definitions(-DENABLE_CV)
-        message("Enabled video and computer vision functionality.")
-    else()
-        message("Disabled video and computer vision functionality.")
-    endif()
-endif()
+#=============================================================================
+# Define Preprocessor Directives Based on Build Options
+#=============================================================================
 
 # Optionally include code that is specific to different platforms
 if (BLD_JETSON_B01)
     add_definitions(-DBLD_JETSON_B01)
     add_definitions(-DBLD_JETSON_SERIAL)
     message("Building for BLD_JETSON_B01 with serial comms.")
+    add_definitions(-DENABLE_CV)
+    message("Enabled video and computer vision functionality.")
 elseif (BLD_JETSON_ORIN_NANO)
     add_definitions(-DBLD_JETSON_ORIN_NANO)
     add_definitions(-DBLD_JETSON_SERIAL)
     message("Building for BLD_JETSON_ORIN_NANO with serial comms.")
+    add_definitions(-DENABLE_CV)
+    message("Enabled video and computer vision functionality.")
 elseif(BLD_WSL)
     add_definitions(-DBLD_WSL)
     add_definitions(-DBLD_WSL_TCP)
@@ -196,17 +163,29 @@ elseif(BLD_WIN AND WIN_TCP)
     add_definitions(-DBLD_WIN_TCP)
     add_definitions(-DBLD_WIN)
     message("Building for _BLD_WIN with TCP comms.")
+    if (WIN_ENABLE_CV)
+        add_definitions(-DENABLE_CV)
+        message("Enabled video and computer vision functionality.")
+    else()
+        message("Disabled video and computer vision functionality.")
+    endif()
 elseif(BLD_WIN AND WIN_SERIAL)
     add_definitions(-DREAL_VEH)
     add_definitions(-DBLD_WIN_SERIAL)
     add_definitions(-DBLD_WIN)
     message("Building for _BLD_WIN with serial comms.")
+    if (WIN_ENABLE_CV)
+        add_definitions(-DENABLE_CV)
+        message("Enabled video and computer vision functionality.")
+    else()
+        message("Disabled video and computer vision functionality.")
+    endif()
 else()
     message(FATAL_ERROR "Invalid build options.")
 endif()
 
 #=============================================================================
-# Find External Libraries and Headers
+# Find External Libraries and Headers 
 #=============================================================================
 
 # Environment variable validation and inclusion based on platform
@@ -320,15 +299,7 @@ else()
     endif()
 endif()
 
-# CMAKE modules path for Find* files and other cmake specific things
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-
-# TODO: Specify the path to TensorRT root dir
-if (NOT TensorRT_DIR)
-    set(TensorRT_DIR /home/cyrus/work/libs/TensorRT-10.0.0.6/)
-endif()
-
-# Find required packages
+# Additional required packages to find
 if(BLD_JETSON_B01)
     find_package(CUDA REQUIRED)
     find_package(OpenCV REQUIRED)
@@ -343,8 +314,15 @@ elseif(BLD_JETSON_ORIN_NANO)
     find_package(vpi 3.2 REQUIRED)
 endif()
 
+# TODO: Specify the path to TensorRT root dir
+if (NOT TensorRT_DIR)
+    set(TensorRT_DIR /home/cyrus/work/libs/TensorRT-10.0.0.6/)
+endif()
+
 #=============================================================================
-# Modules
+# Modules - Standalone code that is used in SquirrelDefender but is not the 
+# "business logic".  Can be easily ported to another project.  They end up
+# being included in the SOURCES that build the program.
 #=============================================================================
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/mavlink/v2.0/common)
@@ -377,7 +355,7 @@ file(GLOB TIMER_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/timer/*.h)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt)
 
 #=============================================================================
-# Set Source files and locations
+# Set SquirrelDefender Source files and locations
 #=============================================================================
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
@@ -400,10 +378,9 @@ list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HE
                     ${PID_HEADERS} ${TIMER_HEADERS})
 
 #=============================================================================
-# Build Executable
+# Build Executable for each supported platform
 #=============================================================================
 
-# Compile the squirreldefender program
 if (BLD_JETSON_B01)
     cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
     set_target_debug_flags(squirreldefender)
@@ -421,50 +398,6 @@ elseif (BLD_JETSON_ORIN_NANO)
     target_include_directories(squirreldefender PRIVATE modules/yolov8_tensorrt/src)
 
     target_link_libraries(squirreldefender 
-                        YoloV8_TRT 
-                        ${OpenCV_LIBS} 
-                        vpi opencv_core
-                        opencv_imgproc 
-                        opencv_imgcodecs 
-                        opencv_videoio
-                        jsoncpp)
-    # Test source base
-    list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/appsrc/main.cpp")
-    set(TEST_SOURCE_BASE ${SOURCES})
-    file(GLOB TEST_UTIL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_utils/*.cpp)
-    file(GLOB TEST_UTIL_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_utils/*.h)
-    list(APPEND TEST_SOURCE_BASE ${TEST_UTIL_SOURCES})
-
-    # Localize target test code
-    set(LOC_TEST_SOURCES ${TEST_SOURCE_BASE})
-    list(APPEND LOC_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_localize_target.cpp)
-    list(APPEND LOC_TEST_HEADERS ${TEST_UTIL_HEADERS})
-
-    cuda_add_executable(test_localize_target ${LOC_TEST_SOURCES} ${LOC_TEST_HEADERS})
-    set_target_debug_flags(test_localize_target)
-
-    target_include_directories(test_localize_target PRIVATE modules/yolov8_tensorrt/src)
-
-    target_link_libraries(test_localize_target 
-                        YoloV8_TRT 
-                        ${OpenCV_LIBS} 
-                        vpi opencv_core
-                        opencv_imgproc 
-                        opencv_imgcodecs 
-                        opencv_videoio
-                        jsoncpp)
-
-    # Follow target test code
-    set(FOLLOW_TEST_SOURCES ${TEST_SOURCE_BASE})
-    list(APPEND FOLLOW_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_follow_target.cpp)
-    list(APPEND FOLLOW_TEST_HEADERS ${TEST_UTIL_HEADERS})
-
-    cuda_add_executable(test_follow_target ${FOLLOW_TEST_SOURCES} ${FOLLOW_TEST_HEADERS})
-    set_target_debug_flags(test_follow_target)
-
-    target_include_directories(test_follow_target PRIVATE modules/yolov8_tensorrt/src)
-
-    target_link_libraries(test_follow_target 
                         YoloV8_TRT 
                         ${OpenCV_LIBS} 
                         vpi opencv_core
@@ -589,3 +522,56 @@ elseif(BLD_WIN)
     set_target_properties(squirreldefender PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 endif()
 
+#=============================================================================
+# Build Test Harness for each supported platform
+#=============================================================================
+
+if (BUILD_TEST_HARNESS)
+    if (BLD_JETSON_ORIN_NANO)
+
+        # Test source base
+        list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/appsrc/main.cpp")
+        set(TEST_SOURCE_BASE ${SOURCES})
+        file(GLOB TEST_UTIL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_utils/*.cpp)
+        file(GLOB TEST_UTIL_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_utils/*.h)
+        list(APPEND TEST_SOURCE_BASE ${TEST_UTIL_SOURCES})
+
+        # Localize target test code
+        set(LOC_TEST_SOURCES ${TEST_SOURCE_BASE})
+        list(APPEND LOC_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_localize_target.cpp)
+        list(APPEND LOC_TEST_HEADERS ${TEST_UTIL_HEADERS})
+
+        cuda_add_executable(test_localize_target ${LOC_TEST_SOURCES} ${LOC_TEST_HEADERS})
+        set_target_debug_flags(test_localize_target)
+
+        target_include_directories(test_localize_target PRIVATE modules/yolov8_tensorrt/src)
+
+        target_link_libraries(test_localize_target 
+                            YoloV8_TRT 
+                            ${OpenCV_LIBS} 
+                            vpi opencv_core
+                            opencv_imgproc 
+                            opencv_imgcodecs 
+                            opencv_videoio
+                            jsoncpp)
+
+        # Follow target test code
+        set(FOLLOW_TEST_SOURCES ${TEST_SOURCE_BASE})
+        list(APPEND FOLLOW_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_follow_target.cpp)
+        list(APPEND FOLLOW_TEST_HEADERS ${TEST_UTIL_HEADERS})
+
+        cuda_add_executable(test_follow_target ${FOLLOW_TEST_SOURCES} ${FOLLOW_TEST_HEADERS})
+        set_target_debug_flags(test_follow_target)
+
+        target_include_directories(test_follow_target PRIVATE modules/yolov8_tensorrt/src)
+
+        target_link_libraries(test_follow_target 
+                            YoloV8_TRT 
+                            ${OpenCV_LIBS} 
+                            vpi opencv_core
+                            opencv_imgproc 
+                            opencv_imgcodecs 
+                            opencv_videoio
+                            jsoncpp)
+    endif()
+endif()
