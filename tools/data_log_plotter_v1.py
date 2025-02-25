@@ -16,10 +16,10 @@ def load_csv(file_path):
     return pd.read_csv(file_path)
 
 def normalize_dataframe(df):
-    """Normalize each column of the dataframe to have values between -1 and 1, excluding the 'Time' column."""
+    """Normalize each column of the dataframe to have values between -1 and 1, excluding the 'g_app_elapsed_time' column."""
     normalized_df = df.copy()
     for column in df.columns:
-        if column != 'Time':
+        if column != 'g_app_elapsed_time':
             normalized_df[column] = 2 * (df[column] - df[column].min()) / (df[column].max() - df[column].min()) - 1
     return normalized_df
 
@@ -27,10 +27,10 @@ def create_figure(df, max_values, title):
     """Create a Plotly figure with data series from the dataframe."""
     fig = go.Figure()
     for column in df.columns:
-        if column != 'Time':
+        if column != 'g_app_elapsed_time':
             name_with_max = f"{column} (Max: {max_values[column]:.2f})"
-            fig.add_trace(go.Scatter(x=df['Time'], y=df[column], mode='lines', name=name_with_max, line_shape='hv'))
-    fig.update_layout(title=title, xaxis_title='Time', yaxis_title='Value')
+            fig.add_trace(go.Scatter(x=df['g_app_elapsed_time'], y=df[column], mode='lines', name=name_with_max, line_shape='hv'))
+    fig.update_layout(title=title, xaxis_title='g_app_elapsed_time', yaxis_title='Value')
     return fig
 
 def save_figure(fig, output_file_name):
@@ -43,13 +43,13 @@ def main():
         df = load_csv(csv_file_path)
         
         # Create and save the plain figure
-        plain_fig = create_figure(df, df.max(), 'All Data over Time (Plain)')
+        plain_fig = create_figure(df, df.max(), 'All Data over g_app_elapsed_time (Plain)')
         plain_output_file_name = os.path.splitext(os.path.basename(csv_file_path))[0] + '_plain.html'
         save_figure(plain_fig, plain_output_file_name)
         
         # Normalize the dataframe and create the normalized figure
         normalized_df = normalize_dataframe(df)
-        normalized_fig = create_figure(normalized_df, df.max(), 'All Data over Time (Normalized)')
+        normalized_fig = create_figure(normalized_df, df.max(), 'All Data over g_app_elapsed_time (Normalized)')
         normalized_output_file_name = os.path.splitext(os.path.basename(csv_file_path))[0] + '_normalized.html'
         save_figure(normalized_fig, normalized_output_file_name)
     else:

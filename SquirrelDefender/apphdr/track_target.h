@@ -82,6 +82,8 @@ extern float g_target_left;
 extern float g_target_right;
 extern float g_target_top;
 extern float g_target_bottom;
+extern float g_target_center_x;
+extern float g_target_center_y;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

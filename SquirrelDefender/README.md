@@ -16,7 +16,7 @@ This folder contains the code for the `squirreldefender` program and instruction
 
 There are two containers for development on the Jetson Orin Nano.  A dev container, used for compiling and testing the code, and a release container, used for just running the compiled executable.  All of the dependencies are inside the container so you just have to run them :)
 
-### Prerequisites (compiling on host):
+### Prerequisites (without docker containers):
 
 - Jetpack 6.1 (~r36.4 I reckon this should work with Jetpack 6.2, I will try it shortly but I haven't verified it yet)
 - CMake >= 3.28 (same rules as above apply for different versions, you have to troubleshoot)
@@ -27,7 +27,7 @@ There are two containers for development on the Jetson Orin Nano.  A dev contain
 
 Note: Defaults on the Orin are fine for all of these if you have JP6.1 or 6.2.  I would recommend installing the correct opencv version using the script provided, however.
 
-### Setup:
+### Setup (without docker containers):
 
 Setup swap.  Either run [setup-swap.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/setup-swap.sh) or you can manually install some swap:
 
@@ -42,7 +42,7 @@ Then add the following line to the end of /etc/fstab to make the change persiste
 
 Copy the script [Install-Jetson-Orin-Nano-dependencies.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/Install-Jetson-Orin-Nano-dependencies.sh) to your favorite GitHub folder because it will clone some repos wherever you run this script, so just make sure to put it wherever you are okay with having those repositories.
 
-### Compile and run the program (on the host):
+### Compile and run the program (without docker containers):
 
 ```
 # Clone the repository
@@ -57,13 +57,13 @@ make -j$(nproc)
 sudo ./squirreldefender
 ```
 
-### Prerequisites (docker method):
+### Prerequisites (with docker containers):
 
 - Docker
 - Nvidia container runtime (if not already installed can follow the instructions at [ISAAC-ROS-Setup.md](https://github.com/crose72/OperationSquirrel/blob/dev/docs/ISAAC-ROS-Setup.md))
 - Jetpack 6.1 (~r36.4 I reckon this should work with Jetpack 6.2, I will try it shortly but I haven't verified it yet)
 
-### Setup:
+### Setup (with docker containers):
 
 Perform the following setup outside of the container and then verify the camera is working in the container.
 
@@ -110,7 +110,10 @@ nvgstcapture-1.0
 ### Dev container - compiling and running squirreldefender:
 
 Outside of the container edit `SquirrelDefender/CMakeLists.txt` file and enable `BLD_JETSON_ORIN_NANO`.
-Inside the container, do the following:
+
+Next, run the script to start up the dev container `scripts/run_dev.sh`.
+
+A terminal inside the container should open up.  This means that the container is running and you now have the ability to develop the code, make changes, run the executable, etc.  Inside the container do the following:
 
 ```
 # Build
@@ -126,7 +129,7 @@ make -j$(nproc)
 
 ### Release container:
 
-If you don't need to change the code and just want to run the precompiled program then you can just do the setup and run `./run_squirreldefender.sh`
+If you don't need to change the code and just want to run the precompiled program then you can just do the setup and run `./run_squirreldefender.sh`.  The purpose of this container is to be deployed onto your drone or other autonomous vehicle since the only thing that it does is run the pre-compiled binary that you created using the dev container from the previous step.
 
 If you want to have the program run as soon as you power on the jetson (for example when your jetson is mounted on your drone) then you need to add a systemd service and do a couple other things.  First enable xserver and display access for the container by default when you power on the jetson by adding it to your `.xprofile`.  Run these outside of the container.
 
@@ -197,6 +200,22 @@ sudo systemctl restart squirreldefender.service
 # Check status of the service
 sudo systemctl status squirreldefender.service
 ```
+
+### Workflow for quickly deploying code changes to the drone:
+
+Let's say you're at the park with your jetson and your drone, and you want to try out different PID gains on the follow algorithm in real life.  Or maybe you want to change the follow distance, or test out some other code changes on the real drone.  How can you make a change to the code and then quickly deploy it to the drone?  This is how:
+
+1. Modify the code using the dev container (instructions above)
+    - Execute `./scripts/run_dev.sh`
+    - Make changes to the code
+    - Recompile the code
+2. Build the Squirreldefender container
+    - Execute `./scripts/build_squirreldefender.sh`
+    - (Choose N if you don't need to push the container to docker hub - since you're at the park I don't think you do, or choose Y if you are ready to push it to docker hub)
+3. Make sure you've followed the instructions above for the release container to have the container execute when the jetson powers up
+    - Stop the squirreldefender service before making changes (instructions above)
+    - Start the squirreldefender service whem you're ready to fly again (instructions above)
+***Remember to disconnect the uart wires or disconnect the battery from the drone so that the props don't start spinning when you're not ready (if squirreldefender.service is active and started when you power on the jetson then it will send the command to arm the drone and takeoff so you don't want it near you when that happens)
 
 ## Jetson Nano B01
 

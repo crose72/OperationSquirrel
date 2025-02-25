@@ -37,7 +37,7 @@ int g_detection_count;
  * Function definitions
  ********************************************************************************/
 bool create_detection_network(void);
-void detect_objects(void);
+void detect_targets(void);
 
 /********************************************************************************
  * Function: create_detection_network
@@ -91,10 +91,10 @@ bool create_detection_network(void)
 }
 
 /********************************************************************************
- * Function: detect_objects
+ * Function: detect_targets
  * Description: Initialize the network used for object detection.
  ********************************************************************************/
-void detect_objects(void)
+void detect_targets(void)
 {
     uint32_t overlay_flags = 0;
 
@@ -151,7 +151,7 @@ bool SSD::init(void)
  ********************************************************************************/
 void SSD::loop(void)
 {
-    detect_objects();
+    detect_targets();
 }
 
 /********************************************************************************

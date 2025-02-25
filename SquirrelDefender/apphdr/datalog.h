@@ -102,12 +102,12 @@ extern float g_target_top;
 extern float g_target_bottom;
 
 /* Localize target variables*/
-extern float d_object_h;
-extern float d_object_w;
-extern float g_x_object;
-extern float g_y_object;
-extern float g_z_object;
-extern float d_object;
+extern float d_target_h;
+extern float d_target_w;
+extern float g_x_target;
+extern float g_y_target;
+extern float g_z_target;
+extern float d_target;
 extern float g_x_error;
 extern float g_y_error;
 extern float g_delta_angle;

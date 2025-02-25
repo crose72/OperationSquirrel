@@ -75,17 +75,17 @@ float y_desired;
 #else // RELEASE_BUILD
 
 /* x forward */
-const float Kp_x = 0.25f;
-const float Ki_x = 0.00009f;
-const float Kd_x = 0.00005f;
+const float Kp_x = 0.5f;
+const float Ki_x = 0.009f;
+const float Kd_x = 0.1f;
 const float w1_x = 1.0f;
 const float w2_x = 0.0f;
 const float w3_x = 0.0f;
 
 /* y forward */
-const float Kp_y = 0.001f;
-const float Ki_y = 0.00009f;
-const float Kd_y = 0.00005f;
+const float Kp_y = 0.3f;
+const float Ki_y = 0.009f;
+const float Kd_y = 0.2f;
 const float w1_y = 1.0f;
 const float w2_y = 0.0f;
 const float w3_y = 0.0f;
@@ -115,7 +115,7 @@ const uint16_t vehicle_rel_height_err = 0.0f;
 const uint16_t vehicle_height_desired = 0.0f;
 const float target_height_desired = 0.0f;
 const float target_width_desired = 0.0f;
-const float x_desired = 1.0f; // Make const in the end
+const float x_desired = 2.0f; // Make const in the end
 const float y_desired = 0.0f; // Make const in the ends
 
 #endif // DEBUG_BUILD
@@ -136,7 +136,7 @@ void get_control_params(void)
 {
 #ifdef DEBUG_BUILD
 
-    json_utils veh_params("../params.json");
+    JSONUtils veh_params("../params.json");
     
     // Accessing Vel_PID_x parameters
     Kp_x = veh_params.get_float_param("Vel_PID_x", "Kp");
@@ -180,26 +180,24 @@ void get_control_params(void)
  ********************************************************************************/
 void calc_follow_error(void)
 {
-#ifdef BLD_JETSON_B01
 #ifdef DEBUG_BUILD
 
-    json_utils target_params("../params.json");
+    JSONUtils target_params("../params.json");
 
     x_desired = target_params.get_float_param("Target", "Desired_X_offset");
 
 #endif // DEBUG_BUILD
-#endif // BLD_JETSON_B01
 
-    if (d_object < 0.001f)
+    if (g_x_target < 0.001f)
     {
         g_x_error = 0.0f;
     }
     else
     {
-        g_x_error = g_x_object - x_desired;
+        g_x_error = g_x_target - x_desired;
     }
 
-    g_y_error = g_y_object - y_desired;
+    g_y_error = g_y_target - y_desired;
 }
 
 /********************************************************************************

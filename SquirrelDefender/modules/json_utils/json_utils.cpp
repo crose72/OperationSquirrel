@@ -33,10 +33,10 @@
  ********************************************************************************/
 
 /********************************************************************************
- * Function: json_utils
+ * Function: JSONUtils
  * Description: Class constructor
  ********************************************************************************/
-json_utils::json_utils(const std::string &filename)
+JSONUtils::JSONUtils(const std::string &filename)
 {
     std::ifstream configFile(filename);
 
@@ -49,16 +49,16 @@ json_utils::json_utils(const std::string &filename)
 }
 
 /********************************************************************************
- * Function: ~json_utils
+ * Function: ~JSONUtils
  * Description: Class destructor
  ********************************************************************************/
-json_utils::~json_utils(void) {}
+JSONUtils::~JSONUtils(void) {}
 
 /********************************************************************************
  * Function: get_float_params
  * Description: Return the values of parameters that are of type float.
  ********************************************************************************/
-float json_utils::get_float_param(const std::string &group, const std::string &key) const
+float JSONUtils::get_float_param(const std::string &group, const std::string &key) const
 {
     return root[group][key].asFloat();
 }
@@ -67,7 +67,7 @@ float json_utils::get_float_param(const std::string &group, const std::string &k
  * Function: get_uint32_params
  * Description: Return the values of parameters that are of type uint32_t.
  ********************************************************************************/
-uint32_t json_utils::get_uint32_param(const std::string &group, const std::string &key) const
+uint32_t JSONUtils::get_uint32_param(const std::string &group, const std::string &key) const
 {
     return root[group][key].asUInt();
 }
@@ -76,7 +76,7 @@ uint32_t json_utils::get_uint32_param(const std::string &group, const std::strin
  * Function: get_bool_params
  * Description: Return the values of parameters that are of type bool.
  ********************************************************************************/
-bool json_utils::get_bool_param(const std::string &group, const std::string &key) const
+bool JSONUtils::get_bool_param(const std::string &group, const std::string &key) const
 {
     return root[group][key].asBool();
 }

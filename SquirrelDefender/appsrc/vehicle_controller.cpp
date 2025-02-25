@@ -107,7 +107,7 @@ void VehicleController::loop(void)
     }
     else if (g_system_state == SystemState::STANDBY)
     {
-        MavCmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, (float)4.0);
+        MavCmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, (float)7.0);
     }
     else if (g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
@@ -124,7 +124,7 @@ void VehicleController::loop(void)
             takeoff_dbc = true;
         }
 
-        if (takeoff_dbc && g_mav_veh_rngfdr_current_distance > 300 || g_mav_veh_rel_alt > 3000)
+        if (takeoff_dbc && g_mav_veh_rngfdr_current_distance > 600 || g_mav_veh_rel_alt > 6000)
         {
             start_follow_mode = true;
         }
