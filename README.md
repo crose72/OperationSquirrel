@@ -60,4 +60,4 @@ If you want to understand how the software is written and the flow, look at `doc
 - Follow the instructions in [01-Setting-up-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/01-Setting-up-SITL.md) to setup the simulation environment.
 - Follow the instructions in [02-Connecting-to-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/02-Connecting-to-SITL.md) to control the simulated drone with your Jetson
 - (Optional) Follow the instructions in [03-Setting-up-AirSim-with-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/03-Setting-up-AirSim-with-SITL.md) to setup a photo-realistic simulation
-- If using real drone then configure the UART pins on your flight controller for Mavlink 2 communication and connect the UART pins on the Jetson to the UART pins on your flight controller.
+- Follow the instruction in [Pre-Flight Checklist](https://github.com/crose72/OperationSquirrel/blob/dev/docs/Pre-Flight-Checklist.md) if you're ready to fly a drone autonomously
