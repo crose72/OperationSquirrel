@@ -97,7 +97,7 @@ int main(void)
 
 #ifdef BLD_JETSON_B01
 
-    while (!stop_program && !g_save_button_press)
+    while (!stop_program && !g_save_button_press) // todo: figure buttons w docker (jetson io/jumper)
 
 #else
 

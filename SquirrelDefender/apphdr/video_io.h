@@ -23,7 +23,7 @@
 
 #elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
 
-#include "video_io_cv.h"
+#include "video_io_opencv.h"
 
 #else
 
