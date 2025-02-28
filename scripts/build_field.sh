@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Set variables (change these)
-DOCKERFILE_PATH="../docker/Dockerfile.field"                     # Path to your Dockerfile
-IMAGE_NAME="crose72/jetpack-r36.4.0"                             # Docker image name
-IMAGE_TAG="field"                               # Tag for the Docker image
-FULL_IMAGE_NAME="$IMAGE_NAME:$IMAGE_TAG"                         # Full image name with tag
+# Docker container build settings
+DOCKERFILE_PATH="../docker/Dockerfile.field"
+IMAGE_NAME="crose72/jetpack-r36.4.0"
+IMAGE_TAG="field"
+FULL_IMAGE_NAME="$IMAGE_NAME:$IMAGE_TAG"
 
 # Build Docker image
 echo "🛠️ Building Docker image..."

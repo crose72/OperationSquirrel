@@ -9,6 +9,8 @@ COPY ../SquirrelDefender/ /workspace/OperationSquirrel/SquirrelDefender/
 # Remove any data files that are currently saved in the jetson filesystem (don't want to mix and match data)
 RUN rm -rf /workspace/OperationSquirrel/SquirrelDefender/data/*
 
+RUN rm -rf /workspace/OperationSquirrel/SquirrelDefender/build-field/
+
 # Make the binary executable
 RUN chmod +x /workspace/OperationSquirrel/SquirrelDefender/build/squirreldefender
 

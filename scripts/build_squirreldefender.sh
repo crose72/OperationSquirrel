@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# Set docker container build settings
+DOCKERFILE_PATH="../docker/Dockerfile.squirreldefender"       # Path to your Dockerfile
+IMAGE_NAME="crose72/jetpack-r36.4.0"  # Docker image name
+IMAGE_TAG="squirreldefender"                          # Tag for the Docker image
+FULL_IMAGE_NAME="$IMAGE_NAME:$IMAGE_TAG"    # Full image name with tag
+
+# Source and destination paths for copying build outputs from the squirreldefender-field
+CONTAINER_NAME="squirreldefender-field"
+SRC_PATH="/workspace/OperationSquirrel/SquirrelDefender/build"
+DEST_PATH="${OS_WS}/OperationSquirrel/SquirrelDefender/build-field"
+
 # Set default build type to "dev"
 BUILD_TYPE="dev"
 
@@ -14,17 +25,13 @@ if [ "$BUILD_TYPE" == "field" ]; then
     BUILD_FOLDER="build-field"
 fi
 
-# make sure to define ${OS_WS}
+# Make sure to define ${OS_WS}
 if [ -z "$OS_WS" ]; then
     echo "❌ Error: OS_WS environment variable is not set."
     exit 1
 fi
 
 # Check if the field container exists
-CONTAINER_NAME="squirreldefender-field"
-SRC_PATH="/workspace/OperationSquirrel/SquirrelDefender/build"
-DEST_PATH="${OS_WS}/OperationSquirrel/SquirrelDefender/build-field"
-
 if docker ps -a --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
     echo "📦 Container '$CONTAINER_NAME' found. Preparing destination directory..."
 
@@ -44,12 +51,6 @@ if docker ps -a --format '{{.Names}}' | grep -q "^$CONTAINER_NAME$"; then
 else
     echo "⚠️ Container '$CONTAINER_NAME' not found. Skipping file copy."
 fi
-
-# Set variables (change these)
-DOCKERFILE_PATH="../docker/Dockerfile.squirreldefender"       # Path to your Dockerfile
-IMAGE_NAME="crose72/jetpack-r36.4.0"  # Docker image name
-IMAGE_TAG="squirreldefender"                          # Tag for the Docker image
-FULL_IMAGE_NAME="$IMAGE_NAME:$IMAGE_TAG"    # Full image name with tag
 
 # Build Docker image
 echo "🛠️ Building Docker image..."

@@ -205,16 +205,60 @@ sudo systemctl status squirreldefender.service
 
 Let's say you're at the park with your jetson and your drone, and you want to try out different PID gains on the follow algorithm in real life.  Or maybe you want to change the follow distance, or test out some other code changes on the real drone.  How can you make a change to the code and then quickly deploy it to the drone?  This is how:
 
-1. Modify the code using the dev container (instructions above)
+#### *When your laptop and jetson have wifi
+
+1. Modify the code using the dev container (follow instructions above)
     - Execute `./scripts/run_dev.sh`
     - Make changes to the code
     - Recompile the code
-2. Build the Squirreldefender container
+2. Build the SquirrelDefender container
     - Execute `./scripts/build_squirreldefender.sh`
     - (Choose N if you don't need to push the container to docker hub - since you're at the park I don't think you do, or choose Y if you are ready to push it to docker hub)
 3. Make sure you've followed the instructions above for the release container to have the container execute when the jetson powers up
     - Stop the squirreldefender service before making changes (instructions above)
     - Start the squirreldefender service whem you're ready to fly again (instructions above)
+
+***Remember to disconnect the uart wires or disconnect the battery from the drone so that the props don't start spinning when you're not ready (if squirreldefender.service is active and started when you power on the jetson then it will send the command to arm the drone and takeoff so you don't want it near you when that happens)
+
+#### *When your laptop and jetson DO NOT have wifi
+
+Before you are out of wifi you can use the dev container to make changes to the starting point of your code for the test flights.  The reason you cannot use the dev container when you're out of wifi is because you will run into time skew issues (file XXX.cpp has timestamp Y millions of seconds in the future, etc.) which will cause issues when you recompile the code with changes and will result in weird behavior from the compiled binary.  I don't know why this happens, so just be mindful of the issue it will cause.
+
+if you have changes that you want to test when you're at a park or some other place where you don't have wifi 
+
+1. Modify the code using the dev container - only once before you are out of wifi (follow instructions above)
+    - Execute `./scripts/run_dev.sh`
+    - Make changes to the code
+    - Recompile the code
+2. Build the field container (we'll use it later)
+    - Execute `./scripts/build_field.sh`
+3. Build the SquirrelDefender container
+    - Execute `./scripts/build_squirreldefender.sh`
+    - (Choose N if you don't need to push the container to docker hub - since you're at the park I don't think you do, or choose Y if you are ready to push it to docker hub)
+4. Make sure you've followed the instructions above for the release container to have the container execute when the jetson powers up
+    - Stop the squirreldefender service before making changes (instructions above)
+    - Start the squirreldefender service whem you're ready to fly again (instructions above)
+ 
+ Hooray!  You've just completed a test flight and landed your drone.  Now you want to make a changes to the code because maybe the PID gains are too slow for your needs which brings us to this point:
+
+5. Stop the squirreldefender service before making change
+6. Stop and remove the field container if it's currently running
+    - `docker ps -a` to check if it's persisting
+    - `docker stop <container id>` to remove it
+    - `docker rm <container id>` to remove it
+7. Run the field container
+    - Execute `./scripts/run_field.sh`
+8. Modify the code in the field container
+    - Use VS Code Dev Container extension, or vim, or nano or something else to access and make your code change inside the field container
+    - Recompile the code
+9. Build the SquirrelDefender container (field container should be running or at least persist - check with `docker ps -a`)
+    - Execute `./scripts/build_squirreldefender.sh --field`
+    - (Choose N if you don't need to push the container to docker hub - since you're at the park I don't think you do, or choose Y if you are ready to push it to docker hub)
+    - The field container starts where you left of with the code in the dev container
+    - This script copies the build from the field container into the squirreldefender container with your new code changes compiled
+
+If your jetson is setup to start the program on boot then you're good to go!  Repeat these steps 5-9 while you're making changes to the code at the park or wherever else you are without wifi.
+
 ***Remember to disconnect the uart wires or disconnect the battery from the drone so that the props don't start spinning when you're not ready (if squirreldefender.service is active and started when you power on the jetson then it will send the command to arm the drone and takeoff so you don't want it near you when that happens)
 
 ## Jetson Nano B01

@@ -1,4 +1,4 @@
-# make sure to define ${OS_WS}
+# Ensure ${OS_WS} is defined
 
 sudo docker run --runtime nvidia -it --rm --network host \
   --privileged --ipc=host \
