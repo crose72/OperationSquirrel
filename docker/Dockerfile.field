@@ -1,0 +1,18 @@
+FROM crose72/jetpack-r36.4.0:base
+
+# Set working directory
+WORKDIR /workspace/
+
+# Copy the SquirrelDefender program into the container (exe is built externally using the dev container)
+COPY ../SquirrelDefender/ /workspace/OperationSquirrel/SquirrelDefender/
+
+# Remove any data files that are currently saved in the jetson filesystem (don't want to mix and match data)
+RUN rm -rf /workspace/OperationSquirrel/SquirrelDefender/data/*
+
+RUN rm -rf /workspace/OperationSquirrel/SquirrelDefender/build-field/
+
+# Make the binary executable
+RUN chmod +x /workspace/OperationSquirrel/SquirrelDefender/build/squirreldefender
+
+# Set working directory to the program's build directory
+WORKDIR /workspace/OperationSquirrel/SquirrelDefender/build/

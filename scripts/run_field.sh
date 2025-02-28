@@ -1,6 +1,6 @@
 # Ensure ${OS_WS} is defined
 
-sudo docker run --runtime nvidia -it --rm --network host \
+sudo docker run --runtime nvidia -it --network host \
   --privileged --ipc=host \
   --env DISPLAY=$DISPLAY \
   --device /dev/video0 \
@@ -29,8 +29,6 @@ sudo docker run --runtime nvidia -it --rm --network host \
   --volume /tmp/.X11-unix:/tmp/.X11-unix \
   --volume /tmp/argus_socket:/tmp/argus_socket \
   --volume /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra \
-  --volume ${OS_WS}/OperationSquirrel/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender \
-  --name squirreldefender-dev \
-  crose72/jetpack-r36.4.0:base \
-  bash -c "cd workspace/OperationSquirrel/SquirrelDefender/build \
-    && exec bash"
+  --name squirreldefender-field \
+  crose72/jetpack-r36.4.0:field \
+  bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build && exec bash"
