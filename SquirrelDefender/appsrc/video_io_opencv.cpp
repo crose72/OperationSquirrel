@@ -153,7 +153,7 @@ bool create_output_vid_stream(void)
     video_writer.open(file_name, fourcc, g_input_video_fps, frame_size);
 
     if (!video_writer.isOpened()) {
-        std::cout << "detectnet: failed to create output_vid_file stream\n" << std::endl;
+        std::cout << "video_io_opencv: failed to create output_vid_file stream\n" << std::endl;
         file_stream_created = false;
         return false;
     }
@@ -347,6 +347,8 @@ void VideoCV::out_loop(void)
 void VideoCV::shutdown(void)
 {
     Print::cpp_cout("video:  shutting down...");
+    delete_input_video_stream();
+    delete_video_file_stream();
     Print::cpp_cout("video:  shutdown complete.\n");
 }
 
