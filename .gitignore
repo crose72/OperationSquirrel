@@ -2,6 +2,7 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
+/.vscode
 /.vs
 /SquirrelDefender/out/build/x64-Debug
 /SquirrelDefender/env_config.json

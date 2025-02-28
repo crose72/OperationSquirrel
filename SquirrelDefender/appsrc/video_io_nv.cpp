@@ -275,6 +275,7 @@ void calc_video_res(void)
 {
     g_input_video_width = static_cast<float>(g_input->GetWidth());
     g_input_video_height = static_cast<float>(g_input->GetHeight());
+    g_input_video_fps = 30;
 }
 
 /********************************************************************************
@@ -339,8 +340,11 @@ VideoNV::~VideoNV(void) {}
  ********************************************************************************/
 bool VideoNV::init(void)
 {
+
     g_valid_image_rcvd = false;
     g_image = NULL;
+
+    calc_video_res(); // populate g_input_video_width, height 
 
     if (!create_input_video_stream() ||
         !create_output_vid_stream())
@@ -348,17 +352,17 @@ bool VideoNV::init(void)
         return false;
     }
     
+#ifdef DEBUG_BUILD
+    
     // note: put in debug build
     if (!create_display_video_stream())
     {
         return false;
     }
 
-#ifdef DEBUG_BUILD
 
 #endif // DEBUG_BUILD
 
-    calc_video_res();
 
     return true;
 }
@@ -381,13 +385,13 @@ void VideoNV::out_loop(void)
 
 #ifdef DEBUG_BUILD
 
-#endif // DEBUG_BUILD
-
     // note: put in debug build
     if (display_stream_created)
     {
         display_video();
     }
+
+#endif // DEBUG_BUILD
 
     if (file_stream_created)
     {

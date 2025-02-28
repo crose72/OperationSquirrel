@@ -4,7 +4,7 @@
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
 
 /********************************************************************************
- * @file    video_io_cv.h
+ * @file    video_io_opencv.h
  * @author  Cameron Rose
  * @date    1/22/2025
  ********************************************************************************/
