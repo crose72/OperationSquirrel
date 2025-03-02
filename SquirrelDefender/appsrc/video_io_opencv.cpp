@@ -47,15 +47,15 @@ struct TextOverlay {
     
     std::string text;
     cv::Point position;
-    cv::Size textSize;
-    cv::Rect backgroundRect;
-    cv::Scalar textColor;
-    cv::Scalar bgColor;
-    int fontFace;
-    double fontScale;
+    cv::Size text_size;
+    cv::Rect bg_rect;
+    cv::Scalar text_color;
+    cv::Scalar bg_color;
+    int font_face;
+    double font_scale;
     int thickness;
     int corner;
-    bool isDynamic; // Flag for text that changes each frame
+    bool is_dynamic; // Flag for text that changes each frame
 };
 
 std::vector<TextOverlay> g_textOverlays;  // Vector to hold overlays
@@ -300,27 +300,27 @@ bool video_output_file_reset(void)
 }
 
 /********************************************************************************
- * Function: initTextOverlay
+ * Function: init_text_overlay
  * Description: Initialize a text overlay config
  ********************************************************************************/
-void initTextOverlay(const cv::Mat& referenceImage, const std::string& defaultText, 
-                    int corner = TextOverlay::TOP_LEFT, bool isDynamic = false, 
-                    cv::Scalar textColor = cv::Scalar(255, 255, 255), double fontScale = 1.0) {
+void init_text_overlay(const cv::Mat& referenceImage, const std::string& defaultText, 
+                    int corner = TextOverlay::TOP_LEFT, bool is_dynamic = false, 
+                    cv::Scalar text_color = cv::Scalar(255, 255, 255), double font_scale = 1.0) {
     TextOverlay overlay;
     
     // Store parameters
     overlay.text = defaultText;
-    overlay.isDynamic = isDynamic;
-    overlay.textColor = textColor;
-    overlay.bgColor = cv::Scalar(0, 0, 0); // Black background
-    overlay.fontFace = cv::FONT_HERSHEY_SIMPLEX;
-    overlay.fontScale = fontScale;
+    overlay.is_dynamic = is_dynamic;
+    overlay.text_color = text_color;
+    overlay.bg_color = cv::Scalar(0, 0, 0); // Black background
+    overlay.font_face = cv::FONT_HERSHEY_SIMPLEX;
+    overlay.font_scale = font_scale;
     overlay.thickness = 1;
     
     // Calculate text size
     int baseline = 0;
-    cv::Size textSize = cv::getTextSize(defaultText, overlay.fontFace, 
-                                        overlay.fontScale, overlay.thickness, &baseline);
+    cv::Size text_size = cv::getTextSize(defaultText, overlay.font_face, 
+                                        overlay.font_scale, overlay.thickness, &baseline);
     
     std::cout << std::to_string(referenceImage.cols) << std::endl;
     std::cout << std::to_string(referenceImage.rows) << std::endl;
@@ -328,40 +328,40 @@ void initTextOverlay(const cv::Mat& referenceImage, const std::string& defaultTe
     // Calculate fixed position based on corner
     switch(corner) {
         case TextOverlay::TOP_LEFT:
-            overlay.position = cv::Point(10, textSize.height + 10);
+            overlay.position = cv::Point(10, text_size.height + 10);
             break;
         case TextOverlay::TOP_RIGHT:
-            overlay.position = cv::Point(referenceImage.cols - textSize.width - 10, 
-                                       textSize.height + 10);
+            overlay.position = cv::Point(referenceImage.cols - text_size.width - 10, 
+                                       text_size.height + 10);
             break;
         case TextOverlay::BOTTOM_LEFT:
             overlay.position = cv::Point(10, referenceImage.rows - 10);
             break;
         case TextOverlay::BOTTOM_RIGHT:
-            overlay.position = cv::Point(referenceImage.cols - textSize.width - 10, 
+            overlay.position = cv::Point(referenceImage.cols - text_size.width - 10, 
                                        referenceImage.rows - 10);
             break;
         default:
-            overlay.position = cv::Point(10, textSize.height + 10);
+            overlay.position = cv::Point(10, text_size.height + 10);
     }
     
     // Pre-calculate background rectangle for static text
-    if (!isDynamic) {
-        overlay.backgroundRect = cv::Rect(
+    if (!is_dynamic) {
+        overlay.bg_rect = cv::Rect(
             overlay.position.x - 5, 
-            overlay.position.y - textSize.height - 5, 
-            textSize.width + 10, 
-            textSize.height + 10
+            overlay.position.y - text_size.height - 5, 
+            text_size.width + 10, 
+            text_size.height + 10
         );
     } else {
         // For dynamic text, we'll use a default size that will be updated later
         // Store the maximum expected width to avoid text getting cut off
-        int maxWidth = textSize.width * 1.5;  // Adjust this based on your needs
-        overlay.backgroundRect = cv::Rect(
+        int maxWidth = text_size.width * 1.5;  // Adjust this based on your needs
+        overlay.bg_rect = cv::Rect(
             overlay.position.x - 5,
-            overlay.position.y - textSize.height - 5,
+            overlay.position.y - text_size.height - 5,
             maxWidth + 10,
-            textSize.height + 10
+            text_size.height + 10
         );
     }
     
@@ -371,29 +371,29 @@ void initTextOverlay(const cv::Mat& referenceImage, const std::string& defaultTe
 
 
 /********************************************************************************
- * Function: updateDynamicText
+ * Function: update_dynamic_text
  * Description: Update the text for a dynamic overlay.
  ********************************************************************************/
-void updateDynamicText(int index, const std::string& newText) {
-    if (index >= 0 && index < g_textOverlays.size() && g_textOverlays[index].isDynamic) {
+void update_dynamic_text(int index, const std::string& newText) {
+    if (index >= 0 && index < g_textOverlays.size() && g_textOverlays[index].is_dynamic) {
         g_textOverlays[index].text = newText;
     }
 }
 
 
 /********************************************************************************
- * Function: renderTextOverlays
+ * Function: render_text_overlays
  * Description: Draw all text overlays on the image.
  ********************************************************************************/
-void renderTextOverlays(cv::Mat& image) {
+void render_text_overlays(cv::Mat& image) {
     for (const auto& overlay : g_textOverlays) {
         // Draw background rectangle
-        cv::rectangle(image, overlay.backgroundRect, overlay.bgColor, -1);
+        cv::rectangle(image, overlay.bg_rect, overlay.bg_color, -1);
         
         // Draw text
         cv::putText(image, overlay.text, overlay.position, 
-                   overlay.fontFace, overlay.fontScale, 
-                   overlay.textColor, overlay.thickness);
+                   overlay.font_face, overlay.font_scale, 
+                   overlay.text_color, overlay.thickness);
     }
 }
 
@@ -435,12 +435,12 @@ bool VideoCV::init(void)
 
 #endif // DEBUG_BUILD
 
-    //initTextOverlay(g_image, "Hello world!", TextOverlay::TOP_LEFT);
+    //init_text_overlay(g_image, "Hello world!", TextOverlay::TOP_LEFT);
     image_overlay = g_image.clone();
-    initTextOverlay(image_overlay, "t: 4.206969", TextOverlay::BOTTOM_LEFT, true);
-    initTextOverlay(image_overlay, "mav_veh_state: 1", TextOverlay::BOTTOM_RIGHT, true);
-    initTextOverlay(image_overlay, "x_target: 4.20696969", TextOverlay::TOP_RIGHT, true);
-    initTextOverlay(image_overlay, "alt: 0.420696969", TextOverlay::TOP_LEFT, true);
+    init_text_overlay(image_overlay, "t: 4.206969", TextOverlay::BOTTOM_LEFT, true);
+    init_text_overlay(image_overlay, "mav_veh_state: 1", TextOverlay::BOTTOM_RIGHT, true);
+    init_text_overlay(image_overlay, "x_target: 4.20696969", TextOverlay::TOP_RIGHT, true);
+    init_text_overlay(image_overlay, "alt: 0.420696969", TextOverlay::TOP_LEFT, true);
 
     return true;
 }
@@ -475,21 +475,21 @@ void VideoCV::out_loop(void)
         std::ostringstream ss;
         ss << "t: " << std::to_string(g_app_elapsed_time);
         std::string str_out_loop = ss.str();
-        updateDynamicText(0, str_out_loop);
+        update_dynamic_text(0, str_out_loop);
         std::ostringstream ss2;
         ss2 << "mav_veh_state: " << std::to_string(g_mav_veh_state);
         str_out_loop = ss2.str();
-        updateDynamicText(1, str_out_loop);
+        update_dynamic_text(1, str_out_loop);
         std::ostringstream ss3;
         ss3 << "x_target: " << std::to_string(g_x_target);
         str_out_loop = ss3.str();
-        updateDynamicText(2, str_out_loop);
+        update_dynamic_text(2, str_out_loop);
         std::ostringstream ss4;
         ss4 << "alt: " << std::to_string(g_mav_veh_rel_alt);
         str_out_loop = ss4.str();
-        updateDynamicText(3, str_out_loop);
+        update_dynamic_text(3, str_out_loop);
 
-        renderTextOverlays(image_overlay);
+        render_text_overlays(image_overlay);
 
         save_video();
     }
