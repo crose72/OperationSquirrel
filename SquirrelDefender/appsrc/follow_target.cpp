@@ -3,7 +3,7 @@
 /********************************************************************************
  * @file    follow_target.cpp
  * @author  Cameron Rose
- * @date    1/22/2025
+ * @date    2/27/2025
  * @brief   Follow the target and maintain a specified x, y, z offset.
  ********************************************************************************/
 
@@ -83,9 +83,9 @@ const float w2_x = 0.0f;
 const float w3_x = 0.0f;
 
 /* y forward */
-const float Kp_y = 0.3f;
-const float Ki_y = 0.009f;
-const float Kd_y = 0.2f;
+const float Kp_y = 0.005;
+const float Ki_y = 0.00f;
+const float Kd_y = 0.001f;
 const float w1_y = 1.0f;
 const float w2_y = 0.0f;
 const float w3_y = 0.0f;
@@ -96,17 +96,17 @@ const float w2_z = 0.0f;
 const float w3_z = 0.0f;
 
 /* x reverse */
-const float Kp_x_rev = 0.001f;
-const float Ki_x_rev = 0.00009f;
-const float Kd_x_rev = 0.00005f;
+const float Kp_x_rev = 0.0;
+const float Ki_x_rev = 0.0;
+const float Kd_x_rev = 0.0;
 const float w1_x_rev = 1.0f;
 const float w2_x_rev = 0.0f;
 const float w3_x_rev = 0.0f;
 
 /* y reverse */
-const float Kp_y_rev = 0.01f;
+const float Kp_y_rev = 0.005;
 const float Ki_y_rev = 0.0f;
-const float Kd_y_rev = 0.0001f;
+const float Kd_y_rev = 0.0;
 const float w1_y_rev = 1.0f;
 const float w2_y_rev = 0.0f;
 const float w3_y_rev = 0.0f;
@@ -188,16 +188,16 @@ void calc_follow_error(void)
 
 #endif // DEBUG_BUILD
 
-    if (g_x_target < 0.001f)
+    if (g_x_target_ekf < 0.001f)
     {
         g_x_error = 0.0f;
     }
     else
     {
-        g_x_error = g_x_target - x_desired;
+        g_x_error = g_x_target_ekf - x_desired;
     }
 
-    g_y_error = g_y_target - y_desired;
+    g_y_error = g_y_target_ekf - y_desired;
 }
 
 /********************************************************************************
@@ -211,9 +211,10 @@ void dtrmn_follow_vector(void)
 
     if (g_target_valid && g_target_too_close)
     {
-        g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                              g_x_error, 0.0, 0.0,
-                                              w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
+        //g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
+        //                                      g_x_error, 0.0, 0.0,
+        //                                      w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
+        g_vy_adjust = 0.0;
         g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
                                               g_y_error, 0.0, 0.0,
                                               w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);

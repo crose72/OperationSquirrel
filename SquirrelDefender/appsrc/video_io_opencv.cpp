@@ -481,7 +481,7 @@ void VideoCV::out_loop(void)
         str_out_loop = ss2.str();
         update_dynamic_text(1, str_out_loop);
         std::ostringstream ss3;
-        ss3 << "x_target: " << std::to_string(g_x_target);
+        ss3 << "x_target: " << std::to_string(g_x_target_ekf);
         str_out_loop = ss3.str();
         update_dynamic_text(2, str_out_loop);
         std::ostringstream ss4;

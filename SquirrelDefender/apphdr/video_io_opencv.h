@@ -26,7 +26,8 @@
  ********************************************************************************/
 extern float g_app_elapsed_time;
 extern uint8_t g_mav_veh_state;
-extern float g_x_target;
+extern float g_x_target_ekf;
+extern float g_y_target_ekf;
 extern int32_t g_mav_veh_rel_alt;
 
 

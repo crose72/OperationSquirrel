@@ -233,7 +233,8 @@ int SystemController::init(void)
 
     if (!MavMsg::init() ||
         !DataLogger::init() ||
-        !VehicleController::init())
+        !VehicleController::init() ||
+        !Time::init())
     {
         return 1;
     }

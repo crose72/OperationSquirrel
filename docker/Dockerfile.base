@@ -1,0 +1,5 @@
+FROM crose72/jetpack-r36.4.0:base
+
+# Install dependencies in the container
+RUN apt install -y libarmadillo-dev liblapack-dev libblas-dev
+RUN pkg-config --cflags --libs armadillo

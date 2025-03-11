@@ -101,7 +101,7 @@ int main(void)
 
 #else
 
-    while (!stop_program)
+    while (!stop_program && !g_manual_override_land)
 
 #endif // BLD_JETSON_B01
 

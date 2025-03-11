@@ -31,6 +31,8 @@ extern float g_x_target;
 extern float g_y_target;
 extern float g_z_target;
 extern float g_dt;
+extern float g_x_target_ekf;
+extern float g_y_target_ekf;
 
 /********************************************************************************
  * Exported objects

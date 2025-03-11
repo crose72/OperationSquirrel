@@ -50,15 +50,7 @@ void follow_mode(void)
     target_velocity[1] = g_vy_adjust;
     target_velocity[2] = g_vz_adjust;
 
-    if (g_target_valid && g_target_too_close)
-    {
-        MavMotion::cmd_velocity_xy_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
-    }
-    else if (g_target_valid && !g_target_too_close)
-    {
-        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
-    }
-    else
+    if (g_target_valid)
     {
         MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
     }
@@ -68,7 +60,7 @@ void follow_mode(void)
 
 /********************************************************************************
  * Function: VehicleController
- * Description: Constructor of the VehicleController class.
+ * Description: Constructor of the VehicleController clasds.
  ********************************************************************************/
 VehicleController::VehicleController(void) {}
 
@@ -124,7 +116,7 @@ void VehicleController::loop(void)
             takeoff_dbc = true;
         }
 
-        if (takeoff_dbc && g_mav_veh_rngfdr_current_distance > 600 || g_mav_veh_rel_alt > 6000)
+        if (takeoff_dbc && g_mav_veh_rngfdr_current_distance > 550 || g_mav_veh_rel_alt > 5500)
         {
             start_follow_mode = true;
         }

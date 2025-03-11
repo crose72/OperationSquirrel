@@ -48,6 +48,29 @@ float y_target_latched;
 bool loc_target_valid_prv;
 float loc_target_center_x_prv;
 float loc_target_center_y_prv;
+// Define state-space matrices using Armadillo
+arma::mat A;  // System dynamics matrix
+arma::mat B;  // Control matrix (if needed, otherwise identity)
+arma::mat H;  // Observation matrix
+arma::mat Q;  // Process noise covariance
+arma::mat R;  // Measurement noise covariance
+arma::mat P;  // Estimate error covariance
+
+// State and measurement vectors
+arma::colvec x0;  // Initial state
+arma::colvec measurements;  // Observed measurements
+
+// Kalman Filter instance
+KF kf;
+
+float g_x_target_ekf;
+float g_y_target_ekf;
+float g_vx_target_ekf;
+float g_vy_target_ekf;
+float g_ax_target_ekf;
+float g_ay_target_ekf;
+float x_target_ekf_prv;
+float y_target_ekf_prv;
 
 /********************************************************************************
  * Calibration definitions
@@ -56,6 +79,8 @@ const float center_of_frame_width = 640.0f;
 const float center_of_frame_height = 360.0f;
 const float camera_fixed_angle = 0.436f; // radians
 const float PI = 3.14159;
+const int n_states = 6;
+const int n_meas = 2;
 
 const float d_offset_w[MAX_IDX_D_WIDTH] = {
     0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5,
@@ -119,6 +144,8 @@ const float delta_offset[MAX_IDX_DELTA_PIXEL_OFFSET][MAX_IDX_DELTA_D_OFFSET] = {
  * Function definitions
  ********************************************************************************/
 void calc_target_offest(void);
+void kf_predict(void);
+void kf_update(void);
 
 /********************************************************************************
  * Function: calc_target_offest
@@ -225,10 +252,62 @@ void calc_target_offest(void)
 }
 
 /********************************************************************************
- * Function: Localize
- * Description: Localize class constructor.
+ * Function: kf_predict
+ * Description: Predict step in kalman filter.
  ********************************************************************************/
-Localize::Localize(void) {};
+void kf_predict(void) 
+{
+
+};
+
+/********************************************************************************
+ * Function: kf_update
+ * Description: Update step in kalman filter.
+ ********************************************************************************/
+void kf_update(void) 
+{
+    if (g_target_valid && 
+        (!(g_target_center_x < 50.0 || g_target_center_x > 670) && 
+        !(g_target_center_y < 50.0 || g_target_center_x > 1230) && 
+        !((g_target_width * g_target_height) < 11178.0)) &&
+        g_dt > 0.0001)
+    {
+        // Ensure g_dt is valid
+        if (std::isnan(g_dt) || std::isinf(g_dt) || g_dt <= 0) {
+            std::cerr << "Error: g_dt is invalid: " << g_dt << std::endl;
+            return;
+        }
+
+        // Prepare measurement vector (observations)
+        colvec z(2);
+        z << g_x_target << g_y_target;
+
+        // Define the system transition matrix A (discretized)
+        mat A_new(6,6, fill::zeros);
+        A_new << 1, 0, g_dt, 0, 0.5 * pow(g_dt,2), 0,
+                 0, 1, 0, g_dt, 0, 0.5 * pow(g_dt,2),
+                 0, 0, 1, 0, g_dt, 0,
+                 0, 0, 0, 1, 0, g_dt,
+                 0, 0, 0, 0, 1, 0,
+                 0, 0, 0, 0, 0, 1;
+
+        // Control input (assumed zero if not using control)
+        colvec u(1, fill::zeros);  // No external control input for now
+
+        // Perform Kalman filter update
+        kf.Kalmanf(z, u);
+
+        // Retrieve the updated state
+        colvec *state = kf.GetCurrentEstimatedState();
+        g_x_target_ekf = state->at(0);
+        g_y_target_ekf = state->at(1);
+        g_vx_target_ekf = state->at(2);
+        g_vy_target_ekf = state->at(3);
+        g_ax_target_ekf = state->at(4);
+        g_ay_target_ekf = state->at(5);
+    }
+};
+
 
 /********************************************************************************
  * Function: ~Localize
@@ -260,7 +339,71 @@ bool Localize::init(void)
     x_target_prv = 0.0f;
     y_target_prv = 0.0f;
     loc_target_valid_prv = false;
+    g_x_target_ekf = 0.0;
+    g_y_target_ekf = 0.0;
+    x_target_ekf_prv = 0.0;
+    y_target_ekf_prv = 0.0;
+    g_vx_target_ekf = 0.0;
+    g_vy_target_ekf = 0.0;
 
+    // KF init
+    // Number of states and measurements
+    int n_states = 6;  // x, y, vx, vy, ax, ay
+    int n_meas = 2;    // x_m, y_m
+    double dt = 0.05;  // Time step
+
+    // Resize matrices and set to zero initially
+    A.set_size(n_states, n_states); A.zeros();
+    B.set_size(n_states, 1); B.zeros();
+    H.set_size(n_meas, n_states); H.zeros();
+    Q.set_size(n_states, n_states); Q.zeros();
+    R.set_size(n_meas, n_meas); R.zeros();
+    P.set_size(n_states, n_states); P.zeros();
+
+    // Define system dynamics (State transition matrix A)
+    A << 1 << 0 << dt << 0 << 0.5 * pow(dt,2) << 0  << arma::endr
+      << 0 << 1 << 0 << dt << 0 << 0.5 * pow(dt,2)  << arma::endr
+      << 0 << 0 << 1 << 0 << dt << 0  << arma::endr
+      << 0 << 0 << 0 << 1 << 0 << dt  << arma::endr
+      << 0 << 0 << 0 << 0 << 1 << 0  << arma::endr
+      << 0 << 0 << 0 << 0 << 0 << 1  << arma::endr;
+
+    // Observation matrix (Only x and y are observed)
+    H << 1 << 0 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 1 << 0 << 0 << 0 << 0 << arma::endr;
+
+    // Model covariance matrix Q (process noise)
+    Q << 0.01 << 0 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 0.1 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 0 << 0.00001 << 0 << 0 << 0 << arma::endr
+      << 0 << 0 << 0 << 0.00001 << 0 << 0 << arma::endr
+      << 0 << 0 << 0 << 0 << 0.00001 << 0 << arma::endr
+      << 0 << 0 << 0 << 0 << 0 << 0.00001 << arma::endr;
+
+    // Measurement covariance matrix R (sensor noise)
+    R << 10.0 << 0 << arma::endr
+      << 0 << 40.0 << arma::endr;
+
+    // Estimate covariance matrix P (initial trust in the estimate)
+    P << 0.1 << 0 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 0.1 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 0 << 0.1 << 0 << 0 << 0 << arma::endr
+      << 0 << 0 << 0 << 0.1 << 0 << 0 << arma::endr
+      << 0 << 0 << 0 << 0 << 0.1 << 0 << arma::endr
+      << 0 << 0 << 0 << 0 << 0 << 0.1 << arma::endr;
+
+    // Initialize Kalman Filter
+    kf.InitSystem(A, B, H, Q, R);
+
+    // Set initial state (assuming stationary at origin)
+    x0.set_size(n_states);
+    x0.zeros(); // Start with zero velocity and acceleration
+    kf.InitSystemState(x0);
+
+    // Resize and reset measurements
+    measurements.set_size(n_meas);
+    measurements.zeros();
+    
     return true;
 }
 
@@ -272,6 +415,7 @@ bool Localize::init(void)
 void Localize::loop(void)
 {
     calc_target_offest();
+    kf_update();
 }
 
 #endif // ENABLE_CV

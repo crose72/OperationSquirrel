@@ -5,7 +5,7 @@
 /********************************************************************************
  * Setup
  ********************************************************************************/
-std::string filename = "../test_suite/data_1.csv";
+std::string filename = "../test_data/data_1.csv";
 std::vector<float> g_app_elapsed_time_arr;
 std::vector<float> g_mav_veh_pitch_arr;
 std::vector<float> g_target_valid_arr;
@@ -20,6 +20,7 @@ std::vector<float> g_target_left_arr;
 std::vector<float> g_target_right_arr;
 std::vector<float> g_target_top_arr;
 std::vector<float> g_target_bottom_arr;
+float time_prv;
 
 void setup(void)
 {
@@ -50,14 +51,17 @@ void setup(void)
         return;
     }
 
-    // Initialize all inputs to the software component  
+    // Initialize the software component  
     Localize::init();
+
+    // Additional initializations
+    time_prv = 0.0;
 }
 
 void run(void)
 {
     // Create csv file to save outputs to
-    std::ofstream outputFile("localize_output_2_filtered.csv");
+    std::ofstream outputFile("localize_output.csv");
     if (!outputFile.is_open()) 
     {
         std::cerr << "Error opening output file!" << std::endl;
@@ -91,7 +95,13 @@ void run(void)
                 << "g_camera_tilt_angle,"
                 << "g_delta_d_x,"
                 << "g_delta_d_z,"
-                << "g_camera_comp_angle\n";
+                << "g_camera_comp_angle,"
+                << "g_x_target_ekf,"
+                << "g_y_target_ekf,"
+                << "g_vx_target_ekf,"
+                << "g_vy_target_ekf,"
+                << "g_ax_target_ekf,"
+                << "g_ay_target_ekf\n";
 
     // Get max number of rows to ensure all data is included
     size_t num_rows = g_app_elapsed_time_arr.size();
@@ -115,6 +125,16 @@ void run(void)
             g_target_right = g_target_right_arr[i];
             g_target_top = g_target_top_arr[i];
             g_target_bottom = g_target_bottom_arr[i];
+
+            // Calculate timestep manually since this is not running on the drone in real time
+            g_dt = g_app_elapsed_time - time_prv;
+            time_prv = g_app_elapsed_time;
+
+            // Have to calculate the bounding box for the localize algo since
+            // it's calculated in the track_target function (or update the inputs
+            // to this test case and call Track::loop)
+            g_target_center_y = (g_target_left + g_target_right) / 2.0f;
+            g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
 
             // Call Localize::loop() to calculate it's outputs
             Localize::loop();
@@ -146,9 +166,14 @@ void run(void)
                        << g_camera_tilt_angle << ","
                        << g_delta_d_x << ","
                        << g_delta_d_z << ","
-                       << g_camera_comp_angle << "\n";
+                       << g_camera_comp_angle << ","
+                       << g_x_target_ekf << ","
+                       << g_y_target_ekf << ","
+                       << g_vx_target_ekf << ","
+                       << g_vy_target_ekf << ","
+                       << g_ax_target_ekf << ","
+                       << g_ay_target_ekf << "\n";
         }
-       
     }
 
     // Close file after writing to it

@@ -4,3 +4,6 @@
 [submodule "SquirrelDefender/modules/yolov8_tensorrt"]
 	path = SquirrelDefender/modules/yolov8_tensorrt
 	url = https://github.com/crose72/YOLOv8-TensorRT-CPP.git
+[submodule "SquirrelDefender/modules/kf_utils"]
+	path = SquirrelDefender/modules/kf_utils
+	url = https://github.com/auralius/kalman-cpp.git
