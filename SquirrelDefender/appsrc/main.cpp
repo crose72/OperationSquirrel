@@ -10,22 +10,7 @@
  * Includes
  ********************************************************************************/
 #include <mutex>
-#include <signal.h>
-#include <chrono>
-#include <thread>
-#include "common_inc.h"
-#include "datalog.h"
-#include "video_io.h"
-#include "system_controller.h"
-#include "mav_data_hub.h"
-#include "mav_utils.h"
-#include "vehicle_controller.h"
-#include "detect_target.h"
-#include "track_target.h"
-#include "localize_target.h"
-#include "follow_target.h"
-#include "time_calc.h"
-#include "timer.h"
+#include "scheduler.h"
 
 #ifdef BLD_JETSON_B01
 
@@ -45,7 +30,6 @@
  * Object definitions
  ********************************************************************************/
 bool stop_program;
-std::mutex mutex_main;
 
 /********************************************************************************
  * Calibration definitions
@@ -86,13 +70,13 @@ void attach_sig_handler(void)
  ********************************************************************************/
 int main(void)
 {
-    Timer main_loop(std::chrono::milliseconds(25));
+
     attach_sig_handler();
     stop_program = false;
 
-    if (SystemController::init() != 0)
+    if (Scheduler::init() != 0)
     {
-        return SystemController::init();
+        return Scheduler::init();
     }
 
 #ifdef BLD_JETSON_B01
@@ -106,30 +90,10 @@ int main(void)
 #endif // BLD_JETSON_B01
 
     {
-        std::lock_guard<std::mutex> lock(mutex_main);
-        main_loop.start_time();
-        SystemController::loop();
-        MavMsg::loop();
-
-#ifdef ENABLE_CV
-
-        Video::in_loop();
-        Detection::loop();
-        Track::loop();
-        Localize::loop();
-        Follow::loop();
-        Video::out_loop();
-
-#endif // ENABLE_CV
-
-        VehicleController::loop();
-        DataLogger::loop();
-        Time::loop();
-        main_loop.end_time();
-        main_loop.wait();
+        Scheduler::loop();
     }
 
-    SystemController::shutdown();
+    Scheduler::shutdown();
 
     return 0;
 }
