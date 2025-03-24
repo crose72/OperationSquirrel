@@ -57,7 +57,7 @@ option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
-option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" ON)
+option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" OFF)
 option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" OFF)
 
 # Option to use environment variables for library paths
@@ -83,6 +83,10 @@ if(BLD_WSL)
 endif()
 
 if(BLD_WIN)
+    math(EXPR BUILD_PLATFORMS "${BUILD_PLATFORMS} + 1")
+endif()
+
+if(BUILD_TEST_HARNESS)
     math(EXPR BUILD_PLATFORMS "${BUILD_PLATFORMS} + 1")
 endif()
 
@@ -228,6 +232,11 @@ if (NOT TensorRT_DIR)
     set(TensorRT_DIR /home/cyrus/work/libs/TensorRT-10.0.0.6/)
 endif()
 
+# Set paths to acados installation
+set(ACADOS_INSTALL_DIR /usr/local)
+set(ACADOS_INCLUDE_DIR ${ACADOS_INSTALL_DIR}/include/acados)
+set(ACADOS_LIB_DIR ${ACADOS_INSTALL_DIR}/lib)
+
 # Environment variable validation and inclusion based on platform
 if(USE_ENV_VAR)
     if(BLD_WIN)
@@ -330,6 +339,10 @@ else()
             /usr/include/opencv4
             ${EIGEN3_INCLUDE_DIR}
             ${ARMADILLO_INCLUDE_DIRS}
+            ${ACADOS_INCLUDE_DIR}
+            /usr/local/include/blasfeo/include # needed for ACADOS
+            /usr/local/include/hpipm/include/ # needed for ACADOS
+            /usr/local/include/acados_c # needed for ACADOS
         )
 
         link_directories(
@@ -337,6 +350,7 @@ else()
             /usr/local/cuda/lib64
             /usr/lib/aarch64-linux-gnu/tegra
             ${ARMADILLO_LIBRARY_DIRS}
+            ${ACADOS_LIB_DIR}
         )
     endif()
 endif()
@@ -435,7 +449,13 @@ if (NOT BUILD_TEST_HARNESS)
                             jsoncpp
                             ${ARMADILLO_LIBRARIES} 
                             ${LAPACK_LIBRARIES} 
-                            ${BLAS_LIBRARIES})
+                            ${BLAS_LIBRARIES}
+                            acados 
+                            hpipm 
+                            blasfeo 
+                            qpOASES_e  # For acados, remove if you are not using qpOASES
+                            osqp       # For acados, remove if you are not using OSQP
+                            )
 
     elseif(BLD_WSL)
         add_executable(squirreldefender ${SOURCES} ${HEADERS})
