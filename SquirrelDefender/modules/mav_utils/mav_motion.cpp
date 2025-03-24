@@ -69,7 +69,7 @@ void MavMotion::cmd_position_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, 
  * Function: cmd_velocity_NED
  * Description: Move in direction of vector vx,vy,vz in the NED frame.
  ********************************************************************************/
-void MavMotion::cmd_velocity_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target[3])
+void MavMotion::cmd_velocity_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target[3], float x, float y)
 {
     float yaw_target = 0.0;
     uint16_t options = 0;
@@ -78,7 +78,7 @@ void MavMotion::cmd_velocity_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, 
         POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE |
         POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
 
-    yaw_target = calc_yaw_target(velocity_target[0], velocity_target[1]);
+    yaw_target = calc_yaw_target(x, y);
 
     send_cmd_velocity_target(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, 
                                       velocity_target[0], velocity_target[1], velocity_target[2], yaw_target, options, MAV_FRAME_BODY_OFFSET_NED);

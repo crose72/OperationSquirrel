@@ -316,7 +316,7 @@ void kf_update(void)
 Localize::~Localize(void) {};
 
 /********************************************************************************
- * Function: localize_target_init
+ * Function: init
  * Description: Initialize all Localize target variables.  Run once at the start
  *              of the program.
  ********************************************************************************/
@@ -408,7 +408,7 @@ bool Localize::init(void)
 }
 
 /********************************************************************************
- * Function: localize_control_loop
+ * Function: loop
  * Description: Return control parameters for the vehicle to Localize a designated
  *              target at a distance.
  ********************************************************************************/
@@ -416,6 +416,15 @@ void Localize::loop(void)
 {
     calc_target_offest();
     kf_update();
+}
+
+/********************************************************************************
+ * Function: shutdown
+ * Description: Clean up code to run before program exits.
+ ********************************************************************************/
+void Localize::shutdown(void)
+{
+    // place clean up code here
 }
 
 #endif // ENABLE_CV

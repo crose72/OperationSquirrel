@@ -1,48 +1,45 @@
-#pragma once
-
 /********************************************************************************
- * @file    vehicle_controller.h
+ * @file    path_planner
  * @author  Cameron Rose
- * @date    1/22/2025
+ * @date    3/12/2025
  ********************************************************************************/
-#ifndef VEHICLE_CONTROLLER_H
-#define VEHICLE_CONTROLLER_H
+#ifndef PATH_PLANNER_H
+#define PATH_PLANNER_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "mav_data_hub.h"
-#include "mav_utils.h"
-#include "follow_target.h"
-#include "system_controller.h"
+#include <iostream>
+#include <opencv2/opencv.hpp>
+#include "ocp_nlp_interface.h"
+#include "external_function_interface.h"
+#include <ocp_nlp/ocp_nlp_common.h>
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+//#include <ocp_nlp/ocp_nlp_common.h>
+//#include <ocp_nlp_interface.h>
+//#include <ocp_nlp/ocp_nlp_sqp.h>
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern bool g_target_too_close;
-extern bool g_target_valid;
-extern float g_vx_adjust;
-extern float g_vy_adjust;
-extern float g_vz_adjust;
-extern float g_x_target_ekf;
-extern float g_y_target_ekf;
-extern uint16_t g_mav_veh_rngfdr_current_distance;
-extern int32_t g_mav_veh_rel_alt;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
 
 /********************************************************************************
- * Function prototypes and Class Definitions
+ * Function prototypes
  ********************************************************************************/
-class VehicleController
+class Planner
 {
-    VehicleController();
-    ~VehicleController();
-
 public:
+    Planner();
+    ~Planner();
+
     static bool init(void);
     static void loop(void);
     static void shutdown(void);
@@ -50,4 +47,4 @@ public:
 private:
 };
 
-#endif // VEHICLE_CONTROLLER_H
+#endif // PATH_PLANNER_H

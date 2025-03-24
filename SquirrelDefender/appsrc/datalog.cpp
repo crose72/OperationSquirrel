@@ -336,3 +336,12 @@ void DataLogger::loop(void)
 
     save_to_csv(file_name, datalog_record);
 }
+
+/********************************************************************************
+ * Function: shutdown
+ * Description: Clean up code to run before program exits.
+ ********************************************************************************/
+void DataLogger::shutdown(void)
+{
+    // place clean up code here
+}

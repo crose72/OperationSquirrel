@@ -212,6 +212,7 @@ int SystemController::init(void)
         !Detection::init() ||
         !Track::init() ||
         !Localize::init() ||
+        !Planner::init() ||
         !Follow::init())
     {
         led_bad_blink();
@@ -270,9 +271,15 @@ void SystemController::shutdown(void)
 {
     VehicleController::shutdown();
     MavMsg::shutdown();
+    DataLogger::shutdown();
+    Time::shutdown();
 
 #ifdef ENABLE_CV
-
+    
+    Track::shutdown();
+    Localize::shutdown();
+    Planner::shutdown();
+    Follow::shutdown();
     Video::shutdown();
     Detection::shutdown();
 

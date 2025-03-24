@@ -83,7 +83,7 @@ const float w2_x = 0.0f;
 const float w3_x = 0.0f;
 
 /* y forward */
-const float Kp_y = 0.005;
+const float Kp_y = 0.03;
 const float Ki_y = 0.00f;
 const float Kd_y = 0.001f;
 const float w1_y = 1.0f;
@@ -115,7 +115,7 @@ const uint16_t vehicle_rel_height_err = 0.0f;
 const uint16_t vehicle_height_desired = 0.0f;
 const float target_height_desired = 0.0f;
 const float target_width_desired = 0.0f;
-const float x_desired = 2.0f; // Make const in the end
+const float x_desired = 4.0f; // Make const in the end
 const float y_desired = 0.0f; // Make const in the ends
 
 #endif // DEBUG_BUILD
@@ -214,7 +214,7 @@ void dtrmn_follow_vector(void)
         //g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
         //                                      g_x_error, 0.0, 0.0,
         //                                      w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
-        g_vy_adjust = 0.0;
+        g_vx_adjust = 0.0;
         g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
                                               g_y_error, 0.0, 0.0,
                                               w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
@@ -274,6 +274,15 @@ void Follow::loop(void)
     get_control_params();
     calc_follow_error();
     dtrmn_follow_vector();
+}
+
+/********************************************************************************
+ * Function: shutdown
+ * Description: Clean up code to run before program exits.
+ ********************************************************************************/
+void Follow::shutdown(void)
+{
+    // place clean up code here
 }
 
 #endif // ENABLE_CV

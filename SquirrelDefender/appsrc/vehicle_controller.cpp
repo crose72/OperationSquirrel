@@ -52,7 +52,7 @@ void follow_mode(void)
 
     if (g_target_valid)
     {
-        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity, g_x_target_ekf, g_y_target_ekf);
     }
 }
 
