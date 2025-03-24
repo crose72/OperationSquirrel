@@ -1,5 +1,29 @@
 FROM crose72/jetpack-r36.4.0:base
 
 # Install dependencies in the container
-RUN apt install -y libarmadillo-dev liblapack-dev libblas-dev
-RUN pkg-config --cflags --libs armadillo
+#RUN apt install -y libarmadillo-dev liblapack-dev libblas-dev
+#RUN pkg-config --cflags --libs armadillo
+
+# Install MPC library and dependencies
+
+# Set environment variables
+#ENV DEBIAN_FRONTEND=noninteractive
+#ENV ACADOS_SOURCE_DIR=/root/acados
+#ENV ACADOS_INSTALL_DIR=/usr/local
+#ENV LD_LIBRARY_PATH=${ACADOS_INSTALL_DIR}/lib:${LD_LIBRARY_PATH}
+#ENV CMAKE_PREFIX_PATH=${ACADOS_INSTALL_DIR}
+
+WORKDIR /root
+
+# Clone acados repo and initialize submodules
+RUN cd acados && \
+    git submodule update --init --recursive && \
+    cd build && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=${ACADOS_INSTALL_DIR} \
+             -DACADOS_WITH_QPOASES=ON \
+             -DACADOS_WITH_OSQP=ON && \
+    make -j$(nproc) && \
+    make install
+
+# Set working directory
+WORKDIR /workspace/OperationSquirrel/SquirrelDefender/build
