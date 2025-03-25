@@ -261,6 +261,43 @@ If your jetson is setup to start the program on boot then you're good to go!  Re
 
 ***Remember to disconnect the uart wires or disconnect the battery from the drone so that the props don't start spinning when you're not ready (if squirreldefender.service is active and started when you power on the jetson then it will send the command to arm the drone and takeoff so you don't want it near you when that happens)
 
+#### Clock skew error when Jetson no longer has wifi connection
+
+When the Jetson has no internet connection the system time defaults to 1969.  Since you're probably working in the present (2025 and beyond), any files you've touched will likey have a timestamp in the present.  This timestamp is after 1969 by a lot.  So if you go to compile the squirreldefender program the compiler will notice that the files have a timestamp millions of seconds in the future, resulting in a clock skew when recompiling.  To solve this issue, create a systemd service to automatically move the system time to a few seconds after the latest timestamp in the OperationSquirrel repo.
+
+Create a systemd service
+```
+sudo nano /etc/systemd/system/clock-skew-fix.service
+```
+
+```
+# Add this to the file
+
+    [Unit]
+    Description=Ensure system clock is ahead of all file timestamps
+    After=multi-user.target
+    [Service]
+    Type=oneshot
+    ExecStart=/bin/bash -c '
+      # Replace with your actual project/code path
+      latest=$(find /home/user/project -type f -exec stat -c %%Y {} + 2>/dev/null | sort -n | tail -1)
+      now=$(date +%%s)
+      if [ -n "$latest" ] && [ "$now" -lt "$latest" ]; then
+        echo "⏩ Clock behind file timestamps, setting time forward..."
+        date -s "@$((latest + 10))"
+      fi
+    '
+    [Install]
+    WantedBy=multi-user.target
+```
+
+Next, enable and start the systemd service you just created
+
+```
+sudo systemctl enable clock-skew-fix.service
+sudo systemctl start clock-skew-fix.service
+```
+
 ## Jetson Nano B01
 
 ### Prerequisites:
