@@ -221,7 +221,7 @@ bool save_video(void)
     // write video file 
     if (video_writer.isOpened())
     {
-        video_writer.write(image_overlay);
+        video_writer.write(g_image);
         return true;
     }
 
@@ -434,13 +434,13 @@ bool VideoCV::init(void)
 
 
 #endif // DEBUG_BUILD
-
+    /*
     //init_text_overlay(g_image, "Hello world!", TextOverlay::TOP_LEFT);
     image_overlay = g_image.clone();
     init_text_overlay(image_overlay, "t: 4.206969", TextOverlay::BOTTOM_LEFT, true);
     init_text_overlay(image_overlay, "mav_veh_state: 1", TextOverlay::BOTTOM_RIGHT, true);
     init_text_overlay(image_overlay, "x_target: 4.20696969", TextOverlay::TOP_RIGHT, true);
-    init_text_overlay(image_overlay, "alt: 0.420696969", TextOverlay::TOP_LEFT, true);
+    init_text_overlay(image_overlay, "alt: 0.420696969", TextOverlay::TOP_LEFT, true);*/
 
     return true;
 }
@@ -470,6 +470,7 @@ void VideoCV::out_loop(void)
 
     if (file_stream_created)
     {
+        /*
         image_overlay = g_image.clone();
 
         std::ostringstream ss;
@@ -489,7 +490,7 @@ void VideoCV::out_loop(void)
         str_out_loop = ss4.str();
         update_dynamic_text(3, str_out_loop);
 
-        render_text_overlays(image_overlay);
+        render_text_overlays(image_overlay);*/
 
         save_video();
     }

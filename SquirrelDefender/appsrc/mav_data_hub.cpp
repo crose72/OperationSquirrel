@@ -210,7 +210,7 @@ void proc_mav_heartbeat_msg(const mavlink_message_t *msg)
         g_mav_veh_mavlink_version = heartbeat.mavlink_version;
     }
     
-    if (g_mav_veh_custom_mode == (uint32_t)9 && g_mav_veh_custom_mode_prv == (uint32_t)4)
+    if (g_mav_veh_custom_mode == (uint32_t)9 && g_mav_veh_custom_mode_prv != (uint32_t)9)
     {
         g_manual_override_land = true;
     }
