@@ -12,12 +12,6 @@
 #include <mutex>
 #include "scheduler.h"
 
-#ifdef BLD_JETSON_B01
-
-#include "status_io.h"
-
-#endif // BLD_JETSON_B01
-
 /********************************************************************************
  * Typedefs
  ********************************************************************************/
@@ -29,7 +23,9 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool stop_program;
+bool g_stop_program;
+bool g_video_playback;
+std::string input_video_path;
 
 /********************************************************************************
  * Calibration definitions
@@ -47,7 +43,7 @@ void sig_handler(int signo)
 {
     if (signo == SIGINT)
     {
-        stop_program = true;
+        g_stop_program = true;
         Print::c_fprintf("received SIGINT\n");
     }
 }
@@ -68,11 +64,19 @@ void attach_sig_handler(void)
  * Function: main
  * Description: Entry point for the program.  Runs the main loop.
  ********************************************************************************/
-int main(void)
+int main(int argc, char** argv) 
 {
-
+    input_video_path = "";
+    g_video_playback = false;
+    g_stop_program = false;
+    
+    if (argc > 1)
+    {
+        input_video_path = argv[1];
+        g_video_playback = true;
+    }
+    
     attach_sig_handler();
-    stop_program = false;
 
     if (Scheduler::init() != 0)
     {
@@ -81,11 +85,11 @@ int main(void)
 
 #ifdef BLD_JETSON_B01
 
-    while (!stop_program && !g_save_button_press) // todo: figure buttons w docker (jetson io/jumper)
+    while (!g_stop_program && !g_save_button_press) // todo: figure buttons w docker (jetson io/jumper)
 
 #else
 
-    while (!stop_program && !g_manual_override_land)
+    while (!g_stop_program && !g_manual_override_land)
 
 #endif // BLD_JETSON_B01
 

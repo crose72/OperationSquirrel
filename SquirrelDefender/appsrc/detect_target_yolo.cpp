@@ -103,22 +103,25 @@ bool YOLO::init(void)
  ********************************************************************************/
 void YOLO::loop(void)
 {
+    if (g_valid_image_rcvd)
+    {
     #ifdef BLD_JETSON_ORIN_NANO
 
-    g_yolo_detections = yolov8_detector->detectObjects(g_image);
-    yolov8_detector->drawObjectLabels(g_image, g_yolo_detections);
-    g_yolo_detection_count = g_yolo_detections.size();
+        g_yolo_detections = yolov8_detector->detectObjects(g_image);
+        yolov8_detector->drawObjectLabels(g_image, g_yolo_detections);
+        g_yolo_detection_count = g_yolo_detections.size();
 
     #elif defined(BLD_WIN)
 
-    YoloNet::detect(g_image, g_net, g_yolo_detections);
-    g_yolo_detection_count = g_yolo_detections.size();
+        YoloNet::detect(g_image, g_net, g_yolo_detections);
+        g_yolo_detection_count = g_yolo_detections.size();
 
     #else
 
     #error "Please define a build platform."
 
     #endif
+    }
 }
 
 /********************************************************************************

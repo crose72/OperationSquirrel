@@ -116,46 +116,49 @@ std::string generate_unique_file_name(const std::string &base_name, const std::s
  ********************************************************************************/
 bool create_input_video_stream(void)
 {
-    #ifdef BLD_JETSON_ORIN_NANO
+    // Use live camera feed or use prerecorded video
+    if (input_video_path == "")
+    {
+        #ifdef BLD_JETSON_ORIN_NANO
 
-    //gst_pipeline = std::format("nvarguscamerasrc ! video/x-raw(memory:NVMM), "
-    //    "width={}, height={}, framerate={}/1 ! nvvidconv ! "
-    //    "nvvidconv flip-method=2 ! "
-    //    "video/x-raw, format=(string)BGRx ! videoconvert ! "
-    //    "video/x-raw, format=(string)BGR ! appsink drop=true sync=false",
-    //    g_input_video_width, g_input_video_height, g_input_video_fps);
-    std::ostringstream ss;
-    ss << "nvarguscamerasrc ! video/x-raw(memory:NVMM), "
-       << "width=" << g_input_video_width << ", height=" << g_input_video_height 
-       << ", framerate=" << g_input_video_fps << "/1 ! nvvidconv ! "
-       << "nvvidconv flip-method=2 ! "
-       << "video/x-raw, format=(string)BGRx ! videoconvert ! "
-       << "video/x-raw, format=(string)BGR ! appsink drop=true sync=false";
-    gst_pipeline = ss.str();
+        //gst_pipeline = std::format("nvarguscamerasrc ! video/x-raw(memory:NVMM), "
+        //    "width={}, height={}, framerate={}/1 ! nvvidconv ! "
+        //    "nvvidconv flip-method=2 ! "
+        //    "video/x-raw, format=(string)BGRx ! videoconvert ! "
+        //    "video/x-raw, format=(string)BGR ! appsink drop=true sync=false",
+        //    g_input_video_width, g_input_video_height, g_input_video_fps);
+        std::ostringstream ss;
+        ss << "nvarguscamerasrc ! video/x-raw(memory:NVMM), "
+        << "width=" << g_input_video_width << ", height=" << g_input_video_height 
+        << ", framerate=" << g_input_video_fps << "/1 ! nvvidconv ! "
+        << "nvvidconv flip-method=2 ! "
+        << "video/x-raw, format=(string)BGRx ! videoconvert ! "
+        << "video/x-raw, format=(string)BGR ! appsink drop=true sync=false";
+        gst_pipeline = ss.str();
 
-    cap.open(gst_pipeline, cv::CAP_GSTREAMER);
+        cap.open(gst_pipeline, cv::CAP_GSTREAMER);
 
-    #elif defined(BLD_WIN)
+        #elif defined(BLD_WIN)
 
-    cap.open(0, cv::CAP_DSHOW);  // Open default webcam
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, g_input_video_width);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, g_input_video_height);
+        cap.open(0, cv::CAP_DSHOW);  // Open default webcam
+        cap.set(cv::CAP_PROP_FRAME_WIDTH, g_input_video_width);
+        cap.set(cv::CAP_PROP_FRAME_HEIGHT, g_input_video_height);
 
-    #else
+        #else
 
-    #error "Please define a build platform."
+        #error "Please define a build platform."
 
-    #endif
+        #endif
+    }
+    else
+    {
+        cap.open(input_video_path);
+    }
 
     if (!cap.isOpened())
     {
         std::cout << "Error: Could not open camera" << std::endl;
         return false;
-    }
-
-    if (!capture_image())
-    {
-        std::cout << "Error: Could not grab first frame at init" << std::endl;
     }
 
     return true;
@@ -181,7 +184,8 @@ bool create_output_vid_stream(void)
     int fourcc = cv::VideoWriter::fourcc('m', 'p', '4', 'v'); // Codec for MP4 format
     video_writer.open(file_name, fourcc, g_input_video_fps, frame_size);
 
-    if (!video_writer.isOpened()) {
+    if (!video_writer.isOpened())
+    {
         std::cout << "video_io_opencv: failed to create output_vid_file stream\n" << std::endl;
         file_stream_created = false;
         return false;
@@ -199,17 +203,35 @@ bool create_output_vid_stream(void)
  ********************************************************************************/
 bool capture_image(void)
 {
-    cap >> g_image;  // Capture g_image from the webcam
+    // If using a .mp4 video as input then wait till the drone has taken off before
+    // playing the video
+    bool video_playback_ready = (g_video_playback && g_mav_veh_rngfdr_current_distance > 550 || g_mav_veh_rel_alt > 5500);
 
-    if (g_image.empty()) {
-        std::cout << "Error: Could not capture image" << std::endl;
+//    if (video_playback_ready || !g_video_playback)
+//    {
+    cap >> g_image;  // Capture g_image from the camera
+
+    if (g_image.empty()) 
+    {
         g_valid_image_rcvd = false;
+
+        if (input_video_path != "")
+        {
+            std::cout << "End of video playback" << std::endl;
+
+            return false;
+        }
+
+        std::cout << "Error: Could not capture image" << std::endl;
         return false;
     }
 
     g_valid_image_rcvd = true;
 
     return true;
+//    }
+
+//    return false;
 }
 
 /********************************************************************************
@@ -219,7 +241,7 @@ bool capture_image(void)
 bool save_video(void)
 {
     // write video file 
-    if (video_writer.isOpened())
+    if (video_writer.isOpened() && g_valid_image_rcvd)
     {
         video_writer.write(g_image);
         return true;
@@ -467,6 +489,8 @@ void VideoCV::out_loop(void)
     display_video();
 
 #endif // DEBUG_BUILD
+
+    display_video();
 
     if (file_stream_created)
     {

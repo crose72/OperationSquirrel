@@ -121,7 +121,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 # Validate CMAKE_BUILD_TYPE
 if(NOT CMAKE_BUILD_TYPE)
-    message(FATAL_ERROR "Invalid build type: ${CMAKE_BUILD_TYPE}. Choose either Debug or Release.")
+    set(CMAKE_BUILD_TYPE Release)
+    message(STATUS "Build type is: ${CMAKE_BUILD_TYPE}. Specify Debug if desired.")
 endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
