@@ -24,7 +24,7 @@
  * Object definitions
  ********************************************************************************/
 bool g_stop_program;
-bool g_video_playback;
+bool g_use_video_playback;
 std::string input_video_path;
 
 /********************************************************************************
@@ -67,13 +67,13 @@ void attach_sig_handler(void)
 int main(int argc, char** argv) 
 {
     input_video_path = "";
-    g_video_playback = false;
+    g_use_video_playback = false;
     g_stop_program = false;
     
     if (argc > 1)
     {
         input_video_path = argv[1];
-        g_video_playback = true;
+        g_use_video_playback = true;
     }
     
     attach_sig_handler();
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 
 #ifdef BLD_JETSON_B01
 
-    while (!g_stop_program && !g_save_button_press) // todo: figure buttons w docker (jetson io/jumper)
+    while (!g_stop_program && !g_manual_override_land && !g_save_button_press) // todo: figure buttons w docker (jetson io/jumper)
 
 #else
 

@@ -27,11 +27,19 @@ PID pid_forwd;
 PID pid_rev;
 
 bool g_target_too_close;
+bool yaw_initial_latched;
 float g_x_error;
 float g_y_error;
 float g_vx_adjust;
 float g_vy_adjust;
 float g_vz_adjust;
+float g_yaw_target;
+float yaw_initial;
+float min_yaw;
+float max_yaw;
+float g_yaw_adjust;
+float g_mav_veh_yaw_prv;
+float yaw_target_error;
 
 /********************************************************************************
  * Calibration definitions
@@ -120,12 +128,14 @@ const float y_desired = 0.0f; // Make const in the ends
 
 #endif // DEBUG_BUILD
 
+const float camera_half_fov = 0.7423; // half of 83 degree FOV camera
+
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
 void get_control_params(void);
 void calc_follow_error(void);
-void overtake_target(void);
+void calc_yaw_target_error(void);
 void dtrmn_follow_vector(void);
 
 /********************************************************************************
@@ -201,6 +211,90 @@ void calc_follow_error(void)
 }
 
 /********************************************************************************
+ * Function: calc_yaw_target_error
+ * Description: Calculate the yaw target for the drone based on the target
+ *              position.
+ ********************************************************************************/
+void calc_yaw_target_error(void)
+{
+    if (!g_first_loop_after_start && g_use_video_playback && !yaw_initial_latched)
+    {
+        yaw_initial = g_mav_veh_yaw;
+        yaw_initial_latched = true;
+        // Yaw has a max value of PI and a min value of - PI.
+        // If the sum of the yaw target and the initial latched yaw state of the 
+        // vehicle results in a value < -PI or > PI then the yaw value will have
+        // to account for that
+        float abs_min_yaw_temp = yaw_initial - camera_half_fov;
+
+        if (abs_min_yaw_temp >= -PI)
+        {
+            min_yaw = abs_min_yaw_temp;
+        }
+        else
+        {
+            min_yaw = PI - (std::abs(abs_min_yaw_temp) - PI);
+        }
+
+        float abs_max_yaw_temp = yaw_initial + camera_half_fov;
+
+        if (abs_max_yaw_temp <= PI)
+        {
+            max_yaw = abs_max_yaw_temp;
+        }
+        else
+        {
+            max_yaw = -(PI - (abs_max_yaw_temp - PI));
+        }
+        std::cout << "Min yaw: " << min_yaw << std::endl;
+        std::cout << "Max yaw: " << max_yaw << std::endl;
+    }
+
+    if (g_target_center_y > 50.0)
+    {
+        g_yaw_target = (0.002 * g_target_center_y - 639.2577);
+    }
+    else if (g_target_center_y < -50.0)
+    {
+        g_yaw_target = (0.002 * std::abs(g_target_center_y) - 639.2577);
+    }
+    else
+    {
+        g_yaw_target = 0.0;
+    }
+
+    // Corrections for when yaw changes signs
+    float abs_yaw_target = 0.0;
+
+    if ((g_yaw_target + g_mav_veh_yaw) < -PI)
+    {
+        abs_yaw_target = PI - (std::abs(g_yaw_target) - PI);
+    }
+    else if ((g_yaw_target + g_mav_veh_yaw) > PI)
+    {
+        abs_yaw_target = -(PI - (std::abs(g_yaw_target) - PI));
+    }
+
+    float abs_max_yaw_temp = yaw_initial + camera_half_fov;
+
+    if (abs_max_yaw_temp <= PI)
+    {
+        max_yaw = abs_max_yaw_temp;
+    }
+    else
+    {
+        max_yaw = -(PI - (abs_max_yaw_temp - PI));
+    }
+    
+    yaw_target_error = g_yaw_target - g_mav_veh_yaw;
+
+    if (g_yaw_target <= min_yaw || g_yaw_target >= max_yaw)
+    {
+        yaw_target_error = 0.0;
+    }
+}
+
+/********************************************************************************
  * Function: dtrmn_follow_vector
  * Description: Determine the follow vector based on the vehicle's error between
                 the desired target offset and the actual target offset.
@@ -209,6 +303,10 @@ void dtrmn_follow_vector(void)
 {
     g_target_too_close = (g_x_error < 0.0);
 
+    float Kp_yaw = 0.05;
+    float Ki_yaw = 0.0;
+    float Kd_yaw = 0.0;
+
     if (g_target_valid && g_target_too_close)
     {
         //g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
@@ -216,22 +314,29 @@ void dtrmn_follow_vector(void)
         //                                      w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
         g_vx_adjust = 0.0;
         g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                              g_y_error, 0.0, 0.0,
-                                              w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
+                                    g_y_error, 0.0, 0.0,
+                                    w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
+        g_yaw_adjust = pid_rev.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
+                                    yaw_target_error, 0.0, 0.0,
+                                    w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
     }
     else if (g_target_valid && !g_target_too_close)
     {
         g_vx_adjust = pid_forwd.pid3(Kp_x, Ki_x, Kd_x,
-                                                g_x_error, 0.0, 0.0,
-                                                w1_x, 0.0, 0.0, ControlDim::X, g_dt);
+                                            g_x_error, 0.0, 0.0,
+                                            w1_x, 0.0, 0.0, ControlDim::X, g_dt);
         g_vy_adjust = pid_forwd.pid3(Kp_y, Ki_y, Kd_y,
-                                                g_y_error, 0.0, 0.0,
-                                                w1_y, 0.0, 0.0, ControlDim::Y, g_dt);
+                                            g_y_error, 0.0, 0.0,
+                                            w1_y, 0.0, 0.0, ControlDim::Y, g_dt);
+        g_yaw_adjust = pid_rev.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
+                                    yaw_target_error, 0.0, 0.0,
+                                    w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
     }
     else
     {
         g_vx_adjust = 0.0f;
         g_vy_adjust = 0.0f;
+        g_yaw_adjust = 0.0f;
     }
 }
 
@@ -260,6 +365,14 @@ bool Follow::init(void)
     g_vx_adjust = 0.0f;
     g_vy_adjust = 0.0f;
     g_vz_adjust = 0.0f;
+    g_yaw_target = 0.0f;
+    yaw_initial = 0.0f;
+    yaw_initial_latched = false;
+    max_yaw = 0.0;
+    min_yaw = 0.0;
+    g_yaw_adjust = 0.0;
+    g_mav_veh_yaw_prv = 0.0;
+    yaw_target_error = 0.0;
 
     return true;
 }
@@ -273,6 +386,7 @@ void Follow::loop(void)
 {
     get_control_params();
     calc_follow_error();
+    calc_yaw_target_error();
     dtrmn_follow_vector();
 }
 

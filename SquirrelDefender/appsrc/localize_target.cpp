@@ -46,6 +46,7 @@ float y_target_prv;
 bool y_target_hyst_actv;
 float y_target_latched;
 bool loc_target_valid_prv;
+bool target_loc_data_ok;
 float loc_target_center_x_prv;
 float loc_target_center_y_prv;
 // Define state-space matrices using Armadillo
@@ -78,7 +79,6 @@ float y_target_ekf_prv;
 const float center_of_frame_width = 640.0f;
 const float center_of_frame_height = 360.0f;
 const float camera_fixed_angle = 0.436f; // radians
-const float PI = 3.14159;
 const int n_states = 6;
 const int n_meas = 2;
 
@@ -143,17 +143,30 @@ const float delta_offset[MAX_IDX_DELTA_PIXEL_OFFSET][MAX_IDX_DELTA_D_OFFSET] = {
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-void calc_target_offest(void);
-void kf_predict(void);
-void kf_update(void);
+void dtrmn_target_location(void);
+void dtrmn_target_loc_data_ok(void);
+void update_target_location(void);
+
 
 /********************************************************************************
- * Function: calc_target_offest
+ * Function: dtrmn_target_loc_data_ok
+ * Description: Predict step in kalman filter.
+ ********************************************************************************/
+void dtrmn_target_loc_data_ok(void) 
+{
+    target_loc_data_ok = (g_target_valid && 
+        (!(g_target_center_x < 50.0 || g_target_center_x > 670) && 
+        !(g_target_center_y < 50.0 || g_target_center_x > 1230) && 
+        !((g_target_width * g_target_height) < 3500.0)));
+};
+
+/********************************************************************************
+ * Function: dtrmn_target_location
  * Description: Calculate the location of the target relative to the drone.
  *              First implementation will be relative to the camera, needs to use
  *              the center mass of the drone in the end though.
  ********************************************************************************/
-void calc_target_offest(void)
+void dtrmn_target_location(void)
 {
     float d_idx_h;
     float d_idx_w;
@@ -164,10 +177,7 @@ void calc_target_offest(void)
     float delta_d;
     float target_bounding_box_rate;
 
-    if (g_target_valid && 
-        (!(g_target_center_x < 50.0 || g_target_center_x > 670) && 
-        !(g_target_center_y < 50.0 || g_target_center_x > 1230) && 
-        !((g_target_width * g_target_height) < 11178.0)))
+    if (target_loc_data_ok)
     {
         /* Calculate distance from camera offset */
         d_idx_h = get_float_index(g_target_height, &height_index[0], MAX_IDX_D_HEIGHT, false);
@@ -252,25 +262,12 @@ void calc_target_offest(void)
 }
 
 /********************************************************************************
- * Function: kf_predict
- * Description: Predict step in kalman filter.
- ********************************************************************************/
-void kf_predict(void) 
-{
-
-};
-
-/********************************************************************************
- * Function: kf_update
+ * Function: update_target_location
  * Description: Update step in kalman filter.
  ********************************************************************************/
-void kf_update(void) 
+void update_target_location(void) 
 {
-    if (g_target_valid && 
-        (!(g_target_center_x < 50.0 || g_target_center_x > 670) && 
-        !(g_target_center_y < 50.0 || g_target_center_x > 1230) && 
-        !((g_target_width * g_target_height) < 11178.0)) &&
-        g_dt > 0.0001)
+    if (target_loc_data_ok && g_dt > 0.0001)
     {
         // Ensure g_dt is valid
         if (std::isnan(g_dt) || std::isinf(g_dt) || g_dt <= 0) {
@@ -346,6 +343,8 @@ bool Localize::init(void)
     g_vx_target_ekf = 0.0;
     g_vy_target_ekf = 0.0;
 
+    target_loc_data_ok = false;
+
     // KF init
     // Number of states and measurements
     int n_states = 6;  // x, y, vx, vy, ax, ay
@@ -414,8 +413,9 @@ bool Localize::init(void)
  ********************************************************************************/
 void Localize::loop(void)
 {
-    calc_target_offest();
-    kf_update();
+    dtrmn_target_loc_data_ok();
+    dtrmn_target_location();
+    update_target_location();
 }
 
 /********************************************************************************

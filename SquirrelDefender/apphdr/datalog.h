@@ -126,6 +126,7 @@ extern bool g_target_too_close;
 extern float g_vx_adjust;
 extern float g_vy_adjust;
 extern float g_vz_adjust;
+extern float g_yaw_target;
 
 /* System variables */
 extern SystemState g_system_state;

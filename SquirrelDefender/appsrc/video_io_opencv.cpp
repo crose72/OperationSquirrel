@@ -77,10 +77,20 @@ bool create_display_video_stream(void);
 bool capture_image(void);
 bool save_video(void);
 bool display_video(void);
-void calc_video_res(void);
 void delete_input_video_stream(void);
 void delete_video_file_stream(void);
 void delete_video_display_stream(void);
+
+// File operations
+bool file_exists(const std::string &name);
+std::string generate_unique_file_name(const std::string &base_name, const std::string &extension);
+
+// Text overlay functions
+void init_text_overlay(const cv::Mat& referenceImage, const std::string& defaultText,
+                       int corner, bool is_dynamic, cv::Scalar text_color, double font_scale);
+void update_dynamic_text(int index, const std::string& newText);
+void render_text_overlays(cv::Mat& image);
+void video_overlay(void);
 
 /********************************************************************************
  * Function: file_exists
@@ -117,7 +127,7 @@ std::string generate_unique_file_name(const std::string &base_name, const std::s
 bool create_input_video_stream(void)
 {
     // Use live camera feed or use prerecorded video
-    if (input_video_path == "")
+    if (!g_use_video_playback)
     {
         #ifdef BLD_JETSON_ORIN_NANO
 
@@ -196,19 +206,12 @@ bool create_output_vid_stream(void)
     return true;
 }
 
-
 /********************************************************************************
  * Function: capture_image
  * Description: Capture an image from the input video stream.
  ********************************************************************************/
 bool capture_image(void)
 {
-    // If using a .mp4 video as input then wait till the drone has taken off before
-    // playing the video
-    bool video_playback_ready = (g_video_playback && g_mav_veh_rngfdr_current_distance > 550 || g_mav_veh_rel_alt > 5500);
-
-//    if (video_playback_ready || !g_video_playback)
-//    {
     cap >> g_image;  // Capture g_image from the camera
 
     if (g_image.empty()) 
@@ -229,9 +232,6 @@ bool capture_image(void)
     g_valid_image_rcvd = true;
 
     return true;
-//    }
-
-//    return false;
 }
 
 /********************************************************************************
@@ -241,7 +241,7 @@ bool capture_image(void)
 bool save_video(void)
 {
     // write video file 
-    if (video_writer.isOpened() && g_valid_image_rcvd)
+    if (video_writer.isOpened() && g_valid_image_rcvd && file_stream_created)
     {
         video_writer.write(g_image);
         return true;
@@ -265,17 +265,6 @@ bool display_video(void)
     }
 
     return false;
-}
-
-/********************************************************************************
- * Function: calc_video_res
- * Description: Delete the input to stop using resources.
- ********************************************************************************/
-void calc_video_res(void)
-{
-    g_input_video_width = 1280.0;
-    g_input_video_height = 720.0;
-    g_input_video_fps = 30;
 }
 
 /********************************************************************************
@@ -325,9 +314,9 @@ bool video_output_file_reset(void)
  * Function: init_text_overlay
  * Description: Initialize a text overlay config
  ********************************************************************************/
-void init_text_overlay(const cv::Mat& referenceImage, const std::string& defaultText, 
-                    int corner = TextOverlay::TOP_LEFT, bool is_dynamic = false, 
-                    cv::Scalar text_color = cv::Scalar(255, 255, 255), double font_scale = 1.0) {
+void init_text_overlay(const cv::Mat& referenceImage, const std::string& defaultText,
+                       int corner, bool is_dynamic, cv::Scalar text_color, double font_scale)
+{
     TextOverlay overlay;
     
     // Store parameters
@@ -348,7 +337,8 @@ void init_text_overlay(const cv::Mat& referenceImage, const std::string& default
     std::cout << std::to_string(referenceImage.rows) << std::endl;
 
     // Calculate fixed position based on corner
-    switch(corner) {
+    switch(corner) 
+    {
         case TextOverlay::TOP_LEFT:
             overlay.position = cv::Point(10, text_size.height + 10);
             break;
@@ -368,14 +358,17 @@ void init_text_overlay(const cv::Mat& referenceImage, const std::string& default
     }
     
     // Pre-calculate background rectangle for static text
-    if (!is_dynamic) {
+    if (!is_dynamic) 
+    {
         overlay.bg_rect = cv::Rect(
             overlay.position.x - 5, 
             overlay.position.y - text_size.height - 5, 
             text_size.width + 10, 
             text_size.height + 10
         );
-    } else {
+    } 
+    else 
+    {
         // For dynamic text, we'll use a default size that will be updated later
         // Store the maximum expected width to avoid text getting cut off
         int maxWidth = text_size.width * 1.5;  // Adjust this based on your needs
@@ -396,19 +389,22 @@ void init_text_overlay(const cv::Mat& referenceImage, const std::string& default
  * Function: update_dynamic_text
  * Description: Update the text for a dynamic overlay.
  ********************************************************************************/
-void update_dynamic_text(int index, const std::string& newText) {
-    if (index >= 0 && index < g_textOverlays.size() && g_textOverlays[index].is_dynamic) {
+void update_dynamic_text(int index, const std::string& newText) 
+{
+    if (index >= 0 && index < g_textOverlays.size() && g_textOverlays[index].is_dynamic) 
+    {
         g_textOverlays[index].text = newText;
     }
 }
-
 
 /********************************************************************************
  * Function: render_text_overlays
  * Description: Draw all text overlays on the image.
  ********************************************************************************/
-void render_text_overlays(cv::Mat& image) {
-    for (const auto& overlay : g_textOverlays) {
+void render_text_overlays(cv::Mat& image) 
+{
+    for (const auto& overlay : g_textOverlays) 
+    {
         // Draw background rectangle
         cv::rectangle(image, overlay.bg_rect, overlay.bg_color, -1);
         
@@ -419,6 +415,36 @@ void render_text_overlays(cv::Mat& image) {
     }
 }
 
+/********************************************************************************
+ * Function: video_overlay
+ * Description: Choose the text to overlay onto the video. 
+ ********************************************************************************/
+void video_overlay(void)
+{
+    image_overlay = g_image.clone();
+
+    std::ostringstream ss;
+    ss << "t: " << std::to_string(g_app_elapsed_time);
+    std::string str_out_loop = ss.str();
+    update_dynamic_text(0, str_out_loop);
+
+    std::ostringstream ss2;
+    ss2 << "mav_veh_state: " << std::to_string(g_mav_veh_state);
+    str_out_loop = ss2.str();
+    update_dynamic_text(1, str_out_loop);
+
+    std::ostringstream ss3;
+    ss3 << "x_target: " << std::to_string(g_x_target_ekf);
+    str_out_loop = ss3.str();
+    update_dynamic_text(2, str_out_loop);
+
+    std::ostringstream ss4;
+    ss4 << "alt: " << std::to_string(g_mav_veh_rel_alt);
+    str_out_loop = ss4.str();
+    update_dynamic_text(3, str_out_loop);
+
+    render_text_overlays(image_overlay);
+}
 
 /********************************************************************************
  * Function: Video
@@ -442,8 +468,9 @@ bool VideoCV::init(void)
 
     g_valid_image_rcvd = false;
     g_image = NULL;
-
-    calc_video_res(); // populate g_input_video_width, height 
+    g_input_video_width = 1280.0;
+    g_input_video_height = 720.0;
+    g_input_video_fps = 30;
 
     if (!create_input_video_stream() ||
         !create_output_vid_stream())
@@ -451,18 +478,14 @@ bool VideoCV::init(void)
         return false;
     }
 
-#ifdef DEBUG_BUILD
-    
-
-
-#endif // DEBUG_BUILD
     /*
     //init_text_overlay(g_image, "Hello world!", TextOverlay::TOP_LEFT);
     image_overlay = g_image.clone();
     init_text_overlay(image_overlay, "t: 4.206969", TextOverlay::BOTTOM_LEFT, true);
     init_text_overlay(image_overlay, "mav_veh_state: 1", TextOverlay::BOTTOM_RIGHT, true);
     init_text_overlay(image_overlay, "x_target: 4.20696969", TextOverlay::TOP_RIGHT, true);
-    init_text_overlay(image_overlay, "alt: 0.420696969", TextOverlay::TOP_LEFT, true);*/
+    init_text_overlay(image_overlay, "alt: 0.420696969", TextOverlay::TOP_LEFT, true);
+    */
 
     return true;
 }
@@ -482,42 +505,9 @@ void VideoCV::in_loop(void)
  ********************************************************************************/
 void VideoCV::out_loop(void)
 {
-
-#ifdef DEBUG_BUILD
-
-    // note: put in debug build
     display_video();
-
-#endif // DEBUG_BUILD
-
-    display_video();
-
-    if (file_stream_created)
-    {
-        /*
-        image_overlay = g_image.clone();
-
-        std::ostringstream ss;
-        ss << "t: " << std::to_string(g_app_elapsed_time);
-        std::string str_out_loop = ss.str();
-        update_dynamic_text(0, str_out_loop);
-        std::ostringstream ss2;
-        ss2 << "mav_veh_state: " << std::to_string(g_mav_veh_state);
-        str_out_loop = ss2.str();
-        update_dynamic_text(1, str_out_loop);
-        std::ostringstream ss3;
-        ss3 << "x_target: " << std::to_string(g_x_target_ekf);
-        str_out_loop = ss3.str();
-        update_dynamic_text(2, str_out_loop);
-        std::ostringstream ss4;
-        ss4 << "alt: " << std::to_string(g_mav_veh_rel_alt);
-        str_out_loop = ss4.str();
-        update_dynamic_text(3, str_out_loop);
-
-        render_text_overlays(image_overlay);*/
-
-        save_video();
-    }
+    //video_overlay();
+    save_video();
 }
 
 /********************************************************************************

@@ -29,6 +29,8 @@ extern float g_x_target_ekf;
 extern float g_y_target_ekf;
 extern uint16_t g_mav_veh_rngfdr_current_distance;
 extern int32_t g_mav_veh_rel_alt;
+extern float g_yaw_target;
+extern float g_yaw_adjust;
 
 /********************************************************************************
  * Exported objects
