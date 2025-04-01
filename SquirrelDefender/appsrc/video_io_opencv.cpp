@@ -218,10 +218,10 @@ bool capture_image(void)
     {
         g_valid_image_rcvd = false;
 
-        if (input_video_path != "")
+        if (g_use_video_playback)
         {
             std::cout << "End of video playback" << std::endl;
-
+            g_stop_program = true;
             return false;
         }
 

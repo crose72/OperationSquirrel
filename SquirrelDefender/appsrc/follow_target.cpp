@@ -25,6 +25,7 @@
  ********************************************************************************/
 PID pid_forwd;
 PID pid_rev;
+PID pid_yaw;
 
 bool g_target_too_close;
 bool yaw_initial_latched;
@@ -252,11 +253,11 @@ void calc_yaw_target_error(void)
 
     if (g_target_center_y > 50.0)
     {
-        g_yaw_target = (0.002 * g_target_center_y - 639.2577);
+        g_yaw_target = (0.0011 * g_target_center_y);
     }
     else if (g_target_center_y < -50.0)
     {
-        g_yaw_target = (0.002 * std::abs(g_target_center_y) - 639.2577);
+        g_yaw_target = -(0.0011 * std::abs(g_target_center_y));
     }
     else
     {
@@ -286,7 +287,7 @@ void calc_yaw_target_error(void)
         max_yaw = -(PI - (abs_max_yaw_temp - PI));
     }
     
-    yaw_target_error = g_yaw_target - g_mav_veh_yaw;
+    yaw_target_error = g_yaw_target;
 
     if (g_yaw_target <= min_yaw || g_yaw_target >= max_yaw)
     {
@@ -303,22 +304,27 @@ void dtrmn_follow_vector(void)
 {
     g_target_too_close = (g_x_error < 0.0);
 
-    float Kp_yaw = 0.05;
-    float Ki_yaw = 0.0;
-    float Kd_yaw = 0.0;
+    JSONUtils veh_params("../params.json");
+    
+    // Accessing Vel_PID_x parameters
+    float Kp_yaw = veh_params.get_float_param("Yaw_PID", "Kp");
+    float Ki_yaw = veh_params.get_float_param("Yaw_PID", "Ki");
+    float Kd_yaw = veh_params.get_float_param("Yaw_PID", "Kd");
+    float w1_yaw = veh_params.get_float_param("Yaw_PID", "w1");
+    float w2_yaw = veh_params.get_float_param("Yaw_PID", "w2");
+    float w3_yaw = veh_params.get_float_param("Yaw_PID", "w3");
 
     if (g_target_valid && g_target_too_close)
     {
         //g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
         //                                      g_x_error, 0.0, 0.0,
         //                                      w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
-        g_vx_adjust = 0.0;
-        g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                    g_y_error, 0.0, 0.0,
-                                    w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
-        g_yaw_adjust = pid_rev.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
+        //g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
+        //                            g_y_error, 0.0, 0.0,
+        //                            w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
+        g_yaw_adjust = pid_yaw.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
                                     yaw_target_error, 0.0, 0.0,
-                                    w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
+                                    w1_yaw, 0.0, 0.0, ControlDim::YAW, g_dt);
     }
     else if (g_target_valid && !g_target_too_close)
     {
@@ -328,9 +334,9 @@ void dtrmn_follow_vector(void)
         g_vy_adjust = pid_forwd.pid3(Kp_y, Ki_y, Kd_y,
                                             g_y_error, 0.0, 0.0,
                                             w1_y, 0.0, 0.0, ControlDim::Y, g_dt);
-        g_yaw_adjust = pid_rev.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
+        g_yaw_adjust = pid_yaw.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
                                     yaw_target_error, 0.0, 0.0,
-                                    w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
+                                    w1_yaw, 0.0, 0.0, ControlDim::YAW, g_dt);
     }
     else
     {
