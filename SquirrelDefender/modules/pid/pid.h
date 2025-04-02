@@ -37,8 +37,8 @@ public:
                float dt);
 
 private:
-    float err_sum[3];                  // Array to hold integral sums for x, y, z
-    float err_prv[3];                  // Array to hold previous errors for x, y, z
+    float err_sum[6];                  // Array to hold integral sums for x, y, z, roll, pitch, yaw
+    float err_prv[6];                  // Array to hold previous errors for x, y, z, roll, pitch, yaw
     const float max_integral = 10.0;   // Max value for integral term to prevent windup
     const float integral_decay = 0.95; // Decay factor for integral term
 };

@@ -35,11 +35,11 @@ extern float g_z_target;
 extern float g_dt;
 extern float g_x_target_ekf;
 extern float g_y_target_ekf;
-extern float g_target_center_y;
 extern bool g_first_loop_after_start;
 extern float g_mav_veh_yaw;
 extern float g_mav_veh_yawspeed;
 extern bool g_use_video_playback;
+extern float g_target_cntr_offset_y;
 
 /********************************************************************************
  * Exported objects

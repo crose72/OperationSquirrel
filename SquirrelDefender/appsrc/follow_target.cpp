@@ -225,7 +225,8 @@ void calc_yaw_target_error(void)
         // Yaw has a max value of PI and a min value of - PI.
         // If the sum of the yaw target and the initial latched yaw state of the 
         // vehicle results in a value < -PI or > PI then the yaw value will have
-        // to account for that
+        // to account for that, since when yaw becomes > PI or < -PI it rolls over
+        // positive sign to negative or visa versa.
         float abs_min_yaw_temp = yaw_initial - camera_half_fov;
 
         if (abs_min_yaw_temp >= -PI)
@@ -247,17 +248,17 @@ void calc_yaw_target_error(void)
         {
             max_yaw = -(PI - (abs_max_yaw_temp - PI));
         }
-        std::cout << "Min yaw: " << min_yaw << std::endl;
-        std::cout << "Max yaw: " << max_yaw << std::endl;
     }
 
-    if (g_target_center_y > 50.0)
+    // If the target is to the right of the center of the video then yaw right
+    // If the target is to the left of the center of the video then yaw left
+    if (g_target_cntr_offset_y > 50.0)
     {
-        g_yaw_target = (0.0011 * g_target_center_y);
+        g_yaw_target = (0.0011 * g_target_cntr_offset_y);
     }
-    else if (g_target_center_y < -50.0)
+    else if (g_target_cntr_offset_y < -50.0)
     {
-        g_yaw_target = -(0.0011 * std::abs(g_target_center_y));
+        g_yaw_target = -(0.0011 * std::abs(g_target_cntr_offset_y));
     }
     else
     {
@@ -288,11 +289,6 @@ void calc_yaw_target_error(void)
     }
     
     yaw_target_error = g_yaw_target;
-
-    if (g_yaw_target <= min_yaw || g_yaw_target >= max_yaw)
-    {
-        yaw_target_error = 0.0;
-    }
 }
 
 /********************************************************************************
@@ -316,12 +312,12 @@ void dtrmn_follow_vector(void)
 
     if (g_target_valid && g_target_too_close)
     {
-        //g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-        //                                      g_x_error, 0.0, 0.0,
-        //                                      w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
-        //g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-        //                            g_y_error, 0.0, 0.0,
-        //                            w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
+        g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
+                                              g_x_error, 0.0, 0.0,
+                                              w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
+        g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
+                                    g_y_error, 0.0, 0.0,
+                                    w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
         g_yaw_adjust = pid_yaw.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
                                     yaw_target_error, 0.0, 0.0,
                                     w1_yaw, 0.0, 0.0, ControlDim::YAW, g_dt);
