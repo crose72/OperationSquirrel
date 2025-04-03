@@ -55,6 +55,9 @@ make -j$(nproc)
 
 # Run the executable
 sudo ./squirreldefender
+
+# If using video playback instead of a camera then execute
+sudo ./squirreldefender ../test_data/video.mp4
 ```
 
 ### Prerequisites (with docker containers):
@@ -125,6 +128,9 @@ make -j$(nproc)
 
 # Run the executable
 ./squirreldefender
+
+# If using video playback instead of a camera then execute
+./squirreldefender ../test_data/video.mp4
 ```
 
 ### Release container:
@@ -303,6 +309,9 @@ make -j$(nproc)
 
 # Run the executable
 sudo ./squirreldefender
+
+# If using video playback instead of a camera then execute
+sudo ./squirreldefender ../test_data/video.mp4
 ```
 
 If you run into issues with the camera try `sudo systemctl restart nvargus-daemon`.
