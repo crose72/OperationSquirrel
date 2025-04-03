@@ -108,7 +108,6 @@ void YOLO::loop(void)
     #ifdef BLD_JETSON_ORIN_NANO
 
         g_yolo_detections = yolov8_detector->detectObjects(g_image);
-        yolov8_detector->drawObjectLabels(g_image, g_yolo_detections);
         g_yolo_detection_count = g_yolo_detections.size();
 
     #elif defined(BLD_WIN)

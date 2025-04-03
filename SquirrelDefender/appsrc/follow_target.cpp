@@ -110,7 +110,7 @@ void dtrmn_follow_vector(void);
  ********************************************************************************/
 void get_control_params(void)
 {
-    JSONUtils follow_control("../params.json");
+    ParamReader follow_control("../params.json");
 
     // Accessing Vel_PID_x parameters
     Kp_x = follow_control.get_float_param("Vel_PID_x", "Kp");
@@ -184,7 +184,7 @@ void calc_follow_error(void)
 void calc_yaw_target_error(void)
 {
     // is g_use_video_playback and yaw_initial_latched needed here? 
-    // or is it fine for using camera to with drone turning all the time?
+    // TODO: or is it fine for using camera to with drone turning all the time?
     if (!g_first_loop_after_start && g_use_video_playback && !yaw_initial_latched)
     {
         yaw_initial = g_mav_veh_yaw;

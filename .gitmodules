@@ -1,9 +1,6 @@
-[submodule "ThirdParty/CppUTest"]
-	path = ThirdParty/CppUTest
-	url = https://github.com/cpputest/cpputest.git
 [submodule "SquirrelDefender/modules/yolov8_tensorrt"]
 	path = SquirrelDefender/modules/yolov8_tensorrt
 	url = https://github.com/crose72/YOLOv8-TensorRT-CPP.git
-[submodule "SquirrelDefender/modules/kf_utils"]
-	path = SquirrelDefender/modules/kf_utils
+[submodule "SquirrelDefender/modules/kf"]
+	path = SquirrelDefender/modules/kf
 	url = https://github.com/auralius/kalman-cpp.git

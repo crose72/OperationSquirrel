@@ -97,10 +97,8 @@ void dtrmn_veh_control_action(void)
         
         if (start_follow_mode)
         {
-            
+            follow_mode();
         }
-
-        follow_mode();
     }
 }
 

@@ -212,10 +212,10 @@ bool SystemController::init(void)
 void SystemController::loop(void)
 {
     system_state_machine();
-    led_system_indicators();
 
 #ifdef BLD_JETSON_B01
 
+    led_system_indicators();
     StatusIO::loop();
 
 #endif // BLD_JETSON_B01

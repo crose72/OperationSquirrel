@@ -357,40 +357,47 @@ else()
 endif()
 
 #=============================================================================
-# Modules - Standalone code that is used in SquirrelDefender but is not the 
-# "business logic".  Can be easily ported to another project.  They end up
-# being included in the SOURCES that build the program.
+# Libraries - Standalone code that is used in SquirrelDefender but is not the 
+# "business logic".  Can be easily ported to another project or replaced
+# with other suitable code.  They end up being included in the SOURCES that 
+# build the program.
 #=============================================================================
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/mavlink/v2.0/common)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolo_utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/pid)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/timer)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/kf_utils/kalman)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/mav/mavlink/v2.0/common)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/mav)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/serial)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/math)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/json)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/print)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/yolo)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/pid)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/timer)
 
-file(GLOB MAV_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.cpp)
-file(GLOB MAV_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.h)
-file(GLOB SERIAL_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils/*.cpp)
-file(GLOB SERIAL_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils/*.h)
-file(GLOB MATH_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils/*.cpp)
-file(GLOB MATH_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils/*.h)
-file(GLOB JSON_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils/*.cpp)
-file(GLOB JSON_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils/*.h)
-file(GLOB YOLO_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/yolo_utils/*.cpp)
-file(GLOB YOLO_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/yolo_utils/*.h)
-file(GLOB PRINT_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils/*.cpp)
-file(GLOB PRINT_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils/*.h)
-file(GLOB PID_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/pid/*.cpp)
-file(GLOB PID_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/pid/*.h)
-file(GLOB TIMER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/timer/*.cpp)
-file(GLOB TIMER_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/timer/*.h)
-file(GLOB KF_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf_utils/kalman/*.cpp)
-file(GLOB KF_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf_utils/kalman/*.h)
+
+file(GLOB MAV_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/mav/*.cpp)
+file(GLOB MAV_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/mav/*.h)
+file(GLOB SERIAL_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/serial/*.cpp)
+file(GLOB SERIAL_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/serial/*.h)
+file(GLOB MATH_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/math/*.cpp)
+file(GLOB MATH_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/math/*.h)
+file(GLOB JSON_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/json/*.cpp)
+file(GLOB JSON_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/json/*.h)
+file(GLOB YOLO_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/yolo/*.cpp)
+file(GLOB YOLO_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/yolo/*.h)
+file(GLOB PRINT_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/print/*.cpp)
+file(GLOB PRINT_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/print/*.h)
+file(GLOB PID_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/pid/*.cpp)
+file(GLOB PID_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/pid/*.h)
+file(GLOB TIMER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/timer/*.cpp)
+file(GLOB TIMER_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/timer/*.h)
+
+#=============================================================================
+# Modules - Other github repositories added as submodules that are used.
+#=============================================================================
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman)
+file(GLOB KF_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.cpp)
+file(GLOB KF_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.h)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt)
 

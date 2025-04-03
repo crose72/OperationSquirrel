@@ -49,21 +49,6 @@ bool loc_target_valid_prv;
 bool target_loc_data_ok;
 float loc_target_center_x_prv;
 float loc_target_center_y_prv;
-// Define state-space matrices using Armadillo
-arma::mat A;  // System dynamics matrix
-arma::mat B;  // Control matrix (if needed, otherwise identity)
-arma::mat H;  // Observation matrix
-arma::mat Q;  // Process noise covariance
-arma::mat R;  // Measurement noise covariance
-arma::mat P;  // Estimate error covariance
-
-// State and measurement vectors
-arma::colvec x0;  // Initial state
-arma::colvec measurements;  // Observed measurements
-
-// Kalman Filter instance
-KF kf;
-
 float g_x_target_ekf;
 float g_y_target_ekf;
 float g_vx_target_ekf;
@@ -72,6 +57,18 @@ float g_ax_target_ekf;
 float g_ay_target_ekf;
 float x_target_ekf_prv;
 float y_target_ekf_prv;
+KF kf; // Kalman Filter instance
+arma::mat A;  // System dynamics matrix
+arma::mat B;  // Control matrix (if needed, otherwise identity)
+arma::mat H;  // Observation matrix
+arma::mat Q;  // Process noise covariance
+arma::mat R;  // Measurement noise covariance
+arma::mat P;  // Estimate error covariance
+arma::colvec x0;  // Initial state
+arma::colvec u0;  // Observed initial measurements
+
+
+
 
 /********************************************************************************
  * Calibration definitions
@@ -269,27 +266,16 @@ void update_target_location(void)
 {
     if (target_loc_data_ok && g_dt > 0.0001)
     {
-        // Ensure g_dt is valid
-        if (std::isnan(g_dt) || std::isinf(g_dt) || g_dt <= 0) {
-            std::cerr << "Error: g_dt is invalid: " << g_dt << std::endl;
-            return;
-        }
-
-        // Prepare measurement vector (observations)
+        // Measurement vector (observations)
         colvec z(2);
         z << g_x_target << g_y_target;
 
         // Define the system transition matrix A (discretized)
-        mat A_new(6,6, fill::zeros);
-        A_new << 1, 0, g_dt, 0, 0.5 * pow(g_dt,2), 0,
-                 0, 1, 0, g_dt, 0, 0.5 * pow(g_dt,2),
-                 0, 0, 1, 0, g_dt, 0,
-                 0, 0, 0, 1, 0, g_dt,
-                 0, 0, 0, 0, 1, 0,
-                 0, 0, 0, 0, 0, 1;
+        // TODO: update the state transition matrix A 
+        // Ensure g_dt is valid (std::isnan(g_dt) || std::isinf(g_dt) || g_dt <= 0) 
 
-        // Control input (assumed zero if not using control)
-        colvec u(1, fill::zeros);  // No external control input for now
+        // No external control input for now
+        colvec u(1, fill::zeros);
 
         // Perform Kalman filter update
         kf.Kalmanf(z, u);
@@ -304,7 +290,6 @@ void update_target_location(void)
         g_ay_target_ekf = state->at(5);
     }
 };
-
 
 /********************************************************************************
  * Function: ~Localize
@@ -346,18 +331,21 @@ bool Localize::init(void)
     target_loc_data_ok = false;
 
     // KF init
-    // Number of states and measurements
-    int n_states = 6;  // x, y, vx, vy, ax, ay
-    int n_meas = 2;    // x_m, y_m
-    double dt = 0.05;  // Time step
+    float dt = 0.05;  // Time step
 
     // Resize matrices and set to zero initially
-    A.set_size(n_states, n_states); A.zeros();
-    B.set_size(n_states, 1); B.zeros();
-    H.set_size(n_meas, n_states); H.zeros();
-    Q.set_size(n_states, n_states); Q.zeros();
-    R.set_size(n_meas, n_meas); R.zeros();
-    P.set_size(n_states, n_states); P.zeros();
+    A.set_size(n_states, n_states); 
+    A.zeros();
+    B.set_size(n_states, 1); 
+    B.zeros();
+    H.set_size(n_meas, n_states); 
+    H.zeros();
+    Q.set_size(n_states, n_states);
+    Q.zeros();
+    R.set_size(n_meas, n_meas); 
+    R.zeros();
+    P.set_size(n_states, n_states); 
+    P.zeros();
 
     // Define system dynamics (State transition matrix A)
     A << 1 << 0 << dt << 0 << 0.5 * pow(dt,2) << 0  << arma::endr
@@ -399,9 +387,9 @@ bool Localize::init(void)
     x0.zeros(); // Start with zero velocity and acceleration
     kf.InitSystemState(x0);
 
-    // Resize and reset measurements
-    measurements.set_size(n_meas);
-    measurements.zeros();
+    // Resize and reset u0
+    u0.set_size(n_meas);
+    u0.zeros();
     
     return true;
 }

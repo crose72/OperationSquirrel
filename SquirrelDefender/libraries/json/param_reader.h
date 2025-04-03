@@ -3,7 +3,7 @@
 #if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
 
 /********************************************************************************
- * @file    json_utils.h
+ * @file    param_reader.h
  * @author  Cameron Rose
  * @date    1/22/2025
  ********************************************************************************/
@@ -32,11 +32,11 @@
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class JSONUtils
+class ParamReader
 {
 public:
-    JSONUtils(const std::string &filename);
-    ~JSONUtils();
+    ParamReader(const std::string &filename);
+    ~ParamReader();
 
     float get_float_param(const std::string &group, const std::string &key) const;
     uint32_t get_uint32_param(const std::string &group, const std::string &key) const;

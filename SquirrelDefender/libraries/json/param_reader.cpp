@@ -1,7 +1,7 @@
 #if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
 
 /********************************************************************************
- * @file    json_utils.cpp
+ * @file    param_reader.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
  * @brief   Provide utilities for accessing parameters from a json file.
@@ -10,7 +10,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "json_utils.h"
+#include "param_reader.h"
 
 /********************************************************************************
  * Typedefs
@@ -33,10 +33,10 @@
  ********************************************************************************/
 
 /********************************************************************************
- * Function: JSONUtils
+ * Function: ParamReader
  * Description: Class constructor
  ********************************************************************************/
-JSONUtils::JSONUtils(const std::string &filename)
+ParamReader::ParamReader(const std::string &filename)
 {
     std::ifstream configFile(filename);
 
@@ -49,16 +49,16 @@ JSONUtils::JSONUtils(const std::string &filename)
 }
 
 /********************************************************************************
- * Function: ~JSONUtils
+ * Function: ~ParamReader
  * Description: Class destructor
  ********************************************************************************/
-JSONUtils::~JSONUtils(void) {}
+ParamReader::~ParamReader(void) {}
 
 /********************************************************************************
  * Function: get_float_params
  * Description: Return the values of parameters that are of type float.
  ********************************************************************************/
-float JSONUtils::get_float_param(const std::string &group, const std::string &key) const
+float ParamReader::get_float_param(const std::string &group, const std::string &key) const
 {
     return root[group][key].asFloat();
 }
@@ -67,7 +67,7 @@ float JSONUtils::get_float_param(const std::string &group, const std::string &ke
  * Function: get_uint32_params
  * Description: Return the values of parameters that are of type uint32_t.
  ********************************************************************************/
-uint32_t JSONUtils::get_uint32_param(const std::string &group, const std::string &key) const
+uint32_t ParamReader::get_uint32_param(const std::string &group, const std::string &key) const
 {
     return root[group][key].asUInt();
 }
@@ -76,7 +76,7 @@ uint32_t JSONUtils::get_uint32_param(const std::string &group, const std::string
  * Function: get_bool_params
  * Description: Return the values of parameters that are of type bool.
  ********************************************************************************/
-bool JSONUtils::get_bool_param(const std::string &group, const std::string &key) const
+bool ParamReader::get_bool_param(const std::string &group, const std::string &key) const
 {
     return root[group][key].asBool();
 }
