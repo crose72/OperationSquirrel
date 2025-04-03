@@ -4,7 +4,17 @@ FROM crose72/jetpack-r36.4.0:base
 WORKDIR /workspace/
 
 # Copy the SquirrelDefender program into the container (exe is built externally using the dev container)
-COPY ../SquirrelDefender/ /workspace/OperationSquirrel/SquirrelDefender/
+COPY ../SquirrelDefender/apphdr /workspace/OperationSquirrel/SquirrelDefender/apphdr
+COPY ../SquirrelDefender/appsrc /workspace/OperationSquirrel/SquirrelDefender/appsrc
+COPY ../SquirrelDefender/modules /workspace/OperationSquirrel/SquirrelDefender/modules
+COPY ../SquirrelDefender/cmake /workspace/OperationSquirrel/SquirrelDefender/cmake
+COPY ../SquirrelDefender/build /workspace/OperationSquirrel/SquirrelDefender/build
+COPY ../SquirrelDefender/data /workspace/OperationSquirrel/SquirrelDefender/data
+COPY ../SquirrelDefender/data /workspace/OperationSquirrel/SquirrelDefender/data
+COPY ../SquirrelDefender/test_flights /workspace/OperationSquirrel/SquirrelDefender/test_flights
+COPY ../SquirrelDefender/test_suite /workspace/OperationSquirrel/SquirrelDefender/test_suite
+COPY ../SquirrelDefender/test_data /workspace/OperationSquirrel/SquirrelDefender/test_data
+COPY ../SquirrelDefender/CMakeLists.txt /workspace/OperationSquirrel/SquirrelDefender/CMakeLists.txt
 
 # Remove any data files that are currently saved in the jetson filesystem (don't want to mix and match data)
 RUN rm -rf /workspace/OperationSquirrel/SquirrelDefender/data/*

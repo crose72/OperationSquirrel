@@ -30,7 +30,8 @@ sudo docker run --runtime nvidia -it --rm --network host \
   --volume /tmp/argus_socket:/tmp/argus_socket \
   --volume /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra \
   --volume ${OS_WS}/OperationSquirrel/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender \
+  --volume ${OS_WS}/YOLOv8-TensorRT-CPP:/workspace/YOLOv8-TensorRT-CPP \
   --name squirreldefender-dev \
   crose72/jetpack-r36.4.0:base \
-  bash -c "cd workspace/OperationSquirrel/SquirrelDefender/build \
+  bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build \
     && exec bash"

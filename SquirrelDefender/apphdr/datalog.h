@@ -114,12 +114,21 @@ extern float g_delta_angle;
 extern float g_camera_tilt_angle;
 extern float g_delta_d_x;
 extern float g_delta_d_z;
+extern float g_x_target_ekf;
+extern float g_y_target_ekf;
+extern float g_vx_target_ekf;
+extern float g_vy_target_ekf;
+extern float g_ax_target_ekf;
+extern float g_ay_target_ekf;
 
 /* Follow target variables */
 extern bool g_target_too_close;
 extern float g_vx_adjust;
 extern float g_vy_adjust;
 extern float g_vz_adjust;
+extern float g_yaw_target;
+extern float g_yaw_target_error;
+extern float g_mav_veh_yaw_adjusted;
 
 /* System variables */
 extern SystemState g_system_state;

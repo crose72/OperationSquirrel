@@ -12,6 +12,7 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
+#include "scheduler.h"
 #include "mav_data_hub.h"
 #include "mav_utils.h"
 #include "datalog.h"
@@ -21,6 +22,7 @@
 #include "detect_target.h"
 #include "track_target.h"
 #include "localize_target.h"
+#include "path_planner.h"
 #include "follow_target.h"
 #include "time_calc.h"
 
@@ -31,6 +33,7 @@ extern bool g_valid_image_rcvd;
 extern uint16_t g_mav_veh_rngfdr_current_distance;
 extern int32_t g_mav_veh_rel_alt;
 extern bool g_save_button_press;
+extern bool controller_initialiazed;
 
 /********************************************************************************
  * Exported objects
@@ -46,7 +49,7 @@ public:
     SystemController();
     ~SystemController();
 
-    static int init(void);
+    static bool init(void);
     static void loop(void);
     static void shutdown(void);
 

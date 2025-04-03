@@ -56,6 +56,8 @@ uint32_t g_mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd;  /*<  Bitmap showing 
 uint32_t g_mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd; /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error.
                                                             Value of 1: healthy.*/
 uint32_t g_mav_veh_custom_mode;                             /*<  A bitfield for use for autopilot-specific flags*/
+uint32_t g_mav_veh_custom_mode_prv;
+bool g_manual_override_land;
 uint8_t g_mav_veh_type;                                     /*<  Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the
                                                             component type (e.g. camera, gimbal, etc.). This should be used in preference to component id for identifying the component type.*/
 uint8_t g_mav_veh_autopilot_type;                           /*<  Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.*/
@@ -207,6 +209,17 @@ void proc_mav_heartbeat_msg(const mavlink_message_t *msg)
         g_mav_veh_state = heartbeat.system_status;
         g_mav_veh_mavlink_version = heartbeat.mavlink_version;
     }
+    
+    if (g_mav_veh_custom_mode == (uint32_t)9 && g_mav_veh_custom_mode_prv != (uint32_t)9)
+    {
+        g_manual_override_land = true;
+    }
+    else
+    {
+        g_manual_override_land = false;
+    }
+
+    g_mav_veh_custom_mode_prv = g_mav_veh_custom_mode;
 
 #ifdef DEBUG_BUILD
 
@@ -769,6 +782,8 @@ bool MavMsg::init(void)
     g_mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd = 0;
 
     g_mav_veh_custom_mode = 0;
+    g_mav_veh_custom_mode_prv = 0;
+    g_manual_override_land = false;
     g_mav_veh_type = 0;
     g_mav_veh_autopilot_type = 0;
     g_mav_veh_base_mode = 0;

@@ -1,16 +1,16 @@
+#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
+
 /********************************************************************************
- * @file    main.cpp
+ * @file    param_reader.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Main entry point for the program, contains the loop functions for 
-            each software component.
+ * @brief   Provide utilities for accessing parameters from a json file.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include <mutex>
-#include "scheduler.h"
+#include "param_reader.h"
 
 /********************************************************************************
  * Typedefs
@@ -23,9 +23,6 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool g_stop_program;
-bool g_use_video_playback;
-std::string input_video_path;
 
 /********************************************************************************
  * Calibration definitions
@@ -36,68 +33,52 @@ std::string input_video_path;
  ********************************************************************************/
 
 /********************************************************************************
- * Function: sig_handler
- * Description: Stop the program if Crl+C is entered in the terminal.
+ * Function: ParamReader
+ * Description: Class constructor
  ********************************************************************************/
-void sig_handler(int signo)
+ParamReader::ParamReader(const std::string &filename)
 {
-    if (signo == SIGINT)
+    std::ifstream configFile(filename);
+
+    if (!configFile.is_open())
     {
-        g_stop_program = true;
-        Print::c_fprintf("received SIGINT\n");
+        std::cerr << "Error: Unable to open parameter file: " << filename << std::endl;
+        return;
     }
+    configFile >> root;
 }
 
 /********************************************************************************
- * Function: attach_sig_handler
- * Description: Attach sig handler to enable program termination by Crl+C.
+ * Function: ~ParamReader
+ * Description: Class destructor
  ********************************************************************************/
-void attach_sig_handler(void)
+ParamReader::~ParamReader(void) {}
+
+/********************************************************************************
+ * Function: get_float_params
+ * Description: Return the values of parameters that are of type float.
+ ********************************************************************************/
+float ParamReader::get_float_param(const std::string &group, const std::string &key) const
 {
-    if (signal(SIGINT, sig_handler) == SIG_ERR)
-    {
-        Print::c_fprintf("can't catch SIGINT");
-    }
+    return root[group][key].asFloat();
 }
 
 /********************************************************************************
- * Function: main
- * Description: Entry point for the program.  Runs the main loop.
+ * Function: get_uint32_params
+ * Description: Return the values of parameters that are of type uint32_t.
  ********************************************************************************/
-int main(int argc, char** argv) 
+uint32_t ParamReader::get_uint32_param(const std::string &group, const std::string &key) const
 {
-    input_video_path = "";
-    g_use_video_playback = false;
-    g_stop_program = false;
-    
-    if (argc > 1)
-    {
-        input_video_path = argv[1];
-        g_use_video_playback = true;
-    }
-    
-    attach_sig_handler();
-
-    if (Scheduler::init() != 0)
-    {
-        return Scheduler::init();
-    }
-
-#ifdef BLD_JETSON_B01
-
-    while (!g_stop_program && !g_manual_override_land && !g_save_button_press) // todo: figure buttons w docker (jetson io/jumper)
-
-#else
-
-    while (!g_stop_program && !g_manual_override_land)
-
-#endif // BLD_JETSON_B01
-
-    {
-        Scheduler::loop();
-    }
-
-    Scheduler::shutdown();
-
-    return 0;
+    return root[group][key].asUInt();
 }
+
+/********************************************************************************
+ * Function: get_bool_params
+ * Description: Return the values of parameters that are of type bool.
+ ********************************************************************************/
+bool ParamReader::get_bool_param(const std::string &group, const std::string &key) const
+{
+    return root[group][key].asBool();
+}
+
+#endif // BLD_JETSON_B01 || BLD_JETSON_ORIN_NANO

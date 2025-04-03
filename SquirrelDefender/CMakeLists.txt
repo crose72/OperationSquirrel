@@ -57,7 +57,8 @@ option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
-option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" ON)
+option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" OFF)
+option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" OFF)
 
 # Option to use environment variables for library paths
 option(USE_ENV_VAR "Use environment variables for library paths" OFF)
@@ -69,6 +70,10 @@ option(USE_ENV_VAR "Use environment variables for library paths" OFF)
 # Ensure only one build platform is selected
 set(BUILD_PLATFORMS 0)
 
+if(BLD_JETSON_ORIN_NANO)
+    math(EXPR BUILD_PLATFORMS "${BUILD_PLATFORMS} + 1")
+endif()
+
 if(BLD_JETSON_B01)
     math(EXPR BUILD_PLATFORMS "${BUILD_PLATFORMS} + 1")
 endif()
@@ -78,6 +83,10 @@ if(BLD_WSL)
 endif()
 
 if(BLD_WIN)
+    math(EXPR BUILD_PLATFORMS "${BUILD_PLATFORMS} + 1")
+endif()
+
+if(BUILD_TEST_HARNESS)
     math(EXPR BUILD_PLATFORMS "${BUILD_PLATFORMS} + 1")
 endif()
 
@@ -112,7 +121,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 # Validate CMAKE_BUILD_TYPE
 if(NOT CMAKE_BUILD_TYPE)
-    message(FATAL_ERROR "Invalid build type: ${CMAKE_BUILD_TYPE}. Choose either Debug or Release.")
+    set(CMAKE_BUILD_TYPE Release)
+    message(STATUS "Build type is: ${CMAKE_BUILD_TYPE}. Specify Debug if desired.")
 endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
@@ -131,11 +141,22 @@ function(set_target_debug_flags target)
             LINK_FLAGS_RELEASE "/INCREMENTAL:NO")
     else()
         # For GCC/Clang
-        target_compile_options(${target} PRIVATE
-            $<$<CONFIG:Debug>:-g -O0>
-            $<$<CONFIG:Release>:-O3>)
+        if (ENABLE_GDB)
+            target_compile_options(${target} PRIVATE
+                $<$<CONFIG:Debug>:-g -O0>
+                $<$<CONFIG:Release>:-g -O3>)
+        else()
+            target_compile_options(${target} PRIVATE
+                $<$<CONFIG:Debug>:-g -O0>
+                $<$<CONFIG:Release>:-O3>)
+        endif()
     endif()
 endfunction()
+
+# Enable ASan
+
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer -g")
+# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
 
 #=============================================================================
 # Define Preprocessor Directives Based on Build Options
@@ -187,6 +208,35 @@ endif()
 #=============================================================================
 # Find External Libraries and Headers 
 #=============================================================================
+
+# Additional required packages to find
+if(BLD_JETSON_B01)
+    find_package(CUDA REQUIRED)
+    find_package(OpenCV REQUIRED)
+    find_package(jetson-utils REQUIRED)
+    find_package(jetson-inference REQUIRED)
+    message(STATUS "Attempting to find JetsonGPIO library...")
+    find_library(JETSON_GPIO_LIB JetsonGPIO)
+elseif(BLD_JETSON_ORIN_NANO)
+    find_package(CUDA REQUIRED)
+    find_package(OpenCV REQUIRED)
+    find_package(TensorRT REQUIRED)
+    find_package(vpi 3.2 REQUIRED)
+    find_package(Eigen3 REQUIRED)
+    find_package(Armadillo REQUIRED)
+    find_package(LAPACK REQUIRED)
+    find_package(BLAS REQUIRED)
+endif()
+
+# TODO: Specify the path to TensorRT root dir
+if (NOT TensorRT_DIR)
+    set(TensorRT_DIR /home/cyrus/work/libs/TensorRT-10.0.0.6/)
+endif()
+
+# Set paths to acados installation
+set(ACADOS_INSTALL_DIR /usr/local)
+set(ACADOS_INCLUDE_DIR ${ACADOS_INSTALL_DIR}/include/acados)
+set(ACADOS_LIB_DIR ${ACADOS_INSTALL_DIR}/lib)
 
 # Environment variable validation and inclusion based on platform
 if(USE_ENV_VAR)
@@ -278,7 +328,6 @@ else()
             /usr/local/cuda/include
             /usr/local/include/opencv4
         )
-
         link_directories(
             /usr/local/lib
             /usr/local/cuda/lib64
@@ -289,68 +338,66 @@ else()
         include_directories(
             /usr/local/cuda/include
             /usr/include/opencv4
+            ${EIGEN3_INCLUDE_DIR}
+            ${ARMADILLO_INCLUDE_DIRS}
+            ${ACADOS_INCLUDE_DIR}
+            #/usr/local/include/blasfeo/include # needed for ACADOS
+            #/usr/local/include/hpipm/include/ # needed for ACADOS
+            #/usr/local/include/acados_c # needed for ACADOS
         )
 
         link_directories(
             /usr/local/lib
             /usr/local/cuda/lib64
             /usr/lib/aarch64-linux-gnu/tegra
+            ${ARMADILLO_LIBRARY_DIRS}
+            # ${ACADOS_LIB_DIR} # needed for ACADOS
         )
     endif()
 endif()
 
-# Additional required packages to find
-if(BLD_JETSON_B01)
-    find_package(CUDA REQUIRED)
-    find_package(OpenCV REQUIRED)
-    find_package(jetson-utils REQUIRED)
-    find_package(jetson-inference REQUIRED)
-    message(STATUS "Attempting to find JetsonGPIO library...")
-    find_library(JETSON_GPIO_LIB JetsonGPIO)
-elseif(BLD_JETSON_ORIN_NANO)
-    find_package(CUDA REQUIRED)
-    find_package(OpenCV REQUIRED)
-    find_package(TensorRT REQUIRED)
-    find_package(vpi 3.2 REQUIRED)
-endif()
-
-# TODO: Specify the path to TensorRT root dir
-if (NOT TensorRT_DIR)
-    set(TensorRT_DIR /home/cyrus/work/libs/TensorRT-10.0.0.6/)
-endif()
-
 #=============================================================================
-# Modules - Standalone code that is used in SquirrelDefender but is not the 
-# "business logic".  Can be easily ported to another project.  They end up
-# being included in the SOURCES that build the program.
+# Libraries - Standalone code that is used in SquirrelDefender but is not the 
+# "business logic".  Can be easily ported to another project or replaced
+# with other suitable code.  They end up being included in the SOURCES that 
+# build the program.
 #=============================================================================
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/mavlink/v2.0/common)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolo_utils)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/pid)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/timer)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/mav/mavlink/v2.0/common)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/mav)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/serial)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/math)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/json)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/print)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/yolo)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/pid)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/timer)
 
-file(GLOB MAV_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.cpp)
-file(GLOB MAV_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/mav_utils/*.h)
-file(GLOB SERIAL_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils/*.cpp)
-file(GLOB SERIAL_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/serial_utils/*.h)
-file(GLOB MATH_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils/*.cpp)
-file(GLOB MATH_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/math_utils/*.h)
-file(GLOB JSON_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils/*.cpp)
-file(GLOB JSON_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/json_utils/*.h)
-file(GLOB YOLO_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/yolo_utils/*.cpp)
-file(GLOB YOLO_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/yolo_utils/*.h)
-file(GLOB PRINT_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils/*.cpp)
-file(GLOB PRINT_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/print_utils/*.h)
-file(GLOB PID_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/pid/*.cpp)
-file(GLOB PID_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/pid/*.h)
-file(GLOB TIMER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/timer/*.cpp)
-file(GLOB TIMER_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/timer/*.h)
+
+file(GLOB MAV_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/mav/*.cpp)
+file(GLOB MAV_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/mav/*.h)
+file(GLOB SERIAL_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/serial/*.cpp)
+file(GLOB SERIAL_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/serial/*.h)
+file(GLOB MATH_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/math/*.cpp)
+file(GLOB MATH_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/math/*.h)
+file(GLOB JSON_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/json/*.cpp)
+file(GLOB JSON_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/json/*.h)
+file(GLOB YOLO_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/yolo/*.cpp)
+file(GLOB YOLO_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/yolo/*.h)
+file(GLOB PRINT_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/print/*.cpp)
+file(GLOB PRINT_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/print/*.h)
+file(GLOB PID_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/pid/*.cpp)
+file(GLOB PID_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/pid/*.h)
+file(GLOB TIMER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/timer/*.cpp)
+file(GLOB TIMER_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/timer/*.h)
+
+#=============================================================================
+# Modules - Other github repositories added as submodules that are used.
+#=============================================================================
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman)
+file(GLOB KF_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.cpp)
+file(GLOB KF_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.h)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt)
 
@@ -372,154 +419,167 @@ file(GLOB HEADERS ${HEADER_DIR}/*.h)
 # Additional source files to compile together
 list(APPEND SOURCES ${MAV_UTILS_SOURCES} ${SERIAL_UTILS_SOURCES} ${MATH_UTILS_SOURCES} 
                     ${JSON_UTILS_SOURCES} ${PRINT_UTILS_SOURCES} ${YOLO_UTILS_SOURCES} 
-                    ${PID_SOURCES} ${TIMER_SOURCES})
+                    ${PID_SOURCES} ${TIMER_SOURCES} ${KF_SOURCES})
 list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HEADERS} 
                     ${JSON_UTILS_HEADERS} ${PRINT_UTILS_HEADERS} ${YOLO_UTILS_HEADERS} 
-                    ${PID_HEADERS} ${TIMER_HEADERS})
+                    ${PID_HEADERS} ${TIMER_HEADERS} ${KF_HEADERS})
 
 #=============================================================================
 # Build Executable for each supported platform
 #=============================================================================
 
-if (BLD_JETSON_B01)
-    cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
-    set_target_debug_flags(squirreldefender)
+# Build only the test harness or the full executable speeds up compile time (so worth it!)
+if (NOT BUILD_TEST_HARNESS)
+    message(STATUS "Building the squirreldefender program")  
+    if (BLD_JETSON_B01)
+        cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
+        set_target_debug_flags(squirreldefender)
 
-    target_link_libraries(squirreldefender 
-                        ${OpenCV_LIBS} 
-                        ${JETSON_GPIO_LIB}
-                        jetson-inference
-                        jetson-utils
-                        jsoncpp)
-elseif (BLD_JETSON_ORIN_NANO)
-    cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
-    set_target_debug_flags(squirreldefender)
+        target_link_libraries(squirreldefender 
+                            ${OpenCV_LIBS} 
+                            ${JETSON_GPIO_LIB}
+                            jetson-inference
+                            jetson-utils
+                            jsoncpp)
+    elseif (BLD_JETSON_ORIN_NANO)
+        cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
+        set_target_debug_flags(squirreldefender)
 
-    target_include_directories(squirreldefender PRIVATE modules/yolov8_tensorrt/src)
+        target_include_directories(squirreldefender PRIVATE modules/yolov8_tensorrt/src)
 
-    target_link_libraries(squirreldefender 
-                        YoloV8_TRT 
-                        ${OpenCV_LIBS} 
-                        vpi opencv_core
-                        opencv_imgproc 
-                        opencv_imgcodecs 
-                        opencv_videoio
-                        jsoncpp)
+        target_link_libraries(squirreldefender 
+                            YoloV8_TRT 
+                            ${OpenCV_LIBS} 
+                            vpi opencv_core
+                            opencv_imgproc 
+                            opencv_imgcodecs 
+                            opencv_videoio
+                            jsoncpp
+                            ${ARMADILLO_LIBRARIES} 
+                            ${LAPACK_LIBRARIES} 
+                            ${BLAS_LIBRARIES}
+                            #acados     # For acados, remove if you are not using qpOASES
+                            #hpipm      # For acados, remove if you are not using qpOASES
+                            #blasfeo    # For acados, remove if you are not using qpOASES
+                            #qpOASES_e  # For acados, remove if you are not using qpOASES
+                            #osqp       # For acados, remove if you are not using OSQP
+                            )
 
-elseif(BLD_WSL)
-    add_executable(squirreldefender ${SOURCES} ${HEADERS})
-    set_target_debug_flags(squirreldefender)
-elseif(BLD_WIN)
+    elseif(BLD_WSL)
+        add_executable(squirreldefender ${SOURCES} ${HEADERS})
+        set_target_debug_flags(squirreldefender)
+    elseif(BLD_WIN)
 
-    if(USE_ENV_VAR)
-        find_package(OpenCV REQUIRED
-            PATHS $ENV{LIB_OPENCV}/../
-                  $ENV{LIB_OPENCV}
-            HINTS $ENV{LIB_OPENCV}/../
-                  $ENV{LIB_OPENCV}
-            NO_DEFAULT_PATH)  # Only look in specified paths
-    else()
-        find_package(OpenCV REQUIRED
-            PATHS "C:/opencv/4.10.0/install"
-                  "C:/opencv/4.10.0/install/x64/vc17"
-            NO_DEFAULT_PATH)
+        if(USE_ENV_VAR)
+            find_package(OpenCV REQUIRED
+                PATHS $ENV{LIB_OPENCV}/../
+                    $ENV{LIB_OPENCV}
+                HINTS $ENV{LIB_OPENCV}/../
+                    $ENV{LIB_OPENCV}
+                NO_DEFAULT_PATH)  # Only look in specified paths
+        else()
+            find_package(OpenCV REQUIRED
+                PATHS "C:/opencv/4.10.0/install"
+                    "C:/opencv/4.10.0/install/x64/vc17"
+                NO_DEFAULT_PATH)
+        endif()
+
+        # Find OpenCV package first
+        find_package(OpenCV REQUIRED)
+        message(STATUS "OpenCV library status:")
+        message(STATUS "    version: ${OpenCV_VERSION}")
+        message(STATUS "    libraries: ${OpenCV_LIBS}")
+        message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
+
+        add_executable(squirreldefender ${SOURCES} ${HEADERS})
+        set_target_debug_flags(squirreldefender)
+        
+        # Add include directories
+        target_include_directories(squirreldefender PRIVATE ${OpenCV_INCLUDE_DIRS})
+        
+        # Link with OpenCV first
+        target_link_libraries(squirreldefender PRIVATE ${OpenCV_LIBS})
+        
+        # Add Windows sockets
+        target_link_libraries(squirreldefender PRIVATE Ws2_32)
+
+        # Set iterator debug level
+        target_compile_definitions(squirreldefender PRIVATE 
+            $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>
+            $<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0>)
+
+        # Match the runtime library with OpenCV
+        if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+            set(CMAKE_CXX_FLAGS_DEBUG "/Zi /Od /MDd")  # Use MDd for debug
+            target_compile_options(squirreldefender PRIVATE /MDd)
+        else()
+            set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG /MD")  # Use MD for release
+            target_compile_options(squirreldefender PRIVATE /MD)
+        endif()
+        
+        target_link_libraries(squirreldefender PRIVATE
+            cudart_static
+            cublas
+            cublasLt
+            cudadevrt
+            cuda
+            cufft
+            cufftw
+            cufilt
+            curand
+            cusolver
+            cusolverMg
+            cusparse
+            nppc
+            nppial
+            nppicc
+            nppidei
+            nppif
+            nppig
+            nppim
+            nppist
+            nppisu
+            nppitc
+            npps
+            nvblas
+            nvfatbin
+            nvfatbin_static
+            nvJitLink
+            nvJitLink_static
+            nvjpeg
+            nvml
+            nvptxcompiler_static
+            nvrtc
+            nvrtc_static
+            nvrtc-builtins_static
+            OpenCL
+        )
+
+        target_link_libraries(squirreldefender PRIVATE
+            nvinfer_10
+            nvinfer_plugin_10
+            nvonnxparser_10
+        )
+
+        target_link_libraries(squirreldefender PRIVATE
+            cudnn
+            cudnn64_8
+            cudnn_adv_infer
+            cudnn_adv_infer64_8
+            cudnn_adv_train
+            cudnn_adv_train64_8
+            cudnn_cnn_infer
+            cudnn_cnn_infer64_8
+            cudnn_cnn_train
+            cudnn_cnn_train64_8
+            cudnn_ops_infer
+            cudnn_ops_infer64_8
+            cudnn_ops_train
+            cudnn_ops_train64_8
+        )
+
+        set_target_properties(squirreldefender PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
     endif()
-
-    # Find OpenCV package first
-    find_package(OpenCV REQUIRED)
-    message(STATUS "OpenCV library status:")
-    message(STATUS "    version: ${OpenCV_VERSION}")
-    message(STATUS "    libraries: ${OpenCV_LIBS}")
-    message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
-
-    add_executable(squirreldefender ${SOURCES} ${HEADERS})
-    set_target_debug_flags(squirreldefender)
-    
-    # Add include directories
-    target_include_directories(squirreldefender PRIVATE ${OpenCV_INCLUDE_DIRS})
-    
-    # Link with OpenCV first
-    target_link_libraries(squirreldefender PRIVATE ${OpenCV_LIBS})
-    
-    # Add Windows sockets
-    target_link_libraries(squirreldefender PRIVATE Ws2_32)
-
-    # Set iterator debug level
-    target_compile_definitions(squirreldefender PRIVATE 
-        $<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=2>
-        $<$<CONFIG:Release>:_ITERATOR_DEBUG_LEVEL=0>)
-
-    # Match the runtime library with OpenCV
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(CMAKE_CXX_FLAGS_DEBUG "/Zi /Od /MDd")  # Use MDd for debug
-        target_compile_options(squirreldefender PRIVATE /MDd)
-    else()
-        set(CMAKE_CXX_FLAGS_RELEASE "/O2 /DNDEBUG /MD")  # Use MD for release
-        target_compile_options(squirreldefender PRIVATE /MD)
-    endif()
-    
-    target_link_libraries(squirreldefender PRIVATE
-        cudart_static
-        cublas
-        cublasLt
-        cudadevrt
-        cuda
-        cufft
-        cufftw
-        cufilt
-        curand
-        cusolver
-        cusolverMg
-        cusparse
-        nppc
-        nppial
-        nppicc
-        nppidei
-        nppif
-        nppig
-        nppim
-        nppist
-        nppisu
-        nppitc
-        npps
-        nvblas
-        nvfatbin
-        nvfatbin_static
-        nvJitLink
-        nvJitLink_static
-        nvjpeg
-        nvml
-        nvptxcompiler_static
-        nvrtc
-        nvrtc_static
-        nvrtc-builtins_static
-        OpenCL
-    )
-
-    target_link_libraries(squirreldefender PRIVATE
-        nvinfer_10
-        nvinfer_plugin_10
-        nvonnxparser_10
-    )
-
-    target_link_libraries(squirreldefender PRIVATE
-        cudnn
-        cudnn64_8
-        cudnn_adv_infer
-        cudnn_adv_infer64_8
-        cudnn_adv_train
-        cudnn_adv_train64_8
-        cudnn_cnn_infer
-        cudnn_cnn_infer64_8
-        cudnn_cnn_train
-        cudnn_cnn_train64_8
-        cudnn_ops_infer
-        cudnn_ops_infer64_8
-        cudnn_ops_train
-        cudnn_ops_train64_8
-    )
-
-    set_target_properties(squirreldefender PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
 endif()
 
 #=============================================================================
@@ -527,6 +587,7 @@ endif()
 #=============================================================================
 
 if (BUILD_TEST_HARNESS)
+    message(STATUS "Building the test harness (not squirreldefender)")
     if (BLD_JETSON_ORIN_NANO)
 
         # Test source base
@@ -547,13 +608,16 @@ if (BUILD_TEST_HARNESS)
         target_include_directories(test_localize_target PRIVATE modules/yolov8_tensorrt/src)
 
         target_link_libraries(test_localize_target 
-                            YoloV8_TRT 
-                            ${OpenCV_LIBS} 
-                            vpi opencv_core
-                            opencv_imgproc 
-                            opencv_imgcodecs 
-                            opencv_videoio
-                            jsoncpp)
+                              YoloV8_TRT 
+                              ${OpenCV_LIBS} 
+                              vpi opencv_core
+                              opencv_imgproc 
+                              opencv_imgcodecs 
+                              opencv_videoio
+                              jsoncpp
+                              ${ARMADILLO_LIBRARIES} 
+                              ${LAPACK_LIBRARIES} 
+                              ${BLAS_LIBRARIES})
 
         # Follow target test code
         set(FOLLOW_TEST_SOURCES ${TEST_SOURCE_BASE})
@@ -566,12 +630,15 @@ if (BUILD_TEST_HARNESS)
         target_include_directories(test_follow_target PRIVATE modules/yolov8_tensorrt/src)
 
         target_link_libraries(test_follow_target 
-                            YoloV8_TRT 
-                            ${OpenCV_LIBS} 
-                            vpi opencv_core
-                            opencv_imgproc 
-                            opencv_imgcodecs 
-                            opencv_videoio
-                            jsoncpp)
+                              YoloV8_TRT 
+                              ${OpenCV_LIBS} 
+                              vpi opencv_core
+                              opencv_imgproc 
+                              opencv_imgcodecs 
+                              opencv_videoio
+                              jsoncpp
+                              ${ARMADILLO_LIBRARIES} 
+                              ${LAPACK_LIBRARIES} 
+                              ${BLAS_LIBRARIES})
     endif()
 endif()

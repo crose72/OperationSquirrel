@@ -1,64 +1,51 @@
 #pragma once
 
-#ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
 
 /********************************************************************************
- * @file    video_io_opencv.h
+ * @file    param_reader.h
  * @author  Cameron Rose
  * @date    1/22/2025
  ********************************************************************************/
-#ifndef VIDEO_IO_CV_H
-#define VIDEO_IO_CV_H
+#ifndef JSON_UTILS_H
+#define JSON_UTILS_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include <string>
+#include <stdint.h>
+#include <iostream>
 #include <fstream>
-#include <opencv2/cudaimgproc.hpp>
-#include <opencv2/opencv.hpp>
-#include <vector>
+#include <map>
+#include <string>
+#include <sstream>
+#include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern float g_app_elapsed_time;
-extern uint8_t g_mav_veh_state;
-extern float g_x_target_ekf;
-extern float g_y_target_ekf;
-extern int32_t g_mav_veh_rel_alt;
-extern std::string input_video_path;
-extern bool g_use_video_playback;
-extern bool g_stop_program;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool g_valid_image_rcvd;
-extern cv::Mat g_image;
-extern float g_input_video_width;
-extern float g_input_video_height;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class VideoCV
+class ParamReader
 {
 public:
-    VideoCV();
-    ~VideoCV();
+    ParamReader(const std::string &filename);
+    ~ParamReader();
 
-    static bool init(void);
-    static void in_loop(void);
-    static void out_loop(void);
-    static void shutdown(void);
+    float get_float_param(const std::string &group, const std::string &key) const;
+    uint32_t get_uint32_param(const std::string &group, const std::string &key) const;
+    bool get_bool_param(const std::string &group, const std::string &key) const;
 
 private:
+    Json::Value root;
 };
 
-#endif // VIDEO_IO_CV_H
+#endif // JSON_UTILS_H
 
-#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
-#endif // ENABLE_CV
+#endif // BLD_JETSON_B01 || BLD_JETSON_ORIN_NANO

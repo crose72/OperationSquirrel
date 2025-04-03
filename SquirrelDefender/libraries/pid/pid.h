@@ -1,64 +1,46 @@
 #pragma once
 
-#ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
-
 /********************************************************************************
- * @file    video_io_opencv.h
+ * @file    pid.h
  * @author  Cameron Rose
  * @date    1/22/2025
  ********************************************************************************/
-#ifndef VIDEO_IO_CV_H
-#define VIDEO_IO_CV_H
+#ifndef PID_CONTROLLER_H
+#define PID_CONTROLLER_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include <string>
-#include <fstream>
-#include <opencv2/cudaimgproc.hpp>
-#include <opencv2/opencv.hpp>
-#include <vector>
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern float g_app_elapsed_time;
-extern uint8_t g_mav_veh_state;
-extern float g_x_target_ekf;
-extern float g_y_target_ekf;
-extern int32_t g_mav_veh_rel_alt;
-extern std::string input_video_path;
-extern bool g_use_video_playback;
-extern bool g_stop_program;
+extern float g_dt_25ms;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool g_valid_image_rcvd;
-extern cv::Mat g_image;
-extern float g_input_video_width;
-extern float g_input_video_height;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class VideoCV
+class PID
 {
 public:
-    VideoCV();
-    ~VideoCV();
+    PID();
+    ~PID();
 
-    static bool init(void);
-    static void in_loop(void);
-    static void out_loop(void);
-    static void shutdown(void);
+    float pid3(float Kp, float Ki, float Kd,
+               float err1, float err2, float err3,
+               float w1, float w2, float w3, int dim, 
+               float dt);
 
 private:
+    float err_sum[6];                  // Array to hold integral sums for x, y, z, roll, pitch, yaw
+    float err_prv[6];                  // Array to hold previous errors for x, y, z, roll, pitch, yaw
+    const float max_integral = 10.0;   // Max value for integral term to prevent windup
+    const float integral_decay = 0.95; // Decay factor for integral term
 };
 
-#endif // VIDEO_IO_CV_H
-
-#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
-#endif // ENABLE_CV
+#endif // PID_CONTROLLER_H

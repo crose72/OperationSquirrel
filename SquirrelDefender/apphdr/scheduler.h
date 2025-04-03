@@ -1,64 +1,62 @@
-#pragma once
-
-#ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
-
 /********************************************************************************
- * @file    video_io_opencv.h
+ * @file    scheduler.h
  * @author  Cameron Rose
- * @date    1/22/2025
+ * @date    3/12/2025
  ********************************************************************************/
-#ifndef VIDEO_IO_CV_H
-#define VIDEO_IO_CV_H
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include <string>
-#include <fstream>
-#include <opencv2/cudaimgproc.hpp>
-#include <opencv2/opencv.hpp>
-#include <vector>
+#include <mutex>
+#include <signal.h>
+#include <chrono>
+#include <thread>
+#include "common_inc.h"
+#include "datalog.h"
+#include "video_io.h"
+#include "system_controller.h"
+#include "mav_data_hub.h"
+#include "mav_utils.h"
+#include "vehicle_controller.h"
+#include "detect_target.h"
+#include "track_target.h"
+#include "localize_target.h"
+#include "follow_target.h"
+#include "time_calc.h"
+#include "timer.h"
+#include "path_planner.h"
+
+#ifdef BLD_JETSON_B01
+
+#include "status_io.h"
+
+#endif // BLD_JETSON_B01
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern float g_app_elapsed_time;
-extern uint8_t g_mav_veh_state;
-extern float g_x_target_ekf;
-extern float g_y_target_ekf;
-extern int32_t g_mav_veh_rel_alt;
-extern std::string input_video_path;
-extern bool g_use_video_playback;
-extern bool g_stop_program;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool g_valid_image_rcvd;
-extern cv::Mat g_image;
-extern float g_input_video_width;
-extern float g_input_video_height;
 
 /********************************************************************************
- * Function prototypes and Class Definitions
+ * Function prototypes
  ********************************************************************************/
-class VideoCV
+class Scheduler
 {
 public:
-    VideoCV();
-    ~VideoCV();
+    Scheduler();
+    ~Scheduler();
 
-    static bool init(void);
-    static void in_loop(void);
-    static void out_loop(void);
+    static int init(void);
+    static void loop(void);
     static void shutdown(void);
 
 private:
 };
 
-#endif // VIDEO_IO_CV_H
-
-#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
-#endif // ENABLE_CV
+#endif // SCHEDULER_H

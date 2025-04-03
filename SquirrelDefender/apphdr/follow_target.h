@@ -14,10 +14,12 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "json_utils.h"
+#include "param_reader.h"
 #include "pid.h"
 #include "localize_target.h"
 #include "time_calc.h"
+#include "track_target.h"
+#include "mav_data_hub.h"
 
 /********************************************************************************
  * Imported objects
@@ -31,6 +33,13 @@ extern float g_x_target;
 extern float g_y_target;
 extern float g_z_target;
 extern float g_dt;
+extern float g_x_target_ekf;
+extern float g_y_target_ekf;
+extern bool g_first_loop_after_start;
+extern float g_mav_veh_yaw;
+extern float g_mav_veh_yawspeed;
+extern bool g_use_video_playback;
+extern float g_target_cntr_offset_y;
 
 /********************************************************************************
  * Exported objects
@@ -41,6 +50,10 @@ extern float g_y_error;
 extern float g_vx_adjust;
 extern float g_vy_adjust;
 extern float g_vz_adjust;
+extern float g_yaw_target;
+extern float g_yaw_adjust;
+extern float g_mav_veh_yaw_adjusted;
+extern float g_yaw_target_error;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

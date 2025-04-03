@@ -15,9 +15,10 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "track_target.h"
-#include "json_utils.h"
+#include "param_reader.h"
 #include "interpolate.h"
 #include "time_calc.h"
+#include "kf.h"
 
 /********************************************************************************
  * Imported objects
@@ -37,6 +38,7 @@ extern float g_target_top;
 extern float g_target_bottom;
 extern float g_target_center_x;
 extern float g_target_center_y;
+extern float g_dt;
 
 /********************************************************************************
  * Exported objects
@@ -54,6 +56,12 @@ extern float g_camera_tilt_angle;
 extern float g_delta_d_x;
 extern float g_delta_d_z;
 extern float g_camera_comp_angle;
+extern float g_x_target_ekf;
+extern float g_y_target_ekf;
+extern float g_vx_target_ekf;
+extern float g_vy_target_ekf;
+extern float g_ax_target_ekf;
+extern float g_ay_target_ekf;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
