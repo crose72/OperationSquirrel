@@ -52,6 +52,8 @@ extern float g_vy_adjust;
 extern float g_vz_adjust;
 extern float g_yaw_target;
 extern float g_yaw_adjust;
+extern float g_mav_veh_yaw_adjusted;
+extern float g_yaw_target_error;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

@@ -341,9 +341,9 @@ else()
             ${EIGEN3_INCLUDE_DIR}
             ${ARMADILLO_INCLUDE_DIRS}
             ${ACADOS_INCLUDE_DIR}
-            /usr/local/include/blasfeo/include # needed for ACADOS
-            /usr/local/include/hpipm/include/ # needed for ACADOS
-            /usr/local/include/acados_c # needed for ACADOS
+            #/usr/local/include/blasfeo/include # needed for ACADOS
+            #/usr/local/include/hpipm/include/ # needed for ACADOS
+            #/usr/local/include/acados_c # needed for ACADOS
         )
 
         link_directories(
@@ -351,7 +351,7 @@ else()
             /usr/local/cuda/lib64
             /usr/lib/aarch64-linux-gnu/tegra
             ${ARMADILLO_LIBRARY_DIRS}
-            ${ACADOS_LIB_DIR}
+            # ${ACADOS_LIB_DIR} # needed for ACADOS
         )
     endif()
 endif()
@@ -451,11 +451,11 @@ if (NOT BUILD_TEST_HARNESS)
                             ${ARMADILLO_LIBRARIES} 
                             ${LAPACK_LIBRARIES} 
                             ${BLAS_LIBRARIES}
-                            acados 
-                            hpipm 
-                            blasfeo 
-                            qpOASES_e  # For acados, remove if you are not using qpOASES
-                            osqp       # For acados, remove if you are not using OSQP
+                            #acados     # For acados, remove if you are not using qpOASES
+                            #hpipm      # For acados, remove if you are not using qpOASES
+                            #blasfeo    # For acados, remove if you are not using qpOASES
+                            #qpOASES_e  # For acados, remove if you are not using qpOASES
+                            #osqp       # For acados, remove if you are not using OSQP
                             )
 
     elseif(BLD_WSL)

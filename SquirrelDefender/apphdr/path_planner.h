@@ -10,18 +10,6 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include <iostream>
-#include <opencv2/opencv.hpp>
-#include "ocp_nlp_interface.h"
-#include "external_function_interface.h"
-#include <ocp_nlp/ocp_nlp_common.h>
-#include <iostream>
-#include <vector>
-#include <cmath>
-
-//#include <ocp_nlp/ocp_nlp_common.h>
-//#include <ocp_nlp_interface.h>
-//#include <ocp_nlp/ocp_nlp_sqp.h>
 
 /********************************************************************************
  * Imported objects

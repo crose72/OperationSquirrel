@@ -19,15 +19,6 @@
 /********************************************************************************
  * Private macros and defines
  ********************************************************************************/
-// Model dimensions
-#define NX 8   // states: [x_d, y_d, v_d_x, v_d_y, x_t, y_t, x_p, y_p]
-#define NU 2   // controls: [a_d_x, a_d_y]
-#define NY (NX + NU)  // outputs for tracking: states + controls
-#define NYN NX  // terminal outputs
-#define N 20   // prediction horizon
-
-// Gravity constant
-#define GRAVITY 9.81
 
 /********************************************************************************
  * Object definitions
