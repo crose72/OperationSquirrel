@@ -18,7 +18,7 @@
 #include <iostream>
 #include <sstream>
 #include "mav_data_hub.h"
-#include "follow_target.h"
+#include "path_planner.h"
 #include "track_target.h"
 #include "localize_target.h"
 #include "detect_target.h"

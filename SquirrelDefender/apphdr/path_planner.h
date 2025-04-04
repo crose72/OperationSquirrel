@@ -1,14 +1,10 @@
-#pragma once
-
-#ifdef ENABLE_CV
-
 /********************************************************************************
- * @file    follow_target.h
+ * @file    path_planner
  * @author  Cameron Rose
- * @date    1/22/2025
+ * @date    3/12/2025
  ********************************************************************************/
-#ifndef FOLLOW_TARGET_H
-#define FOLLOW_TARGET_H
+#ifndef PATH_PLANNER_H
+#define PATH_PLANNER_H
 
 /********************************************************************************
  * Includes
@@ -56,21 +52,19 @@ extern float g_mav_veh_yaw_adjusted;
 extern float g_yaw_target_error;
 
 /********************************************************************************
- * Function prototypes and Class Definitions
+ * Function prototypes
  ********************************************************************************/
-class Follow
+class PathPlanner
 {
 public:
-    Follow();
-    ~Follow();
+    PathPlanner();
+    ~PathPlanner();
 
-    static void loop(void);
     static bool init(void);
+    static void loop(void);
     static void shutdown(void);
 
 private:
 };
 
-#endif // FOLLOW_TARGET_H
-
-#endif // ENABLE_CV
+#endif // PATH_PLANNER_H
