@@ -14,7 +14,7 @@
 #include "common_inc.h"
 #include "mav_data_hub.h"
 #include "mav_utils.h"
-#include "follow_target.h"
+#include "path_planner.h"
 #include "system_controller.h"
 
 /********************************************************************************

@@ -1,16 +1,16 @@
-#ifdef ENABLE_CV
-
 /********************************************************************************
- * @file    follow_target.cpp
+ * @file    path_planner.cpp
  * @author  Cameron Rose
- * @date    2/27/2025
- * @brief   Follow the target and maintain a specified x, y, z offset.
+ * @date    3/12/2025
+ * @brief   The path planner contains the MPC setup and solving for the optimal
+ *          flight path to deliver a payload to a moving target.  An external
+ *          MPC library will be used to solve the MPC problem statement.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "follow_target.h"
+#include "path_planner.h"
 
 /********************************************************************************
  * Typedefs
@@ -302,23 +302,23 @@ void dtrmn_follow_vector(void)
 }
 
 /********************************************************************************
- * Function: Follow
- * Description: Follow class constructor.
+ * Function: PathPlanner
+ * Description: PathPlanner class constructor.
  ********************************************************************************/
-Follow::Follow(void) {};
+PathPlanner::PathPlanner(void) {};
 
 /********************************************************************************
- * Function: ~Follow
- * Description: Follow class destructor.
+ * Function: ~PathPlanner
+ * Description: PathPlanner class destructor.
  ********************************************************************************/
-Follow::~Follow(void) {};
+PathPlanner::~PathPlanner(void) {};
 
 /********************************************************************************
  * Function: init
- * Description: Initialize all follow target variables.  Run once at the start
+ * Description: Initialize all planner variables.  Run once at the start
  *              of the program.
  ********************************************************************************/
-bool Follow::init(void)
+bool PathPlanner::init(void)
 {
     g_target_too_close = false;
     g_x_error = 0.0;
@@ -343,10 +343,9 @@ bool Follow::init(void)
 
 /********************************************************************************
  * Function: loop
- * Description: Return control parameters for the vehicle to follow a designated
- *              target at a distance.
+ * Description: Function to run every loop.
  ********************************************************************************/
-void Follow::loop(void)
+void PathPlanner::loop(void)
 {
     calc_follow_error();
     calc_yaw_target_error();
@@ -355,11 +354,9 @@ void Follow::loop(void)
 
 /********************************************************************************
  * Function: shutdown
- * Description: Clean up code to run before program exits.
+ * Description: Function to clean up planner at the end of the program.
  ********************************************************************************/
-void Follow::shutdown(void)
+void PathPlanner::shutdown(void)
 {
     // place clean up code here
 }
-
-#endif // ENABLE_CV

@@ -64,8 +64,7 @@ int Scheduler::init(void)
         !Detection::init() ||
         !Track::init() ||
         !Localize::init() ||
-        !Planner::init() ||
-        !Follow::init())
+        !PathPlanner::init())
     {
         return 1;
     }
@@ -104,7 +103,7 @@ void Scheduler::loop(void)
     Detection::loop();
     Track::loop();
     Localize::loop();
-    Follow::loop();
+    PathPlanner::loop();
     Video::out_loop();
 
 #endif // ENABLE_CV
@@ -132,8 +131,8 @@ void Scheduler::shutdown(void)
     
     Track::shutdown();
     Localize::shutdown();
-    Planner::shutdown();
-    Follow::shutdown();
+    PathPlanner::shutdown();
+    PathPlanner::shutdown();
     Video::shutdown();
     Detection::shutdown();
 

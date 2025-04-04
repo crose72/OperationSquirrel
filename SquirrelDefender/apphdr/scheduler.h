@@ -24,7 +24,7 @@
 #include "detect_target.h"
 #include "track_target.h"
 #include "localize_target.h"
-#include "follow_target.h"
+#include "path_planner.h"
 #include "time_calc.h"
 #include "timer.h"
 #include "path_planner.h"
