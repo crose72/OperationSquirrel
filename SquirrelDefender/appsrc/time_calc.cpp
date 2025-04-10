@@ -35,6 +35,36 @@ std::chrono::duration<float, std::milli> elapsed_time((float)0.0);
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
+void calc_app_runtime(void);
+
+/********************************************************************************
+ * Function: calc_app_runtime
+ * Description: Class constructor
+ ********************************************************************************/
+void calc_app_runtime(void)
+{
+    if (g_first_loop_after_start)
+    {
+        g_first_loop_after_start = false;
+    }
+    else if (!g_first_loop_after_start)
+    {
+        // Get the current timestamp
+        std::chrono::time_point<std::chrono::steady_clock> current_time = std::chrono::steady_clock::now();
+
+        // Calculate the elapsed time since the start of the program
+        elapsed_time = current_time - start_time;
+
+        // Convert elapsed time to seconds with millisecond precision
+        float app_elapsed_time_tmp = elapsed_time.count() / 1000.0f;
+
+        g_dt = app_elapsed_time_tmp - app_elapsed_time_prv;
+
+        // Truncate the number to three decimal places
+        g_app_elapsed_time = (std::floor(app_elapsed_time_tmp * 1000.0f) / 1000.0f);
+        app_elapsed_time_prv = g_app_elapsed_time;
+    }
+}
 
 /********************************************************************************
  * Function: Time
@@ -63,34 +93,13 @@ bool Time::init(void)
     return true;
 }
 
-
 /********************************************************************************
  * Function: loop
  * Description: Main time calculation loop.
  ********************************************************************************/
 void Time::loop(void)
 {
-    if (g_first_loop_after_start)
-    {
-        g_first_loop_after_start = false;
-    }
-    else if (!g_first_loop_after_start)
-    {
-        // Get the current timestamp
-        std::chrono::time_point<std::chrono::steady_clock> current_time = std::chrono::steady_clock::now();
-
-        // Calculate the elapsed time since the start of the program
-        elapsed_time = current_time - start_time;
-
-        // Convert elapsed time to seconds with millisecond precision
-        float app_elapsed_time_tmp = elapsed_time.count() / 1000.0f;
-
-        g_dt = app_elapsed_time_tmp - app_elapsed_time_prv;
-
-        // Truncate the number to three decimal places
-        g_app_elapsed_time = (std::floor(app_elapsed_time_tmp * 1000.0f) / 1000.0f);
-        app_elapsed_time_prv = g_app_elapsed_time;
-    }
+    calc_app_runtime();
 }
 
 /********************************************************************************
