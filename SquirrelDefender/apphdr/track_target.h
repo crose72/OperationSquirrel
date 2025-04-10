@@ -16,7 +16,7 @@
 #include "common_inc.h"
 #include "video_io.h"
 #include "detect_target.h"
-#include "json_utils.h"
+#include "param_reader.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/tracking.hpp>
 #include <opencv2/core/utility.hpp>
@@ -82,6 +82,8 @@ extern float g_target_left;
 extern float g_target_right;
 extern float g_target_top;
 extern float g_target_bottom;
+extern float g_target_center_x;
+extern float g_target_center_y;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

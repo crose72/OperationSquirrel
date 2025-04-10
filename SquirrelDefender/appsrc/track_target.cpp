@@ -34,8 +34,8 @@ int g_target_detection_id;
 int g_target_track_id;
 float g_target_cntr_offset_x;
 float g_target_cntr_offset_y;
-float target_center_y;
-float target_center_x;
+float g_target_center_y;
+float g_target_center_x;
 float g_target_height;
 float g_target_width;
 float g_target_aspect;
@@ -164,10 +164,10 @@ void get_target_info(void)
         g_target_right = g_detections[g_target_detection_id].Right;
         g_target_top = g_detections[g_target_detection_id].Top;
         g_target_bottom = g_detections[g_target_detection_id].Bottom;
-        target_center_y = (g_target_left + g_target_right) / 2.0f;
-        target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-        g_target_cntr_offset_y = target_center_y - center_of_frame_width;
-        g_target_cntr_offset_x = target_center_x - center_of_frame_height;
+        g_target_center_y = (g_target_left + g_target_right) / 2.0f;
+        g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
+        g_target_cntr_offset_y = g_target_center_y - center_of_frame_width;
+        g_target_cntr_offset_x = g_target_center_x - center_of_frame_height;
         g_target_aspect = g_target_width / g_target_height;
     }
 
@@ -182,10 +182,10 @@ void get_target_info(void)
         g_target_right = g_target_left + g_target_width;
         g_target_top = g_yolo_detections[g_target_detection_id].rect.y;
         g_target_bottom = g_target_top + g_target_height;
-        target_center_y = (g_target_left + g_target_right) / 2.0f;
-        target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-        g_target_cntr_offset_y = target_center_y - center_of_frame_width;
-        g_target_cntr_offset_x = target_center_x - center_of_frame_height;
+        g_target_center_y = (g_target_left + g_target_right) / 2.0f;
+        g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
+        g_target_cntr_offset_y = g_target_center_y - center_of_frame_width;
+        g_target_cntr_offset_x = g_target_center_x - center_of_frame_height;
         g_target_aspect = g_target_width / g_target_height; 
     }
 
@@ -200,10 +200,10 @@ void get_target_info(void)
         g_target_right = g_target_left + g_target_width;
         g_target_top = g_yolo_detections[g_target_detection_id].rect.y;
         g_target_bottom = g_target_top + g_target_height;
-        target_center_y = (g_target_left + g_target_right) / 2.0f;
-        target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-        g_target_cntr_offset_y = target_center_y - center_of_frame_width;
-        g_target_cntr_offset_x = target_center_x - center_of_frame_height;
+        g_target_center_y = (g_target_left + g_target_right) / 2.0f;
+        g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
+        g_target_cntr_offset_y = g_target_center_y - center_of_frame_width;
+        g_target_cntr_offset_x = g_target_center_x - center_of_frame_height;
         g_target_aspect = g_target_width / g_target_height; 
     }
 
@@ -356,10 +356,10 @@ void update_target_info(void)
     g_target_right = g_target_left + g_target_width;
     g_target_top = target_bounding_box.y;
     g_target_bottom = g_target_top + g_target_height;
-    target_center_y = (g_target_left + g_target_right) / 2.0f;
-    target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-    g_target_cntr_offset_y = target_center_y - center_of_frame_width;
-    g_target_cntr_offset_x = target_center_x - center_of_frame_height;
+    g_target_center_y = (g_target_left + g_target_right) / 2.0f;
+    g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
+    g_target_cntr_offset_y = g_target_center_y - center_of_frame_width;
+    g_target_cntr_offset_x = g_target_center_x - center_of_frame_height;
     g_target_aspect = g_target_width / g_target_height;
 }
 

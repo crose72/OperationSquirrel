@@ -30,6 +30,9 @@ enum ControlDim
     X,
     Y,
     Z,
+    ROLL,
+    PITCH,
+    YAW,
     N_DIMS
 };
 

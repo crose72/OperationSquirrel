@@ -26,7 +26,7 @@ bool headings_written;
 std::string data_file_path;
 std::string data_file_name;
 std::string file_name;
-std::vector<std::vector<std::string>> data;
+std::vector<std::vector<std::string>> datalog_record;
 
 /********************************************************************************
  * Calibration definitions
@@ -74,16 +74,16 @@ void save_to_csv(const std::string &filename, const std::vector<std::vector<std:
     }
 
     // Write data to the file, column-wise
-    if (!data.empty())
+    if (!datalog_record.empty())
     {
-        size_t numRows = data.size();
-        size_t numCols = data[0].size();
+        size_t numRows = datalog_record.size();
+        size_t numCols = datalog_record[0].size();
 
         for (size_t row = 0; row < numRows; ++row)
         {
             for (size_t col = 0; col < numCols; ++col)
             {
-                outFile << data[row][col];
+                outFile << datalog_record[row][col];
                 if (col < numCols - 1)
                 {
                     outFile << ',';
@@ -102,7 +102,7 @@ void save_to_csv(const std::string &filename, const std::vector<std::vector<std:
  ********************************************************************************/
 void write_headers(void)
 {
-    data.push_back({"g_app_elapsed_time",
+    datalog_record.push_back({"g_app_elapsed_time",
                     "g_system_state",
                     "g_target_too_close",
                     "g_target_valid",
@@ -117,12 +117,18 @@ void write_headers(void)
                     "g_target_right",
                     "g_target_top",
                     "g_target_bottom",
-                    "d_object_h",
-                    "d_object_w",
-                    "g_x_object",
-                    "g_y_object",
-                    "g_z_object",
-                    "d_object",
+                    "d_target_h",
+                    "d_target_w",
+                    "g_x_target",
+                    "g_y_target",
+                    "g_z_target",
+                    "g_x_target_ekf",
+                    "g_y_target_ekf",
+                    "g_vx_target_ekf",
+                    "g_vy_target_ekf",
+                    "g_ax_target_ekf",
+                    "g_ay_target_ekf",
+                    "d_target",
                     "g_x_error",
                     "g_y_error",
                     "g_delta_angle",
@@ -132,6 +138,9 @@ void write_headers(void)
                     "g_vx_adjust",
                     "g_vy_adjust",
                     "g_vz_adjust",
+                    "g_yaw_target",
+                    "g_yaw_target_error",
+                    "g_mav_veh_yaw_adjusted",
                     "g_mav_veh_sys_stat_voltage_battery",
                     "g_mav_veh_sys_stat_current_battery",
                     "g_mav_veh_sys_stat_battery_remaining",
@@ -185,7 +194,7 @@ void write_headers(void)
                     "g_mav_veh_state",
                     "g_mav_veh_mavlink_version"});
 
-    save_to_csv(file_name, data);
+    save_to_csv(file_name, datalog_record);
 }
 
 /********************************************************************************
@@ -223,7 +232,7 @@ bool DataLogger::init(void)
     headings_written = false;
     data_file_name = "data";
     file_name = "";
-    data = {};
+    datalog_record = {};
 
     file_name = generate_unique_filename(data_file_name);
     write_headers();
@@ -237,9 +246,9 @@ bool DataLogger::init(void)
  ********************************************************************************/
 void DataLogger::loop(void)
 {
-    data.clear();
+    datalog_record.clear();
 
-    data.push_back({{std::to_string(g_app_elapsed_time),
+    datalog_record.push_back({{std::to_string(g_app_elapsed_time),
                      std::to_string(g_system_state),
                      std::to_string(g_target_too_close),
                      std::to_string(g_target_valid),
@@ -254,12 +263,18 @@ void DataLogger::loop(void)
                      std::to_string(g_target_right),
                      std::to_string(g_target_top),
                      std::to_string(g_target_bottom),
-                     std::to_string(d_object_h),
-                     std::to_string(d_object_w),
-                     std::to_string(g_x_object),
-                     std::to_string(g_y_object),
-                     std::to_string(g_z_object),
-                     std::to_string(d_object),
+                     std::to_string(d_target_h),
+                     std::to_string(d_target_w),
+                     std::to_string(g_x_target),
+                     std::to_string(g_y_target),
+                     std::to_string(g_z_target),
+                     std::to_string(g_x_target_ekf),
+                     std::to_string(g_y_target_ekf),
+                     std::to_string(g_vx_target_ekf),
+                     std::to_string(g_vy_target_ekf),
+                     std::to_string(g_ax_target_ekf),
+                     std::to_string(g_ay_target_ekf),
+                     std::to_string(d_target),
                      std::to_string(g_x_error),
                      std::to_string(g_y_error),
                      std::to_string(g_delta_angle),
@@ -269,6 +284,9 @@ void DataLogger::loop(void)
                      std::to_string(g_vx_adjust),
                      std::to_string(g_vy_adjust),
                      std::to_string(g_vz_adjust),
+                     std::to_string(g_yaw_target),
+                     std::to_string(g_yaw_target_error),
+                     std::to_string(g_mav_veh_yaw_adjusted),
                      std::to_string(g_mav_veh_sys_stat_voltage_battery),
                      std::to_string(g_mav_veh_sys_stat_current_battery),
                      std::to_string(g_mav_veh_sys_stat_battery_remaining),
@@ -322,5 +340,14 @@ void DataLogger::loop(void)
                      std::to_string(g_mav_veh_state),
                      std::to_string(g_mav_veh_mavlink_version)}});
 
-    save_to_csv(file_name, data);
+    save_to_csv(file_name, datalog_record);
+}
+
+/********************************************************************************
+ * Function: shutdown
+ * Description: Clean up code to run before program exits.
+ ********************************************************************************/
+void DataLogger::shutdown(void)
+{
+    // place clean up code here
 }

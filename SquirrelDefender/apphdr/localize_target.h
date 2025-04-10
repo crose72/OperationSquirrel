@@ -14,18 +14,15 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "video_io.h"
-#include "detect_target.h"
-#include "json_utils.h"
+#include "track_target.h"
+#include "param_reader.h"
 #include "interpolate.h"
-
+#include "time_calc.h"
+#include "kf.h"
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern uint16_t g_mav_veh_rngfdr_min_distance;
-extern uint16_t g_mav_veh_rngfdr_max_distance;
-extern uint16_t g_mav_veh_rngfdr_current_distance;
 extern float g_mav_veh_pitch;
 extern bool g_target_valid;
 extern int g_target_detection_id;
@@ -39,16 +36,19 @@ extern float g_target_left;
 extern float g_target_right;
 extern float g_target_top;
 extern float g_target_bottom;
+extern float g_target_center_x;
+extern float g_target_center_y;
+extern float g_dt;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern float d_object_h;
-extern float d_object_w;
-extern float g_x_object;
-extern float g_y_object;
-extern float g_z_object;
-extern float d_object;
+extern float d_target_h;
+extern float d_target_w;
+extern float g_x_target;
+extern float g_y_target;
+extern float g_z_target;
+extern float d_target;
 extern float g_x_error;
 extern float g_y_error;
 extern float g_delta_angle;
@@ -56,6 +56,12 @@ extern float g_camera_tilt_angle;
 extern float g_delta_d_x;
 extern float g_delta_d_z;
 extern float g_camera_comp_angle;
+extern float g_x_target_ekf;
+extern float g_y_target_ekf;
+extern float g_vx_target_ekf;
+extern float g_vy_target_ekf;
+extern float g_ax_target_ekf;
+extern float g_ay_target_ekf;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

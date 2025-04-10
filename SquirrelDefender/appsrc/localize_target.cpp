@@ -30,25 +30,54 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-float d_object_h;
-float d_object_w;
-float g_x_object;
-float g_y_object;
-float g_z_object;
-float d_object;
+float d_target_h;
+float d_target_w;
+float g_x_target;
+float g_y_target;
+float g_z_target;
+float d_target;
 float g_delta_angle;       //
 float g_camera_tilt_angle; // Angle of the camera relative to the ground, compensating for pitch
 float g_delta_d_x;
 float g_delta_d_z;
 float g_camera_comp_angle;
+float x_target_prv;
+float y_target_prv;
+bool y_target_hyst_actv;
+float y_target_latched;
+bool loc_target_valid_prv;
+bool target_loc_data_ok;
+float loc_target_center_x_prv;
+float loc_target_center_y_prv;
+float g_x_target_ekf;
+float g_y_target_ekf;
+float g_vx_target_ekf;
+float g_vy_target_ekf;
+float g_ax_target_ekf;
+float g_ay_target_ekf;
+float x_target_ekf_prv;
+float y_target_ekf_prv;
+KF kf; // Kalman Filter instance
+arma::mat A;  // System dynamics matrix
+arma::mat B;  // Control matrix (if needed, otherwise identity)
+arma::mat H;  // Observation matrix
+arma::mat Q;  // Process noise covariance
+arma::mat R;  // Measurement noise covariance
+arma::mat P;  // Estimate error covariance
+arma::colvec x0;  // Initial state
+arma::colvec u0;  // Observed initial measurements
+
+
+
 
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
 const float center_of_frame_width = 640.0f;
 const float center_of_frame_height = 360.0f;
-const float camera_fixed_angle = 0.426f; // radians
-const float PI = 3.14159;
+const float camera_fixed_angle = 0.436f; // radians
+const int n_states = 6;
+const int n_meas = 2;
 
 const float d_offset_w[MAX_IDX_D_WIDTH] = {
     0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5,
@@ -111,15 +140,30 @@ const float delta_offset[MAX_IDX_DELTA_PIXEL_OFFSET][MAX_IDX_DELTA_D_OFFSET] = {
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-void calc_target_offest(void);
+void dtrmn_target_location(void);
+void dtrmn_target_loc_data_ok(void);
+void update_target_location(void);
+
 
 /********************************************************************************
- * Function: calc_target_offest
+ * Function: dtrmn_target_loc_data_ok
+ * Description: Predict step in kalman filter.
+ ********************************************************************************/
+void dtrmn_target_loc_data_ok(void) 
+{
+    target_loc_data_ok = (g_target_valid && 
+        (!(g_target_center_x < 50.0 || g_target_center_x > 670) && 
+        !(g_target_center_y < 50.0 || g_target_center_x > 1230) && 
+        !((g_target_width * g_target_height) < 3500.0)));
+};
+
+/********************************************************************************
+ * Function: dtrmn_target_location
  * Description: Calculate the location of the target relative to the drone.
  *              First implementation will be relative to the camera, needs to use
  *              the center mass of the drone in the end though.
  ********************************************************************************/
-void calc_target_offest(void)
+void dtrmn_target_location(void)
 {
     float d_idx_h;
     float d_idx_w;
@@ -128,86 +172,124 @@ void calc_target_offest(void)
     float delta_idx_d;
     float delta_idx_pix;
     float delta_d;
+    float target_bounding_box_rate;
 
-    /* Calculate distance from camera offset */
-    d_idx_h = get_float_index(g_target_height, &height_index[0], MAX_IDX_D_HEIGHT, false);
-    d_idx_w = get_float_index(g_target_width, &width_index[0], MAX_IDX_D_WIDTH, false);
-    d_object_h = get_interpolated_value(d_idx_h, &d_offset_h[0], MAX_IDX_D_HEIGHT);
-    d_object_w = get_interpolated_value(d_idx_w, &d_offset_w[0], MAX_IDX_D_WIDTH);
-
-    if (g_target_aspect > 0.4f)
+    if (target_loc_data_ok)
     {
-        d_object = d_object_w;
-    }
-    else if (d_object_h > 2.99f)
-    {
-        d_object = d_object_h;
-    }
-    else
-    {
-        d_object = d_object_w;
-    }
+        /* Calculate distance from camera offset */
+        d_idx_h = get_float_index(g_target_height, &height_index[0], MAX_IDX_D_HEIGHT, false);
+        d_idx_w = get_float_index(g_target_width, &width_index[0], MAX_IDX_D_WIDTH, false);
+        d_target_h = get_interpolated_value(d_idx_h, &d_offset_h[0], MAX_IDX_D_HEIGHT);
+        d_target_w = get_interpolated_value(d_idx_w, &d_offset_w[0], MAX_IDX_D_WIDTH);
 
-    /* Calculate true camera angle relative to the ground, adjusting for pitch. */
-    g_camera_comp_angle = (PI / 2.0f) - camera_fixed_angle;
-    g_camera_tilt_angle = g_mav_veh_pitch - camera_fixed_angle;
-
-    /* Calculate the x and z distances of the target relative to the drone camera (positive z is down).*/
-    if (g_camera_tilt_angle <= 0.0f && g_camera_tilt_angle >= -g_camera_comp_angle)
-    {
-        float camera_comp_angle_abs = abs(g_camera_tilt_angle);
-
-        g_x_object = d_object * cos(camera_comp_angle_abs);
-        g_z_object = d_object * sin(camera_comp_angle_abs);
-    }
-
-    /* Calculate shift in target location in the x and z directions based on camera tilt
-       angle and drone pitch. When the drone pitch is equal to the camera tilt angle,
-       then there is no forward or backward adjustment of the target's position because
-       the camera will be parallel to the ground.  This means there can only be an
-       adjustment of the target position estimate in the z direction. Make adjustments when
-       drone pitch is less than or equal to the camera tilt angle (brings the camera parallel
-       to the ground) and greater than a calibratable value. */
-    g_delta_angle = g_camera_comp_angle + g_mav_veh_pitch;
-
-    if (g_delta_angle > 0.0f && g_delta_angle < camera_fixed_angle)
-    {
-        delta_idx_d = get_float_index(d_object, &delta_offset_d[0], MAX_IDX_DELTA_D_OFFSET, true);
-        delta_idx_pix = get_float_index(std::abs(g_target_cntr_offset_x), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
-        delta_d = get_2d_interpolated_value(&delta_offset[0][0], MAX_IDX_DELTA_PIXEL_OFFSET, MAX_IDX_DELTA_D_OFFSET, y_idx_pix, y_idx_d);
-
-        g_delta_d_x = delta_d * cos(g_delta_angle);
-        g_delta_d_z = delta_d * sin(g_delta_angle);
-
-        /* If object center is below the center of the frame */
-        if (g_target_cntr_offset_x > center_of_frame_height)
+        if (g_target_aspect > 0.4f)
         {
-            g_delta_d_x = -g_delta_d_x;
-            g_delta_d_z = -g_delta_d_z;
+            d_target = d_target_w;
         }
+        else if (d_target_h > 2.99f)
+        {
+            d_target = d_target_h;
+        }
+        else
+        {
+            d_target = d_target_w;
+        }
+
+        /* Calculate true camera angle relative to the ground, adjusting for pitch. */
+        g_camera_comp_angle = (PI / 2.0f) - camera_fixed_angle;
+        g_camera_tilt_angle = g_mav_veh_pitch - camera_fixed_angle;
+
+        /* Calculate the x and z distances of the target relative to the drone camera (positive z is down).*/
+        if (g_camera_tilt_angle <= 0.0f && g_camera_tilt_angle >= -g_camera_comp_angle)
+        {
+            float camera_comp_angle_abs = abs(g_camera_tilt_angle);
+
+            g_x_target = d_target * cos(camera_comp_angle_abs);
+            g_z_target = d_target * sin(camera_comp_angle_abs);
+        }
+
+        /* Calculate shift in target location in the x and z directions based on camera tilt
+        angle and drone pitch. When the drone pitch is equal to the camera tilt angle,
+        then there is no forward or backward adjustment of the target's position because
+        the camera will be parallel to the ground.  This means there can only be an
+        adjustment of the target position estimate in the z direction. Make adjustments when
+        drone pitch is less than or equal to the camera tilt angle (brings the camera parallel
+        to the ground) and greater than a calibratable value. */
+        g_delta_angle = g_camera_comp_angle + g_mav_veh_pitch;
+
+        if (g_delta_angle > 0.0f && g_delta_angle < camera_fixed_angle)
+        {
+            delta_idx_d = get_float_index(d_target, &delta_offset_d[0], MAX_IDX_DELTA_D_OFFSET, true);
+            delta_idx_pix = get_float_index(std::abs(g_target_cntr_offset_x), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
+            delta_d = get_2d_interpolated_value(&delta_offset[0][0], MAX_IDX_DELTA_PIXEL_OFFSET, MAX_IDX_DELTA_D_OFFSET, y_idx_pix, y_idx_d);
+
+            g_delta_d_x = delta_d * cos(g_delta_angle);
+            g_delta_d_z = delta_d * sin(g_delta_angle);
+
+            /* If object center is below the center of the frame */
+            if (g_target_cntr_offset_x > center_of_frame_height)
+            {
+                g_delta_d_x = -g_delta_d_x;
+                g_delta_d_z = -g_delta_d_z;
+            }
+        }
+
+        /* Adjust x and z distances based on camera tilt angle */
+        g_x_target = g_x_target + g_delta_d_x;
+        g_z_target = g_z_target + g_delta_d_z;
+
+        /* Calculate target y offset from the center line of view of the camera based on calibrated forward distance and the
+        offset of the center of the target to the side of the center of the video frame in pixels */
+        y_idx_d = get_float_index(d_target, &y_offset_d[0], MAX_IDX_Y_D_OFFSET, true);
+        y_idx_pix = get_float_index(std::abs(g_target_cntr_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
+        float y_target_est = get_2d_interpolated_value(&y_offset[0][0], MAX_IDX_Y_PIXEL_OFFSET, MAX_IDX_Y_D_OFFSET, y_idx_pix, y_idx_d);
+
+        g_y_target = y_target_est;
+
+        if (g_target_cntr_offset_y < 0.0f)
+        {
+            g_y_target = -g_y_target;
+        }
+
+        x_target_prv = g_x_target;
+        y_target_prv = g_y_target;
     }
 
-    /* Adjust x and z distances based on camera tilt angle */
-    g_x_object = g_x_object + g_delta_d_x;
-    g_z_object = g_z_object + g_delta_d_z;
-
-    /* Calculate target y offset from the center line of view of the camera based on calibrated forward distance and the
-       offset of the center of the target to the side of the center of the video frame in pixels */
-    y_idx_d = get_float_index(d_object, &y_offset_d[0], MAX_IDX_Y_D_OFFSET, true);
-    y_idx_pix = get_float_index(std::abs(g_target_cntr_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
-    g_y_object = get_2d_interpolated_value(&y_offset[0][0], MAX_IDX_Y_PIXEL_OFFSET, MAX_IDX_Y_D_OFFSET, y_idx_pix, y_idx_d);
-
-    if (g_target_cntr_offset_y < 0.0f)
-    {
-        g_y_object = -g_y_object;
-    }
+    loc_target_valid_prv = g_target_valid;
 }
 
 /********************************************************************************
- * Function: Localize
- * Description: Localize class constructor.
+ * Function: update_target_location
+ * Description: Update step in kalman filter.
  ********************************************************************************/
-Localize::Localize(void) {};
+void update_target_location(void) 
+{
+    if (target_loc_data_ok && g_dt > 0.0001)
+    {
+        // Measurement vector (observations)
+        colvec z(2);
+        z << g_x_target << g_y_target;
+
+        // Define the system transition matrix A (discretized)
+        // TODO: update the state transition matrix A 
+        // Ensure g_dt is valid (std::isnan(g_dt) || std::isinf(g_dt) || g_dt <= 0) 
+
+        // No external control input for now
+        colvec u(1, fill::zeros);
+
+        // Perform Kalman filter update
+        kf.Kalmanf(z, u);
+
+        // Retrieve the updated state
+        colvec *state = kf.GetCurrentEstimatedState();
+        g_x_target_ekf = state->at(0);
+        g_y_target_ekf = state->at(1);
+        g_vx_target_ekf = state->at(2);
+        g_vy_target_ekf = state->at(3);
+        g_ax_target_ekf = state->at(4);
+        g_ay_target_ekf = state->at(5);
+    }
+};
 
 /********************************************************************************
  * Function: ~Localize
@@ -216,18 +298,18 @@ Localize::Localize(void) {};
 Localize::~Localize(void) {};
 
 /********************************************************************************
- * Function: localize_target_init
+ * Function: init
  * Description: Initialize all Localize target variables.  Run once at the start
  *              of the program.
  ********************************************************************************/
 bool Localize::init(void)
 {
-    d_object_h = 0.0f;
-    d_object_w = 0.0f;
-    g_x_object = 0.0f;
-    g_y_object = 0.0f;
-    g_z_object = 0.0f;
-    d_object = 0.0f;
+    d_target_h = 0.0f;
+    d_target_w = 0.0f;
+    g_x_target = 0.0f;
+    g_y_target = 0.0f;
+    g_z_target = 0.0f;
+    d_target = 0.0f;
     g_x_error = 0.0f;
     g_y_error = 0.0f;
     g_delta_angle = 0.0f;
@@ -236,20 +318,101 @@ bool Localize::init(void)
     g_delta_d_z = 0.0f;
     g_camera_comp_angle = 0.0f;
 
+    x_target_prv = 0.0f;
+    y_target_prv = 0.0f;
+    loc_target_valid_prv = false;
+    g_x_target_ekf = 0.0;
+    g_y_target_ekf = 0.0;
+    x_target_ekf_prv = 0.0;
+    y_target_ekf_prv = 0.0;
+    g_vx_target_ekf = 0.0;
+    g_vy_target_ekf = 0.0;
+
+    target_loc_data_ok = false;
+
+    // KF init
+    float dt = 0.05;  // Time step
+
+    // Resize matrices and set to zero initially
+    A.set_size(n_states, n_states); 
+    A.zeros();
+    B.set_size(n_states, 1); 
+    B.zeros();
+    H.set_size(n_meas, n_states); 
+    H.zeros();
+    Q.set_size(n_states, n_states);
+    Q.zeros();
+    R.set_size(n_meas, n_meas); 
+    R.zeros();
+    P.set_size(n_states, n_states); 
+    P.zeros();
+
+    // Define system dynamics (State transition matrix A)
+    A << 1 << 0 << dt << 0 << 0.5 * pow(dt,2) << 0  << arma::endr
+      << 0 << 1 << 0 << dt << 0 << 0.5 * pow(dt,2)  << arma::endr
+      << 0 << 0 << 1 << 0 << dt << 0  << arma::endr
+      << 0 << 0 << 0 << 1 << 0 << dt  << arma::endr
+      << 0 << 0 << 0 << 0 << 1 << 0  << arma::endr
+      << 0 << 0 << 0 << 0 << 0 << 1  << arma::endr;
+
+    // Observation matrix (Only x and y are observed)
+    H << 1 << 0 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 1 << 0 << 0 << 0 << 0 << arma::endr;
+
+    // Model covariance matrix Q (process noise)
+    Q << 0.01 << 0 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 0.1 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 0 << 0.00001 << 0 << 0 << 0 << arma::endr
+      << 0 << 0 << 0 << 0.00001 << 0 << 0 << arma::endr
+      << 0 << 0 << 0 << 0 << 0.00001 << 0 << arma::endr
+      << 0 << 0 << 0 << 0 << 0 << 0.00001 << arma::endr;
+
+    // Measurement covariance matrix R (sensor noise)
+    R << 10.0 << 0 << arma::endr
+      << 0 << 40.0 << arma::endr;
+
+    // Estimate covariance matrix P (initial trust in the estimate)
+    P << 0.1 << 0 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 0.1 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 0 << 0.1 << 0 << 0 << 0 << arma::endr
+      << 0 << 0 << 0 << 0.1 << 0 << 0 << arma::endr
+      << 0 << 0 << 0 << 0 << 0.1 << 0 << arma::endr
+      << 0 << 0 << 0 << 0 << 0 << 0.1 << arma::endr;
+
+    // Initialize Kalman Filter
+    kf.InitSystem(A, B, H, Q, R);
+
+    // Set initial state (assuming stationary at origin)
+    x0.set_size(n_states);
+    x0.zeros(); // Start with zero velocity and acceleration
+    kf.InitSystemState(x0);
+
+    // Resize and reset u0
+    u0.set_size(n_meas);
+    u0.zeros();
+    
     return true;
 }
 
 /********************************************************************************
- * Function: localize_control_loop
+ * Function: loop
  * Description: Return control parameters for the vehicle to Localize a designated
  *              target at a distance.
  ********************************************************************************/
 void Localize::loop(void)
 {
-    if (g_target_valid)
-    {
-        calc_target_offest();
-    }
+    dtrmn_target_loc_data_ok();
+    dtrmn_target_location();
+    update_target_location();
+}
+
+/********************************************************************************
+ * Function: shutdown
+ * Description: Clean up code to run before program exits.
+ ********************************************************************************/
+void Localize::shutdown(void)
+{
+    // place clean up code here
 }
 
 #endif // ENABLE_CV

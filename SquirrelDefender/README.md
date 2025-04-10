@@ -16,7 +16,7 @@ This folder contains the code for the `squirreldefender` program and instruction
 
 There are two containers for development on the Jetson Orin Nano.  A dev container, used for compiling and testing the code, and a release container, used for just running the compiled executable.  All of the dependencies are inside the container so you just have to run them :)
 
-### Prerequisites (compiling on host):
+### Prerequisites (without docker containers):
 
 - Jetpack 6.1 (~r36.4 I reckon this should work with Jetpack 6.2, I will try it shortly but I haven't verified it yet)
 - CMake >= 3.28 (same rules as above apply for different versions, you have to troubleshoot)
@@ -27,7 +27,7 @@ There are two containers for development on the Jetson Orin Nano.  A dev contain
 
 Note: Defaults on the Orin are fine for all of these if you have JP6.1 or 6.2.  I would recommend installing the correct opencv version using the script provided, however.
 
-### Setup:
+### Setup (without docker containers):
 
 Setup swap.  Either run [setup-swap.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/setup-swap.sh) or you can manually install some swap:
 
@@ -42,7 +42,7 @@ Then add the following line to the end of /etc/fstab to make the change persiste
 
 Copy the script [Install-Jetson-Orin-Nano-dependencies.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/Install-Jetson-Orin-Nano-dependencies.sh) to your favorite GitHub folder because it will clone some repos wherever you run this script, so just make sure to put it wherever you are okay with having those repositories.
 
-### Compile and run the program (on the host):
+### Compile and run the program (without docker containers):
 
 ```
 # Clone the repository
@@ -55,15 +55,18 @@ make -j$(nproc)
 
 # Run the executable
 sudo ./squirreldefender
+
+# If using video playback instead of a camera then execute
+sudo ./squirreldefender ../test_data/video.mp4
 ```
 
-### Prerequisites (docker method):
+### Prerequisites (with docker containers):
 
 - Docker
-- Nvidia container runtime (if not already installed can follow the instructions at [ISAAC-ROS-Setup.md](https://github.com/crose72/OperationSquirrel/blob/dev/docs/ISAAC-ROS-Setup))
+- Nvidia container runtime (if not already installed can follow the instructions at [ISAAC-ROS-Setup.md](https://github.com/crose72/OperationSquirrel/blob/dev/docs/ISAAC-ROS-Setup.md))
 - Jetpack 6.1 (~r36.4 I reckon this should work with Jetpack 6.2, I will try it shortly but I haven't verified it yet)
 
-### Setup:
+### Setup (with docker containers):
 
 Perform the following setup outside of the container and then verify the camera is working in the container.
 
@@ -79,9 +82,26 @@ git clone https://github.com/crose72/OperationSquirrel.git --recursive
 export DISPLAY=:0
 export OS_WS=/home/<user>/workspaces/os-dev/
 
+# Restart terminal, or source .bashrc:
+source ~/.bashrc
+
 # Enable xserver and display access to the docker container 
 # Might need to do before each time running the container
 xhost +
+
+# If you get an error, "unable to open dislay :0", try setting to :1 & repeat
+# If successfull, you should see something like this:
+~/workspaces/os-dev/OperationSquirrel$ xhost +
+access control disabled, clients can connect from any host
+
+# If you get an error opening your csi camera, and are running Jetpack 6.2, 
+# try following these instructions and enable the CSI camera for
+sudo /opt/nvidia/jetson-io/jetson-io.py
+Configure Jetson 24pin CSI Connector
+Configure for compatible hardware
+Camera IMX219 Dual (or whatever CSI camera you're using)
+(save, exit, reboot)
+
 
 # Run the container
 ./scripts/run_dev.sh
@@ -94,6 +114,10 @@ nvgstcapture-1.0
 
 Outside of the container edit `SquirrelDefender/CMakeLists.txt` file and enable `BLD_JETSON_ORIN_NANO`.
 
+Next, run the script to start up the dev container `scripts/run_dev.sh`.
+
+A terminal inside the container should open up.  This means that the container is running and you now have the ability to develop the code, make changes, run the executable, etc.  Inside the container do the following:
+
 ```
 # Build
 cd workspaces/OperationSquirrel/SquirrelDefender
@@ -104,11 +128,14 @@ make -j$(nproc)
 
 # Run the executable
 ./squirreldefender
+
+# If using video playback instead of a camera then execute
+./squirreldefender ../test_data/video.mp4
 ```
 
 ### Release container:
 
-If you don't need to change the code and just want to run the precompiled program then you can just do the setup and run `./run_squirreldefender.sh`
+If you don't need to change the code and just want to run the precompiled program then you can just do the setup and run `./run_squirreldefender.sh`.  The purpose of this container is to be deployed onto your drone or other autonomous vehicle since the only thing that it does is run the pre-compiled binary that you created using the dev container from the previous step.
 
 If you want to have the program run as soon as you power on the jetson (for example when your jetson is mounted on your drone) then you need to add a systemd service and do a couple other things.  First enable xserver and display access for the container by default when you power on the jetson by adding it to your `.xprofile`.  Run these outside of the container.
 
@@ -180,6 +207,103 @@ sudo systemctl restart squirreldefender.service
 sudo systemctl status squirreldefender.service
 ```
 
+### Workflow for quickly deploying code changes to the drone:
+
+Let's say you're at the park with your jetson and your drone, and you want to try out different PID gains on the follow algorithm in real life.  Or maybe you want to change the follow distance, or test out some other code changes on the real drone.  How can you make a change to the code and then quickly deploy it to the drone?  This is how:
+
+#### *When your laptop and jetson have wifi
+
+1. Modify the code using the dev container (follow instructions above)
+    - Execute `./scripts/run_dev.sh`
+    - Make changes to the code
+    - Recompile the code
+2. Build the SquirrelDefender container
+    - Execute `./scripts/build_squirreldefender.sh`
+    - (Choose N if you don't need to push the container to docker hub - since you're at the park I don't think you do, or choose Y if you are ready to push it to docker hub)
+3. Make sure you've followed the instructions above for the release container to have the container execute when the jetson powers up
+    - Stop the squirreldefender service before making changes (instructions above)
+    - Start the squirreldefender service whem you're ready to fly again (instructions above)
+
+***Remember to disconnect the uart wires or disconnect the battery from the drone so that the props don't start spinning when you're not ready (if squirreldefender.service is active and started when you power on the jetson then it will send the command to arm the drone and takeoff so you don't want it near you when that happens)
+
+#### *When your laptop and jetson DO NOT have wifi
+
+Before you are out of wifi you can use the dev container to make changes to the starting point of your code for the test flights.  The reason you cannot use the dev container when you're out of wifi is because you will run into time skew issues (file XXX.cpp has timestamp Y millions of seconds in the future, etc.) which will cause issues when you recompile the code with changes and will result in weird behavior from the compiled binary.  I don't know why this happens, so just be mindful of the issue it will cause.
+
+if you have changes that you want to test when you're at a park or some other place where you don't have wifi 
+
+1. Modify the code using the dev container - only once before you are out of wifi (follow instructions above)
+    - Execute `./scripts/run_dev.sh`
+    - Make changes to the code
+    - Recompile the code
+2. Build the field container (we'll use it later)
+    - Execute `./scripts/build_field.sh`
+3. Build the SquirrelDefender container
+    - Execute `./scripts/build_squirreldefender.sh`
+    - (Choose N if you don't need to push the container to docker hub - since you're at the park I don't think you do, or choose Y if you are ready to push it to docker hub)
+4. Make sure you've followed the instructions above for the release container to have the container execute when the jetson powers up
+    - Stop the squirreldefender service before making changes (instructions above)
+    - Start the squirreldefender service whem you're ready to fly again (instructions above)
+ 
+ Hooray!  You've just completed a test flight and landed your drone.  Now you want to make a changes to the code because maybe the PID gains are too slow for your needs which brings us to this point:
+
+5. Stop the squirreldefender service before making change
+6. Stop and remove the field container if it's currently running
+    - `docker ps -a` to check if it's persisting
+    - `docker stop <container id>` to remove it
+    - `docker rm <container id>` to remove it
+7. Run the field container
+    - Execute `./scripts/run_field.sh`
+8. Modify the code in the field container
+    - Use VS Code Dev Container extension, or vim, or nano or something else to access and make your code change inside the field container
+    - Recompile the code
+9. Build the SquirrelDefender container (field container should be running or at least persist - check with `docker ps -a`)
+    - Execute `./scripts/build_squirreldefender.sh --field`
+    - (Choose N if you don't need to push the container to docker hub - since you're at the park I don't think you do, or choose Y if you are ready to push it to docker hub)
+    - The field container starts where you left of with the code in the dev container
+    - This script copies the build from the field container into the squirreldefender container with your new code changes compiled
+
+If your jetson is setup to start the program on boot then you're good to go!  Repeat these steps 5-9 while you're making changes to the code at the park or wherever else you are without wifi.
+
+***Remember to disconnect the uart wires or disconnect the battery from the drone so that the props don't start spinning when you're not ready (if squirreldefender.service is active and started when you power on the jetson then it will send the command to arm the drone and takeoff so you don't want it near you when that happens)
+
+#### Clock skew error when Jetson no longer has wifi connection
+
+When the Jetson has no internet connection the system time defaults to 1969.  Since you're probably working in the present (2025 and beyond), any files you've touched will likey have a timestamp in the present.  This timestamp is after 1969 by a lot.  So if you go to compile the squirreldefender program the compiler will notice that the files have a timestamp millions of seconds in the future, resulting in a clock skew when recompiling.  To solve this issue, create a systemd service to automatically move the system time to a few seconds after the latest timestamp in the OperationSquirrel repo.
+
+Create a systemd service
+```
+sudo nano /etc/systemd/system/clock-skew-fix.service
+```
+
+```
+# Add this to the file
+
+    [Unit]
+    Description=Ensure system clock is ahead of all file timestamps
+    After=multi-user.target
+    [Service]
+    Type=oneshot
+    ExecStart=/bin/bash -c '
+      # Replace with your actual project/code path
+      latest=$(find /home/user/project -type f -exec stat -c %%Y {} + 2>/dev/null | sort -n | tail -1)
+      now=$(date +%%s)
+      if [ -n "$latest" ] && [ "$now" -lt "$latest" ]; then
+        echo "⏩ Clock behind file timestamps, setting time forward..."
+        date -s "@$((latest + 10))"
+      fi
+    '
+    [Install]
+    WantedBy=multi-user.target
+```
+
+Next, enable and start the systemd service you just created
+
+```
+sudo systemctl enable clock-skew-fix.service
+sudo systemctl start clock-skew-fix.service
+```
+
 ## Jetson Nano B01
 
 ### Prerequisites:
@@ -222,6 +346,9 @@ make -j$(nproc)
 
 # Run the executable
 sudo ./squirreldefender
+
+# If using video playback instead of a camera then execute
+sudo ./squirreldefender ../test_data/video.mp4
 ```
 
 If you run into issues with the camera try `sudo systemctl restart nvargus-daemon`.

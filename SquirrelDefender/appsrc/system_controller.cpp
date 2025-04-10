@@ -24,7 +24,6 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool systems_initialized;
 SystemState g_system_state;
 
 /********************************************************************************
@@ -68,7 +67,7 @@ int system_state_machine(void)
         {
         // Default state is the first state, nothing is initialialized, no systems are active
         case SystemState::DEFAULT:
-            if (systems_initialized)
+            if (controller_initialiazed)
             {
                 g_system_state = SystemState::INIT;
             }
@@ -190,59 +189,20 @@ SystemController::~SystemController(void) {}
  * Function: init
  * Description: Return 0 if all system init tasks have successfully completed.
  ********************************************************************************/
-int SystemController::init(void)
+bool SystemController::init(void)
 {
-    systems_initialized = false;
-    
+    controller_initialiazed = false;
+
 #ifdef BLD_JETSON_B01
 
     if (g_save_button_press)
     {
-        return 2;
+        return false;
     }
 
 #endif // BLD_JETSON_B01
 
-#ifdef ENABLE_CV
-
-    led_init();
-    led_init_blink();
-    
-    if (!Video::init() ||
-        !Detection::init() ||
-        !Track::init() ||
-        !Localize::init() ||
-        !Follow::init())
-    {
-        led_bad_blink();
-        return 1;
-    }
-
-    led_init_blink();
-    
-    if (!MavMsg::init() ||
-        !DataLogger::init() ||
-        !VehicleController::init() ||
-        !Time::init())
-    {
-        led_bad_blink();
-        return 1;
-    }
-
-#else // WSL is the only platform that doesn't support computer vision at the moment
-
-    if (!MavMsg::init() ||
-        !DataLogger::init() ||
-        !VehicleController::init())
-    {
-        return 1;
-    }
-
-#endif // ENABLE_CV
-
-    systems_initialized = true;
-
-    return 0;
+    return true;
 }
 
 /********************************************************************************
@@ -252,10 +212,10 @@ int SystemController::init(void)
 void SystemController::loop(void)
 {
     system_state_machine();
-    led_system_indicators();
 
 #ifdef BLD_JETSON_B01
 
+    led_system_indicators();
     StatusIO::loop();
 
 #endif // BLD_JETSON_B01
@@ -267,22 +227,5 @@ void SystemController::loop(void)
  ********************************************************************************/
 void SystemController::shutdown(void)
 {
-    VehicleController::shutdown();
-    MavMsg::shutdown();
-
-#ifdef ENABLE_CV
-
-    Video::shutdown();
-    Detection::shutdown();
-
-#endif // ENABLE_CV
-
-#ifdef BLD_JETSON_B01
-
-    StatusIO::status_program_complete();
-    StatusIO::shutdown();
-
-#endif // BLD_JETSON_B01
-
 
 }
