@@ -505,8 +505,6 @@ void VideoCV::in_loop(void)
  ********************************************************************************/
 void VideoCV::out_loop(void)
 {
-    display_video();
-    //video_overlay();
     save_video();
 }
 

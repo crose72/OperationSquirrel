@@ -35,9 +35,10 @@ std::vector<std::vector<std::string>> datalog_record;
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-static void write_headers(void);
-static void save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data);
-static std::string generate_unique_filename(const std::string &filename);
+void write_headers(void);
+void save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data);
+std::string generate_unique_filename(const std::string &filename);
+void log_data(void);
 
 /********************************************************************************
  * Function: generate_unique_filename
@@ -198,53 +199,10 @@ void write_headers(void)
 }
 
 /********************************************************************************
- * Function: DataLogger
- * Description: Class constructor
+ * Function: log_data
+ * Description: Log current signals into csv file.
  ********************************************************************************/
-DataLogger::DataLogger() {};
-
-/********************************************************************************
- * Function: ~DataLogger
- * Description: Class destructor
- ********************************************************************************/
-DataLogger::~DataLogger() {};
-
-/********************************************************************************
- * Function: init
- * Description: Initialize data log variables and files.
- ********************************************************************************/
-bool DataLogger::init(void)
-{
-#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
-
-    data_file_path = "../data/";
-
-#elif defined(BLD_WIN)
-
-    data_file_path = "../../data/";
-
-#else
-
-#error "Please define a build platform."
-
-#endif
-
-    headings_written = false;
-    data_file_name = "data";
-    file_name = "";
-    datalog_record = {};
-
-    file_name = generate_unique_filename(data_file_name);
-    write_headers();
-
-    return true;
-}
-
-/********************************************************************************
- * Function: loop
- * Description: Log data.
- ********************************************************************************/
-void DataLogger::loop(void)
+void log_data(void)
 {
     datalog_record.clear();
 
@@ -341,6 +299,58 @@ void DataLogger::loop(void)
                      std::to_string(g_mav_veh_mavlink_version)}});
 
     save_to_csv(file_name, datalog_record);
+}
+
+/********************************************************************************
+ * Function: DataLogger
+ * Description: Class constructor
+ ********************************************************************************/
+DataLogger::DataLogger() {};
+
+/********************************************************************************
+ * Function: ~DataLogger
+ * Description: Class destructor
+ ********************************************************************************/
+DataLogger::~DataLogger() {};
+
+/********************************************************************************
+ * Function: init
+ * Description: Initialize data log variables and files.
+ ********************************************************************************/
+bool DataLogger::init(void)
+{
+#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
+
+    data_file_path = "../data/";
+
+#elif defined(BLD_WIN)
+
+    data_file_path = "../../data/";
+
+#else
+
+#error "Please define a build platform."
+
+#endif
+
+    headings_written = false;
+    data_file_name = "data";
+    file_name = "";
+    datalog_record = {};
+
+    file_name = generate_unique_filename(data_file_name);
+    write_headers();
+
+    return true;
+}
+
+/********************************************************************************
+ * Function: loop
+ * Description: Log data.
+ ********************************************************************************/
+void DataLogger::loop(void)
+{
+    log_data();
 }
 
 /********************************************************************************
