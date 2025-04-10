@@ -92,7 +92,8 @@ bool create_detection_network(void)
 
 /********************************************************************************
  * Function: detect_targets
- * Description: Initialize the network used for object detection.
+ * Description: Run object detection on image and return the detections and 
+ *              container of detected objects.
  ********************************************************************************/
 void detect_targets(void)
 {

@@ -51,6 +51,34 @@ int g_yolo_detection_count;
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
+void detect_targets(void);
+
+/********************************************************************************
+ * Function: detect_targets
+ * Description: Run object detection on image and return the detections and 
+ *              container of detected objects.
+ ********************************************************************************/
+void detect_targets(void)
+{
+    if (g_valid_image_rcvd)
+    {
+    #ifdef BLD_JETSON_ORIN_NANO
+
+        g_yolo_detections = yolov8_detector->detectObjects(g_image);
+        g_yolo_detection_count = g_yolo_detections.size();
+
+    #elif defined(BLD_WIN)
+
+        YoloNet::detect(g_image, g_net, g_yolo_detections);
+        g_yolo_detection_count = g_yolo_detections.size();
+
+    #else
+
+    #error "Please define a build platform."
+
+    #endif
+    }
+}
 
 /********************************************************************************
  * Function: YOLO
@@ -103,24 +131,7 @@ bool YOLO::init(void)
  ********************************************************************************/
 void YOLO::loop(void)
 {
-    if (g_valid_image_rcvd)
-    {
-    #ifdef BLD_JETSON_ORIN_NANO
-
-        g_yolo_detections = yolov8_detector->detectObjects(g_image);
-        g_yolo_detection_count = g_yolo_detections.size();
-
-    #elif defined(BLD_WIN)
-
-        YoloNet::detect(g_image, g_net, g_yolo_detections);
-        g_yolo_detection_count = g_yolo_detections.size();
-
-    #else
-
-    #error "Please define a build platform."
-
-    #endif
-    }
+    detect_targets();
 }
 
 /********************************************************************************
