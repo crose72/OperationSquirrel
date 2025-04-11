@@ -257,7 +257,17 @@ void calc_yaw_target_error(void)
         max_yaw = -(PI - (abs_max_yaw_temp - PI));
     }
     
-    g_yaw_target_error = g_yaw_target - g_mav_veh_yaw_adjusted;
+    // If using video playback then subtract the initial yaw to track
+    // the yaw error over time.  Otherwise, the error is just the yaw target
+    // because the goal is for the target to be in the center of the frame.
+    if (g_use_video_playback)
+    {
+        g_yaw_target_error = g_yaw_target - g_mav_veh_yaw_adjusted;
+    }
+    else
+    {
+        g_yaw_target_error = g_yaw_target;
+    }
 }
 
 /********************************************************************************
