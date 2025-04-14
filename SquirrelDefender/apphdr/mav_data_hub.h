@@ -56,7 +56,6 @@ extern uint32_t g_mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd;
 extern uint32_t g_mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd;
 
 extern uint32_t g_mav_veh_custom_mode;
-extern bool g_manual_override_land;
 extern uint8_t g_mav_veh_type;
 extern uint8_t g_mav_veh_autopilot_type;
 extern uint8_t g_mav_veh_base_mode;

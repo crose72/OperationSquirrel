@@ -25,6 +25,7 @@
  * Object definitions
  ********************************************************************************/
 SystemState g_system_state;
+uint32_t g_mav_veh_custom_mode_prv;
 
 /********************************************************************************
  * Calibration definitions
@@ -35,6 +36,35 @@ SystemState g_system_state;
  ********************************************************************************/
 int system_state_machine(void);
 void led_system_indicators(void);
+void dtrmn_program_stop_cond(void);
+
+/********************************************************************************
+ * Function: system_state_machine
+ * Description: Determine system state,.
+ ********************************************************************************/
+void dtrmn_program_stop_cond(void)
+{   
+    if (g_mav_veh_custom_mode == (uint32_t)9 && g_mav_veh_custom_mode_prv != (uint32_t)9)
+    {
+        g_manual_override_land = true;
+    }
+    else
+    {
+        g_manual_override_land = false;
+    }
+
+    if (g_system_state == SystemState::IN_FLIGHT_GOOD && g_manual_override_land)
+    {
+        g_stop_program = true;
+    }
+
+    if (!g_valid_image_rcvd && g_use_video_playback && g_system_state == SystemState::IN_FLIGHT_GOOD)
+    {
+        g_stop_program = true;
+    }
+
+    g_mav_veh_custom_mode_prv = g_mav_veh_custom_mode;
+}
 
 /********************************************************************************
  * Function: system_state_machine
@@ -192,6 +222,7 @@ SystemController::~SystemController(void) {}
 bool SystemController::init(void)
 {
     controller_initialiazed = false;
+    g_mav_veh_custom_mode_prv = 0;
 
 #ifdef BLD_JETSON_B01
 
@@ -212,6 +243,7 @@ bool SystemController::init(void)
 void SystemController::loop(void)
 {
     system_state_machine();
+    dtrmn_program_stop_cond();
 
 #ifdef BLD_JETSON_B01
 

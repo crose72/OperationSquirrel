@@ -31,7 +31,6 @@ extern float g_y_target_ekf;
 extern int32_t g_mav_veh_rel_alt;
 extern std::string input_video_path;
 extern bool g_use_video_playback;
-extern bool g_stop_program;
 
 /********************************************************************************
  * Exported objects
