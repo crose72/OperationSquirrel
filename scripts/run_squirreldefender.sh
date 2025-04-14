@@ -22,6 +22,10 @@ if sudo docker ps -a --filter "name=$CONTAINER_NAME" --format '{{.Names}}' | gre
     sudo docker rm $CONTAINER_NAME
 fi
 
+# Pull latest
+echo "Pull latest '$CONTAINER_NAME'"
+docker pull crose72/jetpack-r36.4.0:squirreldefender
+
 # Start a new container
 echo "Starting container '$CONTAINER_NAME'"
 
