@@ -1,5 +1,5 @@
 # Ensure ${OS_WS} is defined
-
+docker pull crose72/jetpack-r36.4.0:base
 sudo docker run --runtime nvidia -it --rm --network host \
   --privileged --ipc=host \
   --env DISPLAY=$DISPLAY \
