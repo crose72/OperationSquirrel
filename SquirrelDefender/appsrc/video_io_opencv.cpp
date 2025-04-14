@@ -221,7 +221,6 @@ bool capture_image(void)
         if (g_use_video_playback)
         {
             std::cout << "End of video playback" << std::endl;
-            g_stop_program = true;
             return false;
         }
 

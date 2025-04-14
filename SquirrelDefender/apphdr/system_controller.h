@@ -34,11 +34,16 @@ extern uint16_t g_mav_veh_rngfdr_current_distance;
 extern int32_t g_mav_veh_rel_alt;
 extern bool g_save_button_press;
 extern bool controller_initialiazed;
+extern uint32_t g_mav_veh_custom_mode;
+extern uint32_t g_mav_veh_custom_mode_prv;
+extern bool g_use_video_playback;
+extern bool g_stop_program;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
 extern SystemState g_system_state;
+extern bool g_manual_override_land;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

@@ -85,11 +85,11 @@ int main(int argc, char** argv)
 
 #ifdef BLD_JETSON_B01
 
-    while (!g_stop_program && !g_manual_override_land && !g_save_button_press) // todo: figure buttons w docker (jetson io/jumper)
+    while (!g_stop_program && !g_save_button_press) // todo: figure buttons w docker (jetson io/jumper)
 
 #else
 
-    while (!g_stop_program && !g_manual_override_land)
+    while (!g_stop_program)
 
 #endif // BLD_JETSON_B01
 
