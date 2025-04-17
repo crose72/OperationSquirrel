@@ -57,7 +57,7 @@ option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
-option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" OFF)
+option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" ON)
 option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" OFF)
 
 # Option to use environment variables for library paths
@@ -83,10 +83,6 @@ if(BLD_WSL)
 endif()
 
 if(BLD_WIN)
-    math(EXPR BUILD_PLATFORMS "${BUILD_PLATFORMS} + 1")
-endif()
-
-if(BUILD_TEST_HARNESS)
     math(EXPR BUILD_PLATFORMS "${BUILD_PLATFORMS} + 1")
 endif()
 
