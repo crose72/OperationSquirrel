@@ -44,15 +44,15 @@ void dtrmn_veh_control_action(void);
  ********************************************************************************/
 void follow_mode(void)
 {
-    float target_velocity[3] = {0.0, 0.0, 0.0};
+    float velocity_cmd[3] = {0.0, 0.0, 0.0};
 
-    target_velocity[0] = g_vx_adjust;
-    target_velocity[1] = g_vy_adjust;
-    target_velocity[2] = g_vz_adjust;
+    velocity_cmd[0] = g_vx_cmd;
+    velocity_cmd[1] = g_vy_cmd;
+    velocity_cmd[2] = g_vz_cmd;
 
     if (g_target_valid)
     {
-        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity, g_yaw_adjust);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, velocity_cmd, g_yaw_cmd);
     }
 }
 

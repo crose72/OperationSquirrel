@@ -1,6 +1,8 @@
 # Ensure ${OS_WS} is defined
-docker pull crose72/jetpack-r36.4.0:base
-sudo docker run --runtime nvidia -it --rm --network host \
+DOCKER_IMG="crose72/jetpack-r36.4.0:base"
+DOCKER_WS="/workspace/OperationSquirrel"
+docker pull ${DOCKER_IMG}
+sudo docker run --runtime nvidia --rm -it --network host \
   --privileged --ipc=host \
   --env DISPLAY=$DISPLAY \
   --device /dev/video0 \
@@ -31,7 +33,16 @@ sudo docker run --runtime nvidia -it --rm --network host \
   --volume /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra \
   --volume ${OS_WS}/OperationSquirrel/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender \
   --volume ${OS_WS}/YOLOv8-TensorRT-CPP:/workspace/YOLOv8-TensorRT-CPP \
+  --volume ${OS_WS}/OperationSquirrel/scripts:/workspace/OperationSquirrel/scripts \
   --name squirreldefender-dev \
-  crose72/jetpack-r36.4.0:base \
-  bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build \
-    && exec bash"
+  ${DOCKER_IMG} \
+  bash -c "cd '${DOCKER_WS}'/SquirrelDefender/build \
+    && export DOCKER_IMG='${DOCKER_IMG}' \
+    && export OS_WS='${DOCKER_WS}' \
+    && export PATH='${DOCKER_WS}'/scripts:\$PATH \
+    && echo hello! \
+    && exec bash" \
+
+# Show running containers after starting the container
+#echo "Running Docker containers:"
+#docker ps

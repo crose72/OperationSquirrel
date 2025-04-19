@@ -98,9 +98,9 @@ void run(void)
                 << "g_target_too_close,"
                 << "g_x_error,"
                 << "g_y_error,"
-                << "g_vx_adjust,"
-                << "g_vy_adjust,"
-                << "g_vz_adjust\n";
+                << "g_vx_cmd,"
+                << "g_vy_cmd,"
+                << "g_vz_cmd\n";
 
     // Get max number of rows to ensure all data is included
     size_t num_rows = g_app_elapsed_time_arr.size();
@@ -161,9 +161,9 @@ void run(void)
                        << g_target_too_close << ","
                        << g_x_error << ","
                        << g_y_error << ","
-                       << g_vx_adjust << ","
-                       << g_vy_adjust << ","
-                       << g_vz_adjust << "\n";
+                       << g_vx_cmd << ","
+                       << g_vy_cmd << ","
+                       << g_vz_cmd << "\n";
         }
        
     }

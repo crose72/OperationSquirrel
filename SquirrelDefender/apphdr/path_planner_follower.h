@@ -1,7 +1,7 @@
 /********************************************************************************
- * @file    path_planner
- * @author  Shaun Bowman
- * @date    2025/04/19
+ * @file    path_planner_follower.h
+ * @author  Cameron Rose
+ * @date    3/12/2025
  ********************************************************************************/
 #ifndef PATH_PLANNER_H
 #define PATH_PLANNER_H
@@ -10,41 +10,51 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include <memory>
-#include <vector>
+#include "param_reader.h"
+#include "pid.h"
+#include "localize_target.h"
+#include "time_calc.h"
+#include "track_target.h"
+#include "mav_data_hub.h"
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
+extern uint16_t g_mav_veh_rngfdr_min_distance;
+extern uint16_t g_mav_veh_rngfdr_max_distance;
+extern uint16_t g_mav_veh_rngfdr_current_distance;
+extern float g_mav_veh_pitch;
+extern bool g_target_valid;
+extern float g_x_target;
+extern float g_y_target;
+extern float g_z_target;
+extern float g_dt;
+extern float g_x_target_ekf;
+extern float g_y_target_ekf;
+extern bool g_first_loop_after_start;
+extern float g_mav_veh_yaw;
+extern float g_mav_veh_yawspeed;
+extern bool g_use_video_playback;
+extern float g_target_cntr_offset_y;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern float g_vx_cmd;
-extern float g_vy_cmd;
-extern float g_vz_cmd;
-extern float g_yaw_cmd;
+extern bool g_target_too_close;
+extern float g_x_error;
+extern float g_y_error;
+extern float g_yaw_target;
+extern float g_mav_veh_yaw_cmded;
+extern float g_yaw_target_error;
 
-/**
- * @brief Enum class for path planner types
- */
-enum class PathPlannerType {
-    DELIVERY, // payload delivery
-    FOLLOWER // follow at an offset
-};
+/********************************************************************************
+ * Locals
+ ********************************************************************************/
 
-/**
- * @brief Interface for path planners
- */
-class IPathPlanner {
-public:
-    virtual ~IPathPlanner() = default;
-    virtual bool init() = 0;
-    virtual void loop();
-    virtual void shutdown();
-
-    std::vector<Adjust
-}
+float m_vx_cmd;
+float m_vy_cmd;
+float m_vz_cmd;
+float m_yaw_cmd;
 
 /********************************************************************************
  * Function prototypes

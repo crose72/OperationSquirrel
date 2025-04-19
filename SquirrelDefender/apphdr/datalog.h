@@ -123,12 +123,12 @@ extern float g_ay_target_ekf;
 
 /* Follow target variables */
 extern bool g_target_too_close;
-extern float g_vx_adjust;
-extern float g_vy_adjust;
-extern float g_vz_adjust;
+extern float g_vx_cmd;
+extern float g_vy_cmd;
+extern float g_vz_cmd;
 extern float g_yaw_target;
 extern float g_yaw_target_error;
-extern float g_mav_veh_yaw_adjusted;
+extern float g_mav_veh_yaw_cmded;
 
 /* System variables */
 extern SystemState g_system_state;
