@@ -10,7 +10,6 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include <memory>
 #include <vector>
 
 /********************************************************************************
@@ -33,33 +32,30 @@ enum class PathPlannerType {
     FOLLOWER // follow at an offset
 };
 
-/**
- * @brief Interface for path planners
- */
-class IPathPlanner {
-public:
-    virtual ~IPathPlanner() = default;
-    virtual bool init() = 0;
-    virtual void loop();
-    virtual void shutdown();
-
-    std::vector<Adjust
-}
-
 /********************************************************************************
  * Function prototypes
  ********************************************************************************/
-class PathPlanner
+class PathPlannerBase
+{
+public:
+    PathPlannerBase() = default;
+    virtual ~PathPlanner() = default;
+
+    virtual bool init(void) const = 0;
+    virtual void loop(void) const = 0;
+    virtual void shutdown(void) const = 0;
+
+};
+
+class PathPlanner : public PathPlannerBase
 {
 public:
     PathPlanner();
-    ~PathPlanner();
+    ~PathPlanner() override;
 
-    static bool init(void);
-    static void loop(void);
-    static void shutdown(void);
-
-private:
-};
+    bool init(void) const override;
+    void loop(void) const override;
+    void shutdown(void) const override;
+}
 
 #endif // PATH_PLANNER_H
