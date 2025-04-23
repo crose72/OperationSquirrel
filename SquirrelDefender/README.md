@@ -104,7 +104,7 @@ Camera IMX219 Dual (or whatever CSI camera you're using)
 
 
 # Run the container
-./scripts/run_dev.sh
+./scripts/run_dev_orin.sh
 
 # Test the camera inside the container
 nvgstcapture-1.0
@@ -135,7 +135,7 @@ make -j$(nproc)
 
 ### Release container:
 
-If you don't need to change the code and just want to run the precompiled program then you can just do the setup and run `./run_squirreldefender.sh`.  The purpose of this container is to be deployed onto your drone or other autonomous vehicle since the only thing that it does is run the pre-compiled binary that you created using the dev container from the previous step.
+If you don't need to change the code and just want to run the precompiled program then you can just do the setup and run `./run_squirreldefender_orin.sh`.  The purpose of this container is to be deployed onto your drone or other autonomous vehicle since the only thing that it does is run the pre-compiled binary that you created using the dev container from the previous step.
 
 If you want to have the program run as soon as you power on the jetson (for example when your jetson is mounted on your drone) then you need to add a systemd service and do a couple other things.  First enable xserver and display access for the container by default when you power on the jetson by adding it to your `.xprofile`.  Run these outside of the container.
 
@@ -166,7 +166,7 @@ sudo nano /etc/systemd/system/squirreldefender.service
     Restart=on-failure
     RestartSec=5
     ExecStartPre=/bin/bash -c 'sleep 5'
-    ExecStart=/bin/bash /home/<user>/workspaces/os-dev/OperationSquirrel/scripts/run_squirreldefender.sh
+    ExecStart=/bin/bash /home/<user>/workspaces/os-dev/OperationSquirrel/scripts/run_squirreldefender_orin.sh
     ExecStop=/usr/bin/docker stop squirreldefender
     #ExecStopPost=/usr/bin/docker rm squirreldefender
     StandardOutput=journal
@@ -214,11 +214,11 @@ Let's say you're at the park with your jetson and your drone, and you want to tr
 #### *When your laptop and jetson have wifi
 
 1. Modify the code using the dev container (follow instructions above)
-    - Execute `./scripts/run_dev.sh`
+    - Execute `./scripts/run_dev_orin.sh`
     - Make changes to the code
     - Recompile the code
 2. Build the SquirrelDefender container
-    - Execute `./scripts/build_squirreldefender.sh`
+    - Execute `./scripts/build_squirreldefender_r36.4.0.sh`
     - (Choose N if you don't need to push the container to docker hub - since you're at the park I don't think you do, or choose Y if you are ready to push it to docker hub)
 3. Make sure you've followed the instructions above for the release container to have the container execute when the jetson powers up
     - Stop the squirreldefender service before making changes (instructions above)
@@ -233,13 +233,13 @@ Before you are out of wifi you can use the dev container to make changes to the 
 if you have changes that you want to test when you're at a park or some other place where you don't have wifi 
 
 1. Modify the code using the dev container - only once before you are out of wifi (follow instructions above)
-    - Execute `./scripts/run_dev.sh`
+    - Execute `./scripts/run_dev_orin.sh`
     - Make changes to the code
     - Recompile the code
 2. Build the field container (we'll use it later)
-    - Execute `./scripts/build_field.sh`
+    - Execute `./scripts/build_field_r36.4.0.sh`
 3. Build the SquirrelDefender container
-    - Execute `./scripts/build_squirreldefender.sh`
+    - Execute `./scripts/build_squirreldefender_r36.4.0.sh`
     - (Choose N if you don't need to push the container to docker hub - since you're at the park I don't think you do, or choose Y if you are ready to push it to docker hub)
 4. Make sure you've followed the instructions above for the release container to have the container execute when the jetson powers up
     - Stop the squirreldefender service before making changes (instructions above)
@@ -253,12 +253,12 @@ if you have changes that you want to test when you're at a park or some other pl
     - `docker stop <container id>` to remove it
     - `docker rm <container id>` to remove it
 7. Run the field container
-    - Execute `./scripts/run_field.sh`
+    - Execute `./scripts/run_field_orin.sh`
 8. Modify the code in the field container
     - Use VS Code Dev Container extension, or vim, or nano or something else to access and make your code change inside the field container
     - Recompile the code
 9. Build the SquirrelDefender container (field container should be running or at least persist - check with `docker ps -a`)
-    - Execute `./scripts/build_squirreldefender.sh --field`
+    - Execute `./scripts/build_squirreldefender_r36.4.0.sh --field`
     - (Choose N if you don't need to push the container to docker hub - since you're at the park I don't think you do, or choose Y if you are ready to push it to docker hub)
     - The field container starts where you left of with the code in the dev container
     - This script copies the build from the field container into the squirreldefender container with your new code changes compiled

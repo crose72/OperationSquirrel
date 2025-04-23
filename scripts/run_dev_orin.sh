@@ -1,5 +1,5 @@
 # Ensure ${OS_WS} is defined
-docker pull crose72/jetpack-r36.4.0:base
+docker pull crose72/jetpack-r36.4.0:dev
 sudo docker run --runtime nvidia -it --rm --network host \
   --privileged --ipc=host \
   --env DISPLAY=$DISPLAY \
@@ -32,6 +32,6 @@ sudo docker run --runtime nvidia -it --rm --network host \
   --volume ${OS_WS}/OperationSquirrel/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender \
   --volume ${OS_WS}/YOLOv8-TensorRT-CPP:/workspace/YOLOv8-TensorRT-CPP \
   --name squirreldefender-dev \
-  crose72/jetpack-r36.4.0:base \
+  crose72/jetpack-r36.4.0:dev \
   bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build \
     && exec bash"
