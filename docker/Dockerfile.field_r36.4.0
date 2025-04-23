@@ -1,4 +1,4 @@
-FROM crose72/jetpack-r36.4.0:base
+FROM crose72/jetpack-r36.4.0:dev
 
 # Set working directory
 WORKDIR /workspace/

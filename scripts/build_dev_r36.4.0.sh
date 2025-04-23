@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Docker container build settings
-DOCKERFILE_PATH="../docker/Dockerfile.base"
+DOCKERFILE_PATH="../docker/Dockerfile.dev_r36.4.0"
 IMAGE_NAME="crose72/jetpack-r36.4.0"
-IMAGE_TAG="base"
+IMAGE_TAG="dev"
 FULL_IMAGE_NAME="$IMAGE_NAME:$IMAGE_TAG"
 
 # Build Docker image
