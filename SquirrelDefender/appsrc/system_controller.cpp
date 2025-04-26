@@ -142,65 +142,22 @@ int system_state_machine(void)
 }
 
 /********************************************************************************
- * Function: led_init
- * Description: Initialize LEDs
- ********************************************************************************/
-void led_init(void)
-{
-#ifdef BLD_JETSON_B01
-
-    StatusIO::init();
-
-#endif // BLD_JETSON_B01
-}
-
-/********************************************************************************
- * Function: led_init_blink
- * Description: Specific led sequence to indicate system initializing.
- ********************************************************************************/
-void led_init_blink(void)
-{
-#ifdef BLD_JETSON_B01
-
-    StatusIO::status_initializing();
-
-#endif // BLD_JETSON_B01
-}
-
-/********************************************************************************
- * Function: led_bad_blink
- * Description: Control external leds to describe the system state.
- ********************************************************************************/
-void led_bad_blink(void)
-{
-#ifdef BLD_JETSON_B01
-
-        StatusIO::status_bad_blink();
-
-#endif // BLD_JETSON_B01
-}
-
-/********************************************************************************
  * Function: led_system_indicators
  * Description: Control external leds to describe the system state.
  ********************************************************************************/
 void led_system_indicators(void)
 {
-#ifdef BLD_JETSON_B01
-
     if (g_system_state == SystemState::DEFAULT ||
         g_system_state == SystemState::INIT ||
         g_system_state == SystemState::PRE_ARM_GOOD ||
         g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
-        StatusIO::status_good();
+        /* TODO: blinking green LED */
     }
     else
     {
-        StatusIO::status_good();
+        /* TODO: blinking red LED */
     }
-
-#endif // BLD_JETSON_B01
 }
 
 /********************************************************************************
@@ -244,13 +201,6 @@ void SystemController::loop(void)
 {
     system_state_machine();
     dtrmn_program_stop_cond();
-
-#ifdef BLD_JETSON_B01
-
-    led_system_indicators();
-    StatusIO::loop();
-
-#endif // BLD_JETSON_B01
 }
 
 /********************************************************************************

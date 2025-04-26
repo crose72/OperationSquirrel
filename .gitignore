@@ -4,10 +4,7 @@
 
 /.vscode
 /.vs
-/SquirrelDefender/out/build/x64-Debug
-/SquirrelDefender/env_config.json
 /SquirrelDefender/data
-/SquirrelDefender/out/build/x64-Release
-/SquirrelDefender/build/x64-Release
-/SquirrelDefender/build
-/build
+/SquirrelDefender/out/
+/SquirrelDefender/build*
+/build*

@@ -137,13 +137,4 @@ void Scheduler::shutdown(void)
     Detection::shutdown();
 
 #endif // ENABLE_CV
-
-#ifdef BLD_JETSON_B01
-
-    StatusIO::status_program_complete();
-    StatusIO::shutdown();
-
-#endif // BLD_JETSON_B01
-
-
 }
