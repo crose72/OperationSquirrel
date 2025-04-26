@@ -60,3 +60,15 @@ echo "OpenCV-4-10-0 installed, SUCCESS!"
 sudo apt-get install libjsoncpp-dev
 
 echo "JsonCpp installed, SUCCESS!"
+
+# -----------------------------------------------
+# Install armadillo and other dependencies for
+# kalman filter submodule
+# -----------------------------------------------
+sudo apt-get update && apt install -y \
+    libspdlog-dev \
+    libfmt-dev \
+    libjsoncpp-dev \
+    libarmadillo-dev \
+    liblapack-dev \
+    libblas-dev
