@@ -9,8 +9,8 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
 #include <vector>
+#include <memory>
 
 /********************************************************************************
  * Imported objects
@@ -39,7 +39,7 @@ class PathPlannerBase
 {
 public:
     PathPlannerBase() = default;
-    virtual ~PathPlanner() = default;
+    virtual ~PathPlannerBase() = default;
 
     virtual bool init(void) const = 0;
     virtual void loop(void) const = 0;
@@ -50,12 +50,24 @@ public:
 class PathPlanner : public PathPlannerBase
 {
 public:
-    PathPlanner();
-    ~PathPlanner() override;
+    PathPlanner(PathPlannerType type);
+    virtual ~PathPlanner();
 
     bool init(void) const override;
     void loop(void) const override;
     void shutdown(void) const override;
-}
+
+    // Type of the path planner
+    static PathPlannerType m_type;
+
+    // Factory method - get static instace of specific planner type
+    static std::shared_ptr<const PathPlannerBase> getPlanner(PathPlannerType type);
+
+
+private:
+    // Pointer to the active planner (points to a static instance)
+    mutable std::shared_ptr<PathPlannerBase> m_activePlanner;
+
+};
 
 #endif // PATH_PLANNER_H
