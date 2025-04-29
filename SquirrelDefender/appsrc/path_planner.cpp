@@ -10,9 +10,11 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "path_planner.h"
-#include "path_planner_follower.h"
-#include "path_planner_delivery.h"
+#include "../apphdr/path_planner.h"
+#include "../apphdr/path_planner_follower.h"
+#include "../apphdr/path_planner_delivery.h"
+#include "../apphdr/path_planner_grid.h"
+#include <stdexcept>
 
 /********************************************************************************
  * Typedefs
@@ -34,46 +36,26 @@
  * Function definitions
  ********************************************************************************/
 
-/********************************************************************************
- * Function: PathPlanner
- * Description: PathPlanner class constructor.
- ********************************************************************************/
-PathPlanner::PathPlanner(void) {};
+namespace path_planner {
 
-/********************************************************************************
- * Function: ~PathPlanner
- * Description: PathPlanner class destructor.
- ********************************************************************************/
-PathPlanner::~PathPlanner(void) {};
-
-/********************************************************************************
- * Function: init
- * Description: Initialize all planner variables.  Run once at the start
- *              of the program.
- ********************************************************************************/
-bool PathPlanner::init(void)
-{
-    g_vx_cmd = 0.0;
-    g_vy_cmd = 0.0;
-    g_vz_cmd = 0.0;
-    g_yaw_cmd = 0.0;
-
-    return true;
+PathPlannerBase* createPlanner(Type type) {
+    switch (type) {
+        case Type::DELIVERY:
+            return new DeliveryPlanner();
+        case Type::GRID:
+            return new GridPlanner();
+        case Type::FOLLOWER:
+            // TODO: Implement follower planner
+            throw std::runtime_error("Follower planner not implemented");
+        default:
+            throw std::runtime_error("Invalid planner type");
+    }
 }
 
-/********************************************************************************
- * Function: loop
- * Description: Function to run every loop.
- ********************************************************************************/
-void PathPlanner::loop(void)
-{
+void destroyPlanner(PathPlannerBase* planner) {
+    if (planner) {
+        delete planner;
+    }
 }
 
-/********************************************************************************
- * Function: shutdown
- * Description: Function to clean up planner at the end of the program.
- ********************************************************************************/
-void PathPlanner::shutdown(void)
-{
-    // place clean up code here
-}
+} // namespace path_planner

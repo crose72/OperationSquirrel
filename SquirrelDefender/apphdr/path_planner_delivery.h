@@ -1,38 +1,33 @@
 /********************************************************************************
- * @file    path_planner
+ * @file    path_planner_delivery.h
  * @author  Shaun Bowman
  * @date    2025/04/19
  ********************************************************************************/
-#ifndef PATH_PLANNER_H
-#define PATH_PLANNER_H
+#ifndef PATH_PLANNER_DELIVERY_H
+#define PATH_PLANNER_DELIVERY_H
 
-/********************************************************************************
- * Includes
- ********************************************************************************/
-#include "common_inc.h"
+#include "path_planner.h"
+#include <vector>
 
-/********************************************************************************
- * Imported objects
- ********************************************************************************/
+namespace path_planner {
 
-/********************************************************************************
- * Exported objects
- ********************************************************************************/
-
-/********************************************************************************
- * Function prototypes
- ********************************************************************************/
-class PathPlanner
-{
+class DeliveryPlanner : public PathPlannerBase {
 public:
-    PathPlanner();
-    ~PathPlanner();
+    DeliveryPlanner();
+    ~DeliveryPlanner() override = default;
 
-    static bool init(void);
-    static void loop(void);
-    static void shutdown(void);
+    bool init() override;
+    std::vector<Waypoint> getPath() const override;
+    void setTarget(const Waypoint& target) override;
+    void shutdown() override;
+    Type getType() const override { return Type::DELIVERY; }
 
 private:
+    Waypoint m_target;
+    std::vector<Waypoint> m_waypoints;
+    bool m_initialized{false};
 };
 
-#endif // PATH_PLANNER_H
+} // namespace path_planner
+
+#endif // PATH_PLANNER_DELIVERY_H

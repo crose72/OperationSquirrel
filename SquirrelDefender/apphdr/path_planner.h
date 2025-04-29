@@ -9,8 +9,8 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "path_planner_types.h"
 #include <vector>
-#include <memory>
 
 /********************************************************************************
  * Imported objects
@@ -19,55 +19,40 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern float g_vx_cmd;
-extern float g_vy_cmd;
-extern float g_vz_cmd;
-extern float g_yaw_cmd;
-
-/**
- * @brief Enum class for path planner types
- */
-enum class PathPlannerType {
-    DELIVERY, // payload delivery
-    FOLLOWER // follow at an offset
-};
 
 /********************************************************************************
  * Function prototypes
  ********************************************************************************/
-class PathPlannerBase
-{
+namespace path_planner {
+
+class PathPlannerBase {
 public:
     PathPlannerBase() = default;
     virtual ~PathPlannerBase() = default;
 
-    virtual bool init(void) const = 0;
-    virtual void loop(void) const = 0;
-    virtual void shutdown(void) const = 0;
+    // Initialize the planner
+    virtual bool init() = 0;
 
+    // Get the current path as a sequence of waypoints
+    virtual std::vector<Waypoint> getPath() const = 0;
+
+    // Set the target waypoint
+    virtual void setTarget(const Waypoint& target) = 0;
+
+    // Clean up resources
+    virtual void shutdown() = 0;
+
+    // Get the type of this planner
+    virtual Type getType() const = 0;
 };
 
-class PathPlanner : public PathPlannerBase
-{
-public:
-    PathPlanner(PathPlannerType type);
-    virtual ~PathPlanner();
+// Factory function to create a planner of the specified type
+// Returns nullptr if type is invalid
+PathPlannerBase* createPlanner(Type type);
 
-    bool init(void) const override;
-    void loop(void) const override;
-    void shutdown(void) const override;
+// Destroy a planner created by createPlanner
+void destroyPlanner(PathPlannerBase* planner);
 
-    // Type of the path planner
-    static PathPlannerType m_type;
-
-    // Factory method - get static instace of specific planner type
-    static std::shared_ptr<const PathPlannerBase> getPlanner(PathPlannerType type);
-
-
-private:
-    // Pointer to the active planner (points to a static instance)
-    mutable std::shared_ptr<PathPlannerBase> m_activePlanner;
-
-};
+} // namespace path_planner
 
 #endif // PATH_PLANNER_H
