@@ -115,4 +115,6 @@ std::vector<T> get_column_data(const std::string& file, const std::string& colum
     return column_data;
 }
 
+std::string generate_unique_filename(const std::string &data_file_path, const std::string &filename);
+
 #endif // TEST_CSV_UTILS_H

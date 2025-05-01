@@ -24,18 +24,18 @@
         "w3": 0.0
     },
     "Vel_PID_x_reverse": {
-        "Kp": 0.0,
+        "Kp": 0.25,
         "Ki": 0.0,
         "Kd": 0.0,
-        "w1": 1.0,
+        "w1": 0.0,
         "w2": 0.0,
         "w3": 0.0
     },
     "Vel_PID_y_reverse": {
-        "Kp": 0.005,
+        "Kp": 0.03,
         "Ki": 0.0,
         "Kd": 0.0,
-        "w1": 1.0,
+        "w1": 0.0,
         "w2": 0.0,
         "w3": 0.0
     },
@@ -63,7 +63,9 @@
         "Desired_Z_offset": 0.0
     },
     "Detection_tracking": {
-        "Detect_Thresh": 0.7,
+        "Detect_Thresh": 0.67,
+        "Detect_Class_Orin": 0,
+        "Detect_Class_B01": 1,
         "Max_Batch_Size": 4,
         "Precision": 0,
         "Device": 0,

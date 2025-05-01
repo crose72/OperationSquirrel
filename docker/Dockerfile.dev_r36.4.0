@@ -43,3 +43,5 @@ RUN apt-get update && apt install -y \
     liblapack-dev \
     libblas-dev && \
     pkg-config --cflags --libs armadillo
+
+RUN apt-get update && apt-get -y install gdb

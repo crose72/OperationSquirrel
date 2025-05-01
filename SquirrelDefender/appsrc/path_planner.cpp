@@ -164,16 +164,41 @@ void get_control_params(void)
  ********************************************************************************/
 void calc_follow_error(void)
 {
-    if (g_x_target_ekf < 0.001f)
-    {
-        g_x_error = 0.0f;
-    }
-    else
-    {
-        g_x_error = g_x_target_ekf - x_desired;
-    }
+    float x_error_abs;
+    float y_error_abs;
 
-    g_y_error = g_y_target_ekf - y_desired;
+    if (g_target_loc_data_ok)
+    {
+        x_error_abs = (float)0.01004 * std::abs(g_target_cntr_offset_x) + (float)0.12153;
+
+        if (g_target_cntr_offset_x < (float)(-50.0))
+        {
+            g_x_error = x_error_abs;
+        }
+        else if (g_target_cntr_offset_x > (float)50.0)
+        {
+            g_x_error = -x_error_abs;
+        }
+        else
+        {
+            g_x_error = (float)0.0;
+        }
+
+        y_error_abs = (float)0.00590 * std::abs(g_target_cntr_offset_y) + (float)0.00268;
+        
+        if (g_target_cntr_offset_y < (float)(-50.0))
+        {
+            g_y_error = y_error_abs;
+        }
+        else if (g_target_cntr_offset_x < (float)50.0)
+        {
+            g_y_error = -y_error_abs;
+        }
+        else
+        {
+            g_y_error = (float)0.0;
+        }
+    }
 }
 
 /********************************************************************************
@@ -279,19 +304,7 @@ void dtrmn_follow_vector(void)
 {
     g_target_too_close = (g_x_error < 0.0);
 
-    if (g_target_valid && g_target_too_close)
-    {
-        g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                              g_x_error, 0.0, 0.0,
-                                              w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
-        g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                    g_y_error, 0.0, 0.0,
-                                    w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
-        g_yaw_adjust = pid_yaw.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
-                                    g_yaw_target_error, 0.0, 0.0,
-                                    w1_yaw, 0.0, 0.0, ControlDim::YAW, g_dt);
-    }
-    else if (g_target_valid && !g_target_too_close)
+    if (g_target_valid)
     {
         g_vx_adjust = pid_forwd.pid3(Kp_x, Ki_x, Kd_x,
                                             g_x_error, 0.0, 0.0,

@@ -100,6 +100,8 @@ extern float g_target_left;
 extern float g_target_right;
 extern float g_target_top;
 extern float g_target_bottom;
+extern float g_detection_class;
+extern float g_target_detection_conf;
 
 /* Localize target variables*/
 extern float d_target_h;
@@ -120,6 +122,7 @@ extern float g_vx_target_ekf;
 extern float g_vy_target_ekf;
 extern float g_ax_target_ekf;
 extern float g_ay_target_ekf;
+extern bool g_target_loc_data_ok;
 
 /* Follow target variables */
 extern bool g_target_too_close;
