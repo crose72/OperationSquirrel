@@ -13,8 +13,8 @@ The module is organized into the following key components:
    - Handles memory management and resource allocation
    - Provides common utilities for path planning operations
 
-2. `AStarPlanner` (Concrete Implementation)
-   - Implements A* algorithm for path finding
+2. `GridPlanner` (Concrete Implementation)
+   - Plans a "space filling" grid pattern
    - Optimized for embedded systems with fixed-size memory allocation
    - Uses template parameters for grid size and node type
 
@@ -34,34 +34,8 @@ The module is designed with embedded systems in mind:
 
 ## Example Usage
 
-```cpp
-#include "path_planner/astar_planner.h"
+see examples/src/path_planner_example.cpp
 
-// Define grid dimensions at compile time
-constexpr size_t GRID_WIDTH = 100;
-constexpr size_t GRID_HEIGHT = 100;
-
-// Create planner instance
-AStarPlanner<GRID_WIDTH, GRID_HEIGHT> planner;
-
-// Initialize with obstacle map
-std::array<std::array<bool, GRID_HEIGHT>, GRID_WIDTH> obstacle_map;
-// ... populate obstacle_map ...
-
-planner.initialize(obstacle_map);
-
-// Plan path from start to goal
-Point start{0, 0};
-Point goal{99, 99};
-Path path = planner.planPath(start, goal);
-
-// Use the path
-if (path.isValid()) {
-    for (const auto& point : path.getPoints()) {
-        // Process path points
-    }
-}
-```
 
 ## Build Integration
 
@@ -83,65 +57,56 @@ target_link_libraries(your_target PRIVATE path_planner)
 ```
 
 ### Build Options
+Here are all the essential commands for building and running the path planner project:
 
-The module supports the following CMake options:
+1. Clean Build (from project root):
+```code
+rm -rf build
+mkdir build
+cd build
+```
 
-- `PATH_PLANNER_ENABLE_DEBUG`: Enable debug logging (default: OFF)
-- `PATH_PLANNER_ENABLE_TESTS`: Build unit tests (default: OFF)
+2. Configure with CMake (from build directory):
+```code
+# Debug build
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ..
 
-### Dependencies
+# Release build
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ..
+```
 
-- C++17 or later
-- Eigen3 (for matrix operations)
-- Armadillo (for numerical computations)
+3. Build (from build directory):
+```
+ninja        # Build all targets
+```
 
-## Memory Considerations
+4. Run executables (from build directory):
+```
+# Run the example program
+./path_planner_example
 
-1. **Static Allocation**
-   - Grid dimensions must be known at compile time
-   - Memory usage is predictable and fixed
-   - No heap fragmentation issues
+# Run the tests
+./path_planner_test
+```
 
-2. **Cache Optimization**
-   - Data structures are aligned for optimal cache usage
-   - Contiguous memory layout for path points
-   - Minimized pointer chasing
+5. One-line build and run commands (from project root):
+```
+# Build and run example
+rm -rf build && mkdir build && cd build && cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug .. && ninja && ./path_planner_example
 
-3. **Stack Usage**
-   - Limited recursion depth in path planning algorithms
-   - Stack-allocated temporary variables
-   - Configurable maximum path length
+# Build and run tests
+rm -rf build && mkdir build && cd build && cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug .. && ninja && ./path_planner_test
+```
 
-## Performance Guidelines
+6. Install the library (from build directory):
+```
+sudo ninja install
+```
 
-1. **Grid Size**
-   - Keep grid dimensions as small as possible
-   - Consider using hierarchical planning for large areas
-   - Balance between resolution and memory usage
+## VSCode integration
 
-2. **Update Frequency**
-   - Plan paths at a fixed interval
-   - Cache results when possible
-   - Use incremental updates for small changes
+Using the VSCode "Run and Debug" tool, you can select from the following
 
-3. **Real-time Considerations**
-   - Worst-case execution time is bounded
-   - No dynamic memory allocation during planning
-   - Configurable timeout for path planning
+1. Debug Example : build debug target `/examples/src/path_planner_example.cpp`
 
-## Integration Notes
-
-1. **Thread Safety**
-   - The planner is not thread-safe by default
-   - Use mutex protection if accessing from multiple threads
-   - Consider creating separate planner instances per thread
-
-2. **Error Handling**
-   - All operations return status codes
-   - Invalid paths are clearly marked
-   - Memory allocation failures are handled gracefully
-
-3. **Testing**
-   - Unit tests available in the `tests` directory
-   - Memory usage can be verified using the test harness
-   - Performance benchmarks included
+2. Debug Tests : build debug target `/tests/src/test_path_planner.cpp`
