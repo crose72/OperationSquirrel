@@ -1,0 +1,52 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "mkdir -p build && cd build && cmake .. && make -j",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "build test",
+            "type": "shell",
+            "command": "mkdir -p build && cd build && cmake -DPLANNER_ENABLE_TESTS=ON -DPLANNER_ENABLE_EXAMPLES=OFF .. && make -j planner_test",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "build examples",
+            "type": "shell",
+            "command": "mkdir -p build && cd build && cmake -DPLANNER_ENABLE_TESTS=OFF -DPLANNER_ENABLE_EXAMPLES=ON .. && make -j planner_example_simple planner_example_advanced",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$gcc"
+        },
+        {
+            "label": "build all",
+            "type": "shell",
+            "command": "mkdir -p build && cd build && cmake -DPLANNER_ENABLE_TESTS=ON -DPLANNER_ENABLE_EXAMPLES=ON .. && make -j",
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": "$gcc"
+        }
+    ]
+} 
