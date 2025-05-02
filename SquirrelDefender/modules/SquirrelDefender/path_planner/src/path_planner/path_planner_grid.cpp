@@ -4,8 +4,8 @@
  * @date    2025/04/19
  ********************************************************************************/
 
-#include "../apphdr/path_planner_grid.h"
-#include "../apphdr/path_planner_types.h"
+#include "path_planner/path_planner_grid.h"
+#include "path_planner/path_planner_types.h"
 #include <cmath>
 #include <algorithm>
 

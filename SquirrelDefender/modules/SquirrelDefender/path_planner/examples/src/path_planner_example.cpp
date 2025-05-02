@@ -5,9 +5,11 @@
  * @brief   Example implementation showing how to use the path planners
  ********************************************************************************/
 
-#include "../apphdr/path_planner.h"
-#include "../apphdr/path_planner_types.h"
-#include "../apphdr/path_planner_grid.h"
+#include "path_planner/path_planner.h"
+#include "path_planner/path_planner_types.h"
+#include "path_planner/path_planner_grid.h"
+#include "path_planner/path_planner_delivery.h"
+
 #include <iostream>
 #include <memory>
 

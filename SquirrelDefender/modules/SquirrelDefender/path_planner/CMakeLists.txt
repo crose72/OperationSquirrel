@@ -44,14 +44,13 @@ add_library(path_planner STATIC ${SOURCES} ${HEADERS})
 # Set include directories for the target
 target_include_directories(path_planner
     PUBLIC
-    ${INCLUDE_DIR}
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
 )
 
 # Link dependencies
 target_link_libraries(path_planner
     PRIVATE
-    Eigen3::Eigen
-    ${ARMADILLO_LIBRARIES}
 )
 
 # Set compile definitions
@@ -87,37 +86,26 @@ endif()
 # Examples
 if(PATH_PLANNER_ENABLE_EXAMPLES)
     # Add example executables
-    add_executable(path_planner_example_simple
-        examples/simple_example.cpp
-    )
-    
-    add_executable(path_planner_example_advanced
-        examples/advanced_example.cpp
+    add_executable(path_planner_example
+        examples/src/path_planner_example.cpp
     )
     
     # Link example executables with planner library
-    target_link_libraries(path_planner_example_simple
-        PRIVATE
-        path_planner
-    )
-    
-    target_link_libraries(path_planner_example_advanced
+    target_link_libraries(path_planner_example
         PRIVATE
         path_planner
     )
     
     # Set debug configuration for examples
-    set_target_properties(path_planner_example_simple PROPERTIES
+    set_target_properties(path_planner_example PROPERTIES
         VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
     )
     
-    set_target_properties(path_planner_example_advanced PROPERTIES
-        VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-    )
 endif()
 
 # Install rules
 install(TARGETS path_planner
+    EXPORT path_planner-targets
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
     RUNTIME DESTINATION bin

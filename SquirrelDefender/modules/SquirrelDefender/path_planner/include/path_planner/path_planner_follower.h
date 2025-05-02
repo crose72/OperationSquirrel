@@ -1,75 +1,34 @@
+
 /********************************************************************************
  * @file    path_planner_follower.h
- * @author  Cameron Rose
- * @date    3/12/2025
+ * @author  Shaun Bowman
+ * @date    2025/04/19
  ********************************************************************************/
-#ifndef PATH_PLANNER_H
-#define PATH_PLANNER_H
+#ifndef PATH_PLANNER_FOLLOWER_H
+#define PATH_PLANNER_FOLLOWER_H
 
-/********************************************************************************
- * Includes
- ********************************************************************************/
-#include "common_inc.h"
-#include "param_reader.h"
-#include "pid.h"
-#include "localize_target.h"
-#include "time_calc.h"
-#include "track_target.h"
-#include "mav_data_hub.h"
+#include "path_planner.h"
+#include <vector>
 
-/********************************************************************************
- * Imported objects
- ********************************************************************************/
-extern uint16_t g_mav_veh_rngfdr_min_distance;
-extern uint16_t g_mav_veh_rngfdr_max_distance;
-extern uint16_t g_mav_veh_rngfdr_current_distance;
-extern float g_mav_veh_pitch;
-extern bool g_target_valid;
-extern float g_x_target;
-extern float g_y_target;
-extern float g_z_target;
-extern float g_dt;
-extern float g_x_target_ekf;
-extern float g_y_target_ekf;
-extern bool g_first_loop_after_start;
-extern float g_mav_veh_yaw;
-extern float g_mav_veh_yawspeed;
-extern bool g_use_video_playback;
-extern float g_target_cntr_offset_y;
+namespace path_planner {
 
-/********************************************************************************
- * Exported objects
- ********************************************************************************/
-extern bool g_target_too_close;
-extern float g_x_error;
-extern float g_y_error;
-extern float g_yaw_target;
-extern float g_mav_veh_yaw_cmded;
-extern float g_yaw_target_error;
-
-/********************************************************************************
- * Locals
- ********************************************************************************/
-
-float m_vx_cmd;
-float m_vy_cmd;
-float m_vz_cmd;
-float m_yaw_cmd;
-
-/********************************************************************************
- * Function prototypes
- ********************************************************************************/
-class PathPlanner
-{
+class FollowerPlanner : public PathPlannerBase {
 public:
-    PathPlanner();
-    ~PathPlanner();
+    FollowerPlanner();
+    ~FollowerPlanner() override = default;
 
-    static bool init(void);
-    static void loop(void);
-    static void shutdown(void);
+    bool init() override;
+    std::vector<Waypoint> getPath() const override;
+    void setTarget(const Waypoint& target) override;
+    void shutdown() override;
+    Type getType() const override { return Type::FOLLOWER; }
 
 private:
+    Waypoint m_target;
+    std::vector<Waypoint> m_waypoints;
+    bool m_initialized{false};
 };
 
-#endif // PATH_PLANNER_H
+} // namespace path_planner
+
+#endif // PATH_PLANNER_FOLLOWER_H

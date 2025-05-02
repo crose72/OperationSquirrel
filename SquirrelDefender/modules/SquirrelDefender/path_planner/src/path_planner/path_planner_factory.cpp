@@ -4,10 +4,10 @@
  * @date    2025/04/19
  ********************************************************************************/
 
-#include "../apphdr/path_planner.h"
-#include "../apphdr/path_planner_delivery.h"
-#include "../apphdr/path_planner_grid.h"
-#include "../apphdr/path_planner_types.h"
+#include "path_planner/path_planner.h"
+#include "path_planner/path_planner_delivery.h"
+#include "path_planner/path_planner_grid.h"
+#include "path_planner/path_planner_types.h"
 #include <stdexcept>
 
 namespace path_planner {

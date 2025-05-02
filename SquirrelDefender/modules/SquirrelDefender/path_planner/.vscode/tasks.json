@@ -2,51 +2,51 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "cmake debug",
             "type": "shell",
-            "command": "mkdir -p build && cd build && cmake .. && make -j",
+            "command": "cmake",
+            "args": [
+                "-G",
+                "Ninja",
+                "-DCMAKE_BUILD_TYPE=Debug",
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+                "-B",
+                "${workspaceFolder}/build"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "build debug",
+            "type": "shell",
+            "command": "ninja",
+            "args": [
+                "-C",
+                "build"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "dependsOn": ["cmake debug"],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            },
-            "problemMatcher": "$gcc"
+            "problemMatcher": ["$gcc"]
         },
         {
-            "label": "build test",
+            "label": "clean",
             "type": "shell",
-            "command": "mkdir -p build && cd build && cmake -DPLANNER_ENABLE_TESTS=ON -DPLANNER_ENABLE_EXAMPLES=OFF .. && make -j planner_test",
-            "group": "build",
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            },
-            "problemMatcher": "$gcc"
-        },
-        {
-            "label": "build examples",
-            "type": "shell",
-            "command": "mkdir -p build && cd build && cmake -DPLANNER_ENABLE_TESTS=OFF -DPLANNER_ENABLE_EXAMPLES=ON .. && make -j planner_example_simple planner_example_advanced",
-            "group": "build",
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            },
-            "problemMatcher": "$gcc"
-        },
-        {
-            "label": "build all",
-            "type": "shell",
-            "command": "mkdir -p build && cd build && cmake -DPLANNER_ENABLE_TESTS=ON -DPLANNER_ENABLE_EXAMPLES=ON .. && make -j",
-            "group": "build",
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            },
-            "problemMatcher": "$gcc"
+            "command": "rm",
+            "args": [
+                "-rf",
+                "build"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
         }
     ]
-} 
+}

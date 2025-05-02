@@ -2,12 +2,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Test",
+            "name": "Debug Example",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/planner_test",
+            "program": "${workspaceFolder}/build/path_planner_example",
             "args": [],
-            "stopAtEntry": false,
+            "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
@@ -19,16 +19,16 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build",
+            "preLaunchTask": "build debug",
             "miDebuggerPath": "/usr/bin/gdb"
         },
         {
-            "name": "Debug Simple Example",
+            "name": "Debug Tests",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/planner_example_simple",
+            "program": "${workspaceFolder}/build/path_planner_test",
             "args": [],
-            "stopAtEntry": false,
+            "stopAtEntry": true,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
@@ -40,29 +40,8 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build",
-            "miDebuggerPath": "/usr/bin/gdb"
-        },
-        {
-            "name": "Debug Advanced Example",
-            "type": "cppdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/build/planner_example_advanced",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false,
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ],
-            "preLaunchTask": "build",
+            "preLaunchTask": "build debug",
             "miDebuggerPath": "/usr/bin/gdb"
         }
     ]
-} 
+}
