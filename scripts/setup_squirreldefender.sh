@@ -33,11 +33,12 @@ BASHRC_PATH="/home/$USER_NAME/.bashrc"
 CLOCK_FIX_SCRIPT="/usr/local/bin/clock-skew-fix.sh"
 SQUIRRELDEFENDER_SERVICE="/etc/systemd/system/squirreldefender.service"
 CLOCK_FIX_SERVICE="/etc/systemd/system/clock-skew-fix.service"
-BUILD_DIR="$SCRIPT_DIR/../SquirrelDefender/build"
-ENGINE_FILE="$SCRIPT_DIR/../SquirrelDefender/networks/yolov8s/yolov8s.engine.Orin.fp16.1.1.-1.-1.-1"
+BUILD_DIR=".$SCRIPT_DIR/../SquirrelDefender/build"
+ENGINE_FILE=".$SCRIPT_DIR/../SquirrelDefender/networks/yolov8s/yolov8s.engine.Orin.fp16.1.1.-1.-1.-1"
 
 # 1. Add user to docker
-sudo usermod -aG docker $USER && newgrp docker
+# Note: commented out, doesn't work in script apparently
+#sudo usermod -aG docker $USER && newgrp docker
 
 # 2. Create or update .xprofile
 echo "Creating ~/.xprofile..."
@@ -80,15 +81,15 @@ EOF
 
 # 4. Create the clock skew fix script
 echo "Creating clock-skew-fix.sh..."
-cat <<'EOF' | sudo tee "$CLOCK_FIX_SCRIPT" > /dev/null
+cat <<EOF | sudo tee "$CLOCK_FIX_SCRIPT" > /dev/null
 #!/bin/bash
 
-latest=$(find /home/crose72/workspaces/os-dev/OperationSquirrel/SquirrelDefender -type f -exec stat -c %Y {} + 2>/dev/null | sort -n | tail -1)
-now=$(date +%s)
+latest=\$(find /home/$USER_NAME/workspaces/os-dev/OperationSquirrel/SquirrelDefender -type f -exec stat -c %Y {} + 2>/dev/null | sort -n | tail -1)
+now=\$(date +%s)
 
-if [ -n "$latest" ] && [ "$now" -lt "$latest" ]; then
+if [ -n "\$latest" ] && [ "\$now" -lt "\$latest" ]; then
     echo "Clock behind file timestamps, setting time forward..."
-    date -s "@$((latest + 10))"
+    date -s "@\$((\$latest + 10))"
 fi
 EOF
 sudo chmod +x "$CLOCK_FIX_SCRIPT"
