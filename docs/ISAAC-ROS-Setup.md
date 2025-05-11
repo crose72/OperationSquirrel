@@ -21,6 +21,7 @@ sudo /usr/sbin/nvpmodel -m 0
 
 ## Add user to DOCKER group
 sudo usermod -aG docker $USER
+
 newgrp docker
 
 ## Setup docker

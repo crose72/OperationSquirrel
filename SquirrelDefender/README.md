@@ -61,31 +61,14 @@ cd ~/workspaces/os-dev
 
 # Clone the repository
 git clone https://github.com/crose72/OperationSquirrel.git --recursive
+cd OperationSquirrel/scripts
+./setup_squirreldefender.sh --jetson=orin # for the Orin nano, --jetson=b01 for the B01 nano
 
-# Add the following to your ~/.bashrc file
-export DISPLAY=:0
-export OS_WS=/home/<user>/workspaces/os-dev/
-
-# Restart terminal, or source .bashrc:
+# Source .bashrc file (reset)
 source ~/.bashrc
 
-# Enable xserver and display access to the docker container 
-# Might need to do before each time running the container
-xhost +
-
-# If you get an error, "unable to open dislay :0", try setting to :1 & repeat
-# If successfull, you should see something like this:
-~/workspaces/os-dev/OperationSquirrel$ xhost +
-access control disabled, clients can connect from any host
-
-# If you get an error opening your csi camera, and are running Jetpack 6.2, 
-# try following these instructions and enable the CSI camera for
-sudo /opt/nvidia/jetson-io/jetson-io.py
-Configure Jetson 24pin CSI Connector
-Configure for compatible hardware
-Camera IMX219 Dual (or whatever CSI camera you're using)
-(save, exit, reboot)
-
+# Make .xprofile executable
+chmod +x ~/.xprofile
 
 # Run the container
 ./scripts/run_dev_orin.sh
@@ -93,6 +76,8 @@ Camera IMX219 Dual (or whatever CSI camera you're using)
 # Test the camera inside the container
 nvgstcapture-1.0
 ```
+
+Where `<jetson-type>` is `orin` or `b01`.  A script 
 
 ### Dev container:
 
@@ -118,7 +103,9 @@ make -j$(nproc)
 
 If you don't need to change the code and just want to run the precompiled program then you can just do the setup and run `./run_squirreldefender_orin.sh` or `./run_squirreldefender_b01.sh` to run the program for your Jetson.  The purpose of this container is to be deployed onto your drone or other autonomous vehicle since the only thing that it does is run the pre-compiled binary that you created using the dev container from the previous step.
 
-If you want to have the program run as soon as you power on the jetson (for example when your jetson is mounted on your drone and you plug in the battery to your jetson) then you need to add a systemd service and do a couple other things.  First enable xserver and display access for the container by default when you power on the jetson by adding it to your `.xprofile`.  Run these outside of the container:
+If you want to have the program run as soon as you power on the jetson (for example when your jetson is mounted on your drone and you plug in the battery to your jetson) then you need to add a systemd service and do a couple other things.  First enable xserver and display access for the container by default when you power on the jetson by adding it to your `.xprofile`.  
+
+If you followed the instructions in the setup then these steps have already been completed for you.  If you want to do them manually then the instructions are below.  Run these outside of the container:
 
 Create `.xprofile`
 
@@ -147,7 +134,7 @@ sudo nano /etc/systemd/system/squirreldefender.service
 
     [Service]
     Environment="OS_WS=/home/<user>/workspaces/os-dev"
-    Restart=no
+    Restart=off
     ExecStartPre=/bin/bash -c 'sleep 5'
     ExecStart=/bin/bash /home/<user>/workspaces/os-dev/OperationSquirrel/scripts/run_squirreldefender_<jetson-type>.sh
     ExecStop=/usr/bin/docker stop squirreldefender
