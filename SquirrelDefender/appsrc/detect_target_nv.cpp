@@ -65,10 +65,10 @@ bool create_detection_network(void)
 
 #endif // DEBUG_BUILD
 
-    //const char *model = "../networks/SSD-Mobilenet-v2/ssd_mobilenet_v2_coco.uff";
-    //const char *class_labels = "../networks/SSD-Mobilenet-v2/ssd_coco_labels.txt";
-    const char *model = "../networks/SSD-Inception-v2/ssd_inception_v2_coco.uff";
-    const char *class_labels = "../networks/SSD-Inception-v2/ssd_coco_labels.txt";
+    const char *model = "../networks/SSD-Mobilenet-v2/ssd_mobilenet_v2_coco.uff";
+    const char *class_labels = "../networks/SSD-Mobilenet-v2/ssd_coco_labels.txt";
+    //const char *model = "../networks/SSD-Inception-v2/ssd_inception_v2_coco.uff";
+    //const char *class_labels = "../networks/SSD-Inception-v2/ssd_coco_labels.txt";
     float thresh = (float)0.5;
     const char *input_blob = "Input";
     const char *output_blob = "NMS"; // for SSD
@@ -76,9 +76,9 @@ bool create_detection_network(void)
     Dims3 inputDims(3, 720, 1280);
     const char *output_count = "NMS_1";
 
-    g_net = detectNet::Create("SSD_Inception_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
-    // g_net = detectNet::Create("SSD_Mobilenet_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
-    //g_net = detectNet::Create(model, class_labels, thresh, input_blob, inputDims, output_blob, output_count); // load model from specific path
+    //g_net = detectNet::Create("SSD_Inception_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
+    //g_net = detectNet::Create("SSD_Mobilenet_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
+    g_net = detectNet::Create(model, class_labels, thresh, input_blob, inputDims, output_blob, output_count); // load model from specific path
     g_net->SetTracker(objectTrackerIOU::Create(min_frames, drop_frames, overlap_thresh));
 
     if (!g_net)

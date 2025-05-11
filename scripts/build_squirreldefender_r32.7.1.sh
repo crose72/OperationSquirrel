@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Set docker container build settings
-DOCKERFILE_PATH="../docker/Dockerfile.squirreldefender"       # Path to your Dockerfile
-IMAGE_NAME="crose72/jetpack-r36.4.0"  # Docker image name
+DOCKERFILE_PATH="../docker/Dockerfile.squirreldefender_r32.7.1"       # Path to your Dockerfile
+IMAGE_NAME="crose72/jetson-inference-r32.7.1"  # Docker image name
 IMAGE_TAG="squirreldefender"                          # Tag for the Docker image
 FULL_IMAGE_NAME="$IMAGE_NAME:$IMAGE_TAG"    # Full image name with tag
 

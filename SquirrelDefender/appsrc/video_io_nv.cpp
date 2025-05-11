@@ -34,6 +34,7 @@ videoOutput *output_vid_disp;
 uchar3 *g_image;
 float g_input_video_width;
 float g_input_video_height;
+float g_input_video_fps;
 
 /********************************************************************************
  * Calibration definitions
@@ -121,7 +122,7 @@ bool create_input_video_stream(void)
  ********************************************************************************/
 bool create_output_vid_stream(void)
 {
-    std::string base_path = "file:///home/crose72/Documents/GitHub/OperationSquirrel/SquirrelDefender/data/";
+    std::string base_path = "file:///home/crose72/workspaces/os-dev/OperationSquirrel/SquirrelDefender/data/";
     std::string base_name = "output";
     std::string extension = ".mp4";
     std::string file_name = generate_unique_file_name(base_name, extension);
@@ -273,8 +274,8 @@ bool display_video(void)
  ********************************************************************************/
 void calc_video_res(void)
 {
-    g_input_video_width = static_cast<float>(g_input->GetWidth());
-    g_input_video_height = static_cast<float>(g_input->GetHeight());
+    g_input_video_width = 1280.0; //static_cast<float>(g_input->GetWidth());
+    g_input_video_height = 720.0; //static_cast<float>(g_input->GetHeight());
     g_input_video_fps = 30;
 }
 
@@ -344,13 +345,14 @@ bool VideoNV::init(void)
     g_valid_image_rcvd = false;
     g_image = NULL;
 
-    calc_video_res(); // populate g_input_video_width, height 
-
     if (!create_input_video_stream() ||
         !create_output_vid_stream())
     {
         return false;
     }
+
+    // Call after initializing the video input to avoid seg fault
+    calc_video_res();
     
 #ifdef DEBUG_BUILD
     
@@ -362,7 +364,6 @@ bool VideoNV::init(void)
 
 
 #endif // DEBUG_BUILD
-
 
     return true;
 }

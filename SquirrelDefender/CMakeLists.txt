@@ -57,7 +57,7 @@ option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
-option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" ON)
+option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" OFF)
 option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" OFF)
 
 # Option to use environment variables for library paths
@@ -211,8 +211,10 @@ if(BLD_JETSON_B01)
     find_package(OpenCV REQUIRED)
     find_package(jetson-utils REQUIRED)
     find_package(jetson-inference REQUIRED)
-    message(STATUS "Attempting to find JetsonGPIO library...")
     find_library(JETSON_GPIO_LIB JetsonGPIO)
+    find_package(Armadillo REQUIRED)
+    find_package(LAPACK REQUIRED)
+    find_package(BLAS REQUIRED)
 elseif(BLD_JETSON_ORIN_NANO)
     find_package(CUDA REQUIRED)
     find_package(OpenCV REQUIRED)
@@ -369,7 +371,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/yolo)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/pid)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/timer)
 
-
 file(GLOB MAV_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/mav/*.cpp)
 file(GLOB MAV_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/mav/*.h)
 file(GLOB SERIAL_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/serial/*.cpp)
@@ -395,7 +396,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman)
 file(GLOB KF_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.cpp)
 file(GLOB KF_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.h)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt)
+if(BLD_JETSON_ORIN_NANO)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt)
+endif()
 
 #=============================================================================
 # Set SquirrelDefender Source files and locations
@@ -436,7 +439,10 @@ if (NOT BUILD_TEST_HARNESS)
                             ${JETSON_GPIO_LIB}
                             jetson-inference
                             jetson-utils
-                            jsoncpp)
+                            jsoncpp
+                            ${ARMADILLO_LIBRARIES} 
+                            ${LAPACK_LIBRARIES} 
+                            ${BLAS_LIBRARIES})
     elseif (BLD_JETSON_ORIN_NANO)
         cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
         set_target_debug_flags(squirreldefender)

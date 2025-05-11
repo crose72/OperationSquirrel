@@ -67,38 +67,6 @@ bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &g_image, cv::Rect 
 bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &g_image, cv::Rect &bounding_box);
 
 /********************************************************************************
- * Function: tracker_init
- * Description: Initialize the tracker by resetting the bounding box to zeros.
- ********************************************************************************/
-
-bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
-{
-    tracker->init(cv_image, bounding_box);
-
-    return true;
-}
-
-/********************************************************************************
- * Function: tracker_update
- * Description: Update the bounding box around the tracked target.
- ********************************************************************************/
-bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
-{
-    bool success;
-    try {
-        success = tracker->update(cv_image, bounding_box);
-        if (!success) {
-            std::cerr << "Tracking failed." << std::endl;
-        }
-    }
-    catch (const cv::Exception& e) {
-        std::cerr << "OpenCV error: " << e.what() << std::endl;
-    }
-
-    return success;
-}
-
-/********************************************************************************
  * Function: identify_target
  * Description: Determine which detected object to track.
  ********************************************************************************/
@@ -255,6 +223,38 @@ void validate_target(void)
     target_valid_prv = g_target_valid;
 }
 
+/* TODO: Make tracking work! */
+#ifdef TRACKING_WORKS
+/********************************************************************************
+ * Function: tracker_init
+ * Description: Initialize the tracker by resetting the bounding box to zeros.
+ ********************************************************************************/
+bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
+{
+    tracker->init(cv_image, bounding_box);
+
+    return true;
+}
+
+/********************************************************************************
+ * Function: tracker_update
+ * Description: Update the bounding box around the tracked target.
+ ********************************************************************************/
+bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
+{
+    bool success;
+    try {
+        success = tracker->update(cv_image, bounding_box);
+        if (!success) {
+            std::cerr << "Tracking failed." << std::endl;
+        }
+    }
+    catch (const cv::Exception& e) {
+        std::cerr << "OpenCV error: " << e.what() << std::endl;
+    }
+
+    return success;
+}
 /********************************************************************************
  * Function: track_target
  * Description: Use the bounding box provided by the detection model as the
@@ -340,8 +340,8 @@ void track_target(void)
 #error "Please define build platform."
 
 #endif // defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
-
 }
+#endif
 
 /********************************************************************************
  * Function: update_target_info
