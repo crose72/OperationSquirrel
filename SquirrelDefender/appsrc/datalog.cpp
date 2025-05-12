@@ -113,6 +113,7 @@ void write_headers(void)
                     "g_target_detection_conf",
                     "g_target_cntr_offset_x",
                     "g_target_cntr_offset_y",
+                    "g_target_cntr_offset_x_filt,"
                     "g_target_height",
                     "g_target_width",
                     "g_target_aspect",
@@ -219,6 +220,7 @@ void log_data(void)
                      std::to_string(g_target_detection_conf),
                      std::to_string(g_target_cntr_offset_x),
                      std::to_string(g_target_cntr_offset_y),
+                     std::to_string(g_target_cntr_offset_x_filt),
                      std::to_string(g_target_height),
                      std::to_string(g_target_width),
                      std::to_string(g_target_aspect),

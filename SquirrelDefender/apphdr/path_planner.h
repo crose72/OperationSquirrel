@@ -53,6 +53,7 @@ extern float g_yaw_target;
 extern float g_yaw_adjust;
 extern float g_mav_veh_yaw_adjusted;
 extern float g_yaw_target_error;
+extern float g_target_cntr_offset_x_filt;
 
 /********************************************************************************
  * Function prototypes

@@ -23,8 +23,11 @@ std::vector<float> g_mav_veh_pitch_arr;
 std::vector<float> g_target_valid_arr;
 std::vector<float> g_target_detection_id_arr;
 std::vector<float> g_target_track_id_arr;
+std::vector<float> g_detection_class_arr;
+std::vector<float> g_target_detection_conf_arr;
 std::vector<float> g_target_cntr_offset_x_arr;
 std::vector<float> g_target_cntr_offset_y_arr;
+std::vector<float> g_target_cntr_offset_x_filt_arr;
 std::vector<float> g_target_height_arr;
 std::vector<float> g_target_width_arr;
 std::vector<float> g_target_aspect_arr;
@@ -35,7 +38,7 @@ std::vector<float> g_target_bottom_arr;
 
 void init_test_inputs (void)
 {
-    test_inputs = "../test_data/follow_2.csv";
+    test_inputs = "../test_data/follow_2_playback.csv";
 
     // Create array of input signals for playback
     g_app_elapsed_time_arr = get_column_data<float>(test_inputs, "g_app_elapsed_time");
@@ -43,8 +46,11 @@ void init_test_inputs (void)
     g_target_valid_arr = get_column_data<float>(test_inputs, "g_target_valid");
     g_target_detection_id_arr = get_column_data<float>(test_inputs, "g_target_detection_id");
     g_target_track_id_arr = get_column_data<float>(test_inputs, "g_target_track_id");
+    g_detection_class_arr = get_column_data<float>(test_inputs, "g_detection_class");
+    g_target_detection_conf_arr = get_column_data<float>(test_inputs, "g_target_detection_conf");
     g_target_cntr_offset_x_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_x");
     g_target_cntr_offset_y_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_y");
+    //g_target_cntr_offset_x_filt_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_x_filt");
     g_target_height_arr = get_column_data<float>(test_inputs, "g_target_height");
     g_target_width_arr = get_column_data<float>(test_inputs, "g_target_width");
     g_target_aspect_arr = get_column_data<float>(test_inputs, "g_target_aspect");
@@ -90,8 +96,11 @@ void init_test_output (void)
                 << "g_target_valid,"
                 << "g_target_detection_id,"
                 << "g_target_track_id,"
+                << "g_detection_class,"
+                << "g_target_detection_conf,"
                 << "g_target_cntr_offset_x,"
                 << "g_target_cntr_offset_y,"
+                << "g_target_cntr_offset_x_filt,"
                 << "g_target_height,"
                 << "g_target_width,"
                 << "g_target_aspect,"
@@ -126,7 +135,6 @@ void init_test_output (void)
 
 void init_software_components (void)
 {
-
     // Initialize all inputs to the software component  
     Localize::init();
     PathPlanner::init();
@@ -140,8 +148,11 @@ void get_test_inputs (size_t data_index)
     g_target_valid = g_target_valid_arr[data_index];
     g_target_detection_id = g_target_detection_id_arr[data_index];
     g_target_track_id = g_target_track_id_arr[data_index];
+    g_detection_class = g_detection_class_arr[data_index];
+    g_target_detection_conf = g_target_detection_conf_arr[data_index];
     g_target_cntr_offset_x = g_target_cntr_offset_x_arr[data_index];
     g_target_cntr_offset_y = g_target_cntr_offset_y_arr[data_index];
+    //g_target_cntr_offset_x_filt = g_target_cntr_offset_x_filt_arr[data_index];
     g_target_height = g_target_height_arr[data_index];
     g_target_width = g_target_width_arr[data_index];
     g_target_aspect = g_target_aspect_arr[data_index];
@@ -161,6 +172,12 @@ void get_test_inputs (size_t data_index)
     g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
 }
 
+void run_loops (void)
+{
+    Localize::loop();
+    PathPlanner::loop();
+}
+
 void write_test_outputs (void)
 {
     // Write the latest values of global variables directly to the CSV
@@ -169,8 +186,11 @@ void write_test_outputs (void)
                 << g_target_valid << ","
                 << g_target_detection_id << ","
                 << g_target_track_id << ","
+                << g_detection_class << ","
+                << g_target_detection_conf << ","
                 << g_target_cntr_offset_x << ","
                 << g_target_cntr_offset_y << ","
+                << g_target_cntr_offset_x_filt << ","
                 << g_target_height << ","
                 << g_target_width << ","
                 << g_target_aspect << ","
@@ -210,12 +230,6 @@ void save_test_output (void)
     std::cout << "Processing complete. Results saved to" << test_unique_output_file_name << ".csv\n";
 }
 
-void run_loops (void)
-{
-    Localize::loop();
-    PathPlanner::loop();
-}
-
 void setup(void)
 {
     init_test_inputs();
@@ -240,7 +254,7 @@ void run(void)
         }
     }
 
-    //save_test_output();
+    save_test_output();
 }
 
 /********************************************************************************

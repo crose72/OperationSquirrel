@@ -36,5 +36,5 @@
  ********************************************************************************/
 float low_pass_filter(float x, float x_prev, float alpha) 
 {
-    return alpha * x + ((float)1.0 - alpha) * x_prev;
+    return ((float)1.0 - alpha) * x + alpha * x_prev;
 }
