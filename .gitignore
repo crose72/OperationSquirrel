@@ -5,6 +5,5 @@
 /.vscode
 /.vs
 /SquirrelDefender/data
-/SquirrelDefender/out/
-/SquirrelDefender/build*
-/build*
+/SquirrelDefender/test_data
+**/build*/
