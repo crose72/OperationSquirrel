@@ -5,6 +5,41 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "SquirrelDefender Orin",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/workspace/OperationSquirrel/SquirrelDefender/build/squirreldefender",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "/workspace/OperationSquirrel/SquirrelDefender/build",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set source path",
+                    "text": "directory /workspace/OperationSquirrel/SquirrelDefender",
+                    "ignoreFailures": false
+                }
+            ],
+            "preLaunchTask": "SquirrelDefender Orin: Build",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "pipeTransport": {
+                "pipeCwd": "${workspaceFolder}",
+                "pipeProgram": "docker",
+                "pipeArgs": ["exec", "-i", "squirreldefender-dev", "/usr/bin/gdb", "--interpreter=mi"],
+                "debuggerPath": "/usr/bin/gdb"
+            },
+            "sourceFileMap": {
+                "/workspace/OperationSquirrel/SquirrelDefender": "${workspaceFolder}/SquirrelDefender"
+            }
+        },
+        {
             "name": "Path Planner: Debug Example",
             "type": "cppdbg",
             "request": "launch",
