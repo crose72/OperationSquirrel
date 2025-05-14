@@ -27,7 +27,6 @@ std::vector<float> g_detection_class_arr;
 std::vector<float> g_target_detection_conf_arr;
 std::vector<float> g_target_cntr_offset_x_arr;
 std::vector<float> g_target_cntr_offset_y_arr;
-std::vector<float> g_target_cntr_offset_x_filt_arr;
 std::vector<float> g_target_height_arr;
 std::vector<float> g_target_width_arr;
 std::vector<float> g_target_aspect_arr;
@@ -50,7 +49,6 @@ void init_test_inputs (void)
     g_target_detection_conf_arr = get_column_data<float>(test_inputs, "g_target_detection_conf");
     g_target_cntr_offset_x_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_x");
     g_target_cntr_offset_y_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_y");
-    //g_target_cntr_offset_x_filt_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_x_filt");
     g_target_height_arr = get_column_data<float>(test_inputs, "g_target_height");
     g_target_width_arr = get_column_data<float>(test_inputs, "g_target_width");
     g_target_aspect_arr = get_column_data<float>(test_inputs, "g_target_aspect");
@@ -101,6 +99,7 @@ void init_test_output (void)
                 << "g_target_cntr_offset_x,"
                 << "g_target_cntr_offset_y,"
                 << "g_target_cntr_offset_x_filt,"
+                << "g_target_cntr_offset_y_filt,"
                 << "g_target_height,"
                 << "g_target_width,"
                 << "g_target_aspect,"
@@ -130,7 +129,8 @@ void init_test_output (void)
                 << "g_vx_target_ekf,"
                 << "g_vy_target_ekf,"
                 << "g_ax_target_ekf,"
-                << "g_ay_target_ekf\n";
+                << "g_ay_target_ekf,"
+                << "g_target_data_useful\n";
 }
 
 void init_software_components (void)
@@ -152,7 +152,6 @@ void get_test_inputs (size_t data_index)
     g_target_detection_conf = g_target_detection_conf_arr[data_index];
     g_target_cntr_offset_x = g_target_cntr_offset_x_arr[data_index];
     g_target_cntr_offset_y = g_target_cntr_offset_y_arr[data_index];
-    //g_target_cntr_offset_x_filt = g_target_cntr_offset_x_filt_arr[data_index];
     g_target_height = g_target_height_arr[data_index];
     g_target_width = g_target_width_arr[data_index];
     g_target_aspect = g_target_aspect_arr[data_index];
@@ -191,6 +190,7 @@ void write_test_outputs (void)
                 << g_target_cntr_offset_x << ","
                 << g_target_cntr_offset_y << ","
                 << g_target_cntr_offset_x_filt << ","
+                << g_target_cntr_offset_y_filt << ","
                 << g_target_height << ","
                 << g_target_width << ","
                 << g_target_aspect << ","
@@ -220,7 +220,8 @@ void write_test_outputs (void)
                 << g_vx_target_ekf << ","
                 << g_vy_target_ekf << ","
                 << g_ax_target_ekf << ","
-                << g_ay_target_ekf << "\n";
+                << g_ay_target_ekf << ","
+                << g_target_data_useful << "\n";
 }
 
 void save_test_output (void)

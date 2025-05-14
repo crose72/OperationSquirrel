@@ -43,7 +43,9 @@ float g_mav_veh_yaw_prv;
 float g_yaw_target_error;
 float g_mav_veh_yaw_adjusted;
 float g_target_cntr_offset_x_filt;
+float g_target_cntr_offset_y_filt;
 float target_cntr_offset_x_prv;
+float target_cntr_offset_y_prv;
 
 /********************************************************************************
  * Calibration definitions
@@ -174,11 +176,10 @@ void calc_follow_error(void)
     float filter_coeff = plan_params.get_float_param("Detection_tracking", "BBox_Filt_Coeff");
 
     g_target_cntr_offset_x_filt = low_pass_filter(g_target_cntr_offset_x, target_cntr_offset_x_prv, filter_coeff);
-    target_cntr_offset_x_prv = g_target_cntr_offset_x_filt;
-
-    if (g_target_loc_data_ok)
+    g_target_cntr_offset_y_filt = low_pass_filter(g_target_cntr_offset_y, target_cntr_offset_y_prv, filter_coeff);
+  
+    if (g_target_data_useful)
     {
-
         if (g_target_cntr_offset_x_filt < (float)(-50.0))
         {
             g_x_error = g_target_cntr_offset_x_filt;
@@ -194,17 +195,20 @@ void calc_follow_error(void)
         
         if (g_target_cntr_offset_y < (float)(-50.0))
         {
-            g_y_error = g_target_cntr_offset_x;
+            g_y_error = g_target_cntr_offset_y_filt;
         }
         else if (g_target_cntr_offset_y < (float)50.0)
         {
-            g_y_error = g_target_cntr_offset_y;
+            g_y_error = g_target_cntr_offset_y_filt;
         }
         else
         {
             g_y_error = (float)0.0;
         }
     }
+
+    target_cntr_offset_x_prv = g_target_cntr_offset_x_filt;
+    target_cntr_offset_y_prv = g_target_cntr_offset_y_filt;
 }
 
 /*
@@ -326,8 +330,8 @@ void dtrmn_follow_vector(void)
 {
     g_target_too_close = (g_x_error < 0.0);
 
-    /*
-    if (g_target_valid && g_target_too_close)
+    
+    /*if (g_target_valid && g_target_too_close)
     {
         g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
                                               g_x_error, 0.0, 0.0,
@@ -339,9 +343,8 @@ void dtrmn_follow_vector(void)
                                     g_yaw_target_error, 0.0, 0.0,
                                     w1_yaw, 0.0, 0.0, ControlDim::YAW, g_dt);
     }
-    else
-    */
-    if (g_target_valid && !g_target_too_close)
+    else*/
+    if (g_target_valid && g_target_data_useful)
     {
         g_vx_adjust = pid_forwd.pid3(Kp_x, Ki_x, Kd_x,
                                             g_x_error, 0.0, 0.0,
@@ -381,22 +384,24 @@ PathPlanner::~PathPlanner(void) {};
 bool PathPlanner::init(void)
 {
     g_target_too_close = false;
-    g_x_error = 0.0;
-    g_y_error = 0.0;
-    g_vx_adjust = 0.0;
-    g_vy_adjust = 0.0;
-    g_vz_adjust = 0.0;
-    g_yaw_target = 0.0;
-    yaw_initial = 0.0;
+    g_x_error = (float)0.0;
+    g_y_error = (float)0.0;
+    g_vx_adjust = (float)0.0;
+    g_vy_adjust = (float)0.0;
+    g_vz_adjust = (float)0.0;
+    g_yaw_target = (float)0.0;
+    yaw_initial = (float)0.0;
     yaw_initial_latched = false;
-    max_yaw = 0.0;
-    min_yaw = 0.0;
-    g_yaw_adjust = 0.0;
-    g_mav_veh_yaw_prv = 0.0;
-    g_yaw_target_error = 0.0;
-    g_mav_veh_yaw_adjusted = 0.0;
+    max_yaw = (float)0.0;
+    min_yaw = (float)0.0;
+    g_yaw_adjust = (float)0.0;
+    g_mav_veh_yaw_prv = (float)0.0;
+    g_yaw_target_error = (float)0.0;
+    g_mav_veh_yaw_adjusted = (float)0.0;
     g_target_cntr_offset_x_filt = (float)0.0;
+    g_target_cntr_offset_y_filt = (float)0.0;
     target_cntr_offset_x_prv = (float)0.0;
+    target_cntr_offset_y_prv = (float)0.0;
 
     get_control_params();
 

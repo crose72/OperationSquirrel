@@ -38,7 +38,7 @@ extern float g_mav_veh_yawspeed;
 extern bool g_use_video_playback;
 extern float g_target_cntr_offset_y;
 extern float g_target_cntr_offset_x;
-extern bool g_target_loc_data_ok;
+extern bool g_target_data_useful;
 
 /********************************************************************************
  * Exported objects
@@ -54,6 +54,7 @@ extern float g_yaw_adjust;
 extern float g_mav_veh_yaw_adjusted;
 extern float g_yaw_target_error;
 extern float g_target_cntr_offset_x_filt;
+extern float g_target_cntr_offset_y_filt;
 
 /********************************************************************************
  * Function prototypes

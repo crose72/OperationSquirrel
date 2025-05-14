@@ -62,7 +62,7 @@ extern float g_vx_target_ekf;
 extern float g_vy_target_ekf;
 extern float g_ax_target_ekf;
 extern float g_ay_target_ekf;
-extern bool g_target_loc_data_ok;
+extern bool g_target_data_useful;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

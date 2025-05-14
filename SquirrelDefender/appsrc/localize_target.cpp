@@ -46,7 +46,7 @@ float y_target_prv;
 bool y_target_hyst_actv;
 float y_target_latched;
 bool loc_target_valid_prv;
-bool g_target_loc_data_ok;
+bool g_target_data_useful;
 float loc_target_center_x_prv;
 float loc_target_center_y_prv;
 float g_x_target_ekf;
@@ -151,7 +151,7 @@ void update_target_location(void);
  ********************************************************************************/
 void dtrmn_target_loc_data_ok(void) 
 {
-    g_target_loc_data_ok = (g_target_valid && 
+    g_target_data_useful = (g_target_valid && 
         (!(g_target_center_x < 50.0 || g_target_center_x > 670) && 
         !(g_target_center_y < 50.0 || g_target_center_x > 1230) && 
         !((g_target_width * g_target_height) < 3500.0)));
@@ -174,7 +174,7 @@ void dtrmn_target_location(void)
     float delta_d;
     float target_bounding_box_rate;
 
-    if (g_target_loc_data_ok)
+    if (g_target_data_useful)
     {
         /* Calculate distance from camera offset */
         d_idx_h = get_float_index(g_target_height, &height_index[0], MAX_IDX_D_HEIGHT, false);
@@ -264,7 +264,7 @@ void dtrmn_target_location(void)
  ********************************************************************************/
 void update_target_location(void) 
 {
-    if (g_target_loc_data_ok && g_dt > 0.0001)
+    if (g_target_data_useful && g_dt > 0.0001)
     {
         // Measurement vector (observations)
         colvec z(2);
@@ -328,7 +328,7 @@ bool Localize::init(void)
     g_vx_target_ekf = 0.0;
     g_vy_target_ekf = 0.0;
 
-    g_target_loc_data_ok = false;
+    g_target_data_useful = false;
 
     // KF init
     float dt = 0.05;  // Time step

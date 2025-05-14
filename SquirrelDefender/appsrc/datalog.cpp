@@ -114,6 +114,7 @@ void write_headers(void)
                     "g_target_cntr_offset_x",
                     "g_target_cntr_offset_y",
                     "g_target_cntr_offset_x_filt,"
+                    "g_target_cntr_offset_y_filt,"
                     "g_target_height",
                     "g_target_width",
                     "g_target_aspect",
@@ -132,7 +133,7 @@ void write_headers(void)
                     "g_vy_target_ekf",
                     "g_ax_target_ekf",
                     "g_ay_target_ekf",
-                    "g_target_loc_data_ok",
+                    "g_target_data_useful",
                     "d_target",
                     "g_x_error",
                     "g_y_error",
@@ -221,6 +222,7 @@ void log_data(void)
                      std::to_string(g_target_cntr_offset_x),
                      std::to_string(g_target_cntr_offset_y),
                      std::to_string(g_target_cntr_offset_x_filt),
+                     std::to_string(g_target_cntr_offset_y_filt),
                      std::to_string(g_target_height),
                      std::to_string(g_target_width),
                      std::to_string(g_target_aspect),
@@ -239,7 +241,7 @@ void log_data(void)
                      std::to_string(g_vy_target_ekf),
                      std::to_string(g_ax_target_ekf),
                      std::to_string(g_ay_target_ekf),
-                     std::to_string(g_target_loc_data_ok),
+                     std::to_string(g_target_data_useful),
                      std::to_string(d_target),
                      std::to_string(g_x_error),
                      std::to_string(g_y_error),
