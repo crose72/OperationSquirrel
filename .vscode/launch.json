@@ -1,0 +1,29 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Path Planner: Debug Example",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/scratch/modules-example/SquirrelDefender/path_planner/build/path_planner_example",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/scratch/modules-example/SquirrelDefender/path_planner",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Path Planner: Build Example",
+            "miDebuggerPath": "/usr/bin/gdb"
+        }
+    ]
+}
