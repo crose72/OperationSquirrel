@@ -88,11 +88,3 @@ make -j6       # Build all targets
 # Run the tests
 ./path_planner_test
 ```
-
-## VSCode integration
-
-Using the VSCode "Run and Debug" tool, you can select from the following
-
-1. Debug Example : build debug target `/examples/src/path_planner_example.cpp`
-
-2. Debug Tests : build debug target `/tests/src/test_path_planner.cpp`
