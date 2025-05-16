@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Set variables
-USER_NAME=$(whoami)
-
 # Default display
 DISPLAY_NUM="0"
 
@@ -27,6 +24,8 @@ for arg in "$@"; do
     fi
 done
 
+# Set script variables
+USER_NAME=$(whoami)
 WORKSPACE_PATH="/home/$USER_NAME/workspaces/os-dev"
 XPROFILE_PATH="/home/$USER_NAME/.xprofile"
 BASHRC_PATH="/home/$USER_NAME/.bashrc"
@@ -38,9 +37,9 @@ ENGINE_FILE=".$SCRIPT_DIR/../SquirrelDefender/networks/yolov8s/yolov8s.engine.Or
 
 # 1. Add user to docker
 # Note: commented out, doesn't work in script apparently
-#sudo usermod -aG docker $USER && newgrp docker
+# sudo usermod -aG docker $USER && newgrp docker
 
-# 2. Create or update .xprofile
+# 2. Create or update .xprofile (allows the containers access to the camera and display)
 echo "Creating ~/.xprofile..."
 cat <<EOF > "$XPROFILE_PATH"
 export DISPLAY=:0
@@ -48,7 +47,7 @@ xhost +
 EOF
 chmod +x "$XPROFILE_PATH"
 
-# 3. Update .bashrc
+# 3. Update .bashrc (set environment variables used by the containers)
 
 grep -qxF "export DISPLAY=:$DISPLAY_NUM" "$BASHRC_PATH" || echo "export DISPLAY=:$DISPLAY_NUM" >> "$BASHRC_PATH"
 grep -qxF "export OS_WS=$WORKSPACE_PATH" "$BASHRC_PATH" || echo "export OS_WS=$WORKSPACE_PATH" >> "$BASHRC_PATH"
@@ -57,7 +56,7 @@ echo "Appended to .bashrc:"
 echo "  export DISPLAY=:$DISPLAY_NUM"
 echo "  export OS_WS=$WORKSPACE_PATH"
 
-# 3. Create squirreldefender.service
+# 4. Create squirreldefender.service (runs the squirreldefender container)
 echo "Creating squirreldefender.service for Jetson: $JETSON_TYPE"
 cat <<EOF | sudo tee "$SQUIRRELDEFENDER_SERVICE" > /dev/null
 [Unit]
@@ -79,7 +78,7 @@ User=root
 WantedBy=multi-user.target
 EOF
 
-# 4. Create the clock skew fix script
+# 5. Create the clock skew fix script (makes it possible to compile code when the jetson is not conneceted to wifi)
 echo "Creating clock-skew-fix.sh..."
 cat <<EOF | sudo tee "$CLOCK_FIX_SCRIPT" > /dev/null
 #!/bin/bash
@@ -94,7 +93,7 @@ fi
 EOF
 sudo chmod +x "$CLOCK_FIX_SCRIPT"
 
-# 5. Create the clock-skew-fix.service
+# 6. Create the clock-skew-fix.service (run the clock skew fix script)
 echo "Creating clock-skew-fix.service..."
 cat <<EOF | sudo tee "$CLOCK_FIX_SERVICE" > /dev/null
 [Unit]
@@ -109,25 +108,30 @@ ExecStart=$CLOCK_FIX_SCRIPT
 WantedBy=multi-user.target
 EOF
 
-# 6. Create build folder and copy engine file
+# 7. Create build folder and copy engine file ()
 echo "Ensuring build directory exists at $BUILD_DIR..."
 mkdir -p "$BUILD_DIR"
 
-echo "Copying engine file to build directory..."
-if [ -f "$ENGINE_FILE" ]; then
-    cp "$ENGINE_FILE" "$BUILD_DIR/"
-    echo "Copied: $(basename "$ENGINE_FILE")"
-else
-    echo "Warning: Engine file not found at $ENGINE_FILE"
+# Only the orin needs the engine file moved into the build folder
+if [[ "$JETSON_TYPE" == "orin" ]]; then
+    echo "Copying engine file to build directory..."
+    if [ -f "$ENGINE_FILE" ]; then
+        cp "$ENGINE_FILE" "$BUILD_DIR/"
+        echo "Copied: $(basename "$ENGINE_FILE")"
+    else
+        echo "Warning: Engine file not found at $ENGINE_FILE"
+    fi
 fi
 
-# 7. Enable the systemd services
-sudo systemctl enable squirreldefender.service
+# 8. Enable the systemd services
+# sudo systemctl enable squirreldefender.service # allow users to enable the program when they want
 sudo systemctl enable clock-skew-fix.service
 
-# 8. Configure the camera
+# 9. Configure the camera
 sudo /opt/nvidia/jetson-io/jetson-io.py
 
-# Done
-echo "All files created. All services should be enabled now if the script
-wasn't successfull."
+# 10. Final steps
+echo "To complete the setup: 
+    source ~/.bashrc
+    chmod +x ~/.xprofile
+    sudo reboot now"

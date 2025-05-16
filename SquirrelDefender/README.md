@@ -61,8 +61,18 @@ cd ~/workspaces/os-dev
 
 # Clone the repository
 git clone https://github.com/crose72/OperationSquirrel.git --recursive
+
+# Add the user to docker
+sudo usermod -aG docker $USER && newgrp docker
+
+# Go to and execute the setup script
 cd OperationSquirrel/scripts
 ./setup_squirreldefender.sh --jetson=orin # for the Orin nano, --jetson=b01 for the B01 nano
+
+# This setup script will execute a python script that will allow you to configure your csi camera.
+# It will prompt you to reboot the jetson for the changes to take effect.  Choose to exit without
+# rebooting.  If you choose to reboot, make sure you follow the next steps to source the bashrc 
+# file and make the xprofile executable.
 
 # Source .bashrc file (reset)
 source ~/.bashrc
@@ -70,10 +80,14 @@ source ~/.bashrc
 # Make .xprofile executable
 chmod +x ~/.xprofile
 
+# Reboot the jetson (if you didn't accidentally reboot when configuring the camera)
+sudo reboot now
+
 # Run the container
+cd ~/workspaces/os-dev/OperationSquirrel/scripts
 ./scripts/run_dev_orin.sh
 
-# Test the camera inside the container
+# Test the camera inside the container (sanity check before testing squirreldefender)
 nvgstcapture-1.0
 ```
 
@@ -103,73 +117,31 @@ make -j$(nproc)
 
 If you don't need to change the code and just want to run the precompiled program then you can just do the setup and run `./run_squirreldefender_orin.sh` or `./run_squirreldefender_b01.sh` to run the program for your Jetson.  The purpose of this container is to be deployed onto your drone or other autonomous vehicle since the only thing that it does is run the pre-compiled binary that you created using the dev container from the previous step.
 
-If you want to have the program run as soon as you power on the jetson (for example when your jetson is mounted on your drone and you plug in the battery to your jetson) then you need to add a systemd service and do a couple other things.  First enable xserver and display access for the container by default when you power on the jetson by adding it to your `.xprofile`.  
-
-If you followed the instructions in the setup then these steps have already been completed for you.  If you want to do them manually then the instructions are below.  Run these outside of the container:
-
-Create `.xprofile`
-
-```
-sudo nano ~/.xprofile
-
-# And then add these lines to it
-export DISPLAY=:0
-xhost +
-
-# And make it executable
-chmod +x ~/.xprofile 
-```
-
-Create `squirreldefender.service`
-
-```
-# Create a .service file (one is already included in this folder so you can just copy that)
-sudo nano /etc/systemd/system/squirreldefender.service
-
-# Add this to the file
-
-    [Unit]fender program
-    After=network.target nvargus-daemon.service graphical.target multi-user.target
-    Wants=graphical.target
-
-    [Service]
-    Environment="OS_WS=/home/<user>/workspaces/os-dev"
-    Restart=off
-    ExecStartPre=/bin/bash -c 'sleep 5'
-    ExecStart=/bin/bash /home/<user>/workspaces/os-dev/OperationSquirrel/scripts/run_squirreldefender_<jetson-type>.sh
-    ExecStop=/usr/bin/docker stop squirreldefender
-    StandardOutput=journal
-    StandardError=journal
-    User=root
-
-    [Install]
-    WantedBy=multi-user.target  
-```
-
-where `<jetson-type>` is `orin` or `b01`.
-
-Enable and start the systemd service you just created
+If you want to have the program run as soon as you power on the jetson (for example when your jetson is mounted on your drone and you plug in the battery to your jetson) then you need to do the setup, and then enable the `squirreldefender.service` by doing
 
 ```
 sudo systemctl enable squirreldefender.service
-sudo systemctl start squirreldefender.service
 ```
 
-Now your squirreldefender program should start running, and if your jetson is connected to the drone or the simulation on your laptop via FTDI they you'll see some action.  You can also stop, restart, or check the status of the program by using those commands if you need to troubleshoot.  These steps also mean that as soon as you power on your jetson this program will start running unless you disable it or stop it manually.  Log files from this release container are stored in `~/logs` by default.
+Now your squirreldefender program should start running every time your jetson is powered on (until you disable the service), and if your jetson is connected to the drone or the simulation on your laptop via FTDI they you'll see some action.  You can also stop, restart, or check the status of the program by using those commands if you need to troubleshoot.  These steps also mean that as soon as you power on your jetson this program will start running unless you disable it or stop it manually.  Log files from this release container are stored in `~/logs` by default.
 
 Some additional useful commands
 
 ```
-# Some useful commands
-
 # Save the file and reload the daemon
 sudo systemctl daemon-reload
 
-# Enable the service
+# Enable the service on startup
 sudo systemctl enable squirreldefender.service
+
+# Disable the service on startup
+sudo systemctl disable squirreldefender.service
 
 # Start the service
 sudo systemctl start squirreldefender.service
+
+# Stop the service
+sudo systemctl stop squirreldefender.service
 
 # Restart the service
 sudo systemctl restart squirreldefender.service
@@ -180,20 +152,22 @@ sudo systemctl status squirreldefender.service
 
 ### Quickly deploying code changes to the drone:
 
-Let's say you're at the park with your jetson and your drone, and you want to try out different PID gains on the follow algorithm in real life.  Or maybe you want to change the follow distance, or test out some other code changes on the real drone.  How can you make a change to the code, recompile, and update the release container, and then just power the jetson and fly?  Here's how
+Let's say you're at the park with your jetson and your drone, and you want to try out different PID gains on the follow algorithm in real life.  Or maybe you want to change the follow distance, or test out some other code changes on the real drone.  How can you make a change to the code, recompile, and update the release container, and then just power the jetson and fly?
 
-1. Modify the code using the dev container (follow instructions above)
+***Remember to disconnect the uart wires or disconnect the battery from the drone so that the props don't start spinning when you're not ready (if squirreldefender.service is active and started/restarts when you power on the jetson then it will send the command to arm the drone and takeoff so you don't want it near you when that happens)
+
+1. Stop squirreldefender service
+    - `sudo systemctl stop squirreldefender.service`
+2. Modify the code using the dev container (follow instructions above)
     - Execute `./scripts/run_dev_<jetson-type>.sh`
     - Make changes to the code
     - Recompile the code
-2. Build the SquirrelDefender container
+3. Build the SquirrelDefender container
     - Execute `./scripts/build_squirreldefender_<release for your jetson>.sh`
-    - (Choose N if you don't need to push the container to docker hub - since you're at the park I don't think you do, or choose Y if you are ready to push it to docker hub)
-3. Make sure you've followed the instructions above for the release container to have the container execute when the jetson powers up
-    - Stop the squirreldefender service before making changes (instructions above)
-    - Start the squirreldefender service whem you're ready to fly again (instructions above)
+    - (Choose N if you don't need to push the container to docker hub - since you're at the park I don't think you do)
+4. Enable the squirreldefender service (if not already enabled)
+    - `sudo systemctl enable squirreldefender.service`
 
-***Remember to disconnect the uart wires or disconnect the battery from the drone so that the props don't start spinning when you're not ready (if squirreldefender.service is active and started/restarts when you power on the jetson then it will send the command to arm the drone and takeoff so you don't want it near you when that happens)
 
 #### Clock skew error when Jetson no longer has wifi connection
 
