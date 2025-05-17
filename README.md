@@ -61,3 +61,40 @@ If you want to understand how the software is written and the flow, look at `doc
 - Follow the instructions in [02-Connecting-to-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/02-Connecting-to-SITL.md) to control the simulated drone with your Jetson
 - (Optional) Follow the instructions in [03-Setting-up-AirSim-with-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/03-Setting-up-AirSim-with-SITL.md) to setup a photo-realistic simulation
 - Follow the instruction in [Pre-Flight Checklist](https://github.com/crose72/OperationSquirrel/blob/dev/docs/Pre-Flight-Checklist.md) if you're ready to fly a drone autonomously
+
+## Getting Started w Development
+
+### Prerequisites
+- CMake 3.10 or higher
+- C++17 compatible compiler
+- VSCode / Cursor 
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for development environment setup
+
+## VSCode IDE Development environment
+- to use VScode's run & debug, and type hinting / docstring helpers..
+- install the recomended extensions (.vscode/extensions.json)
+- install the clangd language server (instructions below)
+- Ctrl+shft+p; clangd: restart language server & Developer: Reload window
+- ... you should now see hints as you move the cursor through project sources
+- start the development container (ie: run_dev_orin.sh)
+- navigate to the "Run & Debug" tool panel in VSCode, select the target & press play!
+
+### Installing clangd
+```bash
+# Ubuntu/Debian
+sudo apt install clangd
+
+# macOS
+brew install llvm
+ln -s "$(brew --prefix llvm)/bin/clangd" /usr/local/bin/clangd
+
+# Windows
+# Install via LLVM's official installer: https://releases.llvm.org/
+```
+
+### IDE Setup
+1. Install the "clangd" extension in VSCode
+2. Generate compile_commands.json:
+```bash
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+```

@@ -7,3 +7,14 @@
 /SquirrelDefender/data
 /SquirrelDefender/test_data
 **/build*/
+**/.cache/
+
+# Clangd
+.clangd/
+.clang-tidy
+.clang-format
+compile_commands.json
+*.clangd
+*.clang-tidy
+*.clang-format
+verbose
