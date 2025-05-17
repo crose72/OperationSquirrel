@@ -1,16 +1,16 @@
 {
     "Vel_PID_x": {
-        "Kp": 0.5,
-        "Ki": 0.009,
-        "Kd": 0.1,
+        "Kp": 0.007,
+        "Ki": 0.00009,
+        "Kd": 0.001,
         "w1": 1.0,
         "w2": 0.0,
         "w3": 0.0
     },
     "Vel_PID_y": {
-        "Kp": 0.03,
+        "Kp": 0.0006,
         "Ki": 0.0,
-        "Kd": 0.001,
+        "Kd": 0.00001,
         "w1": 1.0,
         "w2": 0.0,
         "w3": 0.0
@@ -24,18 +24,18 @@
         "w3": 0.0
     },
     "Vel_PID_x_reverse": {
-        "Kp": 0.25,
-        "Ki": 0.0,
-        "Kd": 0.0,
-        "w1": 0.0,
+        "Kp": 0.0025,
+        "Ki": 0.00009,
+        "Kd": 0.001,
+        "w1": 1.0,
         "w2": 0.0,
         "w3": 0.0
     },
     "Vel_PID_y_reverse": {
-        "Kp": 0.03,
+        "Kp": 0.0006,
         "Ki": 0.0,
-        "Kd": 0.0,
-        "w1": 0.0,
+        "Kd": 0.00001,
+        "w1": 1.0,
         "w2": 0.0,
         "w3": 0.0
     },
@@ -48,7 +48,7 @@
         "w3": 0.0
     },
     "Yaw_PID": {
-        "Kp": 0.08,
+        "Kp": 0.1,
         "Ki": 0.0,
         "Kd": 0.00005,
         "w1": 1.0,
@@ -58,7 +58,7 @@
     "Target": {
         "Desired_Height": 640.0,
         "Desired_Width": 150.0,
-        "Desired_X_offset": 4.0,
+        "Desired_X_offset": 11.0,
         "Desired_Y_offset": 0.0,
         "Desired_Z_offset": 0.0
     },
@@ -72,6 +72,7 @@
         "Allow_gpu_fallback": false,
         "Min_Frames": 25,
         "Drop_Frames": 10,
-        "Overlap_Threshold": 0.1
+        "Overlap_Threshold": 0.1,
+        "BBox_Filt_Coeff": 0.85
     }
 }

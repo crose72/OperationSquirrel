@@ -50,7 +50,6 @@ float target_cntr_offset_y_prv;
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-// Eventually these should all be 
 /* x forward */
  float Kp_x = 0.5f;
  float Ki_x = 0.009f;
@@ -193,11 +192,11 @@ void calc_follow_error(void)
             g_x_error = (float)0.0;
         }
         
-        if (g_target_cntr_offset_y < (float)(-50.0))
+        if (g_target_cntr_offset_y_filt < (float)(-50.0))
         {
             g_y_error = g_target_cntr_offset_y_filt;
         }
-        else if (g_target_cntr_offset_y < (float)50.0)
+        else if (g_target_cntr_offset_y_filt > (float)50.0)
         {
             g_y_error = g_target_cntr_offset_y_filt;
         }
@@ -288,7 +287,7 @@ void calc_yaw_target_error(void)
     // Corrections for when yaw changes signs
     float abs_yaw_target = 0.0;
 
-    if ((g_yaw_target + g_mav_veh_yaw) < -PI)
+    if ((g_yaw_target + g_mav_veh_yaw) < - PI)
     {
         abs_yaw_target = PI - (std::abs(g_yaw_target) - PI);
     }
@@ -331,11 +330,11 @@ void dtrmn_follow_vector(void)
     g_target_too_close = (g_x_error < 0.0);
 
     
-    /*if (g_target_valid && g_target_too_close)
+    if (g_target_valid && g_target_data_useful && g_target_too_close && g_x_target_ekf >= (float)3.0)
     {
         g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                              g_x_error, 0.0, 0.0,
-                                              w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
+                                    g_x_error, 0.0, 0.0,
+                                    w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
         g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
                                     g_y_error, 0.0, 0.0,
                                     w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
@@ -343,24 +342,23 @@ void dtrmn_follow_vector(void)
                                     g_yaw_target_error, 0.0, 0.0,
                                     w1_yaw, 0.0, 0.0, ControlDim::YAW, g_dt);
     }
-    else*/
-    if (g_target_valid && g_target_data_useful)
+    if (g_target_valid && g_target_data_useful && g_x_target_ekf >= (float)3.0)
     {
         g_vx_adjust = pid_forwd.pid3(Kp_x, Ki_x, Kd_x,
-                                            g_x_error, 0.0, 0.0,
-                                            w1_x, 0.0, 0.0, ControlDim::X, g_dt);
+                                    g_x_error, 0.0, 0.0,
+                                    w1_x, 0.0, 0.0, ControlDim::X, g_dt);
         g_vy_adjust = pid_forwd.pid3(Kp_y, Ki_y, Kd_y,
-                                            g_y_error, 0.0, 0.0,
-                                            w1_y, 0.0, 0.0, ControlDim::Y, g_dt);
+                                    g_y_error, 0.0, 0.0,
+                                    w1_y, 0.0, 0.0, ControlDim::Y, g_dt);
         g_yaw_adjust = pid_yaw.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
                                     g_yaw_target_error, 0.0, 0.0,
                                     w1_yaw, 0.0, 0.0, ControlDim::YAW, g_dt);
     }
     else
     {
-        g_vx_adjust = 0.0f;
-        g_vy_adjust = 0.0f;
-        g_yaw_adjust = 0.0f;
+        g_vx_adjust = (float)0.0;
+        g_vy_adjust = (float)0.0;
+        g_yaw_adjust = (float)0.0;
     }
 }
 
