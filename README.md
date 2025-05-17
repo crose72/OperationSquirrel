@@ -68,7 +68,6 @@ If you want to understand how the software is written and the flow, look at `doc
 - CMake 3.10 or higher
 - C++17 compatible compiler
 - VSCode / Cursor 
-- See [CONTRIBUTING.md](CONTRIBUTING.md) for development environment setup
 
 ## VSCode IDE Development environment
 - to use VScode's run & debug, and type hinting / docstring helpers..
