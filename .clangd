@@ -1,0 +1,16 @@
+CompileFlags:
+  Add: [-std=c++17]
+  Remove: [-W*]
+  Add: [-Wall, -Wextra]
+
+Diagnostics:
+  ClangTidy:
+    Add: [performance-*, modernize-*]
+    Remove: [modernize-use-trailing-return-type]
+
+Index:
+  Background: Build
+  StandardLibrary: Yes
+
+Hover:
+  ShowAKA: Yes 
