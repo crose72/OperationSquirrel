@@ -37,6 +37,7 @@ extern bool controller_initialiazed;
 extern uint32_t g_mav_veh_custom_mode;
 extern uint32_t g_mav_veh_custom_mode_prv;
 extern bool g_use_video_playback;
+extern bool g_end_of_video;
 extern bool g_stop_program;
 
 /********************************************************************************

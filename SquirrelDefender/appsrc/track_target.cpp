@@ -28,8 +28,10 @@ bool target_tracked;
 bool tracking;
 bool initialized_cv_image;
 bool initialized_tracker;
-bool g_target_valid;
+float target_detection_thresh;
+float target_class;
 bool target_valid_prv;
+bool g_target_valid;
 int g_target_detection_id;
 int g_target_track_id;
 float g_target_cntr_offset_x;
@@ -43,6 +45,8 @@ float g_target_left;
 float g_target_right;
 float g_target_top;
 float g_target_bottom;
+float g_detection_class;
+float g_target_detection_conf;
 
 cv::cuda::GpuMat gpuImage;
 cv::Mat image_cv_wrapped;
@@ -58,6 +62,7 @@ const float center_of_frame_height = 360.0f;
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
+void get_tracking_params(void);
 void identify_target(void);
 void get_target_info(void);
 void validate_target(void);
@@ -65,6 +70,35 @@ void track_target(void);
 void update_target_info(void);
 bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &g_image, cv::Rect &bounding_box);
 bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &g_image, cv::Rect &bounding_box);
+
+/********************************************************************************
+ * Function: get_tracking_params
+ * Description: Calibratable parameters for target tracking and identification.
+ ********************************************************************************/
+void get_tracking_params(void)
+{
+    ParamReader target_params("../params.json");
+
+    target_detection_thresh = target_params.get_float_param("Detection_tracking", "Detect_Thresh");
+
+#if defined(BLD_JETSON_B01)
+
+    target_class = target_params.get_int_param("Detection_tracking", "Detect_Class_B01");
+
+#elif defined(BLD_JETSON_ORIN_NANO)
+
+    target_class = target_params.get_int_param("Detection_tracking", "Detect_Class_Orin");
+
+#elif defined(BLD_WIN)
+
+    target_class = target_params.get_int_param("Detection_tracking", "Detect_Class_Orin");
+
+#else
+
+#error "Please define build platform."
+
+#endif
+}
 
 /********************************************************************************
  * Function: identify_target
@@ -78,21 +112,27 @@ void identify_target(void)
 
     for (int n = 0; n < g_detection_count; ++n)
     {
+        g_detection_class = g_detections[n].ClassID;
+        g_target_detection_conf = g_detections[n].Confidence;
         /* A tracked object, classified as a person with some confidence level */
-        if (g_detections[n].TrackID >= 0 && g_detections[n].ClassID == 1 && g_detections[n].Confidence > 0.5)
+        if (g_detections[n].TrackID >= 0 && g_detection_class == target_class && g_target_detection_conf > target_detection_thresh)
         {
             g_target_detection_id = n;
+            return;
         }
     }
 
 #elif defined(BLD_JETSON_ORIN_NANO)
 
     for (int n = 0; n < g_yolo_detection_count; ++n)
-    {
+    {   
+        g_detection_class = g_yolo_detections[n].label;
+        g_target_detection_conf = g_yolo_detections[n].probability;
         /* A tracked object, classified as a person with some confidence level */
-        if (g_yolo_detections[n].label == 0 && g_yolo_detections[n].probability > 0.5)
+        if (g_detection_class == target_class && g_yolo_detections[n].probability > target_detection_thresh)
         {
             g_target_detection_id = n;
+            return;
         }
     }
 
@@ -100,10 +140,13 @@ void identify_target(void)
 
     for (int n = 0; n < g_yolo_detection_count; ++n)
     {
+        g_detection_class = g_yolo_detections[n].ClassID;
+        g_target_detection_conf = g_yolo_detections[n].Confidence;
         /* A tracked object, classified as a person with some confidence level */
-        if (g_yolo_detections[n].ClassID == 0 && g_yolo_detections[n].Confidence > 0.5)
+        if (g_detection_class == target_class && g_target_detection_conf > target_detection_thresh)
         {
             g_target_detection_id = n;
+            return;
         }
     }
 
@@ -394,6 +437,9 @@ bool Track::init(void)
     g_target_top = 0.0f;
     g_target_bottom = 0.0f;
     g_target_detection_id = -1;
+    target_detection_thresh = 0.0f;
+    g_detection_class = (float)0.0;
+    g_target_detection_conf = (float)0.0;
 
     initialized_cv_image = false;
     target_tracked = false;
