@@ -83,16 +83,7 @@ int main(int argc, char** argv)
         return Scheduler::init();
     }
 
-#ifdef BLD_JETSON_B01
-
-    while (!g_stop_program && !g_save_button_press) // todo: figure buttons w docker (jetson io/jumper)
-
-#else
-
     while (!g_stop_program)
-
-#endif // BLD_JETSON_B01
-
     {
         Scheduler::loop();
     }
