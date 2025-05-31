@@ -13,20 +13,10 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "mav_utils.h"
-#include "serial.h"
-#include <mavlink.h>
-#include <common.h>
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-extern const uint8_t SENDER_SYS_ID;
-extern const uint8_t SENDER_COMP_ID;
-extern const uint8_t TARGET_SYS_ID;
-extern const uint8_t TARGET_COMP_ID;
-extern const int32_t MESSAGE_RATE_DEFAULT;
-extern const int32_t MESSAGE_RATE_1Hz;
-extern const int32_t MESSAGE_RATE_40Hz;
 
 /********************************************************************************
  * Exported objects
@@ -133,6 +123,14 @@ extern float g_mav_veh_local_ned_z;
 extern float g_mav_veh_local_ned_vx;
 extern float g_mav_veh_local_ned_vy;
 extern float g_mav_veh_local_ned_vz;
+
+extern const uint8_t SENDER_SYS_ID;
+extern const uint8_t SENDER_COMP_ID;
+extern const uint8_t TARGET_SYS_ID;
+extern const uint8_t TARGET_COMP_ID;
+extern const int32_t MESSAGE_RATE_DEFAULT;
+extern const int32_t MESSAGE_RATE_1Hz;
+extern const int32_t MESSAGE_RATE_40Hz;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

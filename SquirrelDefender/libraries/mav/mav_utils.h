@@ -14,5 +14,6 @@
 #include "mav_cmd.h"
 #include "mav_motion.h"
 #include "mav_msg_print.h"
+#include "mav_serial.h"
 
 #endif // MAV_UTILS_H
