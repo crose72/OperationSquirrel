@@ -13,9 +13,6 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "mav_utils.h"
-#include "serial.h"
-#include <mavlink.h>
-#include <common.h>
 
 /********************************************************************************
  * Imported objects
