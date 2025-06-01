@@ -11,7 +11,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "serial.h"
+#include "mav_serial.h"
 
 /********************************************************************************
  * Imported objects
@@ -53,7 +53,7 @@ class MavMotion
         static void go_to_waypoint(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, int32_t lat, int32_t lon, float alt);
         
     private:
-        static void send_mav_cmd(mavlink_message_t &msg) { Serial::write_uart(msg); };
+        static void send_mav_cmd(mavlink_message_t &msg) { MavSerial::write_mav_msg(msg); };
         static float calc_yaw_target(float x, float y);
         static float calc_yaw_rate_target(float x, float y);
 };

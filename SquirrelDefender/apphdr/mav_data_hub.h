@@ -13,9 +13,6 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "mav_utils.h"
-#include "serial.h"
-#include <mavlink.h>
-#include <common.h>
 
 /********************************************************************************
  * Imported objects
@@ -24,9 +21,6 @@ extern const uint8_t SENDER_SYS_ID;
 extern const uint8_t SENDER_COMP_ID;
 extern const uint8_t TARGET_SYS_ID;
 extern const uint8_t TARGET_COMP_ID;
-extern const int32_t MESSAGE_RATE_DEFAULT;
-extern const int32_t MESSAGE_RATE_1Hz;
-extern const int32_t MESSAGE_RATE_40Hz;
 
 /********************************************************************************
  * Exported objects
