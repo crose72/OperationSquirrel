@@ -46,9 +46,9 @@ This folder contains the code for the `squirreldefender` program and instruction
 ### Prerequisites:
 
 - Docker
-- Nvidia container runtime (if not already installed can follow the instructions at [ISAAC-ROS-Setup.md](https://github.com/crose72/OperationSquirrel/blob/dev/docs/ISAAC-ROS-Setup.md))
-- Orin: Jetpack 6.1 (~r36.4 I reckon this should work with Jetpack 6.2, I will try it shortly but I haven't verified it yet)
-- B01: Jetpack 4.6.1 (~r32.7.5 is the latest version you can have, container is r32.7.1 based)
+- Nvidia container runtime
+- Orin: Jetpack 6.1 or 6.2 (container is r36.4 based)
+- B01: Jetpack 4.6.1 (container is r32.7.1 based)
 
 ### Setup:
 
