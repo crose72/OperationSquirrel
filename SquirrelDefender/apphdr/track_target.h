@@ -42,7 +42,7 @@ extern int g_detection_count;
 extern float g_input_video_width;
 extern float g_input_video_height;
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
 extern std::vector<Object> g_yolo_detections;
 extern int g_yolo_detection_count;

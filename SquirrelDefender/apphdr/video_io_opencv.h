@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 
 /********************************************************************************
  * @file    video_io_opencv.h

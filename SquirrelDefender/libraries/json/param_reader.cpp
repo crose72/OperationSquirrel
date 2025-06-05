@@ -1,4 +1,4 @@
-#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
+#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
 /********************************************************************************
  * @file    param_reader.cpp

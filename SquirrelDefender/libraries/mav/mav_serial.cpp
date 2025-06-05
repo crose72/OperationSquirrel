@@ -34,8 +34,11 @@
 
 #elif defined(BLD_WSL_TCP) || defined(BLD_WIN_TCP)
 
-/* Sim port/address for linux or windows */
+#define _POSIX_C_SOURCE 200809L // enable certain POSIX-specific functionality
 #define SIM_IP "127.0.0.1" // IP address for SITL simulation
+//#define SIM_IP "172.17.0.1" // IP address when in a container in WSL2
+//#define SIM_IP "host.docker.internal"
+#define SIM_IP "192.168.65.254" // IP address for SITL simulation
 #define SIM_PORT 5762      // Port number for SITL
 
 #else
@@ -58,7 +61,7 @@ HANDLE hComm; // Handle for COM port on Windows
 
 #elif defined(BLD_WSL_TCP) || defined(BLD_WIN_TCP)
 
-SOCKET tcp_socket_fd; // TCP socket descriptor
+int tcp_socket_fd; // TCP socket descriptor
 struct sockaddr_in sim_addr;
 int sock;
 
@@ -251,10 +254,16 @@ void MavSerial::write_mav_msg(mavlink_message_t &msg)
 
 #elif defined(BLD_WSL_TCP) || defined(BLD_WIN_TCP) // send over TCP, common to BLD_WSL_TCP and BLD_WIN_TCP
 
-    int n = send(tcp_socket_fd, (const char *)buffer, len, 0);
-    if (n == SOCKET_ERROR)
+    uint16_t n = sendto(sock, buffer, len, 0, (struct sockaddr *)&sim_addr, sizeof(sim_addr));
+
+    if (MAVLINK_MAX_PACKET_LEN < len)
     {
-        fprintf(stderr, "Error writing to TCP socket\n");
+        fprintf(stderr, "Buffer too large\n");
+    }
+
+    if (n < 0)
+    {
+        fprintf(stderr, "Error writing to serial port\n");
     }
 
 #else

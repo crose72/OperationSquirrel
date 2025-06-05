@@ -55,7 +55,7 @@ bool Detection::init(void)
 
     return SSD::init();
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     return YOLO::init();
 
@@ -80,7 +80,7 @@ void Detection::loop(void)
 
     return SSD::loop();
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     return YOLO::loop();
 
@@ -105,7 +105,7 @@ void Detection::shutdown(void)
 
     return SSD::shutdown();
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     return YOLO::shutdown();
 
