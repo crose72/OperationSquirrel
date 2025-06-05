@@ -35,10 +35,16 @@
 #elif defined(BLD_WSL_TCP) || defined(BLD_WIN_TCP)
 
 #define _POSIX_C_SOURCE 200809L // enable certain POSIX-specific functionality
-#define SIM_IP "127.0.0.1" // IP address for SITL simulation
-//#define SIM_IP "172.17.0.1" // IP address when in a container in WSL2
-//#define SIM_IP "host.docker.internal"
-#define SIM_IP "192.168.65.254" // IP address for SITL simulation
+// #define SIM_IP "127.0.0.1" // IP address for SITL simulation if running natively in WSL2 or on windows
+// If Running in docker container in WSL2 this comes from first installing IN the container: 
+//  apt update && apt install -y netcat
+// and then executing IN the container
+//  nc -zv host.docker.internal 5762 
+// And you should see output like 
+//  Connection to host.docker.internal (XXX.XXX.XX.XXX) 5762 port [tcp/*] succeeded!
+// An replace XXX.XXX.XX.XXX with the resulting IP address
+#define SIM_IP "XXX.XXX.XX.XXX" 
+
 #define SIM_PORT 5762      // Port number for SITL
 
 #else
