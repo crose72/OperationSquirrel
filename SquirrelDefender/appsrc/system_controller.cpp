@@ -63,6 +63,11 @@ void dtrmn_program_stop_cond(void)
         g_stop_program = true;
     }
 
+    if (g_end_of_video)
+    {
+        g_stop_program = true;
+    }
+
     g_mav_veh_custom_mode_prv = g_mav_veh_custom_mode;
 }
 

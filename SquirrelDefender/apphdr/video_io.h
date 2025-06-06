@@ -70,6 +70,7 @@ extern bool g_valid_image_rcvd;
 extern cv::Mat g_image;
 extern float g_input_video_width;
 extern float g_input_video_height;
+extern bool g_end_of_video;
 
 #else
 

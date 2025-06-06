@@ -40,7 +40,9 @@ public:
 
     float get_float_param(const std::string &group, const std::string &key) const;
     uint32_t get_uint32_param(const std::string &group, const std::string &key) const;
+    int get_int_param(const std::string &group, const std::string &key) const;
     bool get_bool_param(const std::string &group, const std::string &key) const;
+    std::string get_string_param(const std::string &group, const std::string &key) const;
 
 private:
     Json::Value root;

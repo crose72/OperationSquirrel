@@ -27,6 +27,7 @@
  * Object definitions
  ********************************************************************************/
 bool g_valid_image_rcvd;
+bool g_end_of_video;
 bool file_stream_created;
 
 std::string base_path = "../data/";
@@ -221,6 +222,7 @@ bool capture_image(void)
         if (g_use_video_playback)
         {
             std::cout << "End of video playback" << std::endl;
+            g_end_of_video = true;
             return false;
         }
 
@@ -470,6 +472,7 @@ bool VideoCV::init(void)
     g_input_video_width = 1280.0;
     g_input_video_height = 720.0;
     g_input_video_fps = 30;
+    g_end_of_video = false;
 
     if (!create_input_video_stream() ||
         !create_output_vid_stream())
@@ -505,6 +508,7 @@ void VideoCV::in_loop(void)
 void VideoCV::out_loop(void)
 {
     save_video();
+    display_video();
 }
 
 /********************************************************************************
