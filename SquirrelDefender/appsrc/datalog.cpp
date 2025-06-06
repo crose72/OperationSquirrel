@@ -25,7 +25,7 @@
 bool headings_written;
 std::string data_file_path;
 std::string data_file_name;
-std::string file_name;
+std::string unique_file_name;
 std::vector<std::vector<std::string>> datalog_record;
 
 /********************************************************************************
@@ -109,8 +109,12 @@ void write_headers(void)
                     "g_target_valid",
                     "g_target_detection_id",
                     "g_target_track_id",
+                    "g_detection_class",
+                    "g_target_detection_conf",
                     "g_target_cntr_offset_x",
                     "g_target_cntr_offset_y",
+                    "g_target_cntr_offset_x_filt,"
+                    "g_target_cntr_offset_y_filt,"
                     "g_target_height",
                     "g_target_width",
                     "g_target_aspect",
@@ -129,6 +133,7 @@ void write_headers(void)
                     "g_vy_target_ekf",
                     "g_ax_target_ekf",
                     "g_ay_target_ekf",
+                    "g_target_data_useful",
                     "d_target",
                     "g_x_error",
                     "g_y_error",
@@ -195,7 +200,7 @@ void write_headers(void)
                     "g_mav_veh_state",
                     "g_mav_veh_mavlink_version"});
 
-    save_to_csv(file_name, datalog_record);
+    save_to_csv(unique_file_name, datalog_record);
 }
 
 /********************************************************************************
@@ -212,8 +217,12 @@ void log_data(void)
                      std::to_string(g_target_valid),
                      std::to_string(g_target_detection_id),
                      std::to_string(g_target_track_id),
+                     std::to_string(g_detection_class),
+                     std::to_string(g_target_detection_conf),
                      std::to_string(g_target_cntr_offset_x),
                      std::to_string(g_target_cntr_offset_y),
+                     std::to_string(g_target_cntr_offset_x_filt),
+                     std::to_string(g_target_cntr_offset_y_filt),
                      std::to_string(g_target_height),
                      std::to_string(g_target_width),
                      std::to_string(g_target_aspect),
@@ -232,6 +241,7 @@ void log_data(void)
                      std::to_string(g_vy_target_ekf),
                      std::to_string(g_ax_target_ekf),
                      std::to_string(g_ay_target_ekf),
+                     std::to_string(g_target_data_useful),
                      std::to_string(d_target),
                      std::to_string(g_x_error),
                      std::to_string(g_y_error),
@@ -298,7 +308,7 @@ void log_data(void)
                      std::to_string(g_mav_veh_state),
                      std::to_string(g_mav_veh_mavlink_version)}});
 
-    save_to_csv(file_name, datalog_record);
+    save_to_csv(unique_file_name, datalog_record);
 }
 
 /********************************************************************************
@@ -335,10 +345,10 @@ bool DataLogger::init(void)
 
     headings_written = false;
     data_file_name = "data";
-    file_name = "";
+    unique_file_name = "";
     datalog_record = {};
 
-    file_name = generate_unique_filename(data_file_name);
+    unique_file_name = generate_unique_filename(data_file_name);
     write_headers();
 
     return true;

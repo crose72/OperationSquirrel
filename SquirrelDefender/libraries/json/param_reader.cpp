@@ -73,12 +73,30 @@ uint32_t ParamReader::get_uint32_param(const std::string &group, const std::stri
 }
 
 /********************************************************************************
+ * Function: get_int_param
+ * Description: Return the values of parameters that are of type int.
+ ********************************************************************************/
+int ParamReader::get_int_param(const std::string &group, const std::string &key) const
+{
+    return root[group][key].asInt();
+}
+
+/********************************************************************************
  * Function: get_bool_params
  * Description: Return the values of parameters that are of type bool.
  ********************************************************************************/
 bool ParamReader::get_bool_param(const std::string &group, const std::string &key) const
 {
     return root[group][key].asBool();
+}
+
+/********************************************************************************
+ * Function: get_string_param
+ * Description: Return the value of parameters that are of type string.
+ ********************************************************************************/
+std::string ParamReader::get_string_param(const std::string &group, const std::string &key) const 
+{
+    return root[group][key].asString();
 }
 
 #endif // BLD_JETSON_B01 || BLD_JETSON_ORIN_NANO
