@@ -1,5 +1,5 @@
 #ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 
 /********************************************************************************
  * @file    detect_target_yolo.cpp
@@ -25,7 +25,7 @@
 /********************************************************************************
 * Object definitions
 ********************************************************************************/
-#ifdef BLD_JETSON_ORIN_NANO
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
 YoloV8* yolov8_detector;
 std::vector<Object> g_yolo_detections;
@@ -62,7 +62,7 @@ void detect_targets(void)
 {
     if (g_valid_image_rcvd)
     {
-    #ifdef BLD_JETSON_ORIN_NANO
+    #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
         g_yolo_detections = yolov8_detector->detectObjects(g_image);
         g_yolo_detection_count = g_yolo_detections.size();
@@ -98,7 +98,7 @@ YOLO::~YOLO(void) {};
  ********************************************************************************/
 bool YOLO::init(void)
 {
-    #ifdef BLD_JETSON_ORIN_NANO
+    #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     YoloV8Config config;
     const std::string engine_path = "../networks/yolov8s/yolov8s.engine.Orin.fp16.1.1.-1.-1.-1";
@@ -140,7 +140,7 @@ void YOLO::loop(void)
  ********************************************************************************/
 void YOLO::shutdown(void)
 {
-    #ifdef BLD_JETSON_ORIN_NANO
+    #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     delete yolov8_detector;
     yolov8_detector = nullptr;

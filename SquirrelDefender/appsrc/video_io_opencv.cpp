@@ -1,5 +1,5 @@
 #ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 
 /********************************************************************************
  * @file    video_io_cv.cpp
@@ -129,7 +129,7 @@ bool create_input_video_stream(void)
     // Use live camera feed or use prerecorded video
     if (!g_use_video_playback)
     {
-        #ifdef BLD_JETSON_ORIN_NANO
+        #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
         //gst_pipeline = std::format("nvarguscamerasrc ! video/x-raw(memory:NVMM), "
         //    "width={}, height={}, framerate={}/1 ! nvvidconv ! "
@@ -181,9 +181,9 @@ bool create_input_video_stream(void)
 bool create_output_vid_stream(void)
 {
     //std::string base_path = "file:///home/crose72/Documents/GitHub/OperationSquirrel/SquirrelDefender/data/";
-    #ifdef BLD_JETSON_ORIN_NANO
+    #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
     std::string base_path = "file:///workspace/OperationSquirrel/SquirrelDefender/data/";
-    #else
+    #elif defined(BLD_WIN)
     std::string base_path = "file:///home/shaun/workspaces/os-dev/OperationSquirrel/SquirrelDefender/data/";
     #endif
     std::string base_name = "output";
@@ -519,5 +519,5 @@ void VideoCV::shutdown(void)
     Print::cpp_cout("video:  shutdown complete.\n");
 }
 
-#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 #endif // ENABLE_CV

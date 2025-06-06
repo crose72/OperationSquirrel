@@ -843,7 +843,7 @@ bool MavMsg::init(void)
     if (!start_mav_comm() ||
         !start_message_subscriptions())
     {
-        Print::c_fprintf("Failed to initialize MAVLink communication");
+        Print::c_fprintf("Failed to initialize MAVLink communication\n");
         return false;
     }
 

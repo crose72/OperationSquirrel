@@ -15,7 +15,7 @@
 #include <mavlink.h>
 #include <common.h>
 
-#ifdef BLD_LINUX_SERIAL // for linux
+#if defined(BLD_LINUX_SERIAL) || defined(BLD_WSL)  // for linux
 
 #include <fcntl.h>
 #include <unistd.h>

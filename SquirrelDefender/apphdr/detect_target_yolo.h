@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 
 /********************************************************************************
  * @file    detect_target_yolo.h
@@ -29,7 +29,7 @@ extern cv::Mat g_image;
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-#ifdef BLD_JETSON_ORIN_NANO
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
 extern std::vector<Object> g_yolo_detections;
 extern int g_yolo_detection_count;

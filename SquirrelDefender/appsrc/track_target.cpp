@@ -85,7 +85,7 @@ void identify_target(void)
         }
     }
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     for (int n = 0; n < g_yolo_detection_count; ++n)
     {
@@ -139,7 +139,7 @@ void get_target_info(void)
         g_target_aspect = g_target_width / g_target_height;
     }
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     if (g_target_detection_id >= 0)
     {
@@ -201,7 +201,7 @@ void validate_target(void)
         g_target_valid = false;
     }
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
    implimented. */
@@ -218,7 +218,7 @@ void validate_target(void)
 
 #error "Please define build platform."
 
-#endif // defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
+#endif // defined(BLD_JETSON_B01)
 
     target_valid_prv = g_target_valid;
 }
