@@ -2,8 +2,8 @@
 
 # Docker container build settings
 DOCKERFILE_PATH="../docker/Dockerfile.dev_ubuntu-22.04"
-IMAGE_NAME="crose72/ubuntu-22.04"
-IMAGE_TAG="dev"
+IMAGE_NAME="crose72/os-dev"
+IMAGE_TAG="cuda12.6-trt10.5-cv4.10-sm61-ubuntu22"
 FULL_IMAGE_NAME="$IMAGE_NAME:$IMAGE_TAG"
 
 # Build Docker image
