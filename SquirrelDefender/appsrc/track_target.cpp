@@ -85,7 +85,7 @@ void get_tracking_params(void)
 
     target_class = target_params.get_int_param("Detection_tracking", "Detect_Class_B01");
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     target_class = target_params.get_int_param("Detection_tracking", "Detect_Class_Orin");
 
