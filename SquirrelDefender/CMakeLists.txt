@@ -700,7 +700,7 @@ if (BUILD_TEST_HARNESS)
         target_include_directories(test_follow_target PRIVATE modules/yolov8_tensorrt/src)
 
         if (BLD_JETSON_ORIN_NANO)
-            target_link_libraries(test_localize_target 
+            target_link_libraries(test_follow_target 
                                 YoloV8_TRT 
                                 ${OpenCV_LIBS} 
                                 vpi 
@@ -713,7 +713,7 @@ if (BUILD_TEST_HARNESS)
                                 ${LAPACK_LIBRARIES} 
                                 ${BLAS_LIBRARIES})
         elseif(BLD_WSL)
-            target_link_libraries(test_localize_target 
+            target_link_libraries(test_follow_target 
                                 YoloV8_TRT 
                                 ${OpenCV_LIBS} 
                                 #vpi 
