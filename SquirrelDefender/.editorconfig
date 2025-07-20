@@ -4,26 +4,13 @@ root = true
 [*]
 indent_style = space
 indent_size = 4
-#end_of_line = lf
-#charset = utf-8
-#trim_trailing_whitespace = true
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
 insert_final_newline = true
 
-[*.cpp]
-indent_style = space
-indent_size = 4
-max_line_length = 120
-
 [*.h]
-indent_style = space
-indent_size = 4
-max_line_length = 120
+max_line_length = 80
 
-# C++ specific rules (you can customize more as needed)
-[*.{cpp,h}]
-# This ensures that preprocessor directives are not indented
-csharp_preprocessor_directives = true
-
-{
-   "editor.formatOnSave": true
-}
+[*.cpp]
+max_line_length = 80

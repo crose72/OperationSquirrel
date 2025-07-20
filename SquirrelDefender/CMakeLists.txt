@@ -51,8 +51,8 @@ project(SquirrelDefender)
 
 # Choose ONLY ONE platform for the build (BLD_JETSON_B01, BLD_WSL, BLD_WIN) 
 option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" OFF)
-option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" ON)
-option(BLD_WSL "Compiling for BLD_WSL" OFF)
+option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" OFF)
+option(BLD_WSL "Compiling for BLD_WSL" ON)
 option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
@@ -714,6 +714,44 @@ if (BUILD_TEST_HARNESS)
                                 ${BLAS_LIBRARIES})
         elseif(BLD_WSL)
             target_link_libraries(test_follow_target 
+                                YoloV8_TRT 
+                                ${OpenCV_LIBS} 
+                                #vpi 
+                                opencv_core
+                                opencv_imgproc 
+                                opencv_imgcodecs 
+                                opencv_videoio
+                                jsoncpp
+                                ${ARMADILLO_LIBRARIES} 
+                                ${LAPACK_LIBRARIES} 
+                                ${BLAS_LIBRARIES})
+        endif()
+
+        # Payload delivery test code
+        set(PAYLOAD_DELIVERY_SOURCES ${TEST_SOURCE_BASE})
+        list(APPEND PAYLOAD_DELIVERY_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_payload_delivery.cpp)
+        list(APPEND PAYLOAD_DELIVERY_HEADERS ${TEST_UTIL_HEADERS})
+
+        cuda_add_executable(test_payload_delivery ${PAYLOAD_DELIVERY_SOURCES} ${PAYLOAD_DELIVERY_HEADERS})
+        set_target_debug_flags(test_payload_delivery)
+
+        target_include_directories(test_payload_delivery PRIVATE modules/yolov8_tensorrt/src)
+
+        if (BLD_JETSON_ORIN_NANO)
+            target_link_libraries(test_payload_delivery 
+                                YoloV8_TRT 
+                                ${OpenCV_LIBS} 
+                                vpi 
+                                opencv_core
+                                opencv_imgproc 
+                                opencv_imgcodecs 
+                                opencv_videoio
+                                jsoncpp
+                                ${ARMADILLO_LIBRARIES} 
+                                ${LAPACK_LIBRARIES} 
+                                ${BLAS_LIBRARIES})
+        elseif(BLD_WSL)
+            target_link_libraries(test_payload_delivery 
                                 YoloV8_TRT 
                                 ${OpenCV_LIBS} 
                                 #vpi 

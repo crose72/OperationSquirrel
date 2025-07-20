@@ -43,7 +43,7 @@
 // And you should see output like 
 //  Connection to host.docker.internal (XXX.XXX.XX.XXX) 5762 port [tcp/*] succeeded!
 // An replace XXX.XXX.XX.XXX with the resulting IP address
-#define SIM_IP "XXX.XXX.XX.XXX" 
+#define SIM_IP "192.168.65.254" 
 
 #define SIM_PORT 5762      // Port number for SITL
 

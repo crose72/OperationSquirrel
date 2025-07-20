@@ -17,6 +17,7 @@
 #include "track_target.h"
 #include "mav_data_hub.h"
 #include "signal_processing.h"
+#include "kf.h"
 
 /********************************************************************************
  * Imported objects
@@ -37,7 +38,6 @@ extern float g_mav_veh_yaw;
 extern float g_mav_veh_yawspeed;
 extern bool g_use_video_playback;
 extern float g_target_cntr_offset_y;
-extern float g_target_cntr_offset_x;
 extern bool g_target_data_useful;
 
 /********************************************************************************

@@ -57,18 +57,15 @@ float g_ax_target_ekf;
 float g_ay_target_ekf;
 float x_target_ekf_prv;
 float y_target_ekf_prv;
-KF kf; // Kalman Filter instance
-arma::mat A;  // System dynamics matrix
-arma::mat B;  // Control matrix (if needed, otherwise identity)
-arma::mat H;  // Observation matrix
-arma::mat Q;  // Process noise covariance
-arma::mat R;  // Measurement noise covariance
-arma::mat P;  // Estimate error covariance
-arma::colvec x0;  // Initial state
-arma::colvec u0;  // Observed initial measurements
-
-
-
+KF kf_loc; // Kalman Filter instance
+arma::mat A_loc;  // System dynamics matrix
+arma::mat B_loc;  // Control matrix (if needed, otherwise identity)
+arma::mat H_loc;  // Observation matrix
+arma::mat Q_loc;  // Process noise covariance
+arma::mat R_loc;  // Measurement noise covariance
+arma::mat P_loc;  // Estimate error covariance
+arma::colvec x0_loc;  // Initial state
+arma::colvec u0_loc;  // Observed initial measurements
 
 /********************************************************************************
  * Calibration definitions
@@ -143,7 +140,84 @@ const float delta_offset[MAX_IDX_DELTA_PIXEL_OFFSET][MAX_IDX_DELTA_D_OFFSET] = {
 void dtrmn_target_loc_data_ok(void);
 void dtrmn_target_location(void);
 void update_target_location(void);
+void init_kf_loc(void);
 
+/********************************************************************************
+ * Function: init_kf_loc
+ * Description: Initialize kalman filter for target location estimation.
+ ********************************************************************************/
+void init_kf_loc(void)
+{
+    x_target_ekf_prv = 0.0;
+    y_target_ekf_prv = 0.0;
+    g_x_target_ekf = 0.0;
+    g_y_target_ekf = 0.0;
+    g_vx_target_ekf = 0.0;
+    g_vy_target_ekf = 0.0;
+    g_ax_target_ekf = 0.0;
+    g_ay_target_ekf = 0.0;
+
+    // KF init
+    float dt = 0.05;  // Time step
+
+    // Resize matrices and set to zero initially
+    A_loc.set_size(n_states, n_states); 
+    A_loc.zeros();
+    B_loc.set_size(n_states, 1); 
+    B_loc.zeros();
+    H_loc.set_size(n_meas, n_states); 
+    H_loc.zeros();
+    Q_loc.set_size(n_states, n_states);
+    Q_loc.zeros();
+    R_loc.set_size(n_meas, n_meas); 
+    R_loc.zeros();
+    P_loc.set_size(n_states, n_states); 
+    P_loc.zeros();
+
+    // Define system dynamics (State transition matrix A_loc)
+    A_loc << 1 << 0 << dt << 0 << 0.5 * pow(dt,2) << 0  << arma::endr
+      << 0 << 1 << 0 << dt << 0 << 0.5 * pow(dt,2)  << arma::endr
+      << 0 << 0 << 1 << 0 << dt << 0  << arma::endr
+      << 0 << 0 << 0 << 1 << 0 << dt  << arma::endr
+      << 0 << 0 << 0 << 0 << 1 << 0  << arma::endr
+      << 0 << 0 << 0 << 0 << 0 << 1  << arma::endr;
+
+    // Observation matrix (Only x and y are observed)
+    H_loc << 1 << 0 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 1 << 0 << 0 << 0 << 0 << arma::endr;
+
+    // Model covariance matrix Q_loc (process noise)
+    Q_loc << 0.01 << 0 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 0.0001 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 0 << 0.00001 << 0 << 0 << 0 << arma::endr
+      << 0 << 0 << 0 << 0.00001 << 0 << 0 << arma::endr
+      << 0 << 0 << 0 << 0 << 0.00001 << 0 << arma::endr
+      << 0 << 0 << 0 << 0 << 0 << 0.00001 << arma::endr;
+
+    // Measurement covariance matrix R_loc (sensor noise)
+    R_loc << 10.0 << 0 << arma::endr
+      << 0 << 40.0 << arma::endr;
+
+    // Estimate covariance matrix P_loc (initial trust in the estimate)
+    P_loc << 0.1 << 0 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 0.1 << 0 << 0 << 0 << 0 << arma::endr
+      << 0 << 0 << 0.1 << 0 << 0 << 0 << arma::endr
+      << 0 << 0 << 0 << 0.1 << 0 << 0 << arma::endr
+      << 0 << 0 << 0 << 0 << 0.1 << 0 << arma::endr
+      << 0 << 0 << 0 << 0 << 0 << 0.1 << arma::endr;
+
+    // Initialize Kalman Filter
+    kf_loc.InitSystem(A_loc, B_loc, H_loc, Q_loc, R_loc);
+
+    // Set initial state (assuming stationary at origin)
+    x0_loc.set_size(n_states);
+    x0_loc.zeros(); // Start with zero velocity and acceleration
+    kf_loc.InitSystemState(x0_loc);
+
+    // Resize and reset u0_loc
+    u0_loc.set_size(n_meas);
+    u0_loc.zeros();
+}
 
 /********************************************************************************
  * Function: dtrmn_target_loc_data_ok
@@ -270,18 +344,18 @@ void update_target_location(void)
         colvec z(2);
         z << g_x_target << g_y_target;
 
-        // Define the system transition matrix A (discretized)
-        // TODO: update the state transition matrix A 
+        // Define the system transition matrix A_loc (discretized)
+        // TODO: update the state transition matrix A_loc 
         // Ensure g_dt is valid (std::isnan(g_dt) || std::isinf(g_dt) || g_dt <= 0) 
 
         // No external control input for now
         colvec u(1, fill::zeros);
 
         // Perform Kalman filter update
-        kf.Kalmanf(z, u);
+        kf_loc.Kalmanf(z, u);
 
         // Retrieve the updated state
-        colvec *state = kf.GetCurrentEstimatedState();
+        colvec *state = kf_loc.GetCurrentEstimatedState();
         g_x_target_ekf = state->at(0);
         g_y_target_ekf = state->at(1);
         g_vx_target_ekf = state->at(2);
@@ -317,80 +391,13 @@ bool Localize::init(void)
     g_delta_d_x = 0.0f;
     g_delta_d_z = 0.0f;
     g_camera_comp_angle = 0.0f;
-
     x_target_prv = 0.0f;
     y_target_prv = 0.0f;
     loc_target_valid_prv = false;
-    g_x_target_ekf = 0.0;
-    g_y_target_ekf = 0.0;
-    x_target_ekf_prv = 0.0;
-    y_target_ekf_prv = 0.0;
-    g_vx_target_ekf = 0.0;
-    g_vy_target_ekf = 0.0;
-
     g_target_data_useful = false;
 
-    // KF init
-    float dt = 0.05;  // Time step
+    init_kf_loc();
 
-    // Resize matrices and set to zero initially
-    A.set_size(n_states, n_states); 
-    A.zeros();
-    B.set_size(n_states, 1); 
-    B.zeros();
-    H.set_size(n_meas, n_states); 
-    H.zeros();
-    Q.set_size(n_states, n_states);
-    Q.zeros();
-    R.set_size(n_meas, n_meas); 
-    R.zeros();
-    P.set_size(n_states, n_states); 
-    P.zeros();
-
-    // Define system dynamics (State transition matrix A)
-    A << 1 << 0 << dt << 0 << 0.5 * pow(dt,2) << 0  << arma::endr
-      << 0 << 1 << 0 << dt << 0 << 0.5 * pow(dt,2)  << arma::endr
-      << 0 << 0 << 1 << 0 << dt << 0  << arma::endr
-      << 0 << 0 << 0 << 1 << 0 << dt  << arma::endr
-      << 0 << 0 << 0 << 0 << 1 << 0  << arma::endr
-      << 0 << 0 << 0 << 0 << 0 << 1  << arma::endr;
-
-    // Observation matrix (Only x and y are observed)
-    H << 1 << 0 << 0 << 0 << 0 << 0 << arma::endr
-      << 0 << 1 << 0 << 0 << 0 << 0 << arma::endr;
-
-    // Model covariance matrix Q (process noise)
-    Q << 0.01 << 0 << 0 << 0 << 0 << 0 << arma::endr
-      << 0 << 0.1 << 0 << 0 << 0 << 0 << arma::endr
-      << 0 << 0 << 0.00001 << 0 << 0 << 0 << arma::endr
-      << 0 << 0 << 0 << 0.00001 << 0 << 0 << arma::endr
-      << 0 << 0 << 0 << 0 << 0.00001 << 0 << arma::endr
-      << 0 << 0 << 0 << 0 << 0 << 0.00001 << arma::endr;
-
-    // Measurement covariance matrix R (sensor noise)
-    R << 10.0 << 0 << arma::endr
-      << 0 << 40.0 << arma::endr;
-
-    // Estimate covariance matrix P (initial trust in the estimate)
-    P << 0.1 << 0 << 0 << 0 << 0 << 0 << arma::endr
-      << 0 << 0.1 << 0 << 0 << 0 << 0 << arma::endr
-      << 0 << 0 << 0.1 << 0 << 0 << 0 << arma::endr
-      << 0 << 0 << 0 << 0.1 << 0 << 0 << arma::endr
-      << 0 << 0 << 0 << 0 << 0.1 << 0 << arma::endr
-      << 0 << 0 << 0 << 0 << 0 << 0.1 << arma::endr;
-
-    // Initialize Kalman Filter
-    kf.InitSystem(A, B, H, Q, R);
-
-    // Set initial state (assuming stationary at origin)
-    x0.set_size(n_states);
-    x0.zeros(); // Start with zero velocity and acceleration
-    kf.InitSystemState(x0);
-
-    // Resize and reset u0
-    u0.set_size(n_meas);
-    u0.zeros();
-    
     return true;
 }
 

@@ -32,25 +32,26 @@
  ********************************************************************************/
 
 /********************************************************************************
- * Function: 
- * Description: 
+ * Function:
+ * Description:
  ********************************************************************************/
 
 /********************************************************************************
  * Function: find_column_index
  * Description: Return the index of a column header in a csv file given the text
- *              in the column header (e.g. if "time" is header of column 5, 
+ *              in the column header (e.g. if "time" is header of column 5,
  *              return 5)
  ********************************************************************************/
-int find_column_index(const std::string& header, const std::string& column) 
+int find_column_index(const std::string &header, const std::string &column)
 {
     std::stringstream ss(header);
     std::string col;
     int column_index = 0;
 
-    while (std::getline(ss, col, ',')) 
+    while (std::getline(ss, col, ','))
     {
-        if (col == column) return column_index;
+        if (col == column)
+            return column_index;
         column_index++;
     }
 
