@@ -176,6 +176,21 @@ void calc_follow_error(void)
         return;
     }
 
+    if (g_x_target_ekf < 0.001f)
+    {
+        g_x_error = 0.0f;
+    }
+    else
+    {
+        g_x_error = g_x_target_ekf - x_desired;
+    }
+
+    return;
+
+    // TODO - remove or complete this code - this is attempting to
+    // change the follow to keep the target in the center of the video
+    g_y_error = g_y_target_ekf - y_desired;
+
     g_target_cntr_offset_x_filt = low_pass_filter(g_target_cntr_offset_x, target_cntr_offset_x_prv, target_bbox_center_filt_coeff);
     g_target_cntr_offset_y_filt = low_pass_filter(g_target_cntr_offset_y, target_cntr_offset_y_prv, target_bbox_center_filt_coeff);
 
