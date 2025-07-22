@@ -46,115 +46,118 @@ float g_mav_veh_yaw_adjusted;
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-// Eventually these should all be 
 /* x forward */
- float Kp_x = 0.5f;
- float Ki_x = 0.009f;
- float Kd_x = 0.1f;
- float w1_x = 1.0f;
- float w2_x = 0.0f;
- float w3_x = 0.0f;
+float Kp_x = (float)0.5;
+float Ki_x = (float)0.009;
+float Kd_x = (float)0.1;
+float w1_x = (float)1.0;
+float w2_x = (float)0.0;
+float w3_x = (float)0.0;
 
 /* y forward */
- float Kp_y = 0.03;
- float Ki_y = 0.00f;
- float Kd_y = 0.001f;
- float w1_y = 1.0f;
- float w2_y = 0.0f;
- float w3_y = 0.0f;
+float Kp_y = (float)0.03;
+float Ki_y = (float)0.00;
+float Kd_y = (float)0.001;
+float w1_y = (float)1.0;
+float w2_y = (float)0.0;
+float w3_y = (float)0.0;
 
 /* z forward */
- float w1_z = 0.0f;
- float w2_z = 0.0f;
- float w3_z = 0.0f;
+float w1_z = (float)0.0;
+float w2_z = (float)0.0;
+float w3_z = (float)0.0;
 
 /* x reverse */
- float Kp_x_rev = 0.0;
- float Ki_x_rev = 0.0;
- float Kd_x_rev = 0.0;
- float w1_x_rev = 1.0f;
- float w2_x_rev = 0.0f;
- float w3_x_rev = 0.0f;
+float Kp_x_rev = (float)0.0;
+float Ki_x_rev = (float)0.0;
+float Kd_x_rev = (float)0.0;
+float w1_x_rev = (float)1.0;
+float w2_x_rev = (float)0.0;
+float w3_x_rev = (float)0.0;
 
 /* y reverse */
- float Kp_y_rev = 0.005;
- float Ki_y_rev = 0.0f;
- float Kd_y_rev = 0.0;
- float w1_y_rev = 1.0f;
- float w2_y_rev = 0.0f;
- float w3_y_rev = 0.0f;
+float Kp_y_rev = (float)0.005;
+float Ki_y_rev = (float)0.0;
+float Kd_y_rev = (float)0.0;
+float w1_y_rev = (float)1.0;
+float w2_y_rev = (float)0.0;
+float w3_y_rev = (float)0.0;
 
-float Kp_yaw = 0.08;
-float Ki_yaw = 0.0;
-float Kd_yaw = 0.00005;
-float w1_yaw = 1.0;
-float w2_yaw = 0.0;
-float w3_yaw = 0.0;
+float Kp_yaw = (float)0.08;
+float Ki_yaw = (float)0.0;
+float Kd_yaw = (float)0.00005;
+float w1_yaw = (float)1.0;
+float w2_yaw = (float)0.0;
+float w3_yaw = (float)0.0;
 
-float x_desired = 4.0f;
-float y_desired = 0.0f;
+float x_desired = (float)4.0;
+float y_desired = (float)0.0;
 
-const float camera_half_fov = 0.7423; // half of 83 degree FOV camera
+float target_bbox_center_filt_coeff = (float)0.75;
+
+const float camera_half_fov = (float)0.7423; // half of 83 degree FOV camera
 
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-void get_control_params(void);
+void get_params(void);
 void calc_follow_error(void);
 void calc_yaw_target_error(void);
 void dtrmn_follow_vector(void);
 
 /********************************************************************************
- * Function: get_control_params
+ * Function: get_params
  * Description: Read follow control parameters from a json or other file type.
  ********************************************************************************/
-void get_control_params(void)
+void get_params(void)
 {
     ParamReader follow_control("../params.json");
 
     // Accessing Vel_PID_x parameters
-    Kp_x = follow_control.get_float_param("Vel_PID_x", "Kp");
-    Ki_x = follow_control.get_float_param("Vel_PID_x", "Ki");
-    Kd_x = follow_control.get_float_param("Vel_PID_x", "Kd");
-    w1_x = follow_control.get_float_param("Vel_PID_x", "w1");
-    w2_x = follow_control.get_float_param("Vel_PID_x", "w2");
-    w3_x = follow_control.get_float_param("Vel_PID_x", "w3");
+    Kp_x = follow_control.get_float_param("PID_vx_forward", "Kp");
+    Ki_x = follow_control.get_float_param("PID_vx_forward", "Ki");
+    Kd_x = follow_control.get_float_param("PID_vx_forward", "Kd");
+    w1_x = follow_control.get_float_param("PID_vx_forward", "w1");
+    w2_x = follow_control.get_float_param("PID_vx_forward", "w2");
+    w3_x = follow_control.get_float_param("PID_vx_forward", "w3");
 
     // Accessing Vel_PID_y parameters
-    Kp_y = follow_control.get_float_param("Vel_PID_y", "Kp");
-    Ki_y = follow_control.get_float_param("Vel_PID_y", "Ki");
-    Kd_y = follow_control.get_float_param("Vel_PID_y", "Kd");
-    w1_y = follow_control.get_float_param("Vel_PID_y", "w1");
-    w2_y = follow_control.get_float_param("Vel_PID_y", "w2");
-    w3_y = follow_control.get_float_param("Vel_PID_y", "w3");
+    Kp_y = follow_control.get_float_param("PID_vy_forward", "Kp");
+    Ki_y = follow_control.get_float_param("PID_vy_forward", "Ki");
+    Kd_y = follow_control.get_float_param("PID_vy_forward", "Kd");
+    w1_y = follow_control.get_float_param("PID_vy_forward", "w1");
+    w2_y = follow_control.get_float_param("PID_vy_forward", "w2");
+    w3_y = follow_control.get_float_param("PID_vy_forward", "w3");
 
     // Accessing Vel_PID_x parameters for reverse movement
-    Kp_x_rev = follow_control.get_float_param("Vel_PID_x_reverse", "Kp");
-    Ki_x_rev = follow_control.get_float_param("Vel_PID_x_reverse", "Ki");
-    Kd_x_rev = follow_control.get_float_param("Vel_PID_x_reverse", "Kd");
-    w1_x_rev = follow_control.get_float_param("Vel_PID_x_reverse", "w1");
-    w2_x_rev = follow_control.get_float_param("Vel_PID_x_reverse", "w2");
-    w3_x_rev = follow_control.get_float_param("Vel_PID_x_reverse", "w3");
+    Kp_x_rev = follow_control.get_float_param("PID_vx_reverse", "Kp");
+    Ki_x_rev = follow_control.get_float_param("PID_vx_reverse", "Ki");
+    Kd_x_rev = follow_control.get_float_param("PID_vx_reverse", "Kd");
+    w1_x_rev = follow_control.get_float_param("PID_vx_reverse", "w1");
+    w2_x_rev = follow_control.get_float_param("PID_vx_reverse", "w2");
+    w3_x_rev = follow_control.get_float_param("PID_vx_reverse", "w3");
 
     // Accessing Vel_PID_y parameters for reverse movment
-    Kp_y_rev = follow_control.get_float_param("Vel_PID_y_reverse", "Kp");
-    Ki_y_rev = follow_control.get_float_param("Vel_PID_y_reverse", "Ki");
-    Kd_y_rev = follow_control.get_float_param("Vel_PID_y_reverse", "Kd");
-    w1_y_rev = follow_control.get_float_param("Vel_PID_y_reverse", "w1");
-    w2_y_rev = follow_control.get_float_param("Vel_PID_y_reverse", "w2");
-    w3_y_rev = follow_control.get_float_param("Vel_PID_y_reverse", "w3");
+    Kp_y_rev = follow_control.get_float_param("PID_vy_reverse", "Kp");
+    Ki_y_rev = follow_control.get_float_param("PID_vy_reverse", "Ki");
+    Kd_y_rev = follow_control.get_float_param("PID_vy_reverse", "Kd");
+    w1_y_rev = follow_control.get_float_param("PID_vy_reverse", "w1");
+    w2_y_rev = follow_control.get_float_param("PID_vy_reverse", "w2");
+    w3_y_rev = follow_control.get_float_param("PID_vy_reverse", "w3");
 
     // Accessing Yaw PID parameters
-    Kp_yaw = follow_control.get_float_param("Yaw_PID", "Kp");
-    Ki_yaw = follow_control.get_float_param("Yaw_PID", "Ki");
-    Kd_yaw = follow_control.get_float_param("Yaw_PID", "Kd");
-    w1_yaw = follow_control.get_float_param("Yaw_PID", "w1");
-    w2_yaw = follow_control.get_float_param("Yaw_PID", "w2");
-    w3_yaw = follow_control.get_float_param("Yaw_PID", "w3");
+    Kp_yaw = follow_control.get_float_param("PID_yaw", "Kp");
+    Ki_yaw = follow_control.get_float_param("PID_yaw", "Ki");
+    Kd_yaw = follow_control.get_float_param("PID_yaw", "Kd");
+    w1_yaw = follow_control.get_float_param("PID_yaw", "w1");
+    w2_yaw = follow_control.get_float_param("PID_yaw", "w2");
+    w3_yaw = follow_control.get_float_param("PID_yaw", "w3");
 
     // Follow params
-    x_desired = follow_control.get_float_param("Target", "Desired_X_offset");
-    y_desired = follow_control.get_float_param("Target", "Desired_Y_offset");
+    x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_offset");
+    y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_offset");
+
+    target_bbox_center_filt_coeff = follow_control.get_float_param("Follow_Params", "BBox_Filt_coeff");
 }
 
 /********************************************************************************
@@ -183,14 +186,14 @@ void calc_follow_error(void)
  ********************************************************************************/
 void calc_yaw_target_error(void)
 {
-    // is g_use_video_playback and yaw_initial_latched needed here? 
+    // is g_use_video_playback and yaw_initial_latched needed here?
     // TODO: or is it fine for using camera to with drone turning all the time?
     if (!g_first_loop_after_start && g_use_video_playback && !yaw_initial_latched)
     {
         yaw_initial = g_mav_veh_yaw;
         yaw_initial_latched = true;
         // Yaw has a max value of PI and a min value of - PI.
-        // If the sum of the yaw target and the initial latched yaw state of the 
+        // If the sum of the yaw target and the initial latched yaw state of the
         // vehicle results in a value < -PI or > PI then the yaw value will have
         // to account for that, since when yaw becomes > PI or < -PI it rolls over
         // positive sign to negative or visa versa.
@@ -256,7 +259,7 @@ void calc_yaw_target_error(void)
     {
         max_yaw = -(PI - (abs_max_yaw_temp - PI));
     }
-    
+
     // If using video playback then subtract the initial yaw to track
     // the yaw error over time.  Otherwise, the error is just the yaw target
     // because the goal is for the target to be in the center of the frame.
@@ -282,11 +285,11 @@ void dtrmn_follow_vector(void)
     if (g_target_valid && g_target_too_close)
     {
         g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                              g_x_error, 0.0, 0.0,
-                                              w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
+                                   g_x_error, 0.0, 0.0,
+                                   w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
         g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                    g_y_error, 0.0, 0.0,
-                                    w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
+                                   g_y_error, 0.0, 0.0,
+                                   w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
         g_yaw_adjust = pid_yaw.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
                                     g_yaw_target_error, 0.0, 0.0,
                                     w1_yaw, 0.0, 0.0, ControlDim::YAW, g_dt);
@@ -294,20 +297,20 @@ void dtrmn_follow_vector(void)
     else if (g_target_valid && !g_target_too_close)
     {
         g_vx_adjust = pid_forwd.pid3(Kp_x, Ki_x, Kd_x,
-                                            g_x_error, 0.0, 0.0,
-                                            w1_x, 0.0, 0.0, ControlDim::X, g_dt);
+                                     g_x_error, 0.0, 0.0,
+                                     w1_x, 0.0, 0.0, ControlDim::X, g_dt);
         g_vy_adjust = pid_forwd.pid3(Kp_y, Ki_y, Kd_y,
-                                            g_y_error, 0.0, 0.0,
-                                            w1_y, 0.0, 0.0, ControlDim::Y, g_dt);
+                                     g_y_error, 0.0, 0.0,
+                                     w1_y, 0.0, 0.0, ControlDim::Y, g_dt);
         g_yaw_adjust = pid_yaw.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
                                     g_yaw_target_error, 0.0, 0.0,
                                     w1_yaw, 0.0, 0.0, ControlDim::YAW, g_dt);
     }
     else
     {
-        g_vx_adjust = 0.0f;
-        g_vy_adjust = 0.0f;
-        g_yaw_adjust = 0.0f;
+        g_vx_adjust = (float)0.0;
+        g_vy_adjust = (float)0.0;
+        g_yaw_adjust = (float)0.0;
     }
 }
 
@@ -331,22 +334,22 @@ PathPlanner::~PathPlanner(void) {};
 bool PathPlanner::init(void)
 {
     g_target_too_close = false;
-    g_x_error = 0.0;
-    g_y_error = 0.0;
-    g_vx_adjust = 0.0;
-    g_vy_adjust = 0.0;
-    g_vz_adjust = 0.0;
-    g_yaw_target = 0.0;
-    yaw_initial = 0.0;
+    g_x_error = (float)0.0;
+    g_y_error = (float)0.0;
+    g_vx_adjust = (float)0.0;
+    g_vy_adjust = (float)0.0;
+    g_vz_adjust = (float)0.0;
+    g_yaw_target = (float)0.0;
+    yaw_initial = (float)0.0;
     yaw_initial_latched = false;
-    max_yaw = 0.0;
-    min_yaw = 0.0;
-    g_yaw_adjust = 0.0;
-    g_mav_veh_yaw_prv = 0.0;
-    g_yaw_target_error = 0.0;
-    g_mav_veh_yaw_adjusted = 0.0;
+    max_yaw = (float)0.0;
+    min_yaw = (float)0.0;
+    g_yaw_adjust = (float)0.0;
+    g_mav_veh_yaw_prv = (float)0.0;
+    g_yaw_target_error = (float)0.0;
+    g_mav_veh_yaw_adjusted = (float)0.0;
 
-    get_control_params();
+    get_params();
 
     return true;
 }
