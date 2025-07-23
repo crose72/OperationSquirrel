@@ -38,12 +38,14 @@ cv::VideoCapture cap;
 cv::VideoWriter video_writer;
 std::string gst_pipeline;
 
+float video_fps_actual;
+
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-float g_input_video_width;
-float g_input_video_height;
-float g_input_video_fps;
+const float g_input_video_width = (float)1280.0;
+const float g_input_video_height = (float)720.0;
+const float g_input_video_fps = (float)16.67;
 
 /********************************************************************************
  * Function definitions
@@ -104,36 +106,36 @@ bool create_input_video_stream(void)
     // Use live camera feed or use prerecorded video
     if (!g_use_video_playback)
     {
-        #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-        //gst_pipeline = std::format("nvarguscamerasrc ! video/x-raw(memory:NVMM), "
-        //    "width={}, height={}, framerate={}/1 ! nvvidconv ! "
-        //    "nvvidconv flip-method=2 ! "
-        //    "video/x-raw, format=(string)BGRx ! videoconvert ! "
-        //    "video/x-raw, format=(string)BGR ! appsink drop=true sync=false",
-        //    g_input_video_width, g_input_video_height, g_input_video_fps);
+        // gst_pipeline = std::format("nvarguscamerasrc ! video/x-raw(memory:NVMM), "
+        //     "width={}, height={}, framerate={}/1 ! nvvidconv ! "
+        //     "nvvidconv flip-method=2 ! "
+        //     "video/x-raw, format=(string)BGRx ! videoconvert ! "
+        //     "video/x-raw, format=(string)BGR ! appsink drop=true sync=false",
+        //     g_input_video_width, g_input_video_height, g_input_video_fps);
         std::ostringstream ss;
         ss << "nvarguscamerasrc ! video/x-raw(memory:NVMM), "
-        << "width=" << g_input_video_width << ", height=" << g_input_video_height 
-        << ", framerate=" << g_input_video_fps << "/1 ! nvvidconv ! "
-        << "nvvidconv flip-method=2 ! "
-        << "video/x-raw, format=(string)BGRx ! videoconvert ! "
-        << "video/x-raw, format=(string)BGR ! appsink drop=true sync=false";
+           << "width=" << g_input_video_width << ", height=" << g_input_video_height
+           << " ! nvvidconv ! "
+           << "nvvidconv flip-method=2 ! "
+           << "video/x-raw, format=(string)BGRx ! videoconvert ! "
+           << "video/x-raw, format=(string)BGR ! appsink drop=true sync=false";
         gst_pipeline = ss.str();
 
         cap.open(gst_pipeline, cv::CAP_GSTREAMER);
 
-        #elif defined(BLD_WIN)
+#elif defined(BLD_WIN)
 
-        cap.open(0, cv::CAP_DSHOW);  // Open default webcam
+        cap.open(0, cv::CAP_DSHOW); // Open default webcam
         cap.set(cv::CAP_PROP_FRAME_WIDTH, g_input_video_width);
         cap.set(cv::CAP_PROP_FRAME_HEIGHT, g_input_video_height);
 
-        #else
+#else
 
-        #error "Please define a build platform."
+#error "Please define a build platform."
 
-        #endif
+#endif
     }
     else
     {
@@ -155,29 +157,28 @@ bool create_input_video_stream(void)
  ********************************************************************************/
 bool create_output_vid_stream(void)
 {
-    //std::string base_path = "file:///home/crose72/Documents/GitHub/OperationSquirrel/SquirrelDefender/data/";
-    #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
     std::string base_path = "file:///workspace/OperationSquirrel/SquirrelDefender/data/";
-    #elif defined(BLD_WIN)
-    std::string base_path = "file:///home/shaun/workspaces/os-dev/OperationSquirrel/SquirrelDefender/data/";
-    #endif
+#endif
+
     std::string base_name = "output";
     std::string extension = ".mp4";
     std::string file_name = generate_unique_file_name(base_name, extension);
-    
+
     cv::Size frame_size(g_input_video_width, g_input_video_height); // 1280x720
-    int fourcc = cv::VideoWriter::fourcc('m', 'p', '4', 'v'); // Codec for MP4 format
+    int fourcc = cv::VideoWriter::fourcc('m', 'p', '4', 'v');       // Codec for MP4 format
     video_writer.open(file_name, fourcc, g_input_video_fps, frame_size);
 
     if (!video_writer.isOpened())
     {
-        std::cout << "video_io_opencv: failed to create output_vid_file stream\n" << std::endl;
+        std::cout << "video_io_opencv: failed to create output_vid_file stream\n"
+                  << std::endl;
         file_stream_created = false;
         return false;
     }
 
     file_stream_created = true;
-    
+
     return true;
 }
 
@@ -187,9 +188,9 @@ bool create_output_vid_stream(void)
  ********************************************************************************/
 bool capture_image(void)
 {
-    cap >> g_image;  // Capture g_image from the camera
+    cap >> g_image; // Capture g_image from the camera
 
-    if (g_image.empty()) 
+    if (g_image.empty())
     {
         g_valid_image_rcvd = false;
 
@@ -205,6 +206,7 @@ bool capture_image(void)
     }
 
     g_valid_image_rcvd = true;
+    video_fps_actual = ((g_dt > (float)0.000001) ? (1 / g_dt) : (float)0.0);
 
     return true;
 }
@@ -247,6 +249,14 @@ void video_mods(void)
         0.5,                              // font scale
         cv::Scalar(255, 255, 255),        // white
         1);
+    overlay_text(
+        g_image,
+        "fps",
+        std::to_string(video_fps_actual),
+        cv::Point(10, g_image.rows - 30), // bottom-left
+        0.5,                              // font scale
+        cv::Scalar(255, 255, 255),        // white
+        1);
 }
 
 /********************************************************************************
@@ -255,7 +265,7 @@ void video_mods(void)
  ********************************************************************************/
 bool save_video(void)
 {
-    // write video file 
+    // write video file
     if (video_writer.isOpened() && g_valid_image_rcvd && file_stream_created)
     {
         video_writer.write(g_image);
@@ -347,10 +357,8 @@ bool VideoCV::init(void)
 
     g_valid_image_rcvd = false;
     g_image = NULL;
-    g_input_video_width = 1280.0;
-    g_input_video_height = 720.0;
-    g_input_video_fps = 30;
     g_end_of_video = false;
+    video_fps_actual = (float)16.67;
 
     if (!create_input_video_stream() ||
         !create_output_vid_stream())
