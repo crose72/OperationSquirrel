@@ -134,12 +134,73 @@ const float delta_offset[MAX_IDX_DELTA_PIXEL_OFFSET][MAX_IDX_DELTA_D_OFFSET] = {
     {0.00f, 0.51f, 0.68f, 0.90f, 1.20f, 1.60f, 1.80f, 2.39f},
     {0.00f, 0.59f, 0.79f, 1.05f, 1.40f, 1.86f, 2.10f, 2.79f}};
 
+// Kalman filter params
+const float dt_kf_loc = 0.05;
+
+// H_loc (Observation matrix, 2x6)
+float H_loc_00 = 1.0f;
+float H_loc_11 = 1.0f;
+
+// Q_loc (Process noise covariance diagonals, 6x6)
+float Q_loc_00 = 0.01f;
+float Q_loc_11 = 0.0001f;
+float Q_loc_22 = 0.00001f;
+float Q_loc_33 = 0.00001f;
+float Q_loc_44 = 0.00001f;
+float Q_loc_55 = 0.00001f;
+
+// R_loc (Measurement noise covariance diagonals, 2x2)
+float R_loc_00 = 10.0f;
+float R_loc_11 = 40.0f;
+
+// P_loc (Estimate covariance diagonals, 6x6)
+float P_loc_00 = 0.1f;
+float P_loc_11 = 0.1f;
+float P_loc_22 = 0.1f;
+float P_loc_33 = 0.1f;
+float P_loc_44 = 0.1f;
+float P_loc_55 = 0.1f;
+
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
+void get_kf_params(void);
+void init_kf_loc(void);
 void dtrmn_target_location(void);
 void update_target_location(void);
-void init_kf_loc(void);
+
+/********************************************************************************
+ * Function: get_kf_params
+ * Description: Calibratable parameters for target tracking and identification.
+ ********************************************************************************/
+void get_kf_params(void)
+{
+    ParamReader kf_params("../params.json");
+
+    // H_loc (Observation matrix, 2x6)
+    H_loc_00 = kf_params.get_float_param("Localization_Params", "H_loc_00");
+    H_loc_11 = kf_params.get_float_param("Localization_Params", "H_loc_11");
+
+    // Q_loc (Process noise covariance diagonals, 6x6)
+    Q_loc_00 = kf_params.get_float_param("Localization_Params", "Q_loc_00");
+    Q_loc_11 = kf_params.get_float_param("Localization_Params", "Q_loc_11");
+    Q_loc_22 = kf_params.get_float_param("Localization_Params", "Q_loc_22");
+    Q_loc_33 = kf_params.get_float_param("Localization_Params", "Q_loc_33");
+    Q_loc_44 = kf_params.get_float_param("Localization_Params", "Q_loc_44");
+    Q_loc_55 = kf_params.get_float_param("Localization_Params", "Q_loc_55");
+
+    // R_loc (Measurement noise covariance diagonals, 2x2)
+    R_loc_00 = kf_params.get_float_param("Localization_Params", "R_loc_00");
+    R_loc_11 = kf_params.get_float_param("Localization_Params", "R_loc_11");
+
+    // P_loc (Estimate covariance diagonals, 6x6)
+    P_loc_00 = kf_params.get_float_param("Localization_Params", "P_loc_00");
+    P_loc_11 = kf_params.get_float_param("Localization_Params", "P_loc_11");
+    P_loc_22 = kf_params.get_float_param("Localization_Params", "P_loc_22");
+    P_loc_33 = kf_params.get_float_param("Localization_Params", "P_loc_33");
+    P_loc_44 = kf_params.get_float_param("Localization_Params", "P_loc_44");
+    P_loc_55 = kf_params.get_float_param("Localization_Params", "P_loc_55");
+}
 
 /********************************************************************************
  * Function: init_kf_loc
@@ -156,9 +217,6 @@ void init_kf_loc(void)
     g_ax_target_ekf = 0.0;
     g_ay_target_ekf = 0.0;
 
-    // KF init
-    float dt = 0.05; // Time step
-
     // Resize matrices and set to zero initially
     A_loc.set_size(n_states, n_states);
     A_loc.zeros();
@@ -174,36 +232,40 @@ void init_kf_loc(void)
     P_loc.zeros();
 
     // Define system dynamics (State transition matrix A_loc)
-    A_loc << 1 << 0 << dt << 0 << 0.5 * pow(dt, 2) << 0 << arma::endr
-          << 0 << 1 << 0 << dt << 0 << 0.5 * pow(dt, 2) << arma::endr
-          << 0 << 0 << 1 << 0 << dt << 0 << arma::endr
-          << 0 << 0 << 0 << 1 << 0 << dt << arma::endr
+    A_loc << 1 << 0 << dt_kf_loc << 0 << 0.5 * pow(dt_kf_loc, 2) << 0 << arma::endr
+          << 0 << 1 << 0 << dt_kf_loc << 0 << 0.5 * pow(dt_kf_loc, 2) << arma::endr
+          << 0 << 0 << 1 << 0 << dt_kf_loc << 0 << arma::endr
+          << 0 << 0 << 0 << 1 << 0 << dt_kf_loc << arma::endr
           << 0 << 0 << 0 << 0 << 1 << 0 << arma::endr
           << 0 << 0 << 0 << 0 << 0 << 1 << arma::endr;
 
     // Observation matrix (Only x and y are observed)
-    H_loc << 1 << 0 << 0 << 0 << 0 << 0 << arma::endr
-          << 0 << 1 << 0 << 0 << 0 << 0 << arma::endr;
+    arma::mat H_loc = arma::zeros<arma::mat>(2, 6);
+    H_loc(0, 0) = H_loc_00;
+    H_loc(1, 1) = H_loc_11;
 
     // Model covariance matrix Q_loc (process noise)
-    Q_loc << 0.01 << 0 << 0 << 0 << 0 << 0 << arma::endr
-          << 0 << 0.0001 << 0 << 0 << 0 << 0 << arma::endr
-          << 0 << 0 << 0.00001 << 0 << 0 << 0 << arma::endr
-          << 0 << 0 << 0 << 0.00001 << 0 << 0 << arma::endr
-          << 0 << 0 << 0 << 0 << 0.00001 << 0 << arma::endr
-          << 0 << 0 << 0 << 0 << 0 << 0.00001 << arma::endr;
+    arma::mat Q_loc = arma::zeros<arma::mat>(6, 6);
+    Q_loc(0, 0) = Q_loc_00;
+    Q_loc(1, 1) = Q_loc_11;
+    Q_loc(2, 2) = Q_loc_22;
+    Q_loc(3, 3) = Q_loc_33;
+    Q_loc(4, 4) = Q_loc_44;
+    Q_loc(5, 5) = Q_loc_55;
 
     // Measurement covariance matrix R_loc (sensor noise)
-    R_loc << 10.0 << 0 << arma::endr
-          << 0 << 40.0 << arma::endr;
+    arma::mat R_loc = arma::zeros<arma::mat>(2, 2);
+    R_loc(0, 0) = R_loc_00;
+    R_loc(1, 1) = R_loc_11;
 
     // Estimate covariance matrix P_loc (initial trust in the estimate)
-    P_loc << 0.1 << 0 << 0 << 0 << 0 << 0 << arma::endr
-          << 0 << 0.1 << 0 << 0 << 0 << 0 << arma::endr
-          << 0 << 0 << 0.1 << 0 << 0 << 0 << arma::endr
-          << 0 << 0 << 0 << 0.1 << 0 << 0 << arma::endr
-          << 0 << 0 << 0 << 0 << 0.1 << 0 << arma::endr
-          << 0 << 0 << 0 << 0 << 0 << 0.1 << arma::endr;
+    arma::mat P_loc = arma::zeros<arma::mat>(6, 6);
+    P_loc(0, 0) = P_loc_00;
+    P_loc(1, 1) = P_loc_11;
+    P_loc(2, 2) = P_loc_22;
+    P_loc(3, 3) = P_loc_33;
+    P_loc(4, 4) = P_loc_44;
+    P_loc(5, 5) = P_loc_55;
 
     // Initialize Kalman Filter
     kf_loc.InitSystem(A_loc, B_loc, H_loc, Q_loc, R_loc);
@@ -390,6 +452,7 @@ bool Localize::init(void)
     loc_target_valid_prv = false;
     g_target_data_useful = false;
 
+    get_kf_params();
     init_kf_loc();
 
     return true;
