@@ -55,18 +55,13 @@
         "w2": 0.0,
         "w3": 0.0
     },
-    "Follow_Params": {
-        "Desired_Height": 640.0,
-        "Desired_Width": 150.0,
-        "Desired_X_offset": 4.0,
-        "Desired_Y_offset": 0.0,
-        "Desired_Z_offset": 0.0,
-        "BBox_Filt_coeff": 0.75
-    },
-    "Detection_Params": {
+    "Tracking_Params": {
+        "BBox_Filt_coeff": 0.75,
         "Detect_Thresh": 0.5,
         "Detect_Class_Orin": 0,
-        "Detect_Class_B01": 1,
+        "Detect_Class_B01": 1
+    },
+    "Detection_Params": {
         "Max_Batch_Size": 4,
         "Precision": 0,
         "Device": 0,
@@ -74,5 +69,13 @@
         "Min_Frames": 25,
         "Drop_Frames": 10,
         "Overlap_Threshold": 0.1
+    },
+    "Follow_Params": {
+        "Desired_Height": 640.0,
+        "Desired_Width": 150.0,
+        "Desired_X_offset": 4.0,
+        "Desired_Y_offset": 0.0,
+        "Desired_Z_offset": 0.0,
+        "BBox_Filt_coeff": 0.75
     }
 }

@@ -17,6 +17,7 @@
 #include "video_io.h"
 #include "detect_target.h"
 #include "param_reader.h"
+#include "signal_processing.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/tracking.hpp>
 #include <opencv2/core/utility.hpp>
@@ -86,6 +87,8 @@ extern float g_target_center_x;
 extern float g_target_center_y;
 extern float g_detection_class;
 extern float g_target_detection_conf;
+extern float g_target_cntr_offset_x_filt;
+extern float g_target_cntr_offset_y_filt;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

@@ -92,24 +92,21 @@ float w3_yaw = (float)0.0;
 
 float x_desired = (float)4.0;
 float y_desired = (float)0.0;
-
-float target_bbox_center_filt_coeff = (float)0.75;
-
 const float camera_half_fov = (float)0.7423; // half of 83 degree FOV camera
 
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-void get_params(void);
+void get_path_params(void);
 void calc_follow_error(void);
 void calc_yaw_target_error(void);
 void dtrmn_follow_vector(void);
 
 /********************************************************************************
- * Function: get_params
+ * Function: get_path_params
  * Description: Read follow control parameters from a json or other file type.
  ********************************************************************************/
-void get_params(void)
+void get_path_params(void)
 {
     ParamReader follow_control("../params.json");
 
@@ -156,8 +153,6 @@ void get_params(void)
     // Follow params
     x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_offset");
     y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_offset");
-
-    target_bbox_center_filt_coeff = follow_control.get_float_param("Follow_Params", "BBox_Filt_coeff");
 }
 
 /********************************************************************************
@@ -349,7 +344,7 @@ bool PathPlanner::init(void)
     g_yaw_target_error = (float)0.0;
     g_mav_veh_yaw_adjusted = (float)0.0;
 
-    get_params();
+    get_path_params();
 
     return true;
 }

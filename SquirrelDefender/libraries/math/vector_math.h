@@ -1,18 +1,19 @@
 #pragma once
 
 /********************************************************************************
- * @file    interpolate.h
+ * @file    vector_math.h
  * @author  Cameron Rose
  * @date    1/22/2025
  ********************************************************************************/
-#ifndef INTERPOLATE_H
-#define INTERPOLATE_H
+#ifndef VECTOR_MATH_H
+#define VECTOR_MATH_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include <stdint.h>
 #include <cmath>
+#include <vector>
 
 /********************************************************************************
  * Imported objects
@@ -25,9 +26,10 @@
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-float get_float_index(float input, const float *array, int max_idx, bool is_ascending);
-float get_interpolated_value(float idx, const float *array, int max_idx);
-float get_2d_interpolated_value(const float *array, int max_rows, int max_cols, float pix_idx, float x_idx);
-int find_floor_index(float x, float *arr, int arr_len);
+float vector_sum(const std::vector<float> &x);
+float vector_product_sum(const std::vector<float> &x, const std::vector<float> &y);
+float vector_square_sum(const std::vector<float> &x);
+float vector_diff_square_sum(const std::vector<float> &x, const std::vector<float> &y);
+float vector_stdev(const std::vector<float> &x);
 
-#endif // INTERPOLATE_H
+#endif // VECTOR_MATH_H
