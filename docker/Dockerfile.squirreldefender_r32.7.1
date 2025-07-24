@@ -9,7 +9,7 @@ ARG BUILD_FOLDER=build
 # Copy the selected SquirrelDefender build folder and any other necessary folders into the container
 COPY SquirrelDefender/${BUILD_FOLDER}/ /workspace/OperationSquirrel/SquirrelDefender/build/
 COPY SquirrelDefender/data/ /workspace/OperationSquirrel/SquirrelDefender/data/
-COPY SquirrelDefender/networks/ /workspace/OperationSquirrel/SquirrelDefender/networks/
+COPY SquirrelDefender/models/ /workspace/OperationSquirrel/SquirrelDefender/models/
 COPY SquirrelDefender/params.json /workspace/OperationSquirrel/SquirrelDefender/params.json
 
 # Remove any data files that are currently saved in the jetson filesystem (don't want to mix and match data)
