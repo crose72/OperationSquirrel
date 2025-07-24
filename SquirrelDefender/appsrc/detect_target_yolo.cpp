@@ -101,8 +101,8 @@ bool YOLO::init(void)
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     YoloV8Config config;
-    const std::string engine_path = "../networks/yolov8s/yolov8s.engine.Orin.fp16.1.1.-1.-1.-1";
-    const std::string model_path = "../networks/yolov8s/yolov8s.onnx";
+    const std::string engine_path = "../models/yolov8s/yolov8s.engine.Orin.fp16.1.1.-1.-1.-1";
+    const std::string model_path = "../models/yolov8s/yolov8s.onnx";
     yolov8_detector = new YoloV8(model_path, engine_path, config);
 
     g_yolo_detections = std::vector<Object>();
@@ -110,8 +110,8 @@ bool YOLO::init(void)
 
 #elif defined(BLD_WIN)
 
-    const std::string class_list_path = "../../networks/yolov5m/coco.names";
-    const std::string model = "../../networks/yolov5m/yolov5m.onnx";
+    const std::string class_list_path = "../../models/yolov5m/coco.names";
+    const std::string model = "../../models/yolov5m/yolov5m.onnx";
     g_net = YoloNet::create(model, class_list_path, cv::dnn::DNN_BACKEND_CUDA, cv::dnn::DNN_TARGET_CUDA);
     g_yolo_detections = std::vector<YoloNet::detection>();
     g_yolo_detections.reserve(100);
