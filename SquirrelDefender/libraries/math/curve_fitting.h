@@ -1,18 +1,20 @@
 #pragma once
 
 /********************************************************************************
- * @file    interpolate.h
+ * @file    curve_fitting.h
  * @author  Cameron Rose
  * @date    1/22/2025
  ********************************************************************************/
-#ifndef INTERPOLATE_H
-#define INTERPOLATE_H
+#ifndef CURVE_FITTING_H
+#define CURVE_FITTING_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include <stdint.h>
 #include <cmath>
+#include "vector_math.h"
+#include <vector>
 
 /********************************************************************************
  * Imported objects
@@ -25,9 +27,8 @@
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-float get_float_index(float input, const float *array, int max_idx, bool is_ascending);
-float get_interpolated_value(float idx, const float *array, int max_idx);
-float get_2d_interpolated_value(const float *array, int max_rows, int max_cols, float pix_idx, float x_idx);
-int find_floor_index(float x, float *arr, int arr_len);
+void linear_regression_window(const std::vector<float> &x, const std::vector<float> &y, float *slope, float *intercept);
+float calc_rmse(const std ::vector<float> &x, const std ::vector<float> &y, float slope, float intercept);
+void count_points_above_and_below(const std ::vector<float> &x, const std ::vector<float> &y, float slope, float intercept, int *above, int *below);
 
-#endif // INTERPOLATE_H
+#endif // CURVE_FITTING_H

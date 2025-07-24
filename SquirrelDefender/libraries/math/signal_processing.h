@@ -1,18 +1,19 @@
 #pragma once
 
 /********************************************************************************
- * @file    interpolate.h
+ * @file    signal_processing.h
  * @author  Cameron Rose
- * @date    1/22/2025
+ * @date    4/29/2025
  ********************************************************************************/
-#ifndef INTERPOLATE_H
-#define INTERPOLATE_H
+#ifndef SIGNAL_PROCESSING_H
+#define SIGNAL_PROCESSING_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include <stdint.h>
 #include <cmath>
+#include <vector>
 
 /********************************************************************************
  * Imported objects
@@ -25,9 +26,11 @@
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-float get_float_index(float input, const float *array, int max_idx, bool is_ascending);
-float get_interpolated_value(float idx, const float *array, int max_idx);
-float get_2d_interpolated_value(const float *array, int max_rows, int max_cols, float pix_idx, float x_idx);
-int find_floor_index(float x, float *arr, int arr_len);
+float low_pass_filter(float x, float x_prev, float alpha);
+void update_buffer(std::vector<float> &buffer, float sample, int &index);
+float moving_average(std::vector<float> &buffer, float sample, int &index, float &sum);
+std::vector<float> unwrap_buffer(const std::vector<float> &buffer, int index);
+float first_derivative(float current, float previous, float dt);
+float second_derivative(float current, float prev, float prev2, float dt);
 
-#endif // INTERPOLATE_H
+#endif // SIGNAL_PROCESSING_H
