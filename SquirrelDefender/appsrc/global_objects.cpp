@@ -1,25 +1,18 @@
-#pragma once
-
 /********************************************************************************
- * @file    common_inc.h
+ * @file    global_objects.cpp
  * @author  Cameron Rose
- * @date    1/22/2025
+ * @date    7/30/2025
+ * @brief   Global variable definitions.
  ********************************************************************************/
-#ifndef COMMON_INC
-#define COMMON_INC
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-// Standard libraries
-#include <stdint.h>
-
-// Global objects
-#include "global_calibrations.h"
-#include "global_types.h"
 #include "global_objects.h"
 
-// Custom libraries
-#include "custom_print.h"
-
-#endif // COMMON_INC
+/********************************************************************************
+ * Object definitions
+ ********************************************************************************/
+bool g_stop_program = false;
+bool g_use_video_playback = false;
+std::string input_video_path = "";

@@ -2,7 +2,7 @@
  * @file    main.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Main entry point for the program, contains the loop functions for 
+ * @brief   Main entry point for the program, contains the loop functions for
             each software component.
  ********************************************************************************/
 
@@ -11,6 +11,7 @@
  ********************************************************************************/
 #include <mutex>
 #include "scheduler.h"
+#include "global_objects.h"
 
 /********************************************************************************
  * Typedefs
@@ -23,9 +24,6 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool g_stop_program;
-bool g_use_video_playback;
-std::string input_video_path;
 
 /********************************************************************************
  * Calibration definitions
@@ -64,18 +62,18 @@ void attach_sig_handler(void)
  * Function: main
  * Description: Entry point for the program.  Runs the main loop.
  ********************************************************************************/
-int main(int argc, char** argv) 
+int main(int argc, char **argv)
 {
     input_video_path = "";
     g_use_video_playback = false;
     g_stop_program = false;
-    
+
     if (argc > 1)
     {
         input_video_path = argv[1];
         g_use_video_playback = true;
     }
-    
+
     attach_sig_handler();
 
     if (Scheduler::init() != 0)
