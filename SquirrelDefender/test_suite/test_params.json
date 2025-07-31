@@ -1,0 +1,18 @@
+{
+    "Input_File": {
+        "File_Name": "../test_data/follow-ann-arbor/playback-w-yolo-boxes/follow_1/follow_1_ann-arbor_yolo-boxes.csv",
+        "File_NameX": "../test_data/follow-ann-arbor/playback-w-yolo-boxes/follow_2/follow_2_ann-arbor_yolo-boxes.csv",
+        "File_NameX": "../test_data/follow-ann-arbor/playback-w-yolo-boxes/follow_4/follow_4_ann-arbor_yolo-boxes.csv",
+        "File_NameX": "../test_data/follow-ann-arbor/playback-w-yolo-boxes/follow_6/follow_6_ann-arbor_yolo-boxes.csv",
+    },
+    "Output_File": {
+        "File_Path": "../test_data/decision2Throw/follow_1_ann-arbor_yolo-boxes/",
+        "File_PathX": "../test_data/decision2Throw/follow_2_ann-arbor_yolo-boxes/",
+        "File_PathX": "../test_data/decision2Throw/follow_4_ann-arbor_yolo-boxes/",
+        "File_PathX": "../test_data/decision2Throw/follow_6_ann-arbor_yolo-boxes/",
+        "File_Name": "follow_1_time2throw",
+        "File_NameX": "follow_2_time2throw",
+        "File_NameX": "follow_4_time2throw",
+        "File_NameX": "follow_6_time2throw"
+    }
+}
