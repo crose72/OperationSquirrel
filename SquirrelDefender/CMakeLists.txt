@@ -427,6 +427,8 @@ file(GLOB KF_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.cpp)
 file(GLOB KF_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.h)
 
 if(BLD_JETSON_ORIN_NANO OR BLD_WSL)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt/src)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt/libs/tensorrt-cpp-api/src)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt)
 endif()
 
@@ -477,8 +479,6 @@ if (NOT BUILD_TEST_HARNESS)
         cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
         set_target_debug_flags(squirreldefender)
 
-        target_include_directories(squirreldefender PRIVATE modules/yolov8_tensorrt/src)
-
         target_link_libraries(squirreldefender 
                             YoloV8_TRT 
                             ${OpenCV_LIBS} 
@@ -501,8 +501,6 @@ if (NOT BUILD_TEST_HARNESS)
     elseif(BLD_WSL)
         cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
         set_target_debug_flags(squirreldefender)
-
-        target_include_directories(squirreldefender PRIVATE modules/yolov8_tensorrt/src)
 
         target_link_libraries(squirreldefender 
                             YoloV8_TRT 
@@ -659,8 +657,6 @@ if (BUILD_TEST_HARNESS)
         cuda_add_executable(test_localize_target ${LOC_TEST_SOURCES} ${LOC_TEST_HEADERS})
         set_target_debug_flags(test_localize_target)
 
-        target_include_directories(test_localize_target PRIVATE modules/yolov8_tensorrt/src)
-
         if (BLD_JETSON_ORIN_NANO)
             target_link_libraries(test_localize_target 
                                 YoloV8_TRT 
@@ -697,10 +693,8 @@ if (BUILD_TEST_HARNESS)
         cuda_add_executable(test_follow_target ${FOLLOW_TEST_SOURCES} ${FOLLOW_TEST_HEADERS})
         set_target_debug_flags(test_follow_target)
 
-        target_include_directories(test_follow_target PRIVATE modules/yolov8_tensorrt/src)
-
         if (BLD_JETSON_ORIN_NANO)
-            target_link_libraries(test_localize_target 
+            target_link_libraries(test_follow_target 
                                 YoloV8_TRT 
                                 ${OpenCV_LIBS} 
                                 vpi 
@@ -713,7 +707,7 @@ if (BUILD_TEST_HARNESS)
                                 ${LAPACK_LIBRARIES} 
                                 ${BLAS_LIBRARIES})
         elseif(BLD_WSL)
-            target_link_libraries(test_localize_target 
+            target_link_libraries(test_follow_target 
                                 YoloV8_TRT 
                                 ${OpenCV_LIBS} 
                                 #vpi 
