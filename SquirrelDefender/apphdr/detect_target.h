@@ -25,7 +25,7 @@
 extern videoSource* g_input;
 extern uchar3* g_image;
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 
 extern cv::Mat g_image;
 
@@ -45,7 +45,7 @@ extern detectNet *g_net;
 extern detectNet::Detection *g_detections;
 extern int g_detection_count;
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
 extern std::vector<Object> g_yolo_detections;
 extern int g_yolo_detection_count;

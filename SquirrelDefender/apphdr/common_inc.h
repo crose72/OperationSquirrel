@@ -17,6 +17,7 @@
 // Global objects
 #include "global_calibrations.h"
 #include "global_types.h"
+#include "global_objects.h"
 
 // Custom libraries
 #include "custom_print.h"

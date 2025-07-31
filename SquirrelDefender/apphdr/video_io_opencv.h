@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 
 /********************************************************************************
  * @file    video_io_opencv.h
@@ -15,6 +15,7 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
+#include "time_calc.h"
 #include <string>
 #include <fstream>
 #include <opencv2/cudaimgproc.hpp>
@@ -31,14 +32,16 @@ extern float g_y_target_ekf;
 extern int32_t g_mav_veh_rel_alt;
 extern std::string input_video_path;
 extern bool g_use_video_playback;
+extern float g_dt;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
 extern bool g_valid_image_rcvd;
 extern cv::Mat g_image;
-extern float g_input_video_width;
-extern float g_input_video_height;
+extern const float g_input_video_width;
+extern const float g_input_video_height;
+extern bool g_end_of_video;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

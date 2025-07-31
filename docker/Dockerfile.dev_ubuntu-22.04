@@ -1,0 +1,41 @@
+FROM nvcr.io/nvidia/cuda-dl-base:24.10-cuda12.6-devel-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3-pip \
+    python3-dev \
+    pkg-config \
+    build-essential \
+    git \
+    wget \
+    unzip \
+    libssl-dev \
+    zlib1g-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN wget https://cmake.org/files/v3.28/cmake-3.28.0-linux-x86_64.sh && \
+    chmod +x cmake-3.28.0-linux-x86_64.sh && \
+    ./cmake-3.28.0-linux-x86_64.sh --prefix=/usr/local --exclude-subdir && \
+    rm cmake-3.28.0-linux-x86_64.sh
+
+RUN apt-get update && apt-get install -y libtbb-dev
+
+RUN apt-get update && apt install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-good1.0-dev && \
+	pkg-config --modversion gstreamer-1.0 && \
+    git clone https://github.com/crose72/Install-OpenCV.git && \
+    cd Install-OpenCV && \
+    chmod +x OpenCV-4-10-0-tracking.sh && \
+    sed -i 's/sudo //g' OpenCV-4-10-0-tracking.sh && \
+    apt-get update && \
+    ./OpenCV-4-10-0-tracking.sh && \
+    cd .. && rm -rf Install-OpenCV
+
+RUN apt-get update && apt install -y \
+    libspdlog-dev \
+    libfmt-dev \
+    libjsoncpp-dev \
+    libarmadillo-dev \
+    liblapack-dev \
+    libblas-dev && \
+    pkg-config --cflags --libs armadillo

@@ -1,5 +1,5 @@
 #ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 
 /********************************************************************************
  * @file    detect_target_yolo.cpp
@@ -10,24 +10,24 @@
 ********************************************************************************/
 
 /********************************************************************************
-* Includes
-********************************************************************************/
+ * Includes
+ ********************************************************************************/
 #include "detect_target_yolo.h"
 
 /********************************************************************************
-* Typedefs
-********************************************************************************/
+ * Typedefs
+ ********************************************************************************/
 
 /********************************************************************************
-* Private macros and defines
-********************************************************************************/
+ * Private macros and defines
+ ********************************************************************************/
 
 /********************************************************************************
-* Object definitions
-********************************************************************************/
-#ifdef BLD_JETSON_ORIN_NANO
+ * Object definitions
+ ********************************************************************************/
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-YoloV8* yolov8_detector;
+YoloV8 *yolov8_detector;
 std::vector<Object> g_yolo_detections;
 int g_yolo_detection_count;
 
@@ -43,7 +43,6 @@ int g_yolo_detection_count;
 
 #endif
 
-
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
@@ -55,28 +54,29 @@ void detect_targets(void);
 
 /********************************************************************************
  * Function: detect_targets
- * Description: Run object detection on image and return the detections and 
+ * Description: Run object detection on image and return the detections and
  *              container of detected objects.
  ********************************************************************************/
 void detect_targets(void)
 {
     if (g_valid_image_rcvd)
     {
-    #ifdef BLD_JETSON_ORIN_NANO
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
         g_yolo_detections = yolov8_detector->detectObjects(g_image);
         g_yolo_detection_count = g_yolo_detections.size();
+        yolov8_detector->drawObjectLabels(g_image, g_yolo_detections);
 
-    #elif defined(BLD_WIN)
+#elif defined(BLD_WIN)
 
         YoloNet::detect(g_image, g_net, g_yolo_detections);
         g_yolo_detection_count = g_yolo_detections.size();
 
-    #else
+#else
 
-    #error "Please define a build platform."
+#error "Please define a build platform."
 
-    #endif
+#endif
     }
 }
 
@@ -98,29 +98,29 @@ YOLO::~YOLO(void) {};
  ********************************************************************************/
 bool YOLO::init(void)
 {
-    #ifdef BLD_JETSON_ORIN_NANO
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     YoloV8Config config;
-    const std::string engine_path = "../networks/yolov8s/yolov8s.engine.Orin.fp16.1.1.-1.-1.-1";
-    const std::string model_path = "../networks/yolov8s/yolov8s.onnx";
+    const std::string engine_path = "../models/yolov8s/yolov8s.engine.Orin.fp16.1.1.-1.-1.-1";
+    const std::string model_path = "../models/yolov8s/yolov8s.onnx";
     yolov8_detector = new YoloV8(model_path, engine_path, config);
-    
+
     g_yolo_detections = std::vector<Object>();
     g_yolo_detections.reserve(100);
 
-    #elif defined(BLD_WIN)
+#elif defined(BLD_WIN)
 
-    const std::string class_list_path = "../../networks/yolov5m/coco.names";
-    const std::string model = "../../networks/yolov5m/yolov5m.onnx";
+    const std::string class_list_path = "../../models/yolov5m/coco.names";
+    const std::string model = "../../models/yolov5m/yolov5m.onnx";
     g_net = YoloNet::create(model, class_list_path, cv::dnn::DNN_BACKEND_CUDA, cv::dnn::DNN_TARGET_CUDA);
     g_yolo_detections = std::vector<YoloNet::detection>();
     g_yolo_detections.reserve(100);
 
-    #else
+#else
 
-    #error "Please define a build platform."
+#error "Please define a build platform."
 
-    #endif
+#endif
 
     return true;
 }
@@ -140,21 +140,20 @@ void YOLO::loop(void)
  ********************************************************************************/
 void YOLO::shutdown(void)
 {
-    #ifdef BLD_JETSON_ORIN_NANO
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     delete yolov8_detector;
     yolov8_detector = nullptr;
 
-    #elif defined(BLD_WIN)
+#elif defined(BLD_WIN)
 
-    #warning "Remember to de-allocate memory at the end of the program if needed."
+#warning "Remember to de-allocate memory at the end of the program if needed."
 
-    #else
+#else
 
-    #error "Please define a build platform."
+#error "Please define a build platform."
 
-    #endif
-
+#endif
 }
 
 #endif // BLD_JETSON_ORIN_NANO

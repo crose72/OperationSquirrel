@@ -32,13 +32,13 @@ videoSource *g_input;
 videoOutput *output_vid_file;
 videoOutput *output_vid_disp;
 uchar3 *g_image;
-float g_input_video_width;
-float g_input_video_height;
-float g_input_video_fps;
 
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
+const float g_input_video_width = 1280.0;
+const float g_input_video_height = 720.0;
+const float g_input_video_fps = 30;
 
 /********************************************************************************
  * Function definitions
@@ -269,17 +269,6 @@ bool display_video(void)
 }
 
 /********************************************************************************
- * Function: calc_video_res
- * Description: Delete the input to stop using resources.
- ********************************************************************************/
-void calc_video_res(void)
-{
-    g_input_video_width = 1280.0; //static_cast<float>(g_input->GetWidth());
-    g_input_video_height = 720.0; //static_cast<float>(g_input->GetHeight());
-    g_input_video_fps = 30;
-}
-
-/********************************************************************************
  * Function: delete_input_video_stream
  * Description: Delete the input to stop using resources.
  ********************************************************************************/
@@ -351,17 +340,13 @@ bool VideoNV::init(void)
         return false;
     }
 
-    // Call after initializing the video input to avoid seg fault
-    calc_video_res();
-    
 #ifdef DEBUG_BUILD
-    
+
     // note: put in debug build
     if (!create_display_video_stream())
     {
         return false;
     }
-
 
 #endif // DEBUG_BUILD
 

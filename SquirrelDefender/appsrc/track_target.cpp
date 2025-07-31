@@ -4,7 +4,7 @@
  * @file    track_target.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Maintain bounding box around a detected target, even when object 
+ * @brief   Maintain bounding box around a detected target, even when object
  *          detection fails.
  ********************************************************************************/
 
@@ -28,8 +28,10 @@ bool target_tracked;
 bool tracking;
 bool initialized_cv_image;
 bool initialized_tracker;
-bool g_target_valid;
+float target_detection_thresh;
+float target_class;
 bool target_valid_prv;
+bool g_target_valid;
 int g_target_detection_id;
 int g_target_track_id;
 float g_target_cntr_offset_x;
@@ -43,7 +45,12 @@ float g_target_left;
 float g_target_right;
 float g_target_top;
 float g_target_bottom;
-
+float g_detection_class;
+float g_target_detection_conf;
+float g_target_cntr_offset_x_filt;
+float g_target_cntr_offset_y_filt;
+float target_cntr_offset_x_prv;
+float target_cntr_offset_y_prv;
 cv::cuda::GpuMat gpuImage;
 cv::Mat image_cv_wrapped;
 cv::Ptr<cv::TrackerCSRT> target_tracker;
@@ -54,10 +61,12 @@ cv::Rect target_bounding_box;
  ********************************************************************************/
 const float center_of_frame_width = 640.0f;
 const float center_of_frame_height = 360.0f;
+float target_bbox_center_filt_coeff = (float)0.75;
 
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
+void get_tracking_params(void);
 void identify_target(void);
 void get_target_info(void);
 void validate_target(void);
@@ -65,6 +74,36 @@ void track_target(void);
 void update_target_info(void);
 bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &g_image, cv::Rect &bounding_box);
 bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &g_image, cv::Rect &bounding_box);
+
+/********************************************************************************
+ * Function: get_tracking_params
+ * Description: Calibratable parameters for target tracking and identification.
+ ********************************************************************************/
+void get_tracking_params(void)
+{
+    ParamReader target_params("../params.json");
+
+    target_bbox_center_filt_coeff = target_params.get_float_param("Tracking_Params", "BBox_Filt_coeff");
+    target_detection_thresh = target_params.get_float_param("Tracking_Params", "Detect_Thresh");
+
+#if defined(BLD_JETSON_B01)
+
+    target_class = target_params.get_int_param("Tracking_Params", "Detect_Class_B01");
+
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+
+    target_class = target_params.get_int_param("Tracking_Params", "Detect_Class_Orin");
+
+#elif defined(BLD_WIN)
+
+    target_class = target_params.get_int_param("Tracking_Params", "Detect_Class_Orin");
+
+#else
+
+#error "Please define build platform."
+
+#endif
+}
 
 /********************************************************************************
  * Function: identify_target
@@ -78,21 +117,27 @@ void identify_target(void)
 
     for (int n = 0; n < g_detection_count; ++n)
     {
+        g_detection_class = g_detections[n].ClassID;
+        g_target_detection_conf = g_detections[n].Confidence;
         /* A tracked object, classified as a person with some confidence level */
-        if (g_detections[n].TrackID >= 0 && g_detections[n].ClassID == 1 && g_detections[n].Confidence > 0.5)
+        if (g_detections[n].TrackID >= 0 && g_detection_class == target_class && g_target_detection_conf > target_detection_thresh)
         {
             g_target_detection_id = n;
+            return;
         }
     }
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     for (int n = 0; n < g_yolo_detection_count; ++n)
     {
+        g_detection_class = g_yolo_detections[n].label;
+        g_target_detection_conf = g_yolo_detections[n].probability;
         /* A tracked object, classified as a person with some confidence level */
-        if (g_yolo_detections[n].label == 0 && g_yolo_detections[n].probability > 0.5)
+        if (g_detection_class == target_class && g_yolo_detections[n].probability > target_detection_thresh)
         {
             g_target_detection_id = n;
+            return;
         }
     }
 
@@ -100,10 +145,13 @@ void identify_target(void)
 
     for (int n = 0; n < g_yolo_detection_count; ++n)
     {
+        g_detection_class = g_yolo_detections[n].ClassID;
+        g_target_detection_conf = g_yolo_detections[n].Confidence;
         /* A tracked object, classified as a person with some confidence level */
-        if (g_yolo_detections[n].ClassID == 0 && g_yolo_detections[n].Confidence > 0.5)
+        if (g_detection_class == target_class && g_target_detection_conf > target_detection_thresh)
         {
             g_target_detection_id = n;
+            return;
         }
     }
 
@@ -132,14 +180,9 @@ void get_target_info(void)
         g_target_right = g_detections[g_target_detection_id].Right;
         g_target_top = g_detections[g_target_detection_id].Top;
         g_target_bottom = g_detections[g_target_detection_id].Bottom;
-        g_target_center_y = (g_target_left + g_target_right) / 2.0f;
-        g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-        g_target_cntr_offset_y = g_target_center_y - center_of_frame_width;
-        g_target_cntr_offset_x = g_target_center_x - center_of_frame_height;
-        g_target_aspect = g_target_width / g_target_height;
     }
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     if (g_target_detection_id >= 0)
     {
@@ -149,12 +192,6 @@ void get_target_info(void)
         g_target_left = g_yolo_detections[g_target_detection_id].rect.x;
         g_target_right = g_target_left + g_target_width;
         g_target_top = g_yolo_detections[g_target_detection_id].rect.y;
-        g_target_bottom = g_target_top + g_target_height;
-        g_target_center_y = (g_target_left + g_target_right) / 2.0f;
-        g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-        g_target_cntr_offset_y = g_target_center_y - center_of_frame_width;
-        g_target_cntr_offset_x = g_target_center_x - center_of_frame_height;
-        g_target_aspect = g_target_width / g_target_height; 
     }
 
 #elif defined(BLD_WIN)
@@ -167,12 +204,6 @@ void get_target_info(void)
         g_target_left = g_yolo_detections[g_target_detection_id].rect.x;
         g_target_right = g_target_left + g_target_width;
         g_target_top = g_yolo_detections[g_target_detection_id].rect.y;
-        g_target_bottom = g_target_top + g_target_height;
-        g_target_center_y = (g_target_left + g_target_right) / 2.0f;
-        g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-        g_target_cntr_offset_y = g_target_center_y - center_of_frame_width;
-        g_target_cntr_offset_x = g_target_center_x - center_of_frame_height;
-        g_target_aspect = g_target_width / g_target_height; 
     }
 
 #else
@@ -180,6 +211,16 @@ void get_target_info(void)
 #error "Please define a build platform."
 
 #endif
+
+    g_target_bottom = g_target_top + g_target_height;
+    g_target_center_y = (g_target_left + g_target_right) / 2.0f;
+    g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
+    g_target_cntr_offset_y = g_target_center_y - center_of_frame_width;
+    g_target_cntr_offset_x = g_target_center_x - center_of_frame_height;
+    g_target_aspect = g_target_width / g_target_height;
+
+    g_target_cntr_offset_x_filt = low_pass_filter(g_target_cntr_offset_x, target_cntr_offset_x_prv, target_bbox_center_filt_coeff);
+    g_target_cntr_offset_y_filt = low_pass_filter(g_target_cntr_offset_y, target_cntr_offset_y_prv, target_bbox_center_filt_coeff);
 }
 
 /********************************************************************************
@@ -191,7 +232,7 @@ void validate_target(void)
 #if defined(BLD_JETSON_B01)
 
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
-       implimented. */
+        implimented. */
     if (g_target_detection_id >= 0 && g_target_track_id >= 0 && g_target_height > 1 && g_target_width > 1)
     {
         g_target_valid = true;
@@ -201,10 +242,10 @@ void validate_target(void)
         g_target_valid = false;
     }
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
-   implimented. */
+    implimented. */
     if (g_target_detection_id >= 0 && g_target_height > 1 && g_target_width > 1)
     {
         g_target_valid = true;
@@ -218,7 +259,7 @@ void validate_target(void)
 
 #error "Please define build platform."
 
-#endif // defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO)
+#endif // defined(BLD_JETSON_B01)
 
     target_valid_prv = g_target_valid;
 }
@@ -243,13 +284,16 @@ bool tracker_init(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect
 bool tracker_update(cv::Ptr<cv::TrackerCSRT> &tracker, cv::Mat &cv_image, cv::Rect &bounding_box)
 {
     bool success;
-    try {
+    try
+    {
         success = tracker->update(cv_image, bounding_box);
-        if (!success) {
+        if (!success)
+        {
             std::cerr << "Tracking failed." << std::endl;
         }
     }
-    catch (const cv::Exception& e) {
+    catch (const cv::Exception &e)
+    {
         std::cerr << "OpenCV error: " << e.what() << std::endl;
     }
 
@@ -264,8 +308,8 @@ void track_target(void)
 {
 #if defined(BLD_JETSON_B01)
 
-/* Don't wrap the image from jetson inference until a valid image has been received.
-   That way we know the memory has been allocaed and is ready. */
+    /* Don't wrap the image from jetson inference until a valid image has been received.
+        That way we know the memory has been allocaed and is ready. */
     if (g_valid_image_rcvd && !initialized_cv_image)
     {
         image_cv_wrapped = cv::Mat(g_input_video_height, g_input_video_width, CV_8UC3, g_image); // Directly wrap uchar3*
@@ -316,7 +360,7 @@ void track_target(void)
             tracker_init(target_tracker, g_image, target_bounding_box);
             initialized_tracker = true;
         }
-        
+
         if (initialized_tracker)
         {
             target_tracked = tracker_update(target_tracker, g_image, target_bounding_box);
@@ -332,7 +376,6 @@ void track_target(void)
         {
             tracking = false;
         }
-        
     }
 
 #else
@@ -382,6 +425,8 @@ Track::~Track(void) {};
  ********************************************************************************/
 bool Track::init(void)
 {
+    get_tracking_params();
+
     g_target_valid = false;
     target_valid_prv = false;
     g_target_cntr_offset_x = 0.0f;
@@ -394,6 +439,13 @@ bool Track::init(void)
     g_target_top = 0.0f;
     g_target_bottom = 0.0f;
     g_target_detection_id = -1;
+    g_detection_class = (float)0.0;
+    g_target_detection_conf = (float)0.0;
+
+    g_target_cntr_offset_x_filt = (float)0.0;
+    g_target_cntr_offset_y_filt = (float)0.0;
+    target_cntr_offset_x_prv = (float)0.0;
+    target_cntr_offset_y_prv = (float)0.0;
 
     initialized_cv_image = false;
     target_tracked = false;
@@ -422,7 +474,6 @@ void Track::loop(void)
  ********************************************************************************/
 void Track::shutdown(void)
 {
-
 }
 
 #endif // ENABLE_CV

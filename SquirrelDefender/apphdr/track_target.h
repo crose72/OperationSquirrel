@@ -17,6 +17,7 @@
 #include "video_io.h"
 #include "detect_target.h"
 #include "param_reader.h"
+#include "signal_processing.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/tracking.hpp>
 #include <opencv2/core/utility.hpp>
@@ -39,16 +40,16 @@ extern detectNet *g_net;
 extern detectNet::Detection *g_detections;
 extern uchar3 *g_image;
 extern int g_detection_count;
-extern float g_input_video_width;
-extern float g_input_video_height;
+extern const float g_input_video_width;
+extern const float g_input_video_height;
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
 extern std::vector<Object> g_yolo_detections;
 extern int g_yolo_detection_count;
 extern cv::Mat g_image;
-extern float g_input_video_width;
-extern float g_input_video_height;
+extern const float g_input_video_width;
+extern const float g_input_video_height;
 
 #elif defined(BLD_WIN)
 
@@ -56,8 +57,8 @@ extern cv::dnn::Net g_net;
 extern std::vector<YoloNet::detection> g_yolo_detections;
 extern int g_yolo_detection_count;
 extern cv::Mat g_image;
-extern float g_input_video_width;
-extern float g_input_video_height;
+extern const float g_input_video_width;
+extern const float g_input_video_height;
 
 #else
 
@@ -84,6 +85,10 @@ extern float g_target_top;
 extern float g_target_bottom;
 extern float g_target_center_x;
 extern float g_target_center_y;
+extern float g_detection_class;
+extern float g_target_detection_conf;
+extern float g_target_cntr_offset_x_filt;
+extern float g_target_cntr_offset_y_filt;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

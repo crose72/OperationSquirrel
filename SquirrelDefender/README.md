@@ -370,34 +370,54 @@ sudo systemctl status squirreldefender.service
 
 ## Windows
 
-The main purpose of this program is to be run on the edge.  It can also be run on a laptop or desktop if you do not have a jetson edge device like the nano or the orin nano.  I won't go into great detail about these build platforms but I will tell you what's required.  If you have more questions feel free to reach out on the discord or try it on your own.  It's basically the same as above, but I use visual studio for my windows project
+The main purpose of this program is to be run on the edge.  It can also be run on a laptop or desktop if you do not have a jetson edge device like the nano or the orin nano.
 
 ### Prerequisites:
 
-- CMake >= 3.28 (same rules as above apply for different versions, you have to troubleshoot)
-- OpenCV 4.10.0 with Cuda and cuDNN
-- Cuda 12.6
-- cuDNN 8.9.7.29 (Can try a different version of cuDNN 8, and maybe cuDNN 9, but don't use 9.5.1.17, we tried, didn't work - known issue)
-- Json (if you want to use the params file, otherwise optional)
+- Docker Desktop
+- WSL2 with Ubuntu-22.04
 
 ### Setup:
 
-Follow the instructions to install OpenCV 4.10.0 with Cuda 12.6 and cuDNN 8.9 from this medium article I found https://medium.com/@jinscott/build-opencv-on-windows-with-cuda-f880270eadb0.  ***DO NOT COMPILE FOR STATIC LIBS***. You can, it's just that you'd then have to manually link every library file.  I compiled with dynamic libs.  But feel free to do it however is best for you.
+This container was built with CUDA enabled OpenCV for a GPU with compute capability of 8.6.  If your GPU has a different capability then a new container will have to be built to accomodate that compute capability.  If you want to do that reach out in the discord and I can help with that.
 
-Install TensorRT 10.4 following the instructions on their website.
+In WSL2 (or on your linux machine) perform the following setup steps:
 
-Install CMake and the gui on your computer.
+```
+# Create a workspace
+mkdir ~/workspaces/os-dev
+cd ~/workspaces/os-dev
 
-Configure the CMakeList.txt file for your windows build.
+# Clone the repository
+git clone https://github.com/crose72/OperationSquirrel.git --recursive
 
-Open CMake gui and setup the project using the cmake file in `SquirrelDefender`.
+# Add the user to docker
+sudo usermod -aG docker $USER && newgrp docker
 
-In Visual Studio choose a release type build (You can try debug but I have had issues with that one).
+# Add these lines to the end of your bashrc file
+export DISPLAY=:0
+export OS_WS=/home/crose72/workspaces/os-dev/
 
-Build the executable.
+sudo nano ~/.bashrc # or you can use vim if you prefer
+
+# Source .bashrc file (reset)
+source ~/.bashrc
+
+# Run the container
+cd ~/workspaces/os-dev/OperationSquirrel/scripts
+./scripts/run_dev_ubuntu-22.04.sh
+```
+
+Edit the `mav_serial.cpp` file IP address argument to ensure that the program can communicate with ArduPilot SITL.  In CMakeLists.txt set `BLD_WSL` to `ON`.  Inside the container you can now build and run the executable:
+
+```
+cmake ..
+make -j$(nproc)
+./squirreldefender <path-to-video-if-no-camera-attached>
+```
 
 Before you execute the program make sure the ArduPilot SITL is running.  The windows build depends on that before it can continue to execute.
 
 ## Linux laptop or desktop
 
-I'm going to leave you to figure out how to compile it on your linux machine based on the instructions above.  It's pretty much the same thing.  Here is something to help you get started on installing opencv with cuda and cudnn on linux though https://medium.com/@juancrrn/installing-opencv-4-with-cuda-in-ubuntu-20-04-fde6d6a0a367.
+Same steps as the windows instructions above.

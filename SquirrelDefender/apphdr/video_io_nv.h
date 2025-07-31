@@ -24,7 +24,6 @@
 #include "jetson-inference/objectTracker.h"
 #include <jetson-inference/objectTrackerIOU.h>
 
-
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
@@ -36,8 +35,8 @@ extern detectNet *g_net;
 extern bool g_valid_image_rcvd;
 extern videoSource *g_input;
 extern uchar3 *g_image;
-extern float g_input_video_width;
-extern float g_input_video_height;
+extern const float g_input_video_width;
+extern const float g_input_video_height;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
