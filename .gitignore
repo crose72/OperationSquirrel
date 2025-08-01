@@ -6,4 +6,5 @@
 /.vs
 /SquirrelDefender/data
 /SquirrelDefender/test_data
+SquirrelDefender/modules/SecretSquirrel
 **/build*/
