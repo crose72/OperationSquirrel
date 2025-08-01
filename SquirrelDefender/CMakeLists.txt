@@ -426,6 +426,10 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman)
 file(GLOB KF_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.cpp)
 file(GLOB KF_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.h)
 
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src)
+file(GLOB SS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.cpp)
+file(GLOB SS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.h)
+
 if(BLD_JETSON_ORIN_NANO OR BLD_WSL)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt/src)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt/libs/tensorrt-cpp-api/src)
@@ -450,10 +454,10 @@ file(GLOB HEADERS ${HEADER_DIR}/*.h)
 # Additional source files to compile together
 list(APPEND SOURCES ${MAV_UTILS_SOURCES} ${SERIAL_UTILS_SOURCES} ${MATH_UTILS_SOURCES} 
                     ${JSON_UTILS_SOURCES} ${PRINT_UTILS_SOURCES} ${YOLO_UTILS_SOURCES} 
-                    ${PID_SOURCES} ${TIMER_SOURCES} ${KF_SOURCES})
+                    ${PID_SOURCES} ${TIMER_SOURCES} ${KF_SOURCES} ${SS_SOURCES})
 list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HEADERS} 
                     ${JSON_UTILS_HEADERS} ${PRINT_UTILS_HEADERS} ${YOLO_UTILS_HEADERS} 
-                    ${PID_HEADERS} ${TIMER_HEADERS} ${KF_HEADERS})
+                    ${PID_HEADERS} ${TIMER_HEADERS} ${KF_HEADERS} ${SS_HEADERS})
 
 #=============================================================================
 # Build Executable for each supported platform
@@ -648,6 +652,7 @@ if (BUILD_TEST_HARNESS)
         file(GLOB TEST_UTIL_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_utils/*.cpp)
         file(GLOB TEST_UTIL_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_utils/*.h)
         list(APPEND TEST_SOURCE_BASE ${TEST_UTIL_SOURCES})
+        include_directories(${CMAKE_CURRENT_SOURCE_DIR}/test_suite)
 
         # Localize target test code
         set(LOC_TEST_SOURCES ${TEST_SOURCE_BASE})
@@ -708,6 +713,42 @@ if (BUILD_TEST_HARNESS)
                                 ${BLAS_LIBRARIES})
         elseif(BLD_WSL)
             target_link_libraries(test_follow_target 
+                                YoloV8_TRT 
+                                ${OpenCV_LIBS} 
+                                #vpi 
+                                opencv_core
+                                opencv_imgproc 
+                                opencv_imgcodecs 
+                                opencv_videoio
+                                jsoncpp
+                                ${ARMADILLO_LIBRARIES} 
+                                ${LAPACK_LIBRARIES} 
+                                ${BLAS_LIBRARIES})
+        endif()
+
+        # Delivery test code
+        set(DELIVERY_TEST_SOURCES ${TEST_SOURCE_BASE})
+        list(APPEND DELIVERY_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/test_suite/test_payload_delivery.cpp)
+        list(APPEND DELIVERY_TEST_HEADERS ${TEST_UTIL_HEADERS})
+
+        cuda_add_executable(test_payload_delivery ${DELIVERY_TEST_SOURCES} ${DELIVERY_TEST_HEADERS})
+        set_target_debug_flags(test_payload_delivery)
+
+        if (BLD_JETSON_ORIN_NANO)
+            target_link_libraries(test_payload_delivery 
+                                YoloV8_TRT 
+                                ${OpenCV_LIBS} 
+                                vpi 
+                                opencv_core
+                                opencv_imgproc 
+                                opencv_imgcodecs 
+                                opencv_videoio
+                                jsoncpp
+                                ${ARMADILLO_LIBRARIES} 
+                                ${LAPACK_LIBRARIES} 
+                                ${BLAS_LIBRARIES})
+        elseif(BLD_WSL)
+            target_link_libraries(test_payload_delivery 
                                 YoloV8_TRT 
                                 ${OpenCV_LIBS} 
                                 #vpi 

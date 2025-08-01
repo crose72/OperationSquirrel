@@ -1,0 +1,5 @@
+[wsl2]
+kernel=C:\\Users\\camer\\bzImage-6.1
+memory=8GB # Limits VM memory in WSL to 8 GB
+processors=16 # Makes the WSL 2 VM use 8 virtual processors
+swap=8GB
