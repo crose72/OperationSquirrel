@@ -86,7 +86,9 @@
         "P_loc_22": 0.1,
         "P_loc_33": 0.1,
         "P_loc_44": 0.1,
-        "P_loc_55": 0.1
+        "P_loc_55": 0.1,
+        "X_pix_mov_avg_window_size": 10,
+        "Y_pix_mov_avg_window_size": 25
     },
     "Follow_Params": {
         "Desired_Height": 640.0,
@@ -94,6 +96,7 @@
         "Desired_X_offset": 8.0,
         "Desired_Y_offset": 0.0,
         "Desired_Z_offset": 0.0,
-        "BBox_Filt_coeff": 0.75
+        "Desired_X_pix_offset": 0.0,
+        "Desired_Y_pix_offset": 0.0
     }
 }

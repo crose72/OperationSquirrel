@@ -57,6 +57,25 @@ float g_ax_target_ekf;
 float g_ay_target_ekf;
 float x_target_ekf_prv;
 float y_target_ekf_prv;
+float camera_comp_angle_abs;
+float g_d_target_h_eq;
+float g_d_target_w_eq;
+float g_fov_height;
+float g_meter_per_pix;
+float g_target_cntr_offset_x_m;
+
+// Buffers for moving average of target centroid
+std::vector<float> target_y_pix_hist4avg;
+std::vector<float> target_x_pix_hist4avg;
+int x_pix_window;
+int y_pix_window;
+float g_target_cntr_offset_x_mov_avg;
+float g_target_cntr_offset_y_mov_avg;
+int y_buffer_idx4avg;
+int x_buffer_idx4avg;
+float y_sum;
+float x_sum;
+
 KF kf_loc;           // Kalman Filter instance
 arma::mat A_loc;     // System dynamics matrix
 arma::mat B_loc;     // Control matrix (if needed, otherwise identity)
@@ -75,6 +94,7 @@ const float center_of_frame_height = 360.0f;
 const float camera_fixed_angle = 0.436f; // radians
 const int n_states = 6;
 const int n_meas = 2;
+const float KNOWN_OBJECT_HEIGHT = (float)1.778;
 
 const float d_offset_w[MAX_IDX_D_WIDTH] = {
     0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5,
@@ -164,42 +184,48 @@ float P_loc_55 = 0.1f;
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-void get_kf_params(void);
+void get_localization_params(void);
 void init_kf_loc(void);
 void dtrmn_target_location(void);
 void update_target_location(void);
+void calc_vertical_fov(void);
+void dtrmn_target_loc_img(void);
 
 /********************************************************************************
- * Function: get_kf_params
- * Description: Calibratable parameters for target tracking and identification.
+ * Function: get_localization_params
+ * Description: Calibratable parameters for target localization.
  ********************************************************************************/
-void get_kf_params(void)
+void get_localization_params(void)
 {
-    ParamReader kf_params("../params.json");
+    ParamReader localization_params("../params.json");
 
     // H_loc (Observation matrix, 2x6)
-    H_loc_00 = kf_params.get_float_param("Localization_Params", "H_loc_00");
-    H_loc_11 = kf_params.get_float_param("Localization_Params", "H_loc_11");
+    H_loc_00 = localization_params.get_float_param("Localization_Params", "H_loc_00");
+    H_loc_11 = localization_params.get_float_param("Localization_Params", "H_loc_11");
 
     // Q_loc (Process noise covariance diagonals, 6x6)
-    Q_loc_00 = kf_params.get_float_param("Localization_Params", "Q_loc_00");
-    Q_loc_11 = kf_params.get_float_param("Localization_Params", "Q_loc_11");
-    Q_loc_22 = kf_params.get_float_param("Localization_Params", "Q_loc_22");
-    Q_loc_33 = kf_params.get_float_param("Localization_Params", "Q_loc_33");
-    Q_loc_44 = kf_params.get_float_param("Localization_Params", "Q_loc_44");
-    Q_loc_55 = kf_params.get_float_param("Localization_Params", "Q_loc_55");
+    Q_loc_00 = localization_params.get_float_param("Localization_Params", "Q_loc_00");
+    Q_loc_11 = localization_params.get_float_param("Localization_Params", "Q_loc_11");
+    Q_loc_22 = localization_params.get_float_param("Localization_Params", "Q_loc_22");
+    Q_loc_33 = localization_params.get_float_param("Localization_Params", "Q_loc_33");
+    Q_loc_44 = localization_params.get_float_param("Localization_Params", "Q_loc_44");
+    Q_loc_55 = localization_params.get_float_param("Localization_Params", "Q_loc_55");
 
     // R_loc (Measurement noise covariance diagonals, 2x2)
-    R_loc_00 = kf_params.get_float_param("Localization_Params", "R_loc_00");
-    R_loc_11 = kf_params.get_float_param("Localization_Params", "R_loc_11");
+    R_loc_00 = localization_params.get_float_param("Localization_Params", "R_loc_00");
+    R_loc_11 = localization_params.get_float_param("Localization_Params", "R_loc_11");
 
     // P_loc (Estimate covariance diagonals, 6x6)
-    P_loc_00 = kf_params.get_float_param("Localization_Params", "P_loc_00");
-    P_loc_11 = kf_params.get_float_param("Localization_Params", "P_loc_11");
-    P_loc_22 = kf_params.get_float_param("Localization_Params", "P_loc_22");
-    P_loc_33 = kf_params.get_float_param("Localization_Params", "P_loc_33");
-    P_loc_44 = kf_params.get_float_param("Localization_Params", "P_loc_44");
-    P_loc_55 = kf_params.get_float_param("Localization_Params", "P_loc_55");
+    P_loc_00 = localization_params.get_float_param("Localization_Params", "P_loc_00");
+    P_loc_11 = localization_params.get_float_param("Localization_Params", "P_loc_11");
+    P_loc_22 = localization_params.get_float_param("Localization_Params", "P_loc_22");
+    P_loc_33 = localization_params.get_float_param("Localization_Params", "P_loc_33");
+    P_loc_44 = localization_params.get_float_param("Localization_Params", "P_loc_44");
+    P_loc_55 = localization_params.get_float_param("Localization_Params", "P_loc_55");
+
+    // Target centroid moving average and curve fit window sizes
+    x_pix_window = localization_params.get_int_param("Localization_Params", "X_pix_mov_avg_window_size");
+    y_pix_window = localization_params.get_int_param("Localization_Params", "Y_pix_mov_avg_window_size");
 }
 
 /********************************************************************************
@@ -307,22 +333,29 @@ void dtrmn_target_location(void)
     if (g_target_data_useful)
     {
         /* Calculate distance from camera offset */
+        const float PIX_HEIGHT_X = (float)1680.557;
+        const float PIX_HEIGHT_X_POW = (float)(-0.863);
+        const float PIX_WIDTH_X = (float)540.456;
+        const float PIX_WIDTH_X_POW = (float)(-0.758);
+
         d_idx_h = get_float_index(g_target_height, &height_index[0], MAX_IDX_D_HEIGHT, false);
         d_idx_w = get_float_index(g_target_width, &width_index[0], MAX_IDX_D_WIDTH, false);
         d_target_h = get_interpolated_value(d_idx_h, &d_offset_h[0], MAX_IDX_D_HEIGHT);
+        g_d_target_h_eq = powf(g_target_height / PIX_HEIGHT_X, (float)1.0 / PIX_HEIGHT_X_POW);
         d_target_w = get_interpolated_value(d_idx_w, &d_offset_w[0], MAX_IDX_D_WIDTH);
+        g_d_target_w_eq = powf(g_target_width / PIX_WIDTH_X, (float)1.0 / PIX_WIDTH_X_POW);
 
         if (g_target_aspect > 0.4f)
         {
-            d_target = d_target_w;
+            d_target = g_d_target_w_eq;
         }
-        else if (d_target_h > 2.99f)
+        else if (g_d_target_h_eq > 2.99f)
         {
-            d_target = d_target_h;
+            d_target = g_d_target_h_eq;
         }
         else
         {
-            d_target = d_target_w;
+            d_target = g_d_target_w_eq;
         }
 
         /* Calculate true camera angle relative to the ground, adjusting for pitch. */
@@ -332,10 +365,10 @@ void dtrmn_target_location(void)
         /* Calculate the x and z distances of the target relative to the drone camera (positive z is down).*/
         if (g_camera_tilt_angle <= 0.0f && g_camera_tilt_angle >= -g_camera_comp_angle)
         {
-            float camera_comp_angle_abs = abs(g_camera_tilt_angle);
+            camera_comp_angle_abs = std::fabs(g_camera_tilt_angle);
 
-            g_x_target = d_target * cos(camera_comp_angle_abs);
-            g_z_target = d_target * sin(camera_comp_angle_abs);
+            g_x_target = d_target * cosf(camera_comp_angle_abs);
+            g_z_target = d_target * sinf(camera_comp_angle_abs);
         }
 
         /* Calculate shift in target location in the x and z directions based on camera tilt
@@ -350,11 +383,11 @@ void dtrmn_target_location(void)
         if (g_delta_angle > 0.0f && g_delta_angle < camera_fixed_angle)
         {
             delta_idx_d = get_float_index(d_target, &delta_offset_d[0], MAX_IDX_DELTA_D_OFFSET, true);
-            delta_idx_pix = get_float_index(std::abs(g_target_cntr_offset_x), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
+            delta_idx_pix = get_float_index(std::fabs(g_target_cntr_offset_x), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
             delta_d = get_2d_interpolated_value(&delta_offset[0][0], MAX_IDX_DELTA_PIXEL_OFFSET, MAX_IDX_DELTA_D_OFFSET, y_idx_pix, y_idx_d);
 
-            g_delta_d_x = delta_d * cos(g_delta_angle);
-            g_delta_d_z = delta_d * sin(g_delta_angle);
+            g_delta_d_x = delta_d * cosf(g_delta_angle);
+            g_delta_d_z = delta_d * sinf(g_delta_angle);
 
             /* If object center is below the center of the frame */
             if (g_target_cntr_offset_x > center_of_frame_height)
@@ -371,7 +404,7 @@ void dtrmn_target_location(void)
         /* Calculate target y offset from the center line of view of the camera based on calibrated forward distance and the
         offset of the center of the target to the side of the center of the video frame in pixels */
         y_idx_d = get_float_index(d_target, &y_offset_d[0], MAX_IDX_Y_D_OFFSET, true);
-        y_idx_pix = get_float_index(std::abs(g_target_cntr_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
+        y_idx_pix = get_float_index(std::fabs(g_target_cntr_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
         float y_target_est = get_2d_interpolated_value(&y_offset[0][0], MAX_IDX_Y_PIXEL_OFFSET, MAX_IDX_Y_D_OFFSET, y_idx_pix, y_idx_d);
 
         g_y_target = y_target_est;
@@ -422,6 +455,48 @@ void update_target_location(void)
 };
 
 /********************************************************************************
+ * Function: calc_vertical_fov
+ * Description: Calculate the field of view of the camera in meters at the
+ *              given vehicle height above the ground, and camera angle
+ *              relative to the ground.
+ ********************************************************************************/
+void calc_vertical_fov(void)
+{
+    // Calculate the line of sight distance of the camera
+    float line_of_sight = std::fabs(g_mav_veh_local_ned_z) / cosf(camera_comp_angle_abs);
+
+    // Calculate the pixel height of a known fixed object at given line of
+    // sight distance from the camera.
+    // The object isn't there, this is an intermediate calculation to determine
+    // how many pixels correspond to a meter at the current drone height.
+    const float PIX_HEIGHT_X = (float)1680.557;
+    const float PIX_HEIGHT_X_POW = (float)(-0.863);
+    // Height of a known object at given distance
+    float ghost_object_height = PIX_HEIGHT_X * powf(line_of_sight, PIX_HEIGHT_X_POW);
+    g_meter_per_pix = (float)1.778 / ghost_object_height;
+    g_fov_height = g_meter_per_pix * g_input_video_height;
+}
+
+/********************************************************************************
+ * Function: dtrmn_target_loc_img
+ * Description: Determine target location and movement patterns in the image.
+ ********************************************************************************/
+void dtrmn_target_loc_img(void)
+{
+    if (!g_target_data_useful)
+    {
+        return;
+    }
+
+    // Moving average for more smoothing - modifies the history vector
+    g_target_cntr_offset_x_mov_avg = moving_average(target_x_pix_hist4avg, g_target_cntr_offset_x, x_buffer_idx4avg, x_sum);
+    g_target_cntr_offset_y_mov_avg = moving_average(target_y_pix_hist4avg, g_target_cntr_offset_y, y_buffer_idx4avg, y_sum);
+
+    // Convert the
+    g_target_cntr_offset_x_m = g_target_cntr_offset_x_mov_avg * g_meter_per_pix;
+}
+
+/********************************************************************************
  * Function: ~Localize
  * Description: Localize class destructor.
  ********************************************************************************/
@@ -434,26 +509,40 @@ Localize::~Localize(void) {};
  ********************************************************************************/
 bool Localize::init(void)
 {
-    d_target_h = 0.0f;
-    d_target_w = 0.0f;
-    g_x_target = 0.0f;
-    g_y_target = 0.0f;
-    g_z_target = 0.0f;
-    d_target = 0.0f;
-    g_x_error = 0.0f;
-    g_y_error = 0.0f;
-    g_delta_angle = 0.0f;
-    g_camera_tilt_angle = 0.0f;
-    g_delta_d_x = 0.0f;
-    g_delta_d_z = 0.0f;
-    g_camera_comp_angle = 0.0f;
-    x_target_prv = 0.0f;
-    y_target_prv = 0.0f;
+    get_localization_params();
+    init_kf_loc();
+
+    d_target_h = (float)0.0;
+    d_target_w = (float)0.0;
+    g_x_target = (float)0.0;
+    g_y_target = (float)0.0;
+    g_z_target = (float)0.0;
+    d_target = (float)0.0;
+    g_x_error = (float)0.0;
+    g_y_error = (float)0.0;
+    g_delta_angle = (float)0.0;
+    g_camera_tilt_angle = (float)0.0;
+    g_delta_d_x = (float)0.0;
+    g_delta_d_z = (float)0.0;
+    g_camera_comp_angle = (float)0.0;
+    x_target_prv = (float)0.0;
+    y_target_prv = (float)0.0;
     loc_target_valid_prv = false;
     g_target_data_useful = false;
-
-    get_kf_params();
-    init_kf_loc();
+    camera_comp_angle_abs = (float)0.0;
+    g_d_target_h_eq = (float)0.0;
+    g_d_target_w_eq = (float)0.0;
+    g_fov_height = (float)0.0;
+    g_meter_per_pix = (float)0.0;
+    g_target_cntr_offset_x_m = (float)0.0;
+    target_y_pix_hist4avg.assign(y_pix_window, (float)0.0);
+    target_x_pix_hist4avg.assign(x_pix_window, (float)0.0);
+    g_target_cntr_offset_x_mov_avg = (float)0.0;
+    g_target_cntr_offset_y_mov_avg = (float)0.0;
+    y_buffer_idx4avg = (int)0;
+    y_sum = (float)0.0;
+    x_buffer_idx4avg = (int)0;
+    x_sum = (float)0.0;
 
     return true;
 }
@@ -467,6 +556,8 @@ void Localize::loop(void)
 {
     dtrmn_target_location();
     update_target_location();
+    calc_vertical_fov();
+    dtrmn_target_loc_img();
 }
 
 /********************************************************************************

@@ -151,8 +151,8 @@ void get_path_params(void)
     w3_yaw = follow_control.get_float_param("PID_yaw", "w3");
 
     // Follow params
-    x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_offset");
-    y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_offset");
+    x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_pix_offset");
+    y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_pix_offset");
 }
 
 /********************************************************************************
@@ -164,14 +164,14 @@ void calc_follow_error(void)
 {
     if (g_x_target_ekf < 0.001f)
     {
-        g_x_error = 0.0f;
+        g_x_error = (float)0.0;
     }
     else
     {
-        g_x_error = g_x_target_ekf - x_desired;
+        g_x_error = (x_desired - g_target_cntr_offset_x_m) * (float)11.0;
     }
 
-    g_y_error = g_y_target_ekf - y_desired;
+    g_y_error = y_desired;
 }
 
 /********************************************************************************

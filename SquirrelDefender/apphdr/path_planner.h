@@ -3,6 +3,7 @@
  * @author  Cameron Rose
  * @date    3/12/2025
  ********************************************************************************/
+
 #ifndef PATH_PLANNER_H
 #define PATH_PLANNER_H
 
@@ -36,6 +37,9 @@ extern float g_mav_veh_yaw;
 extern float g_mav_veh_yawspeed;
 extern bool g_use_video_playback;
 extern float g_target_cntr_offset_y;
+extern float g_target_cntr_offset_x_filt;
+extern float g_target_cntr_offset_y_filt;
+extern float g_target_cntr_offset_x_m;
 
 /********************************************************************************
  * Exported objects
