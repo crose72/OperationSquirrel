@@ -1,5 +1,5 @@
 # Ensure ${OS_WS} is defined
-docker pull crose72/ubuntu-22.04:dev
+docker pull crose72/os-dev:cuda12.6-trt10.5-cv4.10-sm86-vpi3.2-ubuntu22
 sudo docker run --gpus all -it --rm --network host \
   --add-host=host.docker.internal:host-gateway \
   --privileged --ipc=host \
@@ -30,8 +30,9 @@ sudo docker run --gpus all -it --rm --network host \
   --volume /tmp/.X11-unix:/tmp/.X11-unix \
   --volume /tmp/argus_socket:/tmp/argus_socket \
   --volume /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra \
+  --volume ${OS_WS}:/workspace \
   --volume ${OS_WS}/OperationSquirrel/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender \
   --name squirreldefender-dev \
-  crose72/ubuntu-22.04:dev \
+  crose72/os-dev:cuda12.6-trt10.5-cv4.10-sm86-vpi3.2-ubuntu22 \
   bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build \
     && exec bash"
