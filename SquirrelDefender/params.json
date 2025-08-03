@@ -97,6 +97,10 @@
         "Desired_Y_offset": 0.0,
         "Desired_Z_offset": 0.0,
         "Desired_X_pix_offset": 0.0,
-        "Desired_Y_pix_offset": 0.0
+        "Desired_Y_pix_offset": 0.0,
+        "CMD_vel_max_cmd": 10.0,
+        "CMD_vel_max_ramp_rate": 2.5,
+        "CMD_vel_ramp_step_size": 0.3,
+        "CMD_vel_diverge_sensitivity": 0.05
     }
 }

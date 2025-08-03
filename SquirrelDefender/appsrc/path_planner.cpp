@@ -42,6 +42,8 @@ float g_yaw_adjust;
 float g_mav_veh_yaw_prv;
 float g_yaw_target_error;
 float g_mav_veh_yaw_adjusted;
+float x_error_prv;
+float vx_adjust_prv;
 
 /********************************************************************************
  * Calibration definitions
@@ -92,6 +94,12 @@ float w3_yaw = (float)0.0;
 
 float x_desired = (float)4.0;
 float y_desired = (float)0.0;
+
+float max_vel_cmd = (float)10.0;   // max allowed velocity
+float ramp_step_size = (float)0.5; // m/s²
+float max_ramp_rate = (float)2.5;  // m/s²
+float diverge_sensitivity = (float)0.05;
+
 const float camera_half_fov = (float)0.7423; // half of 83 degree FOV camera
 
 /********************************************************************************
@@ -100,7 +108,7 @@ const float camera_half_fov = (float)0.7423; // half of 83 degree FOV camera
 void get_path_params(void);
 void calc_follow_error(void);
 void calc_yaw_target_error(void);
-void dtrmn_follow_vector(void);
+void dtrmn_vel_cmd(void);
 
 /********************************************************************************
  * Function: get_path_params
@@ -153,6 +161,11 @@ void get_path_params(void)
     // Follow params
     x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_pix_offset");
     y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_pix_offset");
+
+    max_vel_cmd = follow_control.get_float_param("Follow_Params", "CMD_vel_max_cmd");
+    max_ramp_rate = follow_control.get_float_param("Follow_Params", "CMD_vel_max_ramp_rate");
+    ramp_step_size = follow_control.get_float_param("Follow_Params", "CMD_vel_ramp_step_size");
+    diverge_sensitivity = follow_control.get_float_param("Follow_Params", "CMD_vel_diverge_sensitivity");
 }
 
 /********************************************************************************
@@ -269,11 +282,74 @@ void calc_yaw_target_error(void)
 }
 
 /********************************************************************************
- * Function: dtrmn_follow_vector
+ * Function: vel_control_smoothing
+ * Description: Take the velocity
+ ********************************************************************************/
+float vel_control_smoothing(float dt,
+                            float prev_error,
+                            float error,
+                            float command_prev,
+                            float current_command,
+                            float current_velocity,
+                            float max_command,
+                            float max_ramp_rate,
+                            float ramp_step_size,
+                            float diverge_sensitivity)
+{
+    // Direction: +1 if increasing, -1 if decreasing
+    float error_delta = error - prev_error;
+    bool improving = std::fabs(error) < std::fabs(prev_error);
+    bool diverging = std::fabs(error) > std::fabs(prev_error) + diverge_sensitivity;
+
+    // Only allow command to change if we're improving or still far from target
+    float delta_command = current_command - command_prev;
+
+    float max_delta = max_ramp_rate * dt;
+
+    if (!improving && diverging)
+    {
+        // If error is getting worse, slow the command ramp
+        max_delta *= ramp_step_size;
+    }
+
+    // Clamp delta to ramp limits
+    if (delta_command > max_delta)
+    {
+        delta_command = max_delta;
+    }
+    else if (delta_command < -max_delta)
+    {
+        delta_command = -max_delta;
+    }
+
+    float new_command = command_prev + delta_command;
+
+    // Clamp to max command magnitude
+    if (new_command > max_command)
+    {
+        new_command = max_command;
+    }
+    if (new_command < -max_command)
+    {
+        new_command = -max_command;
+    }
+
+    return new_command;
+}
+
+float parabolic_easing(float error, float epsilon, float max_output)
+{
+    // Inside deadband → parabolic easing
+    float ratio = error / epsilon;
+    return max_output * ratio * ratio * (error >= 0 ? 1.0f : -1.0f);
+}
+
+/********************************************************************************
+ * Function: dtrmn_vel_cmd
  * Description: Determine the follow vector based on the vehicle's error between
                 the desired target offset and the actual target offset.
  ********************************************************************************/
-void dtrmn_follow_vector(void)
+void dtrmn_vel_cmd(void)
 {
     g_target_too_close = (g_x_error < 0.0);
 
@@ -282,6 +358,7 @@ void dtrmn_follow_vector(void)
         g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
                                    g_x_error, 0.0, 0.0,
                                    w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
+
         g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
                                    g_y_error, 0.0, 0.0,
                                    w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
@@ -294,6 +371,7 @@ void dtrmn_follow_vector(void)
         g_vx_adjust = pid_forwd.pid3(Kp_x, Ki_x, Kd_x,
                                      g_x_error, 0.0, 0.0,
                                      w1_x, 0.0, 0.0, ControlDim::X, g_dt);
+
         g_vy_adjust = pid_forwd.pid3(Kp_y, Ki_y, Kd_y,
                                      g_y_error, 0.0, 0.0,
                                      w1_y, 0.0, 0.0, ControlDim::Y, g_dt);
@@ -307,6 +385,21 @@ void dtrmn_follow_vector(void)
         g_vy_adjust = (float)0.0;
         g_yaw_adjust = (float)0.0;
     }
+
+    g_vx_adjust = vel_control_smoothing(
+        g_dt,
+        x_error_prv,
+        g_x_error,
+        vx_adjust_prv,
+        g_vx_adjust,
+        g_mav_veh_local_ned_vx,
+        max_vel_cmd,
+        max_ramp_rate,
+        ramp_step_size,
+        diverge_sensitivity);
+
+    vx_adjust_prv = g_vx_adjust;
+    x_error_prv = g_x_error;
 }
 
 /********************************************************************************
@@ -328,6 +421,8 @@ PathPlanner::~PathPlanner(void) {};
  ********************************************************************************/
 bool PathPlanner::init(void)
 {
+    get_path_params();
+
     g_target_too_close = false;
     g_x_error = (float)0.0;
     g_y_error = (float)0.0;
@@ -343,8 +438,8 @@ bool PathPlanner::init(void)
     g_mav_veh_yaw_prv = (float)0.0;
     g_yaw_target_error = (float)0.0;
     g_mav_veh_yaw_adjusted = (float)0.0;
-
-    get_path_params();
+    x_error_prv = (float)0.0;
+    vx_adjust_prv = (float)0.0;
 
     return true;
 }
@@ -357,7 +452,7 @@ void PathPlanner::loop(void)
 {
     calc_follow_error();
     calc_yaw_target_error();
-    dtrmn_follow_vector();
+    dtrmn_vel_cmd();
 }
 
 /********************************************************************************
