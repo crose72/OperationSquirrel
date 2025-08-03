@@ -95,10 +95,12 @@ float w3_yaw = (float)0.0;
 float x_desired = (float)4.0;
 float y_desired = (float)0.0;
 
-float max_vel_cmd = (float)10.0;   // max allowed velocity
-float ramp_step_size = (float)0.5; // m/s²
-float max_ramp_rate = (float)2.5;  // m/s²
-float diverge_sensitivity = (float)0.05;
+float vx_cmd_max_allowed = (float)10.0;   // max allowed velocity
+float vx_cmd_ramp_step_size = (float)0.5; // m/s²
+float vx_cmd_max_ramp_rate = (float)2.5;  // m/s²
+float vx_cmd_diverge_sensitivity = (float)0.05;
+float vx_cmd_parabolic_easing_thresh = (float)1.0;
+float vx_cmd_parabolic_easing_max = (float)1.0;
 
 const float camera_half_fov = (float)0.7423; // half of 83 degree FOV camera
 
@@ -162,10 +164,12 @@ void get_path_params(void)
     x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_pix_offset");
     y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_pix_offset");
 
-    max_vel_cmd = follow_control.get_float_param("Follow_Params", "CMD_vel_max_cmd");
-    max_ramp_rate = follow_control.get_float_param("Follow_Params", "CMD_vel_max_ramp_rate");
-    ramp_step_size = follow_control.get_float_param("Follow_Params", "CMD_vel_ramp_step_size");
-    diverge_sensitivity = follow_control.get_float_param("Follow_Params", "CMD_vel_diverge_sensitivity");
+    vx_cmd_max_allowed = follow_control.get_float_param("Follow_Params", "CMD_vel_max_cmd");
+    vx_cmd_max_ramp_rate = follow_control.get_float_param("Follow_Params", "CMD_vel_max_ramp_rate");
+    vx_cmd_ramp_step_size = follow_control.get_float_param("Follow_Params", "CMD_vel_ramp_step_size");
+    vx_cmd_diverge_sensitivity = follow_control.get_float_param("Follow_Params", "CMD_vel_diverge_sensitivity");
+    vx_cmd_parabolic_easing_thresh = follow_control.get_float_param("Follow_Params", "CMD_vel_parabolic_eas_thresh");
+    vx_cmd_parabolic_easing_max = follow_control.get_float_param("Follow_Params", "CMD_vel_parabolic_eas_max_cmd");
 }
 
 /********************************************************************************
@@ -181,7 +185,7 @@ void calc_follow_error(void)
     }
     else
     {
-        g_x_error = (x_desired - g_target_cntr_offset_x_m) * (float)11.0;
+        g_x_error = (x_desired - g_target_cntr_offset_x_m);
     }
 
     g_y_error = y_desired;
@@ -294,16 +298,29 @@ float vel_control_smoothing(float dt,
                             float max_command,
                             float max_ramp_rate,
                             float ramp_step_size,
-                            float diverge_sensitivity)
+                            float diverge_sensitivity,
+                            float easing_thresh,
+                            float max_easing_cmd)
 {
-    // Direction: +1 if increasing, -1 if decreasing
+    // Parabolic easing on command itself when near 0
+    float delta_command = (float)0.0;
+    float shaped_command = current_command;
+
+    if (std::fabs(current_command) < easing_thresh)
+    {
+        float ratio = current_command / easing_thresh; // ∈ [-1, 1]
+        shaped_command = max_easing_cmd * ratio * ratio * (ratio >= 0 ? 1.0f : -1.0f);
+        delta_command = shaped_command - command_prev;
+    }
+    else
+    {
+        delta_command = current_command - command_prev;
+    }
+
+    // Determine if the error is getting smaller or larger
     float error_delta = error - prev_error;
     bool improving = std::fabs(error) < std::fabs(prev_error);
     bool diverging = std::fabs(error) > std::fabs(prev_error) + diverge_sensitivity;
-
-    // Only allow command to change if we're improving or still far from target
-    float delta_command = current_command - command_prev;
-
     float max_delta = max_ramp_rate * dt;
 
     if (!improving && diverging)
@@ -335,13 +352,6 @@ float vel_control_smoothing(float dt,
     }
 
     return new_command;
-}
-
-float parabolic_easing(float error, float epsilon, float max_output)
-{
-    // Inside deadband → parabolic easing
-    float ratio = error / epsilon;
-    return max_output * ratio * ratio * (error >= 0 ? 1.0f : -1.0f);
 }
 
 /********************************************************************************
@@ -393,10 +403,12 @@ void dtrmn_vel_cmd(void)
         vx_adjust_prv,
         g_vx_adjust,
         g_mav_veh_local_ned_vx,
-        max_vel_cmd,
-        max_ramp_rate,
-        ramp_step_size,
-        diverge_sensitivity);
+        vx_cmd_max_allowed,
+        vx_cmd_max_ramp_rate,
+        vx_cmd_ramp_step_size,
+        vx_cmd_diverge_sensitivity,
+        vx_cmd_parabolic_easing_thresh,
+        vx_cmd_parabolic_easing_max);
 
     vx_adjust_prv = g_vx_adjust;
     x_error_prv = g_x_error;
