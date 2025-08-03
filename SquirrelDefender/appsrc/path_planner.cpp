@@ -282,63 +282,7 @@ void calc_yaw_target_error(void)
 }
 
 /********************************************************************************
- * Function: vel_control_smoothing
- * Description: Take the velocity
- ********************************************************************************/
-float vel_control_smoothing(float dt,
-                            float prev_error,
-                            float error,
-                            float command_prev,
-                            float current_command,
-                            float current_velocity,
-                            float max_command,
-                            float max_ramp_rate,
-                            float ramp_step_size,
-                            float diverge_sensitivity)
-{
-    // Direction: +1 if increasing, -1 if decreasing
-    float error_delta = error - prev_error;
-    bool improving = std::fabs(error) < std::fabs(prev_error);
-    bool diverging = std::fabs(error) > std::fabs(prev_error) + diverge_sensitivity;
-
-    // Only allow command to change if we're improving or still far from target
-    float delta_command = current_command - command_prev;
-
-    float max_delta = max_ramp_rate * dt;
-
-    if (!improving && diverging)
-    {
-        // If error is getting worse, slow the command ramp
-        max_delta *= ramp_step_size;
-    }
-
-    // Clamp delta to ramp limits
-    if (delta_command > max_delta)
-    {
-        delta_command = max_delta;
-    }
-    else if (delta_command < -max_delta)
-    {
-        delta_command = -max_delta;
-    }
-
-    float new_command = command_prev + delta_command;
-
-    // Clamp to max command magnitude
-    if (new_command > max_command)
-    {
-        new_command = max_command;
-    }
-    if (new_command < -max_command)
-    {
-        new_command = -max_command;
-    }
-
-    return new_command;
-}
-
-/********************************************************************************
- * Function: dtrmn_vel_cmd
+ * Function: dtrmn_follow_vector
  * Description: Determine the follow vector based on the vehicle's error between
                 the desired target offset and the actual target offset.
  ********************************************************************************/
