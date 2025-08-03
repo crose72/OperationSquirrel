@@ -59,6 +59,7 @@ option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
 option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" OFF)
 option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" OFF)
+option(ENABLE_SECRET_SQUIRREL "Compile custom code with the open source Operation Squirrel" OFF)
 
 # Option to use environment variables for library paths
 option(USE_ENV_VAR "Use environment variables for library paths" OFF)
@@ -426,9 +427,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman)
 file(GLOB KF_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.cpp)
 file(GLOB KF_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.h)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src)
-file(GLOB SS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.cpp)
-file(GLOB SS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.h)
+if(ENABLE_SECRET_SQUIRREL)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src)
+    file(GLOB SS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.cpp)
+    file(GLOB SS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.h)
+endif()
 
 if(BLD_JETSON_ORIN_NANO OR BLD_WSL)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt/src)
