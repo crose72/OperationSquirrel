@@ -1,8 +1,8 @@
 {
     "PID_vx_forward": {
-        "Kp": 0.5,
-        "Ki": 0.009,
-        "Kd": 0.1,
+        "Kp": 5.0,
+        "Ki": 0.09,
+        "Kd": 1.0,
         "w1": 1.0,
         "w2": 0.0,
         "w3": 0.0
@@ -24,9 +24,9 @@
         "w3": 0.0
     },
     "PID_vx_reverse": {
-        "Kp": 0.4,
-        "Ki": 0.009,
-        "Kd": 0.1,
+        "Kp": 4.0,
+        "Ki": 0.09,
+        "Kd": 1.0,
         "w1": 1.0,
         "w2": 0.0,
         "w3": 0.0
@@ -101,6 +101,8 @@
         "CMD_vel_max_cmd": 10.0,
         "CMD_vel_max_ramp_rate": 2.5,
         "CMD_vel_ramp_step_size": 0.3,
-        "CMD_vel_diverge_sensitivity": 0.05
+        "CMD_vel_diverge_sensitivity": 0.05,
+        "CMD_vel_parabolic_eas_thresh": 2.0,
+        "CMD_vel_parabolic_eas_max_cmd": 10.0
     }
 }
