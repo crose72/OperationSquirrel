@@ -1,6 +1,7 @@
 #include "test_utils/test_csv_utils.h"
+#include "global_objects.h"
 #include "localize_target.h"
-#include "path_planner.h"
+#include "delivery_planner.h"
 #include "time_calc.h"
 #include "datalog.h"
 #include "param_reader.h"
@@ -138,8 +139,6 @@ void init_test_output(void)
         << "g_target_valid,"
         << "g_target_cntr_offset_x,"
         << "g_target_cntr_offset_y,"
-        << "g_target_cntr_offset_x_filt,"
-        << "g_target_cntr_offset_y_filt,"
         << "g_target_height,"
         << "g_target_width,"
         << "g_target_aspect,"
@@ -174,6 +173,7 @@ void init_test_output(void)
         << "g_meter_per_pix,"
         << "g_target_cntr_offset_x_mov_avg,"
         << "g_target_cntr_offset_y_mov_avg,"
+        << "g_target_data_useful,"
         /* End Localization Info */
         /* Start Vehicle Controls */
         << "g_x_error,"
@@ -190,9 +190,9 @@ void init_test_output(void)
         << "g_mav_veh_imu_ay,"
         << "g_mav_veh_imu_az,"
         << "g_mav_veh_yaw,"
-        << "g_mav_veh_pitch,"
+        << "g_mav_veh_pitch"
         /* End Mavlink data */
-        << "g_target_data_useful\n";
+        << "\n";
 }
 
 void init_software_components(void)
@@ -264,8 +264,6 @@ void write_test_outputs(void)
         << g_target_valid << ","
         << g_target_cntr_offset_x << ","
         << g_target_cntr_offset_y << ","
-        << g_target_cntr_offset_x_filt << ","
-        << g_target_cntr_offset_y_filt << ","
         << g_target_height << ","
         << g_target_width << ","
         << g_target_aspect << ","
@@ -300,6 +298,7 @@ void write_test_outputs(void)
         << g_meter_per_pix << ","
         << g_target_cntr_offset_x_mov_avg << ","
         << g_target_cntr_offset_y_mov_avg << ","
+        << g_target_data_useful << ","
         /* End Localization Info */
         /* Start Vehicle Controls */
         << g_x_error << ","
@@ -316,9 +315,9 @@ void write_test_outputs(void)
         << g_mav_veh_imu_ay << ","
         << g_mav_veh_imu_az << ","
         << g_mav_veh_yaw << ","
-        << g_mav_veh_pitch << ","
+        << g_mav_veh_pitch
         /* End Mavlink data */
-        << g_target_data_useful << "\n";
+        << "\n";
 }
 
 void save_test_output(void)

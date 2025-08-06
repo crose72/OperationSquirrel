@@ -19,6 +19,7 @@
 /********************************************************************************
  * Private macros and defines
  ********************************************************************************/
+#define NUM_VX_DECEL_STEPS 10
 
 /********************************************************************************
  * Object definitions
@@ -44,6 +45,10 @@ float g_yaw_target_error;
 float g_mav_veh_yaw_adjusted;
 float x_error_prv;
 float vx_adjust_prv;
+float vx_decel_prof_idx;
+bool decel_profile_active;
+int profile_sign;
+bool target_valid_last_cycle;
 
 /********************************************************************************
  * Calibration definitions
@@ -101,8 +106,15 @@ float vx_cmd_max_ramp_rate = (float)2.5;  // m/s²
 float vx_cmd_diverge_sensitivity = (float)0.05;
 float vx_cmd_parabolic_easing_thresh = (float)1.0;
 float vx_cmd_parabolic_easing_max = (float)1.0;
+float vx_cmd_filt_coef = (float)0.05;
 
 const float camera_half_fov = (float)0.7423; // half of 83 degree FOV camera
+
+const float vx_decel_profile_start_idx[NUM_VX_DECEL_STEPS] = {
+    4.500, 2.757, 1.689, 1.034, 0.634, 0.389, 0.239, 0.146, 0.089, 0.054};
+
+const float vx_decel_profile[NUM_VX_DECEL_STEPS] = {
+    4.500, 2.757, 1.689, 1.034, 0.634, 0.389, 0.239, 0.146, 0.089, 0.054};
 
 /********************************************************************************
  * Function definitions
@@ -170,6 +182,8 @@ void get_path_params(void)
     vx_cmd_diverge_sensitivity = follow_control.get_float_param("Follow_Params", "CMD_vel_diverge_sensitivity");
     vx_cmd_parabolic_easing_thresh = follow_control.get_float_param("Follow_Params", "CMD_vel_parabolic_eas_thresh");
     vx_cmd_parabolic_easing_max = follow_control.get_float_param("Follow_Params", "CMD_vel_parabolic_eas_max_cmd");
+
+    vx_cmd_filt_coef = follow_control.get_float_param("Follow_Params", "CMD_vel_X_filt_coef");
 }
 
 /********************************************************************************
@@ -286,75 +300,6 @@ void calc_yaw_target_error(void)
 }
 
 /********************************************************************************
- * Function: vel_control_smoothing
- * Description: Take the velocity
- ********************************************************************************/
-float vel_control_smoothing(float dt,
-                            float prev_error,
-                            float error,
-                            float command_prev,
-                            float current_command,
-                            float current_velocity,
-                            float max_command,
-                            float max_ramp_rate,
-                            float ramp_step_size,
-                            float diverge_sensitivity,
-                            float easing_thresh,
-                            float max_easing_cmd)
-{
-    // Parabolic easing on command itself when near 0
-    float delta_command = (float)0.0;
-    float shaped_command = current_command;
-
-    if (std::fabs(current_command) < easing_thresh)
-    {
-        float ratio = current_command / easing_thresh; // ∈ [-1, 1]
-        shaped_command = max_easing_cmd * ratio * ratio * (ratio >= 0 ? 1.0f : -1.0f);
-        delta_command = shaped_command - command_prev;
-    }
-    else
-    {
-        delta_command = current_command - command_prev;
-    }
-
-    // Determine if the error is getting smaller or larger
-    float error_delta = error - prev_error;
-    bool improving = std::fabs(error) < std::fabs(prev_error);
-    bool diverging = std::fabs(error) > std::fabs(prev_error) + diverge_sensitivity;
-    float max_delta = max_ramp_rate * dt;
-
-    if (!improving && diverging)
-    {
-        // If error is getting worse, slow the command ramp
-        max_delta *= ramp_step_size;
-    }
-
-    // Clamp delta to ramp limits
-    if (delta_command > max_delta)
-    {
-        delta_command = max_delta;
-    }
-    else if (delta_command < -max_delta)
-    {
-        delta_command = -max_delta;
-    }
-
-    float new_command = command_prev + delta_command;
-
-    // Clamp to max command magnitude
-    if (new_command > max_command)
-    {
-        new_command = max_command;
-    }
-    if (new_command < -max_command)
-    {
-        new_command = -max_command;
-    }
-
-    return new_command;
-}
-
-/********************************************************************************
  * Function: dtrmn_vel_cmd
  * Description: Determine the follow vector based on the vehicle's error between
                 the desired target offset and the actual target offset.
@@ -396,20 +341,8 @@ void dtrmn_vel_cmd(void)
         g_yaw_adjust = (float)0.0;
     }
 
-    g_vx_adjust = vel_control_smoothing(
-        g_dt,
-        x_error_prv,
-        g_x_error,
-        vx_adjust_prv,
-        g_vx_adjust,
-        g_mav_veh_local_ned_vx,
-        vx_cmd_max_allowed,
-        vx_cmd_max_ramp_rate,
-        vx_cmd_ramp_step_size,
-        vx_cmd_diverge_sensitivity,
-        vx_cmd_parabolic_easing_thresh,
-        vx_cmd_parabolic_easing_max);
-
+    g_vx_adjust = low_pass_filter(g_vx_adjust, vx_adjust_prv, vx_cmd_filt_coef);
+    target_valid_last_cycle = g_target_valid;
     vx_adjust_prv = g_vx_adjust;
     x_error_prv = g_x_error;
 }
@@ -452,6 +385,10 @@ bool PathPlanner::init(void)
     g_mav_veh_yaw_adjusted = (float)0.0;
     x_error_prv = (float)0.0;
     vx_adjust_prv = (float)0.0;
+    vx_decel_prof_idx = (float)0.0;
+    decel_profile_active = false;
+    profile_sign = (int)1;
+    target_valid_last_cycle = false;
 
     return true;
 }

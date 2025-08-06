@@ -17,6 +17,7 @@
 #include "time_calc.h"
 #include "track_target.h"
 #include "mav_data_hub.h"
+#include "path_planner.h"
 
 /********************************************************************************
  * Imported objects
