@@ -1,12 +1,10 @@
-#pragma once
-
-#ifdef ENABLE_CV
-
 /********************************************************************************
  * @file    localize_target.h
  * @author  Cameron Rose
  * @date    1/22/2025
  ********************************************************************************/
+#ifdef ENABLE_CV
+
 #ifndef LOCALIZE_TARGET_H
 #define LOCALIZE_TARGET_H
 
@@ -17,8 +15,10 @@
 #include "track_target.h"
 #include "param_reader.h"
 #include "interpolate.h"
+#include "signal_processing.h"
 #include "time_calc.h"
 #include "kf.h"
+#include <cmath>
 
 /********************************************************************************
  * Imported objects
@@ -39,6 +39,10 @@ extern float g_target_bottom;
 extern float g_target_center_x;
 extern float g_target_center_y;
 extern float g_dt;
+extern float g_mav_veh_local_ned_z;
+extern float g_target_cntr_offset_x_filt;
+extern float g_target_cntr_offset_x;
+extern const float g_input_video_height;
 
 /********************************************************************************
  * Exported objects
@@ -63,6 +67,13 @@ extern float g_vy_target_ekf;
 extern float g_ax_target_ekf;
 extern float g_ay_target_ekf;
 extern bool g_target_data_useful;
+extern float g_d_target_h_eq;
+extern float g_d_target_w_eq;
+extern float g_fov_height;
+extern float g_meter_per_pix;
+extern float g_target_cntr_offset_x_m;
+extern float g_target_cntr_offset_x_mov_avg;
+extern float g_target_cntr_offset_y_mov_avg;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

@@ -19,6 +19,7 @@
 /********************************************************************************
  * Private macros and defines
  ********************************************************************************/
+#define NUM_VX_DECEL_STEPS 10
 
 /********************************************************************************
  * Object definitions
@@ -42,6 +43,12 @@ float g_yaw_adjust;
 float g_mav_veh_yaw_prv;
 float g_yaw_target_error;
 float g_mav_veh_yaw_adjusted;
+float x_error_prv;
+float vx_adjust_prv;
+float vx_decel_prof_idx;
+bool decel_profile_active;
+int profile_sign;
+bool target_valid_last_cycle;
 
 /********************************************************************************
  * Calibration definitions
@@ -92,7 +99,22 @@ float w3_yaw = (float)0.0;
 
 float x_desired = (float)4.0;
 float y_desired = (float)0.0;
+
+float vx_cmd_max_allowed = (float)10.0;   // max allowed velocity
+float vx_cmd_ramp_step_size = (float)0.5; // m/s²
+float vx_cmd_max_ramp_rate = (float)2.5;  // m/s²
+float vx_cmd_diverge_sensitivity = (float)0.05;
+float vx_cmd_parabolic_easing_thresh = (float)1.0;
+float vx_cmd_parabolic_easing_max = (float)1.0;
+float vx_cmd_filt_coef = (float)0.05;
+
 const float camera_half_fov = (float)0.7423; // half of 83 degree FOV camera
+
+const float vx_decel_profile_start_idx[NUM_VX_DECEL_STEPS] = {
+    4.500, 2.757, 1.689, 1.034, 0.634, 0.389, 0.239, 0.146, 0.089, 0.054};
+
+const float vx_decel_profile[NUM_VX_DECEL_STEPS] = {
+    4.500, 2.757, 1.689, 1.034, 0.634, 0.389, 0.239, 0.146, 0.089, 0.054};
 
 /********************************************************************************
  * Function definitions
@@ -100,7 +122,7 @@ const float camera_half_fov = (float)0.7423; // half of 83 degree FOV camera
 void get_path_params(void);
 void calc_follow_error(void);
 void calc_yaw_target_error(void);
-void dtrmn_follow_vector(void);
+void dtrmn_vel_cmd(void);
 
 /********************************************************************************
  * Function: get_path_params
@@ -151,8 +173,17 @@ void get_path_params(void)
     w3_yaw = follow_control.get_float_param("PID_yaw", "w3");
 
     // Follow params
-    x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_offset");
-    y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_offset");
+    x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_pix_offset");
+    y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_pix_offset");
+
+    vx_cmd_max_allowed = follow_control.get_float_param("Follow_Params", "CMD_vel_max_cmd");
+    vx_cmd_max_ramp_rate = follow_control.get_float_param("Follow_Params", "CMD_vel_max_ramp_rate");
+    vx_cmd_ramp_step_size = follow_control.get_float_param("Follow_Params", "CMD_vel_ramp_step_size");
+    vx_cmd_diverge_sensitivity = follow_control.get_float_param("Follow_Params", "CMD_vel_diverge_sensitivity");
+    vx_cmd_parabolic_easing_thresh = follow_control.get_float_param("Follow_Params", "CMD_vel_parabolic_eas_thresh");
+    vx_cmd_parabolic_easing_max = follow_control.get_float_param("Follow_Params", "CMD_vel_parabolic_eas_max_cmd");
+
+    vx_cmd_filt_coef = follow_control.get_float_param("Follow_Params", "CMD_vel_X_filt_coef");
 }
 
 /********************************************************************************
@@ -164,14 +195,14 @@ void calc_follow_error(void)
 {
     if (g_x_target_ekf < 0.001f)
     {
-        g_x_error = 0.0f;
+        g_x_error = (float)0.0;
     }
     else
     {
-        g_x_error = g_x_target_ekf - x_desired;
+        g_x_error = (x_desired - g_target_cntr_offset_x_m);
     }
 
-    g_y_error = g_y_target_ekf - y_desired;
+    g_y_error = y_desired;
 }
 
 /********************************************************************************
@@ -269,19 +300,20 @@ void calc_yaw_target_error(void)
 }
 
 /********************************************************************************
- * Function: dtrmn_follow_vector
+ * Function: dtrmn_vel_cmd
  * Description: Determine the follow vector based on the vehicle's error between
                 the desired target offset and the actual target offset.
  ********************************************************************************/
-void dtrmn_follow_vector(void)
+void dtrmn_vel_cmd(void)
 {
     g_target_too_close = (g_x_error < 0.0);
 
-    if (g_target_valid && g_target_too_close)
+    if (g_target_valid && g_target_too_close && g_x_error)
     {
         g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
                                    g_x_error, 0.0, 0.0,
                                    w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
+
         g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
                                    g_y_error, 0.0, 0.0,
                                    w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
@@ -294,6 +326,7 @@ void dtrmn_follow_vector(void)
         g_vx_adjust = pid_forwd.pid3(Kp_x, Ki_x, Kd_x,
                                      g_x_error, 0.0, 0.0,
                                      w1_x, 0.0, 0.0, ControlDim::X, g_dt);
+
         g_vy_adjust = pid_forwd.pid3(Kp_y, Ki_y, Kd_y,
                                      g_y_error, 0.0, 0.0,
                                      w1_y, 0.0, 0.0, ControlDim::Y, g_dt);
@@ -307,6 +340,11 @@ void dtrmn_follow_vector(void)
         g_vy_adjust = (float)0.0;
         g_yaw_adjust = (float)0.0;
     }
+
+    g_vx_adjust = low_pass_filter(g_vx_adjust, vx_adjust_prv, vx_cmd_filt_coef);
+    target_valid_last_cycle = g_target_valid;
+    vx_adjust_prv = g_vx_adjust;
+    x_error_prv = g_x_error;
 }
 
 /********************************************************************************
@@ -328,6 +366,8 @@ PathPlanner::~PathPlanner(void) {};
  ********************************************************************************/
 bool PathPlanner::init(void)
 {
+    get_path_params();
+
     g_target_too_close = false;
     g_x_error = (float)0.0;
     g_y_error = (float)0.0;
@@ -343,8 +383,12 @@ bool PathPlanner::init(void)
     g_mav_veh_yaw_prv = (float)0.0;
     g_yaw_target_error = (float)0.0;
     g_mav_veh_yaw_adjusted = (float)0.0;
-
-    get_path_params();
+    x_error_prv = (float)0.0;
+    vx_adjust_prv = (float)0.0;
+    vx_decel_prof_idx = (float)0.0;
+    decel_profile_active = false;
+    profile_sign = (int)1;
+    target_valid_last_cycle = false;
 
     return true;
 }
@@ -357,7 +401,7 @@ void PathPlanner::loop(void)
 {
     calc_follow_error();
     calc_yaw_target_error();
-    dtrmn_follow_vector();
+    dtrmn_vel_cmd();
 }
 
 /********************************************************************************

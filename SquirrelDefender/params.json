@@ -1,16 +1,16 @@
 {
     "PID_vx_forward": {
-        "Kp": 0.5,
-        "Ki": 0.009,
-        "Kd": 0.1,
+        "Kp": 0.3,
+        "Ki": 0.0,
+        "Kd": 0.0,
         "w1": 1.0,
         "w2": 0.0,
         "w3": 0.0
     },
     "PID_vy_forward": {
-        "Kp": 0.03,
+        "Kp": 0.0,
         "Ki": 0.0,
-        "Kd": 0.001,
+        "Kd": 0.0,
         "w1": 1.0,
         "w2": 0.0,
         "w3": 0.0
@@ -24,17 +24,17 @@
         "w3": 0.0
     },
     "PID_vx_reverse": {
-        "Kp": 0.4,
-        "Ki": 0.009,
-        "Kd": 0.1,
+        "Kp": 0.1,
+        "Ki": 0.0,
+        "Kd": 1.0,
         "w1": 1.0,
         "w2": 0.0,
         "w3": 0.0
     },
     "PID_vy_reverse": {
-        "Kp": 0.03,
+        "Kp": 0.0,
         "Ki": 0.0,
-        "Kd": 0.001,
+        "Kd": 0.0,
         "w1": 1.0,
         "w2": 0.0,
         "w3": 0.0
@@ -48,7 +48,7 @@
         "w3": 0.0
     },
     "PID_yaw": {
-        "Kp": 0.15,
+        "Kp": 0.09,
         "Ki": 0.0,
         "Kd": 0.05,
         "w1": 1.0,
@@ -86,7 +86,9 @@
         "P_loc_22": 0.1,
         "P_loc_33": 0.1,
         "P_loc_44": 0.1,
-        "P_loc_55": 0.1
+        "P_loc_55": 0.1,
+        "X_pix_mov_avg_window_size": 10,
+        "Y_pix_mov_avg_window_size": 25
     },
     "Follow_Params": {
         "Desired_Height": 640.0,
@@ -94,6 +96,14 @@
         "Desired_X_offset": 8.0,
         "Desired_Y_offset": 0.0,
         "Desired_Z_offset": 0.0,
-        "BBox_Filt_coeff": 0.75
+        "Desired_X_pix_offset": 0.0,
+        "Desired_Y_pix_offset": 0.0,
+        "CMD_vel_max_cmd": 10.0,
+        "CMD_vel_max_ramp_rate": 2.5,
+        "CMD_vel_ramp_step_size": 2.0,
+        "CMD_vel_diverge_sensitivity": 0.05,
+        "CMD_vel_parabolic_eas_thresh": 0.25,
+        "CMD_vel_parabolic_eas_max_cmd": 10.0,
+        "CMD_vel_X_filt_coef": 0.1
     }
 }

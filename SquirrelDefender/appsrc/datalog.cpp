@@ -196,7 +196,7 @@ void write_headers(void)
                               "g_mav_veh_type",
                               "g_mav_veh_autopilot_type",
                               "g_mav_veh_base_mode",
-                              " g_mav_veh_custom_mode",
+                              "g_mav_veh_custom_mode",
                               "g_mav_veh_state",
                               "g_mav_veh_mavlink_version"});
 

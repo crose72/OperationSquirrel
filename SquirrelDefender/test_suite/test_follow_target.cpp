@@ -1,6 +1,7 @@
 #include "test_utils/test_csv_utils.h"
+#include "global_objects.h"
 #include "localize_target.h"
-#include "path_planner.h"
+#include "delivery_planner.h"
 #include "time_calc.h"
 #include "datalog.h"
 #include "param_reader.h"
@@ -25,6 +26,8 @@ std::vector<float> g_detection_class_arr;
 std::vector<float> g_target_detection_conf_arr;
 std::vector<float> g_target_cntr_offset_x_arr;
 std::vector<float> g_target_cntr_offset_y_arr;
+std::vector<float> g_target_cntr_offset_x_filt_arr;
+std::vector<float> g_target_cntr_offset_y_filt_arr;
 std::vector<float> g_target_height_arr;
 std::vector<float> g_target_width_arr;
 std::vector<float> g_target_aspect_arr;
@@ -39,6 +42,7 @@ std::vector<float> g_mav_veh_imu_ay_arr;
 std::vector<float> g_mav_veh_imu_az_arr;
 std::vector<float> g_mav_veh_yaw_arr;
 std::vector<float> g_mav_veh_pitch_arr;
+std::vector<float> g_mav_veh_local_ned_z_arr;
 std::vector<float> g_yaw_target_arr;
 
 void init_test_inputs(void)
@@ -54,6 +58,8 @@ void init_test_inputs(void)
     g_target_detection_conf_arr = get_column_data<float>(test_inputs, "g_target_detection_conf");
     g_target_cntr_offset_x_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_x");
     g_target_cntr_offset_y_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_y");
+    g_target_cntr_offset_x_filt_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_x_filt");
+    g_target_cntr_offset_y_filt_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_y_filt");
     g_target_height_arr = get_column_data<float>(test_inputs, "g_target_height");
     g_target_width_arr = get_column_data<float>(test_inputs, "g_target_width");
     g_target_aspect_arr = get_column_data<float>(test_inputs, "g_target_aspect");
@@ -68,6 +74,7 @@ void init_test_inputs(void)
     g_mav_veh_imu_az_arr = get_column_data<float>(test_inputs, "g_mav_veh_imu_az");
     g_mav_veh_yaw_arr = get_column_data<float>(test_inputs, "g_mav_veh_yaw");
     g_mav_veh_pitch_arr = get_column_data<float>(test_inputs, "g_mav_veh_pitch");
+    g_mav_veh_local_ned_z_arr = get_column_data<float>(test_inputs, "g_mav_veh_local_ned_z");
     g_yaw_target_arr = get_column_data<float>(test_inputs, "g_yaw_target");
 
     // Check if any input signal arrays are empty
@@ -77,6 +84,8 @@ void init_test_inputs(void)
         g_target_track_id_arr.empty() ||
         g_target_cntr_offset_x_arr.empty() ||
         g_target_cntr_offset_y_arr.empty() ||
+        g_target_cntr_offset_x_filt_arr.empty() ||
+        g_target_cntr_offset_y_filt_arr.empty() ||
         g_target_height_arr.empty() ||
         g_target_width_arr.empty() ||
         g_target_aspect_arr.empty() ||
@@ -120,11 +129,14 @@ void init_test_output(void)
     // Write csv Header
     test_output_file
         << "g_app_elapsed_time,"
-        << "g_target_valid,"
+        /* Start Detection Info */
         << "g_target_detection_id,"
         << "g_target_track_id,"
         << "g_detection_class,"
         << "g_target_detection_conf,"
+        /* End Detection Info */
+        /* Start Tracking Info */
+        << "g_target_valid,"
         << "g_target_cntr_offset_x,"
         << "g_target_cntr_offset_y,"
         << "g_target_height,"
@@ -134,6 +146,8 @@ void init_test_output(void)
         << "g_target_right,"
         << "g_target_top,"
         << "g_target_bottom,"
+        /* End Tracking Info */
+        /* Start Localization Info */
         << "d_target_h,"
         << "d_target_w,"
         << "g_x_target,"
@@ -146,6 +160,21 @@ void init_test_output(void)
         << "g_delta_d_z,"
         << "g_camera_comp_angle,"
         << "g_target_too_close,"
+        << "g_d_target_h_eq,"
+        << "g_d_target_w_eq,"
+        << "g_fov_height,"
+        << "g_x_target_ekf,"
+        << "g_y_target_ekf,"
+        << "g_vx_target_ekf,"
+        << "g_vy_target_ekf,"
+        << "g_ax_target_ekf,"
+        << "g_ay_target_ekf,"
+        << "g_target_cntr_offset_x_m,"
+        << "g_meter_per_pix,"
+        << "g_target_cntr_offset_x_mov_avg,"
+        << "g_target_cntr_offset_y_mov_avg,"
+        << "g_target_data_useful,"
+        /* End Localization Info */
         /* Start Vehicle Controls */
         << "g_x_error,"
         << "g_y_error,"
@@ -154,12 +183,6 @@ void init_test_output(void)
         << "g_vz_adjust,"
         << "g_yaw_target,"
         /* End Vehicle Controls */
-        << "g_x_target_ekf,"
-        << "g_y_target_ekf,"
-        << "g_vx_target_ekf,"
-        << "g_vy_target_ekf,"
-        << "g_ax_target_ekf,"
-        << "g_ay_target_ekf,"
         /* Start Mavlink data */
         << "g_mav_veh_local_ned_vx,"
         << "g_mav_veh_local_ned_vy,"
@@ -167,9 +190,9 @@ void init_test_output(void)
         << "g_mav_veh_imu_ay,"
         << "g_mav_veh_imu_az,"
         << "g_mav_veh_yaw,"
-        << "g_mav_veh_pitch,"
+        << "g_mav_veh_pitch"
         /* End Mavlink data */
-        << "g_target_data_useful\n";
+        << "\n";
 }
 
 void init_software_components(void)
@@ -190,6 +213,8 @@ void get_test_inputs(size_t data_index)
     g_target_detection_conf = g_target_detection_conf_arr[data_index];
     g_target_cntr_offset_x = g_target_cntr_offset_x_arr[data_index];
     g_target_cntr_offset_y = g_target_cntr_offset_y_arr[data_index];
+    g_target_cntr_offset_x_filt = g_target_cntr_offset_x_filt_arr[data_index];
+    g_target_cntr_offset_y_filt = g_target_cntr_offset_y_filt_arr[data_index];
     g_target_height = g_target_height_arr[data_index];
     g_target_width = g_target_width_arr[data_index];
     g_target_aspect = g_target_aspect_arr[data_index];
@@ -204,6 +229,7 @@ void get_test_inputs(size_t data_index)
     g_mav_veh_imu_az = g_mav_veh_imu_az_arr[data_index];
     g_mav_veh_yaw = g_mav_veh_yaw_arr[data_index];
     g_mav_veh_pitch = g_mav_veh_pitch_arr[data_index];
+    g_mav_veh_local_ned_z = g_mav_veh_local_ned_z_arr[data_index];
     g_yaw_target = g_yaw_target_arr[data_index];
 
     // Calculate timestep manually since this is not running on the drone in real time
@@ -228,11 +254,14 @@ void write_test_outputs(void)
     // Write the latest values of global variables directly to the CSV
     test_output_file
         << g_app_elapsed_time << ","
-        << g_target_valid << ","
+        /* Start Detection Info */
         << g_target_detection_id << ","
         << g_target_track_id << ","
         << g_detection_class << ","
         << g_target_detection_conf << ","
+        /* End Detection Info */
+        /* Start Tracking Info */
+        << g_target_valid << ","
         << g_target_cntr_offset_x << ","
         << g_target_cntr_offset_y << ","
         << g_target_height << ","
@@ -242,6 +271,8 @@ void write_test_outputs(void)
         << g_target_right << ","
         << g_target_top << ","
         << g_target_bottom << ","
+        /* End Tracking Info */
+        /* Start Localization Info */
         << d_target_h << ","
         << d_target_w << ","
         << g_x_target << ","
@@ -254,6 +285,21 @@ void write_test_outputs(void)
         << g_delta_d_z << ","
         << g_camera_comp_angle << ","
         << g_target_too_close << ","
+        << g_d_target_h_eq << ","
+        << g_d_target_w_eq << ","
+        << g_fov_height << ","
+        << g_x_target_ekf << ","
+        << g_y_target_ekf << ","
+        << g_vx_target_ekf << ","
+        << g_vy_target_ekf << ","
+        << g_ax_target_ekf << ","
+        << g_ay_target_ekf << ","
+        << g_target_cntr_offset_x_m << ","
+        << g_meter_per_pix << ","
+        << g_target_cntr_offset_x_mov_avg << ","
+        << g_target_cntr_offset_y_mov_avg << ","
+        << g_target_data_useful << ","
+        /* End Localization Info */
         /* Start Vehicle Controls */
         << g_x_error << ","
         << g_y_error << ","
@@ -262,12 +308,6 @@ void write_test_outputs(void)
         << g_vz_adjust << ","
         << g_yaw_target << ","
         /* End Vehicle Controls */
-        << g_x_target_ekf << ","
-        << g_y_target_ekf << ","
-        << g_vx_target_ekf << ","
-        << g_vy_target_ekf << ","
-        << g_ax_target_ekf << ","
-        << g_ay_target_ekf << ","
         /* Start Mavlink data */
         << g_mav_veh_local_ned_vx << ","
         << g_mav_veh_local_ned_vy << ","
@@ -275,9 +315,9 @@ void write_test_outputs(void)
         << g_mav_veh_imu_ay << ","
         << g_mav_veh_imu_az << ","
         << g_mav_veh_yaw << ","
-        << g_mav_veh_pitch << ","
+        << g_mav_veh_pitch
         /* End Mavlink data */
-        << g_target_data_useful << "\n";
+        << "\n";
 }
 
 void save_test_output(void)

@@ -3,6 +3,7 @@
  * @author  Cameron Rose
  * @date    3/12/2025
  ********************************************************************************/
+
 #ifndef PATH_PLANNER_H
 #define PATH_PLANNER_H
 
@@ -16,6 +17,7 @@
 #include "time_calc.h"
 #include "track_target.h"
 #include "mav_data_hub.h"
+#include "path_planner.h"
 
 /********************************************************************************
  * Imported objects
@@ -36,6 +38,9 @@ extern float g_mav_veh_yaw;
 extern float g_mav_veh_yawspeed;
 extern bool g_use_video_playback;
 extern float g_target_cntr_offset_y;
+extern float g_target_cntr_offset_x_filt;
+extern float g_target_cntr_offset_y_filt;
+extern float g_target_cntr_offset_x_m;
 
 /********************************************************************************
  * Exported objects
