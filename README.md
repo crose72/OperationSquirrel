@@ -13,7 +13,12 @@ https://github.com/user-attachments/assets/a6b1fb76-5357-4e33-b026-c60e2d991b9d
 
 ### Autonomous drone following in real life
 
+My VERY FIRST test flight ever in real life.  Prior to this I had only used simulation.
+
 https://github.com/user-attachments/assets/12bda7be-26f7-4e50-8a76-f6e40bb1b42d
+
+Here's a better video that includes the drone's perspective too.
+And I'll be uploading an even better video than this one soon!
 
 [![Watch the video](https://img.youtube.com/vi/FgqmfTvIJS4/0.jpg)](https://youtu.be/FgqmfTvIJS4)
 
