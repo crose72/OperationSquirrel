@@ -15,6 +15,8 @@ https://github.com/user-attachments/assets/a6b1fb76-5357-4e33-b026-c60e2d991b9d
 
 https://github.com/user-attachments/assets/12bda7be-26f7-4e50-8a76-f6e40bb1b42d
 
+[![Watch the video](https://img.youtube.com/vi/FgqmfTvIJS4/0.jpg)](https://youtu.be/FgqmfTvIJS4)
+
 ## Description
 
 This project is aimed at creating an autonomous drone to deliver static and/or dynamic payloads to a moving target.  Advanced control methods, path planning algorithms, localization, AI/ML techniques and more will be deployed to achieve this goal.  The engineering feats accomplished along the way are stepping stones for other exciting problems.  The work done for this project can be expanded to protect crops from birds, home security, deliveries, or any other creative use.
