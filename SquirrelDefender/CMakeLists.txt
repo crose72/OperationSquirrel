@@ -433,10 +433,10 @@ if(ENABLE_SECRET_SQUIRREL)
     file(GLOB SS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.h)
 endif()
 
-if(BLD_JETSON_ORIN_NANO OR BLD_WSL)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt/src)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt/libs/tensorrt-cpp-api/src)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/yolov8_tensorrt)
+if(BLD_JETSON_ORIN_NANO OR BLD_WSL)    
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/trtinfer/src)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/trtinfer/include)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/trtinfer)
 endif()
 
 #=============================================================================
@@ -487,7 +487,7 @@ if (NOT BUILD_TEST_HARNESS)
         set_target_debug_flags(squirreldefender)
 
         target_link_libraries(squirreldefender 
-                            YoloV8_TRT 
+                            trtinfer 
                             ${OpenCV_LIBS} 
                             vpi 
                             opencv_core
@@ -510,7 +510,7 @@ if (NOT BUILD_TEST_HARNESS)
         set_target_debug_flags(squirreldefender)
 
         target_link_libraries(squirreldefender 
-                            YoloV8_TRT 
+                            trtinfer 
                             ${OpenCV_LIBS} 
                             #vpi 
                             opencv_core
@@ -667,7 +667,7 @@ if (BUILD_TEST_HARNESS)
 
         if (BLD_JETSON_ORIN_NANO)
             target_link_libraries(test_localize_target 
-                                YoloV8_TRT 
+                                trtinfer 
                                 ${OpenCV_LIBS} 
                                 vpi 
                                 opencv_core
@@ -680,7 +680,7 @@ if (BUILD_TEST_HARNESS)
                                 ${BLAS_LIBRARIES})
         elseif(BLD_WSL)
             target_link_libraries(test_localize_target 
-                                YoloV8_TRT 
+                                trtinfer 
                                 ${OpenCV_LIBS} 
                                 #vpi 
                                 opencv_core
@@ -703,7 +703,7 @@ if (BUILD_TEST_HARNESS)
 
         if (BLD_JETSON_ORIN_NANO)
             target_link_libraries(test_follow_target 
-                                YoloV8_TRT 
+                                trtinfer 
                                 ${OpenCV_LIBS} 
                                 vpi 
                                 opencv_core
@@ -716,7 +716,7 @@ if (BUILD_TEST_HARNESS)
                                 ${BLAS_LIBRARIES})
         elseif(BLD_WSL)
             target_link_libraries(test_follow_target 
-                                YoloV8_TRT 
+                                trtinfer 
                                 ${OpenCV_LIBS} 
                                 #vpi 
                                 opencv_core
@@ -739,7 +739,7 @@ if (BUILD_TEST_HARNESS)
 
         if (BLD_JETSON_ORIN_NANO)
             target_link_libraries(test_payload_delivery 
-                                YoloV8_TRT 
+                                trtinfer 
                                 ${OpenCV_LIBS} 
                                 vpi 
                                 opencv_core
@@ -752,7 +752,7 @@ if (BUILD_TEST_HARNESS)
                                 ${BLAS_LIBRARIES})
         elseif(BLD_WSL)
             target_link_libraries(test_payload_delivery 
-                                YoloV8_TRT 
+                                trtinfer 
                                 ${OpenCV_LIBS} 
                                 #vpi 
                                 opencv_core

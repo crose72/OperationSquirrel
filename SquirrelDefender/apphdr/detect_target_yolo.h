@@ -16,8 +16,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "video_io.h"
-#include "yolo_net.h"
-#include "yolov8.h"
+#include "YOLOv8.h"
 #include <opencv2/cudaimgproc.hpp>
 #include <vector>
 
