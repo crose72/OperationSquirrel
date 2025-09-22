@@ -104,12 +104,12 @@ extern float g_detection_class;
 extern float g_target_detection_conf;
 
 /* Localize target variables*/
-extern float d_target_h;
-extern float d_target_w;
+extern float g_d_target_h;
+extern float g_d_target_w;
 extern float g_x_target;
 extern float g_y_target;
 extern float g_z_target;
-extern float d_target;
+extern float g_d_target;
 extern float g_x_error;
 extern float g_y_error;
 extern float g_delta_angle;
@@ -157,7 +157,6 @@ public:
     static void shutdown(void);
 
 private:
-
 };
 
 #endif // DATALOG_H

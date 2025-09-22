@@ -47,12 +47,12 @@ extern const float g_input_video_height;
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern float d_target_h;
-extern float d_target_w;
+extern float g_d_target_h;
+extern float g_d_target_w;
 extern float g_x_target;
 extern float g_y_target;
 extern float g_z_target;
-extern float d_target;
+extern float g_d_target;
 extern float g_x_error;
 extern float g_y_error;
 extern float g_delta_angle;
@@ -67,8 +67,6 @@ extern float g_vy_target_ekf;
 extern float g_ax_target_ekf;
 extern float g_ay_target_ekf;
 extern bool g_target_data_useful;
-extern float g_d_target_h_eq;
-extern float g_d_target_w_eq;
 extern float g_fov_height;
 extern float g_meter_per_pix;
 extern float g_target_cntr_offset_x_m;

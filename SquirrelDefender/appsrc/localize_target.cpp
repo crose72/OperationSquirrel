@@ -30,12 +30,12 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-float d_target_h;
-float d_target_w;
+float g_d_target_h;
+float g_d_target_w;
 float g_x_target;
 float g_y_target;
 float g_z_target;
-float d_target;
+float g_d_target;
 float g_delta_angle;       //
 float g_camera_tilt_angle; // Angle of the camera relative to the ground, compensating for pitch
 float g_delta_d_x;
@@ -58,8 +58,6 @@ float g_ay_target_ekf;
 float x_target_ekf_prv;
 float y_target_ekf_prv;
 float camera_comp_angle_abs;
-float g_d_target_h_eq;
-float g_d_target_w_eq;
 float g_fov_height;
 float g_meter_per_pix;
 float g_target_cntr_offset_x_m;
@@ -338,24 +336,20 @@ void dtrmn_target_location(void)
         const float PIX_WIDTH_X = (float)540.456;
         const float PIX_WIDTH_X_POW = (float)(-0.758);
 
-        d_idx_h = get_float_index(g_target_height, &height_index[0], MAX_IDX_D_HEIGHT, false);
-        d_idx_w = get_float_index(g_target_width, &width_index[0], MAX_IDX_D_WIDTH, false);
-        d_target_h = get_interpolated_value(d_idx_h, &d_offset_h[0], MAX_IDX_D_HEIGHT);
-        g_d_target_h_eq = powf(g_target_height / PIX_HEIGHT_X, (float)1.0 / PIX_HEIGHT_X_POW);
-        d_target_w = get_interpolated_value(d_idx_w, &d_offset_w[0], MAX_IDX_D_WIDTH);
-        g_d_target_w_eq = powf(g_target_width / PIX_WIDTH_X, (float)1.0 / PIX_WIDTH_X_POW);
+        g_d_target_h = powf(g_target_height / PIX_HEIGHT_X, (float)1.0 / PIX_HEIGHT_X_POW);
+        g_d_target_w = powf(g_target_width / PIX_WIDTH_X, (float)1.0 / PIX_WIDTH_X_POW);
 
         if (g_target_aspect > 0.4f)
         {
-            d_target = g_d_target_w_eq;
+            g_d_target = g_d_target_w;
         }
-        else if (g_d_target_h_eq > 2.99f)
+        else if (g_d_target_h > 2.99f)
         {
-            d_target = g_d_target_h_eq;
+            g_d_target = g_d_target_h;
         }
         else
         {
-            d_target = g_d_target_w_eq;
+            g_d_target = g_d_target_w;
         }
 
         /* Calculate true camera angle relative to the ground, adjusting for pitch. */
@@ -367,8 +361,8 @@ void dtrmn_target_location(void)
         {
             camera_comp_angle_abs = std::fabs(g_camera_tilt_angle);
 
-            g_x_target = d_target * cosf(camera_comp_angle_abs);
-            g_z_target = d_target * sinf(camera_comp_angle_abs);
+            g_x_target = g_d_target * cosf(camera_comp_angle_abs);
+            g_z_target = g_d_target * sinf(camera_comp_angle_abs);
         }
 
         /* Calculate shift in target location in the x and z directions based on camera tilt
@@ -382,7 +376,7 @@ void dtrmn_target_location(void)
 
         if (g_delta_angle > 0.0f && g_delta_angle < camera_fixed_angle)
         {
-            delta_idx_d = get_float_index(d_target, &delta_offset_d[0], MAX_IDX_DELTA_D_OFFSET, true);
+            delta_idx_d = get_float_index(g_d_target, &delta_offset_d[0], MAX_IDX_DELTA_D_OFFSET, true);
             delta_idx_pix = get_float_index(std::fabs(g_target_cntr_offset_x), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
             delta_d = get_2d_interpolated_value(&delta_offset[0][0], MAX_IDX_DELTA_PIXEL_OFFSET, MAX_IDX_DELTA_D_OFFSET, y_idx_pix, y_idx_d);
 
@@ -403,7 +397,7 @@ void dtrmn_target_location(void)
 
         /* Calculate target y offset from the center line of view of the camera based on calibrated forward distance and the
         offset of the center of the target to the side of the center of the video frame in pixels */
-        y_idx_d = get_float_index(d_target, &y_offset_d[0], MAX_IDX_Y_D_OFFSET, true);
+        y_idx_d = get_float_index(g_d_target, &y_offset_d[0], MAX_IDX_Y_D_OFFSET, true);
         y_idx_pix = get_float_index(std::fabs(g_target_cntr_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
         float y_target_est = get_2d_interpolated_value(&y_offset[0][0], MAX_IDX_Y_PIXEL_OFFSET, MAX_IDX_Y_D_OFFSET, y_idx_pix, y_idx_d);
 
@@ -512,12 +506,12 @@ bool Localize::init(void)
     get_localization_params();
     init_kf_loc();
 
-    d_target_h = (float)0.0;
-    d_target_w = (float)0.0;
+    g_d_target_h = (float)0.0;
+    g_d_target_w = (float)0.0;
     g_x_target = (float)0.0;
     g_y_target = (float)0.0;
     g_z_target = (float)0.0;
-    d_target = (float)0.0;
+    g_d_target = (float)0.0;
     g_x_error = (float)0.0;
     g_y_error = (float)0.0;
     g_delta_angle = (float)0.0;
@@ -530,8 +524,6 @@ bool Localize::init(void)
     loc_target_valid_prv = false;
     g_target_data_useful = false;
     camera_comp_angle_abs = (float)0.0;
-    g_d_target_h_eq = (float)0.0;
-    g_d_target_w_eq = (float)0.0;
     g_fov_height = (float)0.0;
     g_meter_per_pix = (float)0.0;
     g_target_cntr_offset_x_m = (float)0.0;
