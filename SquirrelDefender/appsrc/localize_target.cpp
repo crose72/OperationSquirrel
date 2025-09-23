@@ -61,6 +61,7 @@ float camera_comp_angle_abs;
 float g_fov_height;
 float g_meter_per_pix;
 float g_target_cntr_offset_x_m;
+float g_line_of_sight;
 
 // Buffers for moving average of target centroid
 std::vector<float> target_y_pix_hist4avg;
@@ -353,7 +354,7 @@ void dtrmn_target_location(void)
         }
 
         /* Calculate true camera angle relative to the ground, adjusting for pitch. */
-        g_camera_comp_angle = (PI / 2.0f) - camera_fixed_angle;
+        g_camera_comp_angle = (PI / (float)2.0) - camera_fixed_angle;
         g_camera_tilt_angle = g_mav_veh_pitch - camera_fixed_angle;
 
         /* Calculate the x and z distances of the target relative to the drone camera (positive z is down).*/
@@ -457,7 +458,14 @@ void update_target_location(void)
 void calc_vertical_fov(void)
 {
     // Calculate the line of sight distance of the camera
-    float line_of_sight = std::fabs(g_mav_veh_local_ned_z) / cosf(camera_comp_angle_abs);
+    if ((g_camera_comp_angle + g_mav_veh_pitch) < (float)0.001)
+    {
+        g_line_of_sight = (float)0.0;
+    }
+    else
+    {
+        g_line_of_sight = std::fabs(g_mav_veh_local_ned_z) / cosf(g_camera_comp_angle + g_mav_veh_pitch);
+    }
 
     // Calculate the pixel height of a known fixed object at given line of
     // sight distance from the camera.
@@ -466,7 +474,7 @@ void calc_vertical_fov(void)
     const float PIX_HEIGHT_X = (float)1680.557;
     const float PIX_HEIGHT_X_POW = (float)(-0.863);
     // Height of a known object at given distance
-    float ghost_object_height = PIX_HEIGHT_X * powf(line_of_sight, PIX_HEIGHT_X_POW);
+    float ghost_object_height = PIX_HEIGHT_X * powf(g_line_of_sight, PIX_HEIGHT_X_POW);
     g_meter_per_pix = (float)1.778 / ghost_object_height;
     g_fov_height = g_meter_per_pix * g_input_video_height;
 }
@@ -535,6 +543,7 @@ bool Localize::init(void)
     y_sum = (float)0.0;
     x_buffer_idx4avg = (int)0;
     x_sum = (float)0.0;
+    g_line_of_sight = (float)0.0;
 
     return true;
 }

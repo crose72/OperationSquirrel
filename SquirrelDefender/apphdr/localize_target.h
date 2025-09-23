@@ -72,6 +72,7 @@ extern float g_meter_per_pix;
 extern float g_target_cntr_offset_x_m;
 extern float g_target_cntr_offset_x_mov_avg;
 extern float g_target_cntr_offset_y_mov_avg;
+extern float g_line_of_sight;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

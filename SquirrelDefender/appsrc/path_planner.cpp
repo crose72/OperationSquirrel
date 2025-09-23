@@ -173,8 +173,8 @@ void get_path_params(void)
     w3_yaw = follow_control.get_float_param("PID_yaw", "w3");
 
     // Follow params
-    x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_pix_offset");
-    y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_pix_offset");
+    x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_offset");
+    y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_offset");
 
     vx_cmd_max_allowed = follow_control.get_float_param("Follow_Params", "CMD_vel_max_cmd");
     vx_cmd_max_ramp_rate = follow_control.get_float_param("Follow_Params", "CMD_vel_max_ramp_rate");
@@ -199,7 +199,7 @@ void calc_follow_error(void)
     }
     else
     {
-        g_x_error = (x_desired - g_target_cntr_offset_x_m);
+        g_x_error = (g_x_target_ekf - x_desired);
     }
 
     g_y_error = y_desired;
@@ -308,7 +308,7 @@ void dtrmn_vel_cmd(void)
 {
     g_target_too_close = (g_x_error < 0.0);
 
-    if (g_target_valid && g_target_too_close && g_x_error)
+    if (g_target_valid && g_target_too_close)
     {
         g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
                                    g_x_error, 0.0, 0.0,
@@ -341,7 +341,6 @@ void dtrmn_vel_cmd(void)
         g_yaw_adjust = (float)0.0;
     }
 
-    g_vx_adjust = low_pass_filter(g_vx_adjust, vx_adjust_prv, vx_cmd_filt_coef);
     target_valid_last_cycle = g_target_valid;
     vx_adjust_prv = g_vx_adjust;
     x_error_prv = g_x_error;

@@ -172,6 +172,7 @@ void init_test_output(void)
         << "g_target_cntr_offset_x_mov_avg,"
         << "g_target_cntr_offset_y_mov_avg,"
         << "g_target_data_useful,"
+        << "g_line_of_sight,"
         /* End Localization Info */
         /* Start Vehicle Controls */
         << "g_x_error,"
@@ -295,6 +296,7 @@ void write_test_outputs(void)
         << g_target_cntr_offset_x_mov_avg << ","
         << g_target_cntr_offset_y_mov_avg << ","
         << g_target_data_useful << ","
+        << g_line_of_sight << ","
         /* End Localization Info */
         /* Start Vehicle Controls */
         << g_x_error << ","
