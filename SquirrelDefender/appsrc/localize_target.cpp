@@ -90,10 +90,17 @@ arma::colvec u0_loc; // Observed initial measurements
  ********************************************************************************/
 const float center_of_frame_width = 640.0f;
 const float center_of_frame_height = 360.0f;
-const float camera_fixed_angle = 0.436f; // radians
 const int n_states = 6;
 const int n_meas = 2;
-const float KNOWN_OBJECT_HEIGHT = (float)1.778;
+const float known_obj_heigh_all_dist = (float)1.778; // Height of known object at all distances
+// Coefficients and power for the equation relating target height to distance
+// from the camera in the forward direction.  Equation solved so the input
+// is target size (bounding box in pixels) and output is target estimated
+// distance (in meters).
+const float pix_height_x_coef = (float)1680.557;
+const float pix_height_x_pow = (float)(-0.863);
+const float pix_width_x = (float)540.456;
+const float pix_width_x_pow = (float)(-0.758);
 
 const float d_offset_w[MAX_IDX_D_WIDTH] = {
     0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5, 8.0, 8.5, 9.0, 9.5,
@@ -180,15 +187,17 @@ float P_loc_33 = 0.1f;
 float P_loc_44 = 0.1f;
 float P_loc_55 = 0.1f;
 
+float camera_fixed_angle = (float)0.489; // radians
+
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
 void get_localization_params(void);
 void init_kf_loc(void);
-void dtrmn_target_location(void);
-void update_target_location(void);
-void calc_vertical_fov(void);
+void calc_fov(void);
 void dtrmn_target_loc_img(void);
+void dtrmn_target_loc_real(void);
+void update_target_loc(void);
 
 /********************************************************************************
  * Function: get_localization_params
@@ -197,6 +206,8 @@ void dtrmn_target_loc_img(void);
 void get_localization_params(void)
 {
     ParamReader localization_params("../params.json");
+
+    camera_fixed_angle = localization_params.get_float_param("Localization_Params", "Camera_fixed_angle");
 
     // H_loc (Observation matrix, 2x6)
     H_loc_00 = localization_params.get_float_param("Localization_Params", "H_loc_00");
@@ -306,12 +317,72 @@ void init_kf_loc(void)
 }
 
 /********************************************************************************
- * Function: dtrmn_target_location
+ * Function: calc_fov
+ * Description: Calculate the field of view of the camera in meters at the
+ *              given vehicle height above the ground, and camera angle
+ *              relative to the ground.
+ ********************************************************************************/
+void calc_fov(void)
+{
+    // Calculate the line of sight distance of the camera
+    if ((g_camera_comp_angle + g_mav_veh_pitch) < (float)0.001)
+    {
+        g_line_of_sight = (float)0.0;
+    }
+    else
+    {
+        g_line_of_sight = std::fabs(g_mav_veh_local_ned_z) / cosf(g_camera_comp_angle + g_mav_veh_pitch);
+    }
+
+    // Calculate the pixel height of a known fixed object at given line of
+    // sight distance from the camera.
+    // The object isn't there, this is an intermediate calculation to determine
+    // how many pixels correspond to a meter at the current drone height.
+
+    // Height of a known object at given distance
+    float ghost_object_height = pix_height_x_coef * powf(g_line_of_sight, pix_height_x_pow);
+    // How many meters a single pixel represents at the line of sight distance
+    // TODO: When to use actual vs ghost object height?
+    // Uses "ghost object" height - the height of the known object at the LOS distance
+    // g_meter_per_pix = known_obj_heigh_all_dist / ghost_object_height;
+    // Currently gonna use the target actual height
+    g_meter_per_pix = known_obj_heigh_all_dist / g_target_height;
+    g_fov_height = g_meter_per_pix * g_input_video_height;
+}
+
+/********************************************************************************
+ * Function: dtrmn_target_loc_img
+ * Description: Determine target location and movement patterns in the image.
+ ********************************************************************************/
+void dtrmn_target_loc_img(void)
+{
+    // Only consider targets whose bounding boxes are not smashed against the
+    // video frame, and at least a certain size (to prevent bad estimation)
+    g_target_data_useful = (g_target_valid &&
+                            (!(g_target_center_x < 50.0 || g_target_center_x > 670) &&
+                             !(g_target_center_y < 50.0 || g_target_center_x > 1230) &&
+                             !((g_target_width * g_target_height) < 3500.0)));
+
+    if (!g_target_data_useful)
+    {
+        return;
+    }
+
+    // Moving average for more smoothing - modifies the history vector
+    g_target_cntr_offset_x_mov_avg = moving_average(target_x_pix_hist4avg, g_target_cntr_offset_x, x_buffer_idx4avg, x_sum);
+    g_target_cntr_offset_y_mov_avg = moving_average(target_y_pix_hist4avg, g_target_cntr_offset_y, y_buffer_idx4avg, y_sum);
+
+    // Convert the
+    g_target_cntr_offset_x_m = g_target_cntr_offset_x_mov_avg * g_meter_per_pix;
+}
+
+/********************************************************************************
+ * Function: dtrmn_target_loc_real
  * Description: Calculate the location of the target relative to the drone.
  *              First implementation will be relative to the camera, needs to use
  *              the center mass of the drone in the end though.
  ********************************************************************************/
-void dtrmn_target_location(void)
+void dtrmn_target_loc_real(void)
 {
     float d_idx_h;
     float d_idx_w;
@@ -322,23 +393,11 @@ void dtrmn_target_location(void)
     float delta_d;
     float target_bounding_box_rate;
 
-    // Only consider targets whose bounding boxes are not smashed against the
-    // video frame, and at least a certain size (to prevent bad estimation)
-    g_target_data_useful = (g_target_valid &&
-                            (!(g_target_center_x < 50.0 || g_target_center_x > 670) &&
-                             !(g_target_center_y < 50.0 || g_target_center_x > 1230) &&
-                             !((g_target_width * g_target_height) < 3500.0)));
-
     if (g_target_data_useful)
     {
         /* Calculate distance from camera offset */
-        const float PIX_HEIGHT_X = (float)1680.557;
-        const float PIX_HEIGHT_X_POW = (float)(-0.863);
-        const float PIX_WIDTH_X = (float)540.456;
-        const float PIX_WIDTH_X_POW = (float)(-0.758);
-
-        g_d_target_h = powf(g_target_height / PIX_HEIGHT_X, (float)1.0 / PIX_HEIGHT_X_POW);
-        g_d_target_w = powf(g_target_width / PIX_WIDTH_X, (float)1.0 / PIX_WIDTH_X_POW);
+        g_d_target_h = powf(g_target_height / pix_height_x_coef, (float)1.0 / pix_height_x_pow);
+        g_d_target_w = powf(g_target_width / pix_width_x, (float)1.0 / pix_width_x_pow);
 
         if (g_target_aspect > 0.4f)
         {
@@ -402,6 +461,8 @@ void dtrmn_target_location(void)
         y_idx_pix = get_float_index(std::fabs(g_target_cntr_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
         float y_target_est = get_2d_interpolated_value(&y_offset[0][0], MAX_IDX_Y_PIXEL_OFFSET, MAX_IDX_Y_D_OFFSET, y_idx_pix, y_idx_d);
 
+        y_target_est = g_meter_per_pix * g_target_cntr_offset_y_mov_avg;
+
         g_y_target = y_target_est;
 
         if (g_target_cntr_offset_y < 0.0f)
@@ -417,10 +478,10 @@ void dtrmn_target_location(void)
 }
 
 /********************************************************************************
- * Function: update_target_location
+ * Function: update_target_loc
  * Description: Update step in kalman filter.
  ********************************************************************************/
-void update_target_location(void)
+void update_target_loc(void)
 {
     if (g_target_data_useful && g_dt > 0.0001)
     {
@@ -448,55 +509,6 @@ void update_target_location(void)
         g_ay_target_ekf = state->at(5);
     }
 };
-
-/********************************************************************************
- * Function: calc_vertical_fov
- * Description: Calculate the field of view of the camera in meters at the
- *              given vehicle height above the ground, and camera angle
- *              relative to the ground.
- ********************************************************************************/
-void calc_vertical_fov(void)
-{
-    // Calculate the line of sight distance of the camera
-    if ((g_camera_comp_angle + g_mav_veh_pitch) < (float)0.001)
-    {
-        g_line_of_sight = (float)0.0;
-    }
-    else
-    {
-        g_line_of_sight = std::fabs(g_mav_veh_local_ned_z) / cosf(g_camera_comp_angle + g_mav_veh_pitch);
-    }
-
-    // Calculate the pixel height of a known fixed object at given line of
-    // sight distance from the camera.
-    // The object isn't there, this is an intermediate calculation to determine
-    // how many pixels correspond to a meter at the current drone height.
-    const float PIX_HEIGHT_X = (float)1680.557;
-    const float PIX_HEIGHT_X_POW = (float)(-0.863);
-    // Height of a known object at given distance
-    float ghost_object_height = PIX_HEIGHT_X * powf(g_line_of_sight, PIX_HEIGHT_X_POW);
-    g_meter_per_pix = (float)1.778 / ghost_object_height;
-    g_fov_height = g_meter_per_pix * g_input_video_height;
-}
-
-/********************************************************************************
- * Function: dtrmn_target_loc_img
- * Description: Determine target location and movement patterns in the image.
- ********************************************************************************/
-void dtrmn_target_loc_img(void)
-{
-    if (!g_target_data_useful)
-    {
-        return;
-    }
-
-    // Moving average for more smoothing - modifies the history vector
-    g_target_cntr_offset_x_mov_avg = moving_average(target_x_pix_hist4avg, g_target_cntr_offset_x, x_buffer_idx4avg, x_sum);
-    g_target_cntr_offset_y_mov_avg = moving_average(target_y_pix_hist4avg, g_target_cntr_offset_y, y_buffer_idx4avg, y_sum);
-
-    // Convert the
-    g_target_cntr_offset_x_m = g_target_cntr_offset_x_mov_avg * g_meter_per_pix;
-}
 
 /********************************************************************************
  * Function: ~Localize
@@ -555,10 +567,10 @@ bool Localize::init(void)
  ********************************************************************************/
 void Localize::loop(void)
 {
-    dtrmn_target_location();
-    update_target_location();
-    calc_vertical_fov();
+    calc_fov();
     dtrmn_target_loc_img();
+    dtrmn_target_loc_real();
+    update_target_loc();
 }
 
 /********************************************************************************

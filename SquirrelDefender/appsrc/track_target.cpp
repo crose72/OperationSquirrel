@@ -429,15 +429,15 @@ bool Track::init(void)
 
     g_target_valid = false;
     target_valid_prv = false;
-    g_target_cntr_offset_x = 0.0f;
-    g_target_cntr_offset_y = 0.0f;
-    g_target_height = 0.0f;
-    g_target_width = 0.0f;
-    g_target_aspect = 0.0f;
-    g_target_left = 0.0f;
-    g_target_right = 0.0f;
-    g_target_top = 0.0f;
-    g_target_bottom = 0.0f;
+    g_target_cntr_offset_x = (float)0.0;
+    g_target_cntr_offset_y = (float)0.0;
+    g_target_height = (float)0.0;
+    g_target_width = (float)0.0;
+    g_target_aspect = (float)0.0;
+    g_target_left = (float)0.0;
+    g_target_right = (float)0.0;
+    g_target_top = (float)0.0;
+    g_target_bottom = (float)0.0;
     g_target_detection_id = -1;
     g_detection_class = (float)0.0;
     g_target_detection_conf = (float)0.0;

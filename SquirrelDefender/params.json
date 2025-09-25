@@ -74,13 +74,13 @@
         "H_loc_00": 1.0,
         "H_loc_11": 1.0,
         "Q_loc_00": 0.01,
-        "Q_loc_11": 0.0001,
+        "Q_loc_11": 0.01,
         "Q_loc_22": 0.00001,
         "Q_loc_33": 0.00001,
         "Q_loc_44": 0.00001,
         "Q_loc_55": 0.00001,
         "R_loc_00": 10.0,
-        "R_loc_11": 40.0,
+        "R_loc_11": 5.0,
         "P_loc_00": 0.1,
         "P_loc_11": 0.1,
         "P_loc_22": 0.1,
@@ -88,7 +88,8 @@
         "P_loc_44": 0.1,
         "P_loc_55": 0.1,
         "X_pix_mov_avg_window_size": 10,
-        "Y_pix_mov_avg_window_size": 25
+        "Y_pix_mov_avg_window_size": 125,
+        "Camera_fixed_angle": 0.489
     },
     "Follow_Params": {
         "Desired_Height": 640.0,
