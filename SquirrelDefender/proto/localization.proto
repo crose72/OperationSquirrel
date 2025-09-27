@@ -1,6 +1,0 @@
-syntax = "proto3";
-
-message Target {
-  double timestamp = 1;
-  double value = 2;
-}

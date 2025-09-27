@@ -23,6 +23,8 @@
 #include "localize_target.h"
 #include "detect_target.h"
 #include "time_calc.h"
+#include "mcap_logger.h"
+#include "TargetInfo.pb.h"
 
 /********************************************************************************
  * Imported objects
@@ -156,7 +158,12 @@ public:
     static void loop(void);
     static void shutdown(void);
 
+    void logTargetInfo(float x, float y, float timestamp);
+
 private:
+    static std::unique_ptr<MCAPLogger> mMCAPLogger;
 };
+
+extern DataLogger data_logger;
 
 #endif // DATALOG_H

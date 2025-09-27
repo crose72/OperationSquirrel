@@ -19,6 +19,7 @@
 #include "time_calc.h"
 #include "kf.h"
 #include <cmath>
+#include "datalog.h"
 
 /********************************************************************************
  * Imported objects

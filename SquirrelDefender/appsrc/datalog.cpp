@@ -28,6 +28,9 @@ std::string data_file_name;
 std::string unique_file_name;
 std::vector<std::vector<std::string>> datalog_record;
 
+DataLogger data_logger;
+std::unique_ptr<MCAPLogger> DataLogger::mMCAPLogger = nullptr;
+
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
@@ -39,6 +42,37 @@ void write_headers(void);
 void save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data);
 std::string generate_unique_filename(const std::string &filename);
 void log_data(void);
+
+void DataLogger::logTargetInfo(float x, float y, float timestamp)
+{
+    foxglove::TargetInfo msg;
+    msg.set_x(x);
+    msg.set_y(y);
+    msg.set_timestamp(timestamp);
+
+    std::string data;
+    bool success = msg.SerializeToString(&data);
+    if (!success)
+    {
+        std::cerr << "Serialization failed!" << std::endl;
+    }
+    else
+    {
+        std::cout << "yay" << std::endl;
+    }
+
+    // MCAP timestamp should be uint64_t nanoseconds, but can use whatever you want for now
+    // mcap_logger_.logMessage("/target_location", data, static_cast<uint64_t>(timestamp * 1e9));
+    bool ok = mMCAPLogger->logMessage("/target_info", data, timestamp);
+    if (!ok)
+    {
+        std::cerr << "MCAP logMessage failed!" << std::endl;
+    }
+    else
+    {
+        std::cout << "MCAP logMessage succeeded." << std::endl;
+    }
+}
 
 /********************************************************************************
  * Function: generate_unique_filename
@@ -315,7 +349,15 @@ void log_data(void)
  * Function: DataLogger
  * Description: Class constructor
  ********************************************************************************/
-DataLogger::DataLogger() {};
+DataLogger::DataLogger()
+{
+    mMCAPLogger = std::make_unique<MCAPLogger>("file.mcap", "profile");
+    mMCAPLogger->addChannel(
+        "/target_info",        // Topic name
+        "foxglove.TargetInfo", // Schema name as defined in your .proto file (package + message name)
+        "protobuf"             // Encoding (could be "protobuf" or "proto3", depends on MCAP version)
+    );
+};
 
 /********************************************************************************
  * Function: ~DataLogger
@@ -369,5 +411,5 @@ void DataLogger::loop(void)
  ********************************************************************************/
 void DataLogger::shutdown(void)
 {
-    // place clean up code here
+    mMCAPLogger->close();
 }

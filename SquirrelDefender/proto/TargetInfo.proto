@@ -1,0 +1,9 @@
+syntax = "proto3";
+package foxglove;
+
+message TargetInfo 
+{
+    float x = 1;
+    float y = 2;
+    float timestamp = 3;
+}

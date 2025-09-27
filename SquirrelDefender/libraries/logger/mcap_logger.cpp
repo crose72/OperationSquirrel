@@ -9,6 +9,7 @@
  * Includes
  ********************************************************************************/
 #include "mcap_logger.h"
+#include <iostream>
 
 /********************************************************************************
  * Typedefs
@@ -46,21 +47,44 @@ MCAPLogger::~MCAPLogger()
     close();
 }
 
-uint16_t MCAPLogger::addChannel(const std::string &schemaName,
-                                const std::string &protoSchemaText,
-                                const std::string &topic)
+uint16_t MCAPLogger::addChannel(const std::string &topic,
+                                const std::string &schemaName,
+                                const std::string &encoding)
 {
-    mcap::Schema schema{schemaName, "protobuf", protoSchemaText};
-    mWriter.addSchema(schema);
-    // If your MCAP version throws on error, this is fine.
+    std::string protoSchemaText = ""; // You could add your schema text if you want
 
-    mcap::Channel channel{topic, "protobuf", schema.id, {}};
+    mcap::Schema schema{schemaName, encoding, protoSchemaText};
+    mWriter.addSchema(schema);
+
+    mcap::Channel channel{topic, encoding, schema.id, {}};
     channel.id = mNextChannelId++;
     mWriter.addChannel(channel);
+
+    mChannelMap[topic] = channel.id;
+
+    std::cout << "[MCAP] Added channel: " << topic << " id=" << channel.id << std::endl;
     return channel.id;
 }
 
 bool MCAPLogger::logMessage(const std::string &topic, const std::string &data, uint64_t timestamp)
+{
+    auto it = mChannelMap.find(topic);
+    if (it == mChannelMap.end())
+        return false;
+
+    mcap::Message msg;
+    msg.channelId = it->second;
+    msg.sequence = mSeq++;
+    msg.logTime = timestamp;
+    msg.publishTime = timestamp;
+    msg.data = reinterpret_cast<const std::byte *>(data.data());
+    msg.dataSize = static_cast<uint64_t>(data.size());
+
+    auto s = mWriter.write(msg);
+    return s.ok();
+}
+
+bool MCAPLogger::logMessage(const std::string &topic, const std::string &data, float timestamp)
 {
     auto it = mChannelMap.find(topic);
     if (it == mChannelMap.end())

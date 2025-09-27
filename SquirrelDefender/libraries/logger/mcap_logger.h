@@ -1,3 +1,5 @@
+#pragma once
+
 /********************************************************************************
  * @file    mcap_logger.h
  * @author  Cameron Rose
@@ -39,6 +41,7 @@ public:
 
     // Log any protobuf message (as bytes)
     bool logMessage(const std::string &topic, const std::string &data, uint64_t timestamp);
+    bool logMessage(const std::string &topic, const std::string &data, float timestamp);
 
     void close();
 
