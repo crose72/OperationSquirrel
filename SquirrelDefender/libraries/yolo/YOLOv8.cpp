@@ -5,160 +5,315 @@
 #include "utils.h"
 
 /**
- * @brief YOLOv8 constructor. Loads a TensorRT engine from a model path and config.
+ * @brief YOLOv8 constructor. Loads a TensorRT engine and parameters
+ *        from an engine path and config.
  * @param trtModelPath Path to TensorRT engine file.
  * @param config YOLOv8 configuration parameters.
- * @throws std::runtime_error if the engine cannot be loaded.
  */
 YOLOv8::YOLOv8(const std::string &trtModelPath, const Config &config)
-    : mDetectionThreshold(config.probabilityThreshold), mNMSThreshold(config.nmsThreshold), mTopK(config.topK),
-      mSegChannels(config.segChannels), mSegHeight(config.segH), mSegWidth(config.segW), mSegThreshold(config.segmentationThreshold),
-      mClassNames(config.classNames), mNumKPS(config.numKPS), mKPSThresh(config.kpsThreshold)
+    : mDetectionThreshold(config.probabilityThreshold),
+      mNMSThreshold(config.nmsThreshold),
+      mTopK(config.topK),
+      mSegChannels(config.segChannels),
+      mSegHeight(config.segH),
+      mSegWidth(config.segW),
+      mSegThreshold(config.segmentationThreshold),
+      mClassNames(config.classNames),
+      mNumKPS(config.numKPS),
+      mKPSThresh(config.kpsThreshold)
 {
     if (!trtModelPath.empty())
     {
-        // If no ONNX model, check for TRT model
-        // Load the TensorRT engine file directly
         mEngine = std::make_unique<TRTEngine<float>>(trtModelPath);
-        bool succ = mEngine->loadNetwork(trtModelPath, mMean, mStd, mNormalize);
-        if (!succ)
+
+        bool engineLoaded = mEngine->loadNetwork(trtModelPath, mMean, mStd, mNormalize);
+
+        if (!engineLoaded)
         {
-            throw std::runtime_error("Error: Unable to load TensorRT engine from " + trtModelPath);
+            const std::string msg = "Error: Unable to load TensorRT engine from " + trtModelPath;
+            spdlog::error(msg);
         }
     }
     else
     {
-        throw std::runtime_error("Error: Neither ONNX model nor TensorRT engine path provided.");
+        const std::string msg = "No TensorRT engine path provided.";
+        spdlog::error(msg);
     }
+
+    // Get engine parameters
+    const std::vector<nvinfer1::Dims> inputDims = mEngine->getInputDims();
+
+    if (inputDims[0].nbDims == 4)
+    {
+        // [N, C, H, W]
+        mEngineInputHeight = inputDims[0].d[2];
+        mEngineInputWidth = inputDims[0].d[3];
+    }
+    else if (inputDims[0].nbDims == 3)
+    {
+        // [C, H, W] (single image, N omitted)
+        mEngineInputHeight = inputDims[0].d[1];
+        mEngineInputWidth = inputDims[0].d[2];
+    }
+    else
+    {
+        // Unexpected engine format
+        const std::string msg = "Unsupported input tensor for YOLO, actual input tensors is: " + std::to_string(inputDims[0].nbDims);
+        spdlog::error(msg);
+    }
+
+    const std::vector<nvinfer1::Dims> outputDims = mEngine->getOutputDims();
+
+    mNumOutputTensors = outputDims.size();
+
+    for (int tensor = 0; tensor < mNumOutputTensors; ++tensor)
+    {
+        if (outputDims[tensor].nbDims == 3)
+        {
+            // Proposal output: [batch, anchor_features, num_anchors]
+            mEngineBatchSize = outputDims[tensor].d[0];
+            mNumAnchorFeatures = outputDims[tensor].d[1];
+            mNumAnchors = outputDims[tensor].d[2];
+        }
+        else if (outputDims[tensor].nbDims == 4)
+        {
+            // Mask protos: [batch, seg_channels, seg_height, seg_width]
+            // mSegBatchSize = outputDims[tensor].d[0];
+            mSegChannels = outputDims[tensor].d[1];
+            mSegHeight = outputDims[tensor].d[2];
+            mSegWidth = outputDims[tensor].d[3];
+        }
+        else
+        {
+            // Unexpected engine format
+            const std::string msg = "Unsupported output tensor for YOLO, actual output tensors is: " + std::to_string(outputDims[tensor].nbDims);
+            spdlog::error(msg);
+        }
+    }
+
+    mNumClasses = mClassNames.size();
 }
 
 /**
- * @brief Preprocesses a CUDA BGR image for YOLOv8 inference.
+ * @brief Preprocesses a CUDA BGR image for YOLOv8 inference as a batch of 1.
  * @param gpuImg Input CUDA image (BGR).
- * @return Nested vector suitable for batch inference input.
+ * @return Nested vector of resized single image with RGB format and padding
  */
 std::vector<std::vector<cv::cuda::GpuMat>> YOLOv8::preprocess(const cv::cuda::GpuMat &gpuImg)
 {
-    // Populate the input vectors
-    const auto &inputDims = mEngine->getInputDims();
+    std::vector<cv::cuda::GpuMat> inputImg{gpuImg};
 
-    // Convert the image from BGR to RGB
-    cv::cuda::GpuMat rgbMat;
-    cv::cuda::cvtColor(gpuImg, rgbMat, cv::COLOR_BGR2RGB);
+    std::vector<std::vector<cv::cuda::GpuMat>> preprocessedBatch = preprocess(inputImg);
 
-    auto resized = rgbMat;
-
-    // Resize to the model expected input size while maintaining the aspect ratio with the use of padding
-    if (resized.rows != inputDims[0].d[1] || resized.cols != inputDims[0].d[2])
-    {
-        // Only resize if not already the right size to avoid unecessary copy
-        resized = resizeKeepAspectRatioPadRightBottom(rgbMat, inputDims[0].d[1], inputDims[0].d[2]);
-    }
-
-    // Convert to format expected by our inference engine
-    // The reason for the strange format is because it supports models with multiple inputs as well as batching
-    // In our case though, the model only has a single input and we are using a batch size of 1.
-    std::vector<cv::cuda::GpuMat> input{std::move(resized)};
-    std::vector<std::vector<cv::cuda::GpuMat>> inputs{std::move(input)};
-
-    // These params will be used in the post-processing stage
-    mInputImgHeight = rgbMat.rows;
-    mInputImgWidth = rgbMat.cols;
-    mAspectScaleFactor = 1.f / std::min(inputDims[0].d[2] / static_cast<float>(rgbMat.cols), inputDims[0].d[1] / static_cast<float>(rgbMat.rows));
-
-    return inputs;
+    return preprocessedBatch;
 }
 
 /**
- * @brief Run YOLOv8 inference and return detected objects (CUDA input).
- * @param inputImageBGR Input CUDA image (BGR).
- * @return Vector of detected objects.
+ * @brief Preprocesses a batch of CUDA BGR images for YOLOv8 inference.
+ * @param gpuImg Input vector of CUDA images (BGR).
+ * @return Nested vector of resized images with RGB format and padding
+ */
+std::vector<std::vector<cv::cuda::GpuMat>> YOLOv8::preprocess(const std::vector<cv::cuda::GpuMat> &gpuImgs)
+{
+    mActualBatchSize = gpuImgs.size();
+    mInputImgHeights.clear();
+    mInputImgWidths.clear();
+    mAspectScaleFactors.clear();
+
+    std::vector<cv::cuda::GpuMat> resizedImgs;
+
+    for (const auto &gpuImg : gpuImgs)
+    {
+        float inputImgHeight = gpuImg.rows;
+        float inputImgWidth = gpuImg.cols;
+
+        // Convert the image from BGR to RGB
+        // This assumes that the image is being read as the OpenCV standard BGR format
+        cv::cuda::GpuMat rgbMat;
+        cv::cuda::cvtColor(gpuImg, rgbMat, cv::COLOR_BGR2RGB);
+
+        // Initialize the resized image
+        cv::cuda::GpuMat resizedImg = rgbMat;
+
+        // Resize to the model expected input size while maintaining the
+        // aspect ratio with the use of padding
+        if (inputImgHeight != mEngineInputHeight || inputImgWidth != mEngineInputWidth)
+        {
+            resizedImg = letterbox(rgbMat, mEngineInputHeight, mEngineInputWidth);
+        }
+
+        resizedImgs.push_back(resizedImg);
+
+        // Save the size of the image
+        // These params will be used in the post-processing stage
+        mInputImgHeights.push_back(inputImgHeight);
+        mInputImgWidths.push_back(inputImgWidth);
+
+        // How much the image is scaled up/down to required YOLO size
+        mAspectScaleFactors.push_back(
+            (float)1.0 / std::min(mEngineInputWidth / static_cast<float>(inputImgWidth),
+                                  mEngineInputHeight / static_cast<float>(inputImgHeight)));
+    }
+
+    // For YOLOv8, each element of the outer vector is a model input tensor (only 1 for normal YOLO).
+    // Each inner vector is a batch. So we want [ [img1,img2,...,imgN] ]
+    std::vector<std::vector<cv::cuda::GpuMat>> preprocessedBatch;
+    preprocessedBatch.push_back(std::move(resizedImgs));
+
+    return preprocessedBatch;
+}
+
+/**
+ * @brief Run YOLOv8 inference and return detected objects for a single image (CPU input).
+ * @param inputImgBGR Input OpenCV image (BGR, CPU memory).
+ * @return Vector of detections for a single image.
+ */
+std::vector<Object> YOLOv8::detectObjects(const cv::Mat &inputImgBGR)
+{
+    // Upload the image to GPU memory
+    std::vector<cv::cuda::GpuMat> gpuImgs;
+    cv::cuda::GpuMat gpuImg;
+
+    gpuImg.upload(inputImgBGR);
+    gpuImgs.push_back(gpuImg);
+
+    std::vector<std::vector<Object>> detections = detectObjects(gpuImgs);
+    return detections[0];
+}
+
+/**
+ * @brief Run YOLOv8 inference and return detected objects for a single image (GPU input).
+ * @param batchInputImgsBGR Input OpenCV images (BGR, CPU memory).
+ * @return Vector of detections for a single image.
  */
 std::vector<Object> YOLOv8::detectObjects(const cv::cuda::GpuMat &inputImageBGR)
+{
+    std::vector<cv::cuda::GpuMat> gpuImgs;
+
+    gpuImgs.push_back(inputImageBGR);
+
+    std::vector<std::vector<Object>> detections = detectObjects(gpuImgs);
+
+    return detections[0];
+}
+
+/**
+ * @brief Run YOLOv8 inference and return detected objects for a batch of images (CPU input).
+ * @param batchInputImgsBGR Input OpenCV images (BGR, CPU memory).
+ * @return Vector of detections for a batch of images.
+ */
+std::vector<std::vector<Object>> YOLOv8::detectObjects(const std::vector<cv::Mat> &batchInputImgsBGR)
+{
+    // Upload the image to GPU memory
+    std::vector<cv::cuda::GpuMat> gpuImgs;
+
+    for (const auto &cpuImg : batchInputImgsBGR)
+    {
+        cv::cuda::GpuMat gpuImg;
+        gpuImg.upload(cpuImg);
+
+        gpuImgs.push_back(gpuImg);
+    }
+
+    // Call detectObjects with the batch of GPU images
+    return detectObjects(gpuImgs);
+}
+
+/**
+ * @brief Run YOLOv8 inference and return detected objects for a batch of images (CPU input).
+ * @param batchInputImgsBGR Input OpenCV images (BGR, CPU memory).
+ * @return Vector of detections for a batch of images.
+ */
+std::vector<std::vector<Object>> YOLOv8::detectObjects(const std::vector<cv::cuda::GpuMat> &batchInputImgsBGR)
 {
     // Preprocess the input image
 #ifdef ENABLE_BENCHMARKS
     static int numIts = 1;
     preciseStopwatch s1;
 #endif
-    const auto input = preprocess(inputImageBGR);
+
+    const std::vector<std::vector<cv::cuda::GpuMat>> engineInputBatch = preprocess(batchInputImgsBGR);
+
+    // End timer to clock preprocessing time
 #ifdef ENABLE_BENCHMARKS
     static long long t1 = 0;
     t1 += s1.elapsedTime<long long, std::chrono::microseconds>();
-    std::cout << "Avg Preprocess time: " << (t1 / numIts) / 1000.f << " ms" << std::endl;
+    spdlog::info("Avg Preprocess time: {:.3f} ms", (t1 / numIts) / 1000.f);
 #endif
-    // Run inference using the TensorRT engine
+
+    // Start timer to clock inference time
 #ifdef ENABLE_BENCHMARKS
     preciseStopwatch s2;
 #endif
+
+    // Run inference using the TensorRT engine
+    // Raw engine outputs
     std::vector<std::vector<std::vector<float>>> featureVectors;
-    auto succ = mEngine->runInference(input, featureVectors);
-    if (!succ)
+
+    bool inferenceSuccessful = mEngine->runInference(engineInputBatch, featureVectors);
+
+    if (!inferenceSuccessful)
     {
-        throw std::runtime_error("Error: Unable to run inference.");
+        const std::string msg = "Error: Unable to run inference.";
+        spdlog::error(msg);
     }
 
+    // End timer to clock inference time
 #ifdef ENABLE_BENCHMARKS
     static long long t2 = 0;
     t2 += s2.elapsedTime<long long, std::chrono::microseconds>();
-    std::cout << "Avg Inference time: " << (t2 / numIts) / 1000.f << " ms" << std::endl;
+    spdlog::info("Avg Inference time: {:.3f} ms", (t2 / numIts) / 1000.f);
+
+    // Start timer to clock postprocessing time
     preciseStopwatch s3;
 #endif
+
+    // Nested vector for detections to support batch >= 1
+    std::vector<std::vector<Object>> detections;
+
     // Check if our model does only object detection or also supports segmentation
-    std::vector<Object> ret;
-    const auto &numOutputs = mEngine->getOutputDims().size();
-    if (numOutputs == 1)
+    if (mNumOutputTensors == 1)
     {
         // Object detection or pose estimation
-        // Since we have a batch size of 1 and only 1 output, we must convert the output from a 3D array to a 1D array.
-        std::vector<float> featureVector;
+        // Since we have only 1 output from the model,
+        // we must convert the output from a 3D array to a 1D array.
+        std::vector<std::vector<float>> featureVector;
         transformOutput(featureVectors, featureVector);
 
-        const auto &outputDims = mEngine->getOutputDims();
-        int numChannels = outputDims[outputDims.size() - 1].d[1];
-        // TODO: Need to improve this to make it more generic (don't use magic number).
-        // For now it works with Ultralytics pretrained models.
-        if (numChannels == 56)
+        if (mNumAnchorFeatures == mNumPoseAnchorFeatures)
         {
-            // Pose estimation
-            ret = postprocessPose(featureVector);
+            // Key pose estimation
+            for (int i = 0; i < mActualBatchSize; ++i)
+            {
+                detections.push_back(postprocessPose(featureVector[i], i));
+            }
         }
         else
         {
             // Object detection
-            ret = postprocessDetect(featureVector);
+            for (int i = 0; i < mActualBatchSize; ++i)
+            {
+                detections.push_back(postprocessDetect(featureVector[i], i));
+            }
         }
     }
     else
     {
         // Segmentation
-        // Since we have a batch size of 1 and 2 outputs, we must convert the output from a 3D array to a 2D array.
-        std::vector<std::vector<float>> featureVector;
-        transformOutput(featureVectors, featureVector);
-        ret = postProcessSegmentation(featureVector);
+        for (int i = 0; i < mActualBatchSize; ++i)
+        {
+            detections.push_back(postProcessSegmentation(featureVectors[i], i));
+        }
     }
+
+    // End timer to clock postprocessing time
 #ifdef ENABLE_BENCHMARKS
     static long long t3 = 0;
     t3 += s3.elapsedTime<long long, std::chrono::microseconds>();
-    std::cout << "Avg Postprocess time: " << (t3 / numIts++) / 1000.f << " ms\n"
-              << std::endl;
+    spdlog::info("Avg Postprocess time: {:.3f} ms", (t3 / numIts++) / 1000.f);
 #endif
-    return ret;
-}
 
-/**
- * @brief Run YOLOv8 inference and return detected objects (CPU input).
- * @param inputImageBGR Input OpenCV image (BGR, CPU memory).
- * @return Vector of detected objects.
- */
-std::vector<Object> YOLOv8::detectObjects(const cv::Mat &inputImageBGR)
-{
-    // Upload the image to GPU memory
-    cv::cuda::GpuMat gpuImg;
-    gpuImg.upload(inputImageBGR);
-
-    // Call detectObjects with the GPU image
-    return detectObjects(gpuImg);
+    return detections;
 }
 
 /**
@@ -166,30 +321,21 @@ std::vector<Object> YOLOv8::detectObjects(const cv::Mat &inputImageBGR)
  * @param featureVectors Model output tensors (segmentation).
  * @return Vector of detected objects with segmentation masks.
  */
-std::vector<Object> YOLOv8::postProcessSegmentation(std::vector<std::vector<float>> &featureVectors)
+std::vector<Object> YOLOv8::postProcessSegmentation(std::vector<std::vector<float>> &featureVectors, int imageInBatch)
 {
-    const auto &outputDims = mEngine->getOutputDims();
-
-    int numChannels = outputDims[0].d[1];
-    int numAnchors = outputDims[0].d[2];
-
-    const auto numClasses = numChannels - -4;
-
     // Ensure the output lengths are correct
-    if (featureVectors[0].size() != static_cast<size_t>(numChannels) * numAnchors)
+    if (featureVectors[0].size() != static_cast<size_t>(mNumAnchorFeatures) * mNumAnchors)
     {
-        throw std::logic_error("Output at index 0 has incorrect length");
+        const std::string msg = "Output at index 0 has incorrect length";
+        spdlog::error(msg);
     }
 
     if (featureVectors[1].size() != static_cast<size_t>(mSegChannels) * mSegHeight * mSegWidth)
     {
-        throw std::logic_error("Output at index 1 has incorrect length");
+
+        const std::string msg = "Output at index 1 has incorrect length";
+        spdlog::error(msg);
     }
-
-    cv::Mat output = cv::Mat(numChannels, numAnchors, CV_32F, featureVectors[0].data());
-    output = output.t();
-
-    cv::Mat protos = cv::Mat(mSegChannels, mSegHeight * mSegWidth, CV_32F, featureVectors[1].data());
 
     std::vector<int> labels;
     std::vector<float> scores;
@@ -197,50 +343,23 @@ std::vector<Object> YOLOv8::postProcessSegmentation(std::vector<std::vector<floa
     std::vector<cv::Mat> maskConfs;
     std::vector<int> indices;
 
-    // Object the bounding boxes and class labels
-    for (int i = 0; i < numAnchors; i++)
-    {
-        auto rowPtr = output.row(i).ptr<float>();
-        auto bboxesPtr = rowPtr;
-        auto scoresPtr = rowPtr + 4;
-        auto maskConfsPtr = rowPtr + 4 + numClasses;
-        auto maxSPtr = std::max_element(scoresPtr, scoresPtr + numClasses);
-        float score = *maxSPtr;
-        if (score > mDetectionThreshold)
-        {
-            float x = *bboxesPtr++;
-            float y = *bboxesPtr++;
-            float w = *bboxesPtr++;
-            float h = *bboxesPtr;
+    // Convert output tensor 1 to opencv mat to obtain segmentation mask scores
+    cv::Mat output = cv::Mat(mNumAnchorFeatures, mNumAnchors, CV_32F, featureVectors[0].data());
+    output = output.t();
 
-            float x0 = std::clamp((x - 0.5f * w) * mAspectScaleFactor, 0.f, mInputImgWidth);
-            float y0 = std::clamp((y - 0.5f * h) * mAspectScaleFactor, 0.f, mInputImgHeight);
-            float x1 = std::clamp((x + 0.5f * w) * mAspectScaleFactor, 0.f, mInputImgWidth);
-            float y1 = std::clamp((y + 0.5f * h) * mAspectScaleFactor, 0.f, mInputImgHeight);
+    decodeYOLOAnchors(
+        featureVectors[0], &output, mNumAnchors, mNumClasses, mDetectionThreshold,
+        mAspectScaleFactors[imageInBatch], mInputImgWidths[imageInBatch], mInputImgHeights[imageInBatch],
+        bboxes, scores, labels, YOLO_SEG, &maskConfs, nullptr, mSegChannels, 0);
 
-            int label = maxSPtr - scoresPtr;
-            cv::Rect_<float> bbox;
-            bbox.x = x0;
-            bbox.y = y0;
-            bbox.width = x1 - x0;
-            bbox.height = y1 - y0;
-
-            cv::Mat maskConf = cv::Mat(1, mSegChannels, CV_32F, maskConfsPtr);
-
-            bboxes.push_back(bbox);
-            labels.push_back(label);
-            scores.push_back(score);
-            maskConfs.push_back(maskConf);
-        }
-    }
-
-    // Require OpenCV 4.7 for this function
+    // Run NMS - OpenCV 4.7 or later required
     cv::dnn::NMSBoxesBatched(bboxes, scores, labels, mDetectionThreshold, mNMSThreshold, indices);
 
     // Obtain the segmentation masks
     cv::Mat masks;
     std::vector<Object> objs;
     int cnt = 0;
+
     for (auto &i : indices)
     {
         if (cnt >= mTopK)
@@ -260,21 +379,24 @@ std::vector<Object> YOLOv8::postProcessSegmentation(std::vector<std::vector<floa
     // Convert segmentation mask to original frame
     if (!masks.empty())
     {
+        // The second output tensor is used to apply the masks to each pixel identified as part of the
+        // object in the image
+        const cv::Mat protos = cv::Mat(mSegChannels, mSegHeight * mSegWidth, CV_32F, featureVectors[1].data());
+
         cv::Mat matmulRes = (masks * protos).t();
         cv::Mat maskMat = matmulRes.reshape(indices.size(), {mSegWidth, mSegHeight});
 
         std::vector<cv::Mat> maskChannels;
         cv::split(maskMat, maskChannels);
-        const auto inputDims = mEngine->getInputDims();
 
         cv::Rect roi;
-        if (mInputImgHeight > mInputImgWidth)
+        if (mInputImgHeights[imageInBatch] > mInputImgWidths[imageInBatch])
         {
-            roi = cv::Rect(0, 0, mSegWidth * mInputImgWidth / mInputImgHeight, mSegHeight);
+            roi = cv::Rect(0, 0, mSegWidth * mInputImgWidths[imageInBatch] / mInputImgHeights[imageInBatch], mSegHeight);
         }
         else
         {
-            roi = cv::Rect(0, 0, mSegWidth, mSegHeight * mInputImgHeight / mInputImgWidth);
+            roi = cv::Rect(0, 0, mSegWidth, mSegHeight * mInputImgHeights[imageInBatch] / mInputImgWidths[imageInBatch]);
         }
 
         for (size_t i = 0; i < indices.size(); i++)
@@ -283,7 +405,7 @@ std::vector<Object> YOLOv8::postProcessSegmentation(std::vector<std::vector<floa
             cv::exp(-maskChannels[i], dest);
             dest = 1.0 / (1.0 + dest);
             dest = dest(roi);
-            cv::resize(dest, mask, cv::Size(static_cast<int>(mInputImgWidth), static_cast<int>(mInputImgHeight)), cv::INTER_LINEAR);
+            cv::resize(dest, mask, cv::Size(static_cast<int>(mInputImgWidths[imageInBatch]), static_cast<int>(mInputImgHeights[imageInBatch])), cv::INTER_LINEAR);
             objs[i].boxMask = mask(objs[i].rect) > mSegThreshold;
         }
     }
@@ -296,68 +418,20 @@ std::vector<Object> YOLOv8::postProcessSegmentation(std::vector<std::vector<floa
  * @param featureVector Model output tensor.
  * @return Vector of detected objects with keypoints.
  */
-std::vector<Object> YOLOv8::postprocessPose(std::vector<float> &featureVector)
+std::vector<Object> YOLOv8::postprocessPose(std::vector<float> &featureVector, int imageInBatch)
 {
-    const auto &outputDims = mEngine->getOutputDims();
-    auto numChannels = outputDims[0].d[1];
-    auto numAnchors = outputDims[0].d[2];
-
     std::vector<cv::Rect> bboxes;
     std::vector<float> scores;
     std::vector<int> labels;
     std::vector<int> indices;
     std::vector<std::vector<float>> kpss;
 
-    cv::Mat output = cv::Mat(numChannels, numAnchors, CV_32F, featureVector.data());
-    output = output.t();
+    decodeYOLOAnchors(
+        featureVector, nullptr, mNumAnchors, mNumClasses, mDetectionThreshold,
+        mAspectScaleFactors[imageInBatch], mInputImgWidths[imageInBatch], mInputImgHeights[imageInBatch],
+        bboxes, scores, labels, YOLO_POSE, nullptr, &kpss, 0, mNumKPS);
 
-    // Get all the YOLO proposals
-    for (int i = 0; i < numAnchors; i++)
-    {
-        auto rowPtr = output.row(i).ptr<float>();
-        auto bboxesPtr = rowPtr;
-        auto scoresPtr = rowPtr + 4;
-        auto kps_ptr = rowPtr + 5;
-        float score = *scoresPtr;
-        if (score > mDetectionThreshold)
-        {
-            float x = *bboxesPtr++;
-            float y = *bboxesPtr++;
-            float w = *bboxesPtr++;
-            float h = *bboxesPtr;
-
-            float x0 = std::clamp((x - 0.5f * w) * mAspectScaleFactor, 0.f, mInputImgWidth);
-            float y0 = std::clamp((y - 0.5f * h) * mAspectScaleFactor, 0.f, mInputImgHeight);
-            float x1 = std::clamp((x + 0.5f * w) * mAspectScaleFactor, 0.f, mInputImgWidth);
-            float y1 = std::clamp((y + 0.5f * h) * mAspectScaleFactor, 0.f, mInputImgHeight);
-
-            cv::Rect_<float> bbox;
-            bbox.x = x0;
-            bbox.y = y0;
-            bbox.width = x1 - x0;
-            bbox.height = y1 - y0;
-
-            std::vector<float> kps;
-            for (int k = 0; k < mNumKPS; k++)
-            {
-                float kpsX = *(kps_ptr + 3 * k) * mAspectScaleFactor;
-                float kpsY = *(kps_ptr + 3 * k + 1) * mAspectScaleFactor;
-                float kpsS = *(kps_ptr + 3 * k + 2);
-                kpsX = std::clamp(kpsX, 0.f, mInputImgWidth);
-                kpsY = std::clamp(kpsY, 0.f, mInputImgHeight);
-                kps.push_back(kpsX);
-                kps.push_back(kpsY);
-                kps.push_back(kpsS);
-            }
-
-            bboxes.push_back(bbox);
-            labels.push_back(0); // All detected objects are people
-            scores.push_back(score);
-            kpss.push_back(kps);
-        }
-    }
-
-    // Run NMS
+    // Run NMS - OpenCV 4.7 or later required
     cv::dnn::NMSBoxesBatched(bboxes, scores, labels, mDetectionThreshold, mNMSThreshold, indices);
 
     std::vector<Object> objects;
@@ -389,75 +463,31 @@ std::vector<Object> YOLOv8::postprocessPose(std::vector<float> &featureVector)
  * @param featureVector Model output tensor.
  * @return Vector of detected objects with bounding boxes.
  */
-std::vector<Object> YOLOv8::postprocessDetect(std::vector<float> &featureVector)
+std::vector<Object> YOLOv8::postprocessDetect(std::vector<float> &featureVector, int imageInBatch)
 {
-    const auto &outputDims = mEngine->getOutputDims();
-
-    auto numChannels = outputDims[0].d[1];
-    auto numAnchors = outputDims[0].d[2];
-    auto numClasses = mClassNames.size();
-
     std::vector<cv::Rect> bboxes;
     std::vector<float> scores;
     std::vector<int> labels;
     std::vector<int> indices;
 
-    cv::Mat output = cv::Mat(numChannels, numAnchors, CV_32F, featureVector.data());
-    output = output.t();
+    decodeYOLOAnchors(
+        featureVector, nullptr, mNumAnchors, mNumClasses, mDetectionThreshold,
+        mAspectScaleFactors[imageInBatch], mInputImgWidths[imageInBatch], mInputImgHeights[imageInBatch],
+        bboxes, scores, labels, YOLO_DET, nullptr, nullptr, 0, 0);
 
-    // Get all the YOLO proposals
-    for (int i = 0; i < numAnchors; i++)
-    {
-        auto rowPtr = output.row(i).ptr<float>();
-        auto bboxesPtr = rowPtr;
-        auto scoresPtr = rowPtr + 4;
-        auto maxSPtr = std::max_element(scoresPtr, scoresPtr + numClasses);
-        float score = *maxSPtr;
-        if (score > mDetectionThreshold)
-        {
-            float x = *bboxesPtr++;
-            float y = *bboxesPtr++;
-            float w = *bboxesPtr++;
-            float h = *bboxesPtr;
-
-            float x0 = std::clamp((x - 0.5f * w) * mAspectScaleFactor, 0.f, mInputImgWidth);
-            float y0 = std::clamp((y - 0.5f * h) * mAspectScaleFactor, 0.f, mInputImgHeight);
-            float x1 = std::clamp((x + 0.5f * w) * mAspectScaleFactor, 0.f, mInputImgWidth);
-            float y1 = std::clamp((y + 0.5f * h) * mAspectScaleFactor, 0.f, mInputImgHeight);
-
-            int label = maxSPtr - scoresPtr;
-            cv::Rect_<float> bbox;
-            bbox.x = x0;
-            bbox.y = y0;
-            bbox.width = x1 - x0;
-            bbox.height = y1 - y0;
-
-            bboxes.push_back(bbox);
-            labels.push_back(label);
-            scores.push_back(score);
-        }
-    }
-
-    // Run NMS
+    // Run NMS - OpenCV 4.7 or later required
     cv::dnn::NMSBoxesBatched(bboxes, scores, labels, mDetectionThreshold, mNMSThreshold, indices);
-
     std::vector<Object> objects;
-
-    // Choose the top k detections
     int cnt = 0;
     for (auto &chosenIdx : indices)
     {
         if (cnt >= mTopK)
-        {
             break;
-        }
-
         Object obj{};
         obj.probability = scores[chosenIdx];
         obj.label = labels[chosenIdx];
         obj.rect = bboxes[chosenIdx];
         objects.push_back(obj);
-
         cnt += 1;
     }
 
@@ -465,10 +495,138 @@ std::vector<Object> YOLOv8::postprocessDetect(std::vector<float> &featureVector)
 }
 
 /**
+ * @brief Decode YOLO output tensor anchors into detection, segmentation, or pose results.
+ *
+ * This function post-processes the output tensor from a YOLO model to extract object bounding boxes,
+ * detection scores, class labels, and (optionally) segmentation masks or pose keypoints, according to the model type.
+ *
+ * @param output             Flattened output tensor (anchor-major, CHW format) from the model.
+ * @param numAnchors         Number of anchor positions (e.g., 8400 for YOLOv8).
+ * @param numClasses         Number of classes in the model (e.g., 80 for COCO).
+ * @param detectionThreshold Minimum score to accept a detection.
+ * @param aspectScaleFactor  Scale to convert normalized coordinates to image coordinates.
+ * @param imgWidth           Width of the original input image (after aspect scaling).
+ * @param imgHeight          Height of the original input image (after aspect scaling).
+ * @param[out] bboxes        Output vector of detected bounding boxes (image coordinates).
+ * @param[out] scores        Output vector of detection or instance scores.
+ * @param[out] labels        Output vector of integer class labels.
+ * @param type               Type of YOLO postprocess (YOLO_DET for detection, YOLO_SEG for segmentation, YOLO_POSE for pose).
+ * @param[in,out] maskConfs  Optional pointer to output vector for segmentation mask coefficients (YOLO_SEG only). Pass nullptr if unused.
+ * @param[in,out] kpss       Optional pointer to output vector for pose keypoints (YOLO_POSE only). Pass nullptr if unused.
+ * @param numMaskChannels    Number of mask channels (YOLO_SEG only; set to 0 otherwise).
+ * @param numKeypoints       Number of keypoints (YOLO_POSE only; set to 0 otherwise).
+ *
+ * @details
+ *  - For object detection, fills `bboxes`, `scores`, and `labels`.
+ *  - For segmentation, additionally fills `maskConfs` with per-object mask coefficients.
+ *  - For pose estimation, additionally fills `kpss` with per-object keypoints.
+ *
+ *  The output tensor should be in anchor-major, CHW layout. Segmentation and pose features are only parsed if
+ *  their respective pointers are non-null and type is set.
+ */
+
+void YOLOv8::decodeYOLOAnchors(
+    const std::vector<float> &output,
+    const cv::Mat *outputMat,
+    int numAnchors,
+    int numClasses,
+    float detectionThreshold,
+    float aspectScaleFactor,
+    float imgWidth,
+    float imgHeight,
+    std::vector<cv::Rect> &bboxes,
+    std::vector<float> &scores,
+    std::vector<int> &labels,
+    InferenceType type,
+    // Optional: mask coeffs and keypoints containers (pass nullptr if unused)
+    std::vector<cv::Mat> *maskConfs,
+    std::vector<std::vector<float>> *kpss,
+    int numMaskChannels,
+    int numKeypoints)
+{
+    for (int anchor = 0; anchor < numAnchors; ++anchor)
+    {
+        // Fetch bbox from anchor-major layout
+        float x = output[anchor + 0 * numAnchors];
+        float y = output[anchor + 1 * numAnchors];
+        float w = output[anchor + 2 * numAnchors];
+        float h = output[anchor + 3 * numAnchors];
+
+        // Fetch class scores and get label/score
+        int class_start = 4 * numAnchors + anchor; // offset of class score for each anchor is after bbox dims
+        float max_score = -1.f;
+        int max_label = -1;
+
+        // Detection/Segmentation: multi-class, find max
+        if (type == YOLO_DET || type == YOLO_SEG)
+        {
+            for (int cls = 0; cls < numClasses; ++cls)
+            {
+                // Get class score indexed in the first output tensor
+                // for
+                float s = output[class_start + cls * numAnchors];
+                if (s > max_score)
+                {
+                    max_score = s;
+                    max_label = cls;
+                }
+            }
+        }
+        // Pose: typically one score (objectness)
+        else if (type == YOLO_POSE)
+        {
+            max_score = output[class_start];
+            max_label = 0; // only "person" class
+        }
+
+        if (max_score > detectionThreshold)
+        {
+            // Convert to absolute image coordinates
+            float x0 = std::clamp((x - 0.5f * w) * aspectScaleFactor, 0.f, imgWidth);
+            float y0 = std::clamp((y - 0.5f * h) * aspectScaleFactor, 0.f, imgHeight);
+            float x1 = std::clamp((x + 0.5f * w) * aspectScaleFactor, 0.f, imgWidth);
+            float y1 = std::clamp((y + 0.5f * h) * aspectScaleFactor, 0.f, imgHeight);
+
+            bboxes.emplace_back(x0, y0, x1 - x0, y1 - y0);
+            scores.push_back(max_score);
+            labels.push_back(max_label);
+
+            // --- Segmentation mask coefficients ---
+            if (outputMat != nullptr && numMaskChannels > 0)
+            {
+                auto rowPtr = outputMat->row(anchor).ptr<float>();
+                auto maskConfsPtr = rowPtr + 4 + numClasses;
+                cv::Mat maskConf = cv::Mat(1, numMaskChannels, CV_32F, maskConfsPtr);
+                maskConfs->push_back(maskConf); // .clone() is IMPORTANT!
+            }
+
+            // --- Keypoints for pose ---
+            if (type == YOLO_POSE && kpss && numKeypoints > 0)
+            {
+                int kps_start = (4 + 1) * numAnchors + anchor; // 4 bbox + 1 obj score
+                std::vector<float> kps;
+                for (int k = 0; k < numKeypoints; ++k)
+                {
+                    float kpsX = output[kps_start + (3 * k + 0) * numAnchors] * aspectScaleFactor;
+                    float kpsY = output[kps_start + (3 * k + 1) * numAnchors] * aspectScaleFactor;
+                    float kpsS = output[kps_start + (3 * k + 2) * numAnchors];
+                    kpsX = std::clamp(kpsX, 0.f, imgWidth);
+                    kpsY = std::clamp(kpsY, 0.f, imgHeight);
+                    kps.push_back(kpsX);
+                    kps.push_back(kpsY);
+                    kps.push_back(kpsS);
+                }
+                kpss->push_back(kps);
+            }
+        }
+    }
+}
+
+/**
  * @brief Draw object bounding boxes, labels, and masks (if present) on an image.
  * @param image OpenCV image (CPU memory) to annotate.
  * @param objects Vector of detected objects.
- * @param scale Drawing scale (default: 1).
+ * @param scale Drawing scale (line thickness) (default: 1).
  */
 void YOLOv8::drawObjectLabels(cv::Mat &image, const std::vector<Object> &objects, unsigned int scale)
 {
