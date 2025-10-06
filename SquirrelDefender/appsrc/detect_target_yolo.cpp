@@ -98,10 +98,19 @@ YOLO::~YOLO(void) {};
  ********************************************************************************/
 bool YOLO::init(void)
 {
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN_NANO)
 
     YOLOv8::Config config;
     const std::string engine_path = "/workspace/OperationSquirrel/SquirrelDefender/models/yolov8s/yolov8s.engine.orin.fp16";
+    yolov8_detector = new YOLOv8(engine_path, config);
+
+    g_yolo_detections = std::vector<Object>();
+    g_yolo_detections.reserve(100);
+
+#elif defined(BLD_WSL)
+
+    YOLOv8::Config config;
+    const std::string engine_path = "/workspace/OperationSquirrel/SquirrelDefender/models/yolov8s/yolov8s.engine.NVIDIAGeForceRTX3060LaptopGPU.fp16";
     yolov8_detector = new YOLOv8(engine_path, config);
 
     g_yolo_detections = std::vector<Object>();
