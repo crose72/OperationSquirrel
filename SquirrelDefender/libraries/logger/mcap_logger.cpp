@@ -10,6 +10,10 @@
  ********************************************************************************/
 #include "mcap_logger.h"
 #include <iostream>
+#include <fstream>
+#include <vector>
+#include <cstddef> // std::byte
+#include <cstring> // std::memcpy
 
 /********************************************************************************
  * Typedefs
@@ -31,6 +35,23 @@
  * Function definitions
  ********************************************************************************/
 
+static std::vector<std::byte> readAllBytes(const std::string &path)
+{
+    std::ifstream f(path, std::ios::binary);
+    if (!f)
+        return {};
+
+    // Slurp into a temporary char buffer
+    std::vector<char> tmp((std::istreambuf_iterator<char>(f)),
+                          std::istreambuf_iterator<char>());
+
+    // Copy into std::byte vector
+    std::vector<std::byte> out(tmp.size());
+    if (!tmp.empty())
+        std::memcpy(out.data(), tmp.data(), tmp.size());
+    return out;
+}
+
 /********************************************************************************
  * Function:
  * Description:
@@ -49,21 +70,49 @@ MCAPLogger::~MCAPLogger()
 
 uint16_t MCAPLogger::addChannel(const std::string &topic,
                                 const std::string &schemaName,
-                                const std::string &encoding)
+                                const std::string & /*encoding_ignored*/)
 {
-    std::string protoSchemaText = ""; // You could add your schema text if you want
+    // Load the FileDescriptorSet that CMake generated.
+    const std::string descPath =
+#ifdef SCHEMA_DESC_PATH
+        SCHEMA_DESC_PATH;
+#else
+        "schemas.desc"; // fallback if not defined by CMake
+#endif
 
-    mcap::Schema schema{schemaName, encoding, protoSchemaText};
-    mWriter.addSchema(schema);
+    const auto descBytes = readAllBytes(descPath);
+    if (descBytes.empty())
+    {
+        std::cerr << "[MCAP] ERROR: Could not read descriptor set at "
+                  << descPath << " — Foxglove will show 'no such type: "
+                  << schemaName << "'\n";
+        return 0;
+    }
 
-    mcap::Channel channel{topic, encoding, schema.id, {}};
-    channel.id = mNextChannelId++;
-    mWriter.addChannel(channel);
+    // Add schema: name must be "package.Message", encoding must be "protobuf".
+    mcap::Schema schema;
+    schema.name = schemaName; // e.g., "logger.TargetInfo"
+    schema.encoding = "protobuf";
+    schema.data = descBytes;
 
-    mChannelMap[topic] = channel.id;
+    mWriter.addSchema(schema); // void; sets schema.id internally
 
-    std::cout << "[MCAP] Added channel: " << topic << " id=" << channel.id << std::endl;
-    return channel.id;
+    // Create channel that references the schema. You must assign channel.id.
+    mcap::Channel ch;
+    ch.id = mNextChannelId++; // your class already has this counter
+    ch.topic = topic;         // e.g., "/target_info"
+    ch.messageEncoding = "protobuf";
+    ch.schemaId = schema.id; // use the id set by addSchema()
+
+    mWriter.addChannel(ch); // void
+
+    mChannelMap[topic] = static_cast<uint16_t>(ch.id);
+
+    std::cout << "[MCAP] Added channel: " << topic
+              << " schema=" << schemaName
+              << " chId=" << ch.id << std::endl;
+
+    return static_cast<uint16_t>(ch.id);
 }
 
 bool MCAPLogger::logMessage(const std::string &topic, const std::string &data, uint64_t timestamp)

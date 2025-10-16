@@ -1,8 +1,7 @@
 syntax = "proto3";
-package foxglove;
+package logger;
 
-message TargetInfo 
-{
+message TargetInfo {
     float x = 1;
     float y = 2;
     float timestamp = 3;

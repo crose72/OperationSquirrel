@@ -488,52 +488,81 @@ list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HE
                     ${JSON_UTILS_HEADERS} ${PRINT_UTILS_HEADERS} ${YOLO_UTILS_HEADERS} 
                     ${PID_HEADERS} ${TIMER_HEADERS} ${KF_HEADERS} ${SS_HEADERS} ${MCAP_LOGGER_HEADERS})
 
-set(PROTO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/proto)
-file(GLOB PROTO_FILES RELATIVE ${PROTO_DIR} "${PROTO_DIR}/*.proto")
+# ---- Squirrel protos (only ours, not submodules) ----
+find_package(Protobuf REQUIRED)  # keep this before using ${Protobuf_PROTOC_EXECUTABLE}
 
-# Generate protobuf cpp files
+set(OS_PROTO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/proto")
+file(GLOB OS_PROTO_ABS "${OS_PROTO_DIR}/*.proto")
 
-if(PROTO_FILES)
-  message(STATUS "Found proto files: ${PROTO_FILES}")
-
-  # full paths
-  set(PROTO_PATHS "")
-  foreach(p ${PROTO_FILES})
-    list(APPEND PROTO_PATHS "${PROTO_DIR}/${p}")
+if (OS_PROTO_ABS)
+  message(STATUS "[squirrel_protos] Found:")
+  foreach(_p IN LISTS OS_PROTO_ABS)
+    message(STATUS "  ${_p}")
   endforeach()
 
-  # Use protobuf_generate_cpp if available
-  if(COMMAND protobuf_generate_cpp)
-    protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_PATHS})
-  else()
-    # Fallback: explicit custom commands to run protoc for each proto
-    set(PROTO_SRCS "")
-    set(PROTO_HDRS "")
-    foreach(p ${PROTO_PATHS})
-      get_filename_component(name ${p} NAME_WE)
-      set(out_cc ${CMAKE_CURRENT_BINARY_DIR}/generated/${name}.pb.cc)
-      set(out_h  ${CMAKE_CURRENT_BINARY_DIR}/generated/${name}.pb.h)
-      add_custom_command(
-        OUTPUT ${out_cc} ${out_h}
-        COMMAND ${Protobuf_PROTOC_EXECUTABLE}
-                --cpp_out=${CMAKE_CURRENT_BINARY_DIR}/generated
-                --proto_path=${PROTO_DIR}
-                ${p}
-        DEPENDS ${p}
-        COMMENT "Generating protobuf C++ for ${p}"
-      )
-      list(APPEND PROTO_SRCS ${out_cc})
-      list(APPEND PROTO_HDRS ${out_h})
-    endforeach()
-  endif()
+  # Unique generated dir (top-level build tree)
+  set(SQUIRREL_GEN_DIR "${CMAKE_BINARY_DIR}/generated_squirrel_protos")
 
-  # Include generated headers and add generated sources to build
-  include_directories(${CMAKE_CURRENT_BINARY_DIR})
-  list(APPEND SOURCES ${PROTO_SRCS})
+  # One-time prep: ensure the output dir exists before any proto rules
+  add_custom_target(squirrel_protos_prep
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${SQUIRREL_GEN_DIR}
+    COMMENT "[squirrel_protos] Preparing ${SQUIRREL_GEN_DIR}"
+  )
+
+  # --proto_path only to our proto folder
+  set(PROTO_PATH_ARGS "--proto_path=${OS_PROTO_DIR}")
+
+  # Generate C++ for each .proto
+  set(SQUIRREL_PROTO_SRCS "")
+  set(SQUIRREL_PROTO_HDRS "")
+  foreach(p IN LISTS OS_PROTO_ABS)
+    get_filename_component(name "${p}" NAME_WE)
+    set(out_cc "${SQUIRREL_GEN_DIR}/${name}.pb.cc")
+    set(out_h  "${SQUIRREL_GEN_DIR}/${name}.pb.h")
+
+    add_custom_command(
+      OUTPUT ${out_cc} ${out_h}
+      COMMAND ${Protobuf_PROTOC_EXECUTABLE}
+              ${PROTO_PATH_ARGS}
+              --cpp_out=${SQUIRREL_GEN_DIR}
+              ${p}
+      DEPENDS ${p} squirrel_protos_prep
+      COMMENT "[squirrel_protos] Generating C++ for ${p}"
+      VERBATIM
+    )
+    list(APPEND SQUIRREL_PROTO_SRCS ${out_cc})
+    list(APPEND SQUIRREL_PROTO_HDRS ${out_h})
+  endforeach()
+
+  add_library(squirrel_protos ${SQUIRREL_PROTO_SRCS} ${SQUIRREL_PROTO_HDRS})
+  add_dependencies(squirrel_protos squirrel_protos_prep)
+  target_include_directories(squirrel_protos PUBLIC ${SQUIRREL_GEN_DIR})
+  target_link_libraries(squirrel_protos PUBLIC protobuf::libprotobuf)
+
+  # Single descriptor set for our protos
+  set(SQUIRREL_DESC_OUT ${SQUIRREL_GEN_DIR}/schemas.desc)
+  add_custom_command(
+    OUTPUT ${SQUIRREL_DESC_OUT}
+    COMMAND ${Protobuf_PROTOC_EXECUTABLE}
+            ${PROTO_PATH_ARGS}
+            --include_imports
+            --descriptor_set_out=${SQUIRREL_DESC_OUT}
+            ${OS_PROTO_ABS}
+    DEPENDS ${OS_PROTO_ABS} squirrel_protos_prep
+    COMMENT "[squirrel_protos] Generating descriptor set: ${SQUIRREL_DESC_OUT}"
+    VERBATIM
+  )
+  add_custom_target(squirrel_protos_desc ALL DEPENDS ${SQUIRREL_DESC_OUT})
+  add_dependencies(squirrel_protos_desc squirrel_protos_prep)
+
+  # Optional: copy descriptor next to top-level binaries
+  add_custom_command(TARGET squirrel_protos_desc POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${SQUIRREL_DESC_OUT} ${CMAKE_BINARY_DIR}/schemas.desc)
+
 else()
-  message(STATUS "No .proto files found in ${PROTO_DIR} (ok, skipping protobuf generation).")
+  message(STATUS "[squirrel_protos] No .proto files in ${OS_PROTO_DIR}")
 endif()
-
 
 #=============================================================================
 # Build Executable for each supported platform
@@ -559,7 +588,7 @@ if (NOT BUILD_TEST_HARNESS)
         cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
         set_target_debug_flags(squirreldefender)
 
-        target_link_libraries(squirreldefender 
+        target_link_libraries(squirreldefender
                             ${Protobuf_LIBRARIES}
                             # MCAP dependencies
                             mcap
@@ -590,7 +619,8 @@ if (NOT BUILD_TEST_HARNESS)
         cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
         set_target_debug_flags(squirreldefender)
 
-        target_link_libraries(squirreldefender 
+        target_link_libraries(squirreldefender  
+                            squirrel_protos
                             ${Protobuf_LIBRARIES}
                             # MCAP dependencies
                             mcap
@@ -616,6 +646,13 @@ if (NOT BUILD_TEST_HARNESS)
                             #qpOASES_e  # For acados, remove if you are not using qpOASES
                             #osqp       # For acados, remove if you are not using OSQP
                             )
+                            
+        # Wire in protos only if they were defined
+        if (TARGET squirrel_protos)
+        target_link_libraries(squirreldefender squirrel_protos)  # <-- NO PRIVATE
+        add_dependencies(squirreldefender squirrel_protos squirrel_protos_desc)
+        # include dirs are PUBLIC on squirrel_protos, so no extra include needed
+        endif()
     elseif(BLD_WIN)
 
         if(USE_ENV_VAR)

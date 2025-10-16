@@ -45,7 +45,7 @@ void log_data(void);
 
 void DataLogger::logTargetInfo(float x, float y, float timestamp)
 {
-    foxglove::TargetInfo msg;
+    logger::TargetInfo msg;
     msg.set_x(x);
     msg.set_y(y);
     msg.set_timestamp(timestamp);
@@ -353,9 +353,9 @@ DataLogger::DataLogger()
 {
     mMCAPLogger = std::make_unique<MCAPLogger>("file.mcap", "profile");
     mMCAPLogger->addChannel(
-        "/target_info",        // Topic name
-        "foxglove.TargetInfo", // Schema name as defined in your .proto file (package + message name)
-        "protobuf"             // Encoding (could be "protobuf" or "proto3", depends on MCAP version)
+        "/target_info",      // Topic name
+        "logger.TargetInfo", // Schema name as defined in your .proto file (package + message name)
+        "protobuf"           // Encoding (could be "protobuf" or "proto3", depends on MCAP version)
     );
 };
 
