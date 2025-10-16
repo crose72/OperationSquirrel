@@ -4,5 +4,5 @@ package logger;
 message TargetInfo {
     float x = 1;
     float y = 2;
-    float timestamp = 3;
+    double timestamp = 3;
 }

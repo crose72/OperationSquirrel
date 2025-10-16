@@ -23,6 +23,7 @@
  * Exported objects
  ********************************************************************************/
 extern float g_app_elapsed_time;
+extern uint64_t g_app_elapsed_time_ns;
 extern float g_dt;
 extern bool g_first_loop_after_start;
 
@@ -32,15 +33,15 @@ extern bool g_first_loop_after_start;
 
 class Time
 {
-    public:
-        Time();
-        ~Time();
+public:
+    Time();
+    ~Time();
 
-        static bool init(void);
-        static void loop(void);
-        static void shutdown(void);
+    static bool init(void);
+    static void loop(void);
+    static void shutdown(void);
 
-    private:
-    };
+private:
+};
 
 #endif // TIME_CALC_H

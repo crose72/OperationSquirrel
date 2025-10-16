@@ -158,7 +158,7 @@ public:
     static void loop(void);
     static void shutdown(void);
 
-    void logTargetInfo(float x, float y, float timestamp);
+    void logTargetInfo(float x, float y, uint64_t timestamp);
 
 private:
     static std::unique_ptr<MCAPLogger> mMCAPLogger;

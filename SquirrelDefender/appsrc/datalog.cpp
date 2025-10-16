@@ -43,12 +43,12 @@ void save_to_csv(const std::string &filename, const std::vector<std::vector<std:
 std::string generate_unique_filename(const std::string &filename);
 void log_data(void);
 
-void DataLogger::logTargetInfo(float x, float y, float timestamp)
+void DataLogger::logTargetInfo(float x, float y, uint64_t timestamp)
 {
     logger::TargetInfo msg;
     msg.set_x(x);
     msg.set_y(y);
-    msg.set_timestamp(timestamp);
+    msg.set_timestamp(static_cast<double>(timestamp) * 1e-9);
 
     std::string data;
     bool success = msg.SerializeToString(&data);
