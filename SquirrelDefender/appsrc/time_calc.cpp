@@ -38,6 +38,7 @@ static std::chrono::steady_clock::time_point g_start_steady;
 
 // offset that maps steady_clock → system_clock epoch (computed at init)
 static uint64_t g_offset_ns = 0;
+uint64_t g_epoch_ns = 0;
 
 /********************************************************************************
  * Calibration definitions
@@ -74,6 +75,11 @@ uint64_t now_elapsed_ns()
     return std::chrono::duration_cast<std::chrono::nanoseconds>(
                std::chrono::steady_clock::now() - g_start_steady)
         .count();
+}
+
+static inline uint64_t epoch_now_ns()
+{
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 }
 
 /********************************************************************************
@@ -145,6 +151,7 @@ void Time::loop(void)
 {
     calc_app_runtime();
     g_app_elapsed_time_ns = now_elapsed_ns();
+    g_epoch_ns = epoch_now_ns();
 }
 
 /********************************************************************************

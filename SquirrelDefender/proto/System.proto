@@ -1,0 +1,10 @@
+syntax = "proto3";
+package logger;
+
+import "Common.proto";
+
+message SystemStateMsg {
+  Time  t = 1;
+  int32 system_state     = 10; // cast from your SystemState enum
+  float app_elapsed_time = 11; // g_app_elapsed_time (float)
+}

@@ -34,8 +34,8 @@ bool controller_initialiazed;
  ********************************************************************************/
 
 /********************************************************************************
- * Function: 
- * Description: 
+ * Function:
+ * Description:
  ********************************************************************************/
 
 /********************************************************************************
@@ -59,7 +59,7 @@ int Scheduler::init(void)
 {
 
 #ifdef ENABLE_CV
-    
+
     if (!Video::init() ||
         !Detection::init() ||
         !Track::init() ||
@@ -68,13 +68,13 @@ int Scheduler::init(void)
     {
         return 1;
     }
-    
+
 #endif // ENABLE_CV
 
-    if (!MavMsg::init() ||
+    if (!Time::init() ||
+        !MavMsg::init() ||
         !DataLogger::init() ||
         !VehicleController::init() ||
-        !Time::init() ||
         !SystemController::init())
     {
         return 1;
@@ -109,8 +109,8 @@ void Scheduler::loop(void)
 #endif // ENABLE_CV
 
     VehicleController::loop();
-    DataLogger::loop();
     Time::loop();
+    DataLogger::loop();
     main_loop.end_time();
     main_loop.wait();
 }
@@ -128,7 +128,7 @@ void Scheduler::shutdown(void)
     Time::shutdown();
 
 #ifdef ENABLE_CV
-    
+
     Track::shutdown();
     Localize::shutdown();
     PathPlanner::shutdown();

@@ -512,7 +512,7 @@ void update_target_loc(void)
 
 void log_target_info(void)
 {
-    data_logger.logTargetInfo(g_x_target_ekf, g_y_target_ekf, g_app_elapsed_time_ns);
+    // data_logger.logTargetInfo(g_x_target_ekf, g_y_target_ekf, g_app_elapsed_time_ns);
 }
 
 /********************************************************************************

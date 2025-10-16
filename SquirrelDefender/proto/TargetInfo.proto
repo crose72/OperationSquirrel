@@ -1,8 +1,68 @@
 syntax = "proto3";
 package logger;
 
-message TargetInfo {
-    float x = 1;
-    float y = 2;
-    double timestamp = 3;
+import "Common.proto";
+
+message TargetDetectionTrack {
+  Time   t = 1;
+
+  bool   target_valid              = 10;
+  int32  target_detection_id       = 11; // int -> int32
+  int32  target_track_id           = 12; // int -> int32
+  float  detection_class           = 13; // you declared float
+  float  target_detection_conf     = 14;
+
+  float  target_cntr_offset_x      = 20;
+  float  target_cntr_offset_y      = 21;
+  float  target_cntr_offset_x_filt = 22;
+  float  target_cntr_offset_y_filt = 23;
+
+  float  target_height             = 30;
+  float  target_width              = 31;
+  float  target_aspect             = 32;
+  float  target_left               = 33;
+  float  target_right              = 34;
+  float  target_top                = 35;
+  float  target_bottom             = 36;
+}
+
+message TargetEstimate {
+  Time  t = 1;
+
+  float d_target_h   = 10;
+  float d_target_w   = 11;
+
+  float x_target     = 20;
+  float y_target     = 21;
+  float z_target     = 22;
+
+  float d_target     = 30;
+  float x_error      = 31;
+  float y_error      = 32;
+
+  float delta_angle        = 40;
+  float camera_tilt_angle  = 41;
+  float delta_d_x          = 42;
+  float delta_d_z          = 43;
+
+  float x_target_ekf = 50;
+  float y_target_ekf = 51;
+  float vx_target_ekf= 52;
+  float vy_target_ekf= 53;
+  float ax_target_ekf= 54;
+  float ay_target_ekf= 55;
+
+  bool  target_data_useful = 60;
+}
+
+message ControlAdjust {
+  Time  t = 1;
+
+  bool  target_too_close = 10;
+  float vx_adjust        = 11;
+  float vy_adjust        = 12;
+  float vz_adjust        = 13;
+  float yaw_target       = 14;
+  float yaw_target_error = 15;
+  float mav_veh_yaw_adjusted = 16;
 }

@@ -140,6 +140,8 @@ extern float g_target_cntr_offset_y_filt;
 /* System variables */
 extern SystemState g_system_state;
 
+extern uint64_t g_epoch_ns;
+
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
@@ -159,6 +161,7 @@ public:
     static void shutdown(void);
 
     void logTargetInfo(float x, float y, uint64_t timestamp);
+    static void log_data_mcap(void);
 
 private:
     static std::unique_ptr<MCAPLogger> mMCAPLogger;

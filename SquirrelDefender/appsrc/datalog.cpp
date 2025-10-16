@@ -10,7 +10,10 @@
  * Includes
  ********************************************************************************/
 #include "datalog.h"
-
+#include "Common.pb.h"
+#include "TargetInfo.pb.h"
+#include "Mavlink.pb.h"
+#include "System.pb.h"
 /********************************************************************************
  * Typedefs
  ********************************************************************************/
@@ -43,36 +46,65 @@ void save_to_csv(const std::string &filename, const std::vector<std::vector<std:
 std::string generate_unique_filename(const std::string &filename);
 void log_data(void);
 
-void DataLogger::logTargetInfo(float x, float y, uint64_t timestamp)
+// Unique filename helper (your approach, targeting .mcap)
+static std::string generate_unique_mcap_filename(const std::string &stem)
 {
-    logger::TargetInfo msg;
-    msg.set_x(x);
-    msg.set_y(y);
-    msg.set_timestamp(static_cast<double>(timestamp) * 1e-9);
-
-    std::string data;
-    bool success = msg.SerializeToString(&data);
-    if (!success)
+#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+    const std::string baseDir = "../data/";
+#elif defined(BLD_WIN)
+    const std::string baseDir = "../../data/";
+#else
+#error "Please define a build platform."
+#endif
+    int counter = 0;
+    while (true)
     {
-        std::cerr << "Serialization failed!" << std::endl;
-    }
-    else
-    {
-        std::cout << "yay" << std::endl;
-    }
-
-    // MCAP timestamp should be uint64_t nanoseconds, but can use whatever you want for now
-    // mcap_logger_.logMessage("/target_location", data, static_cast<uint64_t>(timestamp * 1e9));
-    bool ok = mMCAPLogger->logMessage("/target_info", data, timestamp);
-    if (!ok)
-    {
-        std::cerr << "MCAP logMessage failed!" << std::endl;
-    }
-    else
-    {
-        std::cout << "MCAP logMessage succeeded." << std::endl;
+        const std::string name = (counter == 0)
+                                     ? (baseDir + stem + ".mcap")
+                                     : (baseDir + stem + "_" + std::to_string(counter) + ".mcap");
+        std::ifstream f(name, std::ios::binary);
+        if (!f.good())
+            return name;
+        ++counter;
     }
 }
+
+static inline void fill_time(logger::Time *t, uint64_t ts_ns)
+{
+    t->set_timestamp_ns(ts_ns);
+    t->set_timestamp_sec(static_cast<double>(ts_ns) * 1e-9);
+}
+
+// void DataLogger::logTargetInfo(float x, float y, uint64_t timestamp)
+// {
+//     logger::TargetInfo msg;
+//     msg.set_x(x);
+//     msg.set_y(y);
+//     msg.set_timestamp(static_cast<double>(timestamp) * 1e-9);
+
+//     std::string data;
+//     bool success = msg.SerializeToString(&data);
+//     if (!success)
+//     {
+//         std::cerr << "Serialization failed!" << std::endl;
+//     }
+//     else
+//     {
+//         std::cout << "yay" << std::endl;
+//     }
+
+//     // MCAP timestamp should be uint64_t nanoseconds, but can use whatever you want for now
+//     // mcap_logger_.logMessage("/target_location", data, static_cast<uint64_t>(timestamp * 1e9));
+//     bool ok = mMCAPLogger->logMessage("/target_info", data, timestamp);
+//     if (!ok)
+//     {
+//         std::cerr << "MCAP logMessage failed!" << std::endl;
+//     }
+//     else
+//     {
+//         std::cout << "MCAP logMessage succeeded." << std::endl;
+//     }
+// }
 
 /********************************************************************************
  * Function: generate_unique_filename
@@ -345,19 +377,211 @@ void log_data(void)
     save_to_csv(unique_file_name, datalog_record);
 }
 
+void DataLogger::log_data_mcap(void)
+{
+    if (!mMCAPLogger)
+        return;
+    const uint64_t ts_ns = g_epoch_ns;
+
+    // --- System state ---
+    {
+        logger::SystemStateMsg m;
+        fill_time(m.mutable_t(), ts_ns);
+        m.set_system_state(static_cast<int32_t>(g_system_state));
+        m.set_app_elapsed_time(g_app_elapsed_time);
+        std::string bytes;
+        if (m.SerializeToString(&bytes))
+        {
+            mMCAPLogger->logMessage("/system/state", bytes, ts_ns);
+        }
+    }
+
+    // --- Target detections/tracks ---
+    {
+        logger::TargetDetectionTrack m;
+        fill_time(m.mutable_t(), ts_ns);
+        m.set_target_valid(g_target_valid);
+        m.set_target_detection_id(static_cast<int32_t>(g_target_detection_id));
+        m.set_target_track_id(static_cast<int32_t>(g_target_track_id));
+        m.set_detection_class(g_detection_class);
+        m.set_target_detection_conf(g_target_detection_conf);
+        m.set_target_cntr_offset_x(g_target_cntr_offset_x);
+        m.set_target_cntr_offset_y(g_target_cntr_offset_y);
+        m.set_target_cntr_offset_x_filt(g_target_cntr_offset_x_filt);
+        m.set_target_cntr_offset_y_filt(g_target_cntr_offset_y_filt);
+        m.set_target_height(g_target_height);
+        m.set_target_width(g_target_width);
+        m.set_target_aspect(g_target_aspect);
+        m.set_target_left(g_target_left);
+        m.set_target_right(g_target_right);
+        m.set_target_top(g_target_top);
+        m.set_target_bottom(g_target_bottom);
+        std::string bytes;
+        if (m.SerializeToString(&bytes))
+        {
+            mMCAPLogger->logMessage("/target/detections", bytes, ts_ns);
+        }
+    }
+
+    // --- Target estimate / EKF ---
+    {
+        logger::TargetEstimate m;
+        fill_time(m.mutable_t(), ts_ns);
+        m.set_d_target_h(g_d_target_h);
+        m.set_d_target_w(g_d_target_w);
+        m.set_x_target(g_x_target);
+        m.set_y_target(g_y_target);
+        m.set_z_target(g_z_target);
+        m.set_d_target(g_d_target);
+        m.set_x_error(g_x_error);
+        m.set_y_error(g_y_error);
+        m.set_delta_angle(g_delta_angle);
+        m.set_camera_tilt_angle(g_camera_tilt_angle);
+        m.set_delta_d_x(g_delta_d_x);
+        m.set_delta_d_z(g_delta_d_z);
+        m.set_x_target_ekf(g_x_target_ekf);
+        m.set_y_target_ekf(g_y_target_ekf);
+        m.set_vx_target_ekf(g_vx_target_ekf);
+        m.set_vy_target_ekf(g_vy_target_ekf);
+        m.set_ax_target_ekf(g_ax_target_ekf);
+        m.set_ay_target_ekf(g_ay_target_ekf);
+        m.set_target_data_useful(g_target_data_useful);
+        std::string bytes;
+        if (m.SerializeToString(&bytes))
+        {
+            mMCAPLogger->logMessage("/target/estimate", bytes, ts_ns);
+        }
+    }
+
+    // --- Control adjustments ---
+    {
+        logger::ControlAdjust m;
+        fill_time(m.mutable_t(), ts_ns);
+        m.set_target_too_close(g_target_too_close);
+        m.set_vx_adjust(g_vx_adjust);
+        m.set_vy_adjust(g_vy_adjust);
+        m.set_vz_adjust(g_vz_adjust);
+        m.set_yaw_target(g_yaw_target);
+        m.set_yaw_target_error(g_yaw_target_error);
+        m.set_mav_veh_yaw_adjusted(g_mav_veh_yaw_adjusted);
+        std::string bytes;
+        if (m.SerializeToString(&bytes))
+        {
+            mMCAPLogger->logMessage("/control/adjust", bytes, ts_ns);
+        }
+    }
+
+    // --- MAV system / metadata ---
+    {
+        logger::MavSystem m;
+        fill_time(m.mutable_t(), ts_ns);
+        m.set_sys_stat_voltage_battery(static_cast<uint32_t>(g_mav_veh_sys_stat_voltage_battery));
+        m.set_sys_stat_current_battery(static_cast<int32_t>(g_mav_veh_sys_stat_current_battery));
+        m.set_sys_stat_battery_remaining(static_cast<int32_t>(g_mav_veh_sys_stat_battery_remaining));
+        m.set_rel_alt(static_cast<int32_t>(g_mav_veh_rel_alt));
+        m.set_veh_type(static_cast<uint32_t>(g_mav_veh_type));
+        m.set_autopilot_type(static_cast<uint32_t>(g_mav_veh_autopilot_type));
+        m.set_base_mode(static_cast<uint32_t>(g_mav_veh_base_mode));
+        m.set_custom_mode(static_cast<uint32_t>(g_mav_veh_custom_mode));
+        m.set_state(static_cast<uint32_t>(g_mav_veh_state));
+        m.set_mavlink_version(static_cast<uint32_t>(g_mav_veh_mavlink_version));
+        std::string bytes;
+        if (m.SerializeToString(&bytes))
+        {
+            mMCAPLogger->logMessage("/mav/system", bytes, ts_ns);
+        }
+    }
+
+    // --- MAV kinematics / attitude ---
+    {
+        logger::MavKinematics m;
+        fill_time(m.mutable_t(), ts_ns);
+        m.set_gps_vx(static_cast<int32_t>(g_mav_veh_gps_vx));
+        m.set_gps_vy(static_cast<int32_t>(g_mav_veh_gps_vy));
+        m.set_gps_vz(static_cast<int32_t>(g_mav_veh_gps_vz));
+        m.set_gps_hdg(static_cast<uint32_t>(g_mav_veh_gps_hdg));
+        m.set_roll(g_mav_veh_roll);
+        m.set_pitch(g_mav_veh_pitch);
+        m.set_yaw(g_mav_veh_yaw);
+        m.set_rollspeed(g_mav_veh_rollspeed);
+        m.set_pitchspeed(g_mav_veh_pitchspeed);
+        m.set_yawspeed(g_mav_veh_yawspeed);
+        m.set_local_ned_x(g_mav_veh_local_ned_x);
+        m.set_local_ned_y(g_mav_veh_local_ned_y);
+        m.set_local_ned_z(g_mav_veh_local_ned_z);
+        m.set_local_ned_vx(g_mav_veh_local_ned_vx);
+        m.set_local_ned_vy(g_mav_veh_local_ned_vy);
+        m.set_local_ned_vz(g_mav_veh_local_ned_vz);
+        m.set_q1_actual(g_mav_veh_q1_actual);
+        m.set_q2_actual(g_mav_veh_q2_actual);
+        m.set_q3_actual(g_mav_veh_q3_actual);
+        m.set_q4_actual(g_mav_veh_q4_actual);
+        m.set_roll_rate_actual(g_mav_veh_roll_rate_actual);
+        m.set_pitch_rate_actual(g_mav_veh_pitch_rate_actual);
+        m.set_yaw_rate_actual(g_mav_veh_yaw_rate_actual);
+        for (int i = 0; i < 4; ++i)
+            m.add_repr_offset_q(g_mav_veh_repr_offset_q[i]);
+        std::string bytes;
+        if (m.SerializeToString(&bytes))
+        {
+            mMCAPLogger->logMessage("/mav/kinematics", bytes, ts_ns);
+        }
+    }
+
+    // --- MAV IMU raw ---
+    {
+        logger::MavImuRaw m;
+        fill_time(m.mutable_t(), ts_ns);
+        m.set_imu_ax(static_cast<int32_t>(g_mav_veh_imu_ax));
+        m.set_imu_ay(static_cast<int32_t>(g_mav_veh_imu_ay));
+        m.set_imu_az(static_cast<int32_t>(g_mav_veh_imu_az));
+        m.set_imu_xgyro(static_cast<int32_t>(g_mav_veh_imu_xgyro));
+        m.set_imu_ygyro(static_cast<int32_t>(g_mav_veh_imu_ygyro));
+        m.set_imu_zgyro(static_cast<int32_t>(g_mav_veh_imu_zgyro));
+        std::string bytes;
+        if (m.SerializeToString(&bytes))
+        {
+            mMCAPLogger->logMessage("/mav/imu_raw", bytes, ts_ns);
+        }
+    }
+
+    // --- Rangefinder ---
+    {
+        logger::MavRangefinder m;
+        fill_time(m.mutable_t(), ts_ns);
+        m.set_current_distance(static_cast<uint32_t>(g_mav_veh_rngfdr_current_distance));
+        m.set_signal_quality(static_cast<uint32_t>(g_mav_veh_rngfdr_signal_quality));
+        std::string bytes;
+        if (m.SerializeToString(&bytes))
+        {
+            mMCAPLogger->logMessage("/mav/rangefinder", bytes, ts_ns);
+        }
+    }
+
+    // --- Optical flow ---
+    {
+        logger::MavOpticalFlow m;
+        fill_time(m.mutable_t(), ts_ns);
+        m.set_flow_comp_m_x(g_mav_veh_flow_comp_m_x);
+        m.set_flow_comp_m_y(g_mav_veh_flow_comp_m_y);
+        m.set_flow_x(static_cast<int32_t>(g_mav_veh_flow_x));
+        m.set_flow_y(static_cast<int32_t>(g_mav_veh_flow_y));
+        m.set_flow_quality(static_cast<uint32_t>(g_mav_veh_flow_quality));
+        m.set_flow_rate_x(g_mav_veh_flow_rate_x);
+        m.set_flow_rate_y(g_mav_veh_flow_rate_y);
+        std::string bytes;
+        if (m.SerializeToString(&bytes))
+        {
+            mMCAPLogger->logMessage("/mav/flow", bytes, ts_ns);
+        }
+    }
+}
+
 /********************************************************************************
  * Function: DataLogger
  * Description: Class constructor
  ********************************************************************************/
-DataLogger::DataLogger()
-{
-    mMCAPLogger = std::make_unique<MCAPLogger>("file.mcap", "profile");
-    mMCAPLogger->addChannel(
-        "/target_info",      // Topic name
-        "logger.TargetInfo", // Schema name as defined in your .proto file (package + message name)
-        "protobuf"           // Encoding (could be "protobuf" or "proto3", depends on MCAP version)
-    );
-};
+DataLogger::DataLogger() {};
 
 /********************************************************************************
  * Function: ~DataLogger
@@ -390,8 +614,19 @@ bool DataLogger::init(void)
     unique_file_name = "";
     datalog_record = {};
 
-    unique_file_name = generate_unique_filename(data_file_name);
-    write_headers();
+    const std::string path = generate_unique_mcap_filename(data_file_name);
+    mMCAPLogger = std::make_unique<MCAPLogger>(path, "profile");
+
+    // Register channels (schema names must match package.Message)
+    mMCAPLogger->addChannel("/system/state", "logger.SystemStateMsg", "protobuf");
+    mMCAPLogger->addChannel("/target/detections", "logger.TargetDetectionTrack", "protobuf");
+    mMCAPLogger->addChannel("/target/estimate", "logger.TargetEstimate", "protobuf");
+    mMCAPLogger->addChannel("/control/adjust", "logger.ControlAdjust", "protobuf");
+    mMCAPLogger->addChannel("/mav/system", "logger.MavSystem", "protobuf");
+    mMCAPLogger->addChannel("/mav/kinematics", "logger.MavKinematics", "protobuf");
+    mMCAPLogger->addChannel("/mav/imu_raw", "logger.MavImuRaw", "protobuf");
+    mMCAPLogger->addChannel("/mav/rangefinder", "logger.MavRangefinder", "protobuf");
+    mMCAPLogger->addChannel("/mav/flow", "logger.MavOpticalFlow", "protobuf");
 
     return true;
 }
@@ -402,7 +637,15 @@ bool DataLogger::init(void)
  ********************************************************************************/
 void DataLogger::loop(void)
 {
-    log_data();
+    static uint32_t dbg = 0;
+    if ((dbg++ % 60) == 0)
+    {
+        std::cerr << "[LOG] ts=" << g_epoch_ns
+                  << " roll=" << g_mav_veh_roll
+                  << " tgt_valid=" << g_target_valid
+                  << " x=" << g_x_target << "\n";
+    }
+    log_data_mcap();
 }
 
 /********************************************************************************
@@ -411,5 +654,9 @@ void DataLogger::loop(void)
  ********************************************************************************/
 void DataLogger::shutdown(void)
 {
-    mMCAPLogger->close();
+    if (mMCAPLogger)
+    {
+        mMCAPLogger->close();
+        mMCAPLogger.reset();
+    }
 }
