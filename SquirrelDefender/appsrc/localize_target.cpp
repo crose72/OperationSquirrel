@@ -510,11 +510,6 @@ void update_target_loc(void)
     }
 };
 
-void log_target_info(void)
-{
-    // data_logger.logTargetInfo(g_x_target_ekf, g_y_target_ekf, g_app_elapsed_time_ns);
-}
-
 /********************************************************************************
  * Function: ~Localize
  * Description: Localize class destructor.
@@ -576,7 +571,6 @@ void Localize::loop(void)
     dtrmn_target_loc_img();
     dtrmn_target_loc_real();
     update_target_loc();
-    log_target_info();
 }
 
 /********************************************************************************

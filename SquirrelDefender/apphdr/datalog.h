@@ -24,7 +24,10 @@
 #include "detect_target.h"
 #include "time_calc.h"
 #include "mcap_logger.h"
+#include "Common.pb.h"
 #include "TargetInfo.pb.h"
+#include "Mavlink.pb.h"
+#include "System.pb.h"
 
 /********************************************************************************
  * Imported objects
@@ -156,17 +159,33 @@ public:
     DataLogger();
     ~DataLogger();
 
-    static bool init(void);
-    static void loop(void);
-    static void shutdown(void);
+    static bool init();
+    static void loop();
+    static void shutdown();
+    static void log_data();
 
-    void logTargetInfo(float x, float y, uint64_t timestamp);
-    static void log_data_mcap(void);
+    static inline void logTime(logger::Time *t, uint64_t ts_ns)
+    {
+        t->set_timestamp_ns(ts_ns);
+        t->set_timestamp_sec(static_cast<double>(ts_ns) * 1e-9);
+    }
+
+    template <typename ProtoMsg>
+    static bool publish(const std::string &topic, const ProtoMsg &msg, uint64_t timestamp)
+    {
+        if (!mMCAPLogger)
+            return false; // not initialized yet
+        std::string bytes;
+        if (!msg.SerializeToString(&bytes))
+            return false;
+
+        std::lock_guard<std::mutex> lk(s_mtx); // safe if called from multiple threads
+        return mMCAPLogger->logMessage(topic, bytes, timestamp);
+    }
 
 private:
     static std::unique_ptr<MCAPLogger> mMCAPLogger;
+    static std::mutex s_mtx;
 };
-
-extern DataLogger data_logger;
 
 #endif // DATALOG_H

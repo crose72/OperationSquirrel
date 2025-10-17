@@ -1,3 +1,5 @@
+#pragma once
+
 /********************************************************************************
  * @file    localize_target.h
  * @author  Cameron Rose
@@ -44,6 +46,7 @@ extern float g_mav_veh_local_ned_z;
 extern float g_target_cntr_offset_x_filt;
 extern float g_target_cntr_offset_x;
 extern const float g_input_video_height;
+extern uint64_t g_epoch_ns;
 
 /********************************************************************************
  * Exported objects
