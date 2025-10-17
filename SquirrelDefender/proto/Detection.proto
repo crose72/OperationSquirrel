@@ -1,0 +1,31 @@
+// detection.proto
+syntax = "proto3";
+package logger;
+
+import "Common.proto";
+
+message BBox {
+  float cx = 1;  // center x (px)
+  float cy = 2;  // center y (px)
+  float h  = 3;  // height (px)
+  float w  = 4;  // width (px)
+}
+
+message Keypoint {
+  float x = 1;   // px
+  float y = 2;   // px
+  float s = 3;   // confidence (optional)
+}
+
+message Detection {
+  uint32 id     = 1;  // e.g., track id if you have one; else 0
+  uint32 label  = 2;  // class id
+  float  score  = 3;  // confidence
+  BBox   box    = 4;
+  repeated Keypoint keypoints = 5; // optional
+}
+
+message Objects {
+  Time t          = 1;
+  repeated Detection detections = 4;
+}
