@@ -34,7 +34,13 @@
  * Function: Timer
  * Description: Class constructor
  ********************************************************************************/
-Timer::Timer(std::chrono::milliseconds loop_rate_desired) : loop_rate_desired(loop_rate_desired) {}
+Timer::Timer() {}
+
+/********************************************************************************
+ * Function: Timer
+ * Description: Class constructor
+ ********************************************************************************/
+Timer::Timer(std::chrono::milliseconds mDesiredRate) : mDesiredRate(mDesiredRate) {}
 
 /********************************************************************************
  * Function: ~Timer
@@ -46,18 +52,28 @@ Timer::~Timer(void) {}
  * Function: start_time
  * Description: Get loop start time.
  ********************************************************************************/
-void Timer::start_time(void)
+void Timer::start(void)
 {
-    loop_start_time = std::chrono::steady_clock::now();
+    mStartTime = std::chrono::steady_clock::now();
 }
 
 /********************************************************************************
  * Function: end_time
  * Description: Get loop end time.
  ********************************************************************************/
-void Timer::end_time(void)
+void Timer::stop(void)
 {
-    loop_end_time = std::chrono::steady_clock::now();
+    mEndTime = std::chrono::steady_clock::now();
+}
+
+/********************************************************************************
+ * Function: end_time
+ * Description: Get loop end time.
+ ********************************************************************************/
+std::chrono::milliseconds Timer::getLoopTime(void)
+{
+    std::chrono::milliseconds mLoopTime = std::chrono::duration_cast<std::chrono::milliseconds>(mEndTime - mStartTime);
+    return mLoopTime;
 }
 
 /********************************************************************************
@@ -67,13 +83,13 @@ void Timer::end_time(void)
  ********************************************************************************/
 void Timer::wait(void)
 {
-    end_time();
+    stop();
 
-    std::chrono::milliseconds loop_duration = std::chrono::duration_cast<std::chrono::milliseconds>(loop_end_time - loop_start_time);
-    while (loop_duration < loop_rate_desired)
+    std::chrono::milliseconds mLoopTime = std::chrono::duration_cast<std::chrono::milliseconds>(mEndTime - mStartTime);
+    while (mLoopTime < mDesiredRate)
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1)); // wait in small increments
-        loop_end_time = std::chrono::steady_clock::now();
-        loop_duration = std::chrono::duration_cast<std::chrono::milliseconds>(loop_end_time - loop_start_time);
+        mEndTime = std::chrono::steady_clock::now();
+        mLoopTime = std::chrono::duration_cast<std::chrono::milliseconds>(mEndTime - mStartTime);
     }
 }

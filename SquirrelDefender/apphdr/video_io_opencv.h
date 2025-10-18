@@ -21,6 +21,7 @@
 #include <opencv2/cudaimgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <spdlog/spdlog.h>
 
 /********************************************************************************
  * Imported objects
