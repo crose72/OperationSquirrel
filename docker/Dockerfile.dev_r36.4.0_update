@@ -1,4 +1,4 @@
-FROM crose72/os-dev:cuda12.6-trt10.5-cv4.10-sm86-vpi3.2-ubuntu22
+FROM crose72/jetpack-r36.4.0:dev
 
 RUN apt-get update && \
     apt-get install -y liblz4-dev libzstd-dev pkg-config

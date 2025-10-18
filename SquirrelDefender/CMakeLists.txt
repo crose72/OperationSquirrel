@@ -51,8 +51,8 @@ project(SquirrelDefender)
 
 # Choose ONLY ONE platform for the build (BLD_JETSON_B01, BLD_WSL, BLD_WIN) 
 option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" OFF)
-option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" OFF)
-option(BLD_WSL "Compiling for BLD_WSL" ON)
+option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" ON)
+option(BLD_WSL "Compiling for BLD_WSL" OFF)
 option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
@@ -228,6 +228,14 @@ elseif(BLD_JETSON_ORIN_NANO)
     find_package(LAPACK REQUIRED)
     find_package(BLAS REQUIRED)
     find_package(Protobuf REQUIRED)
+    
+    # MCAP logging dependencies
+    find_package(ZLIB REQUIRED)
+    find_package(Threads REQUIRED)
+    find_library(LZ4_LIBRARY lz4)
+    find_library(ZSTD_LIBRARY zstd)
+    find_path(LZ4_INCLUDE_DIR lz4.h)
+    find_path(ZSTD_INCLUDE_DIR zstd.h)
 elseif(BLD_WSL)
     find_package(CUDA REQUIRED)
     find_package(OpenCV REQUIRED)
@@ -589,6 +597,7 @@ if (NOT BUILD_TEST_HARNESS)
         set_target_debug_flags(squirreldefender)
 
         target_link_libraries(squirreldefender
+                            squirrel_protos
                             ${Protobuf_LIBRARIES}
                             # MCAP dependencies
                             mcap
