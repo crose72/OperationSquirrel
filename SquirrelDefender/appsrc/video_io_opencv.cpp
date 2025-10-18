@@ -26,19 +26,17 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool g_valid_image_rcvd;
-bool g_end_of_video;
-bool file_stream_created;
-
 std::string base_path = "../data/";
-
 cv::Mat g_image;
 cv::Mat image_overlay;
 cv::VideoCapture cap;
 cv::VideoWriter video_writer;
 std::string gst_pipeline;
-
 float video_fps_actual;
+bool g_valid_image_rcvd;
+bool g_end_of_video;
+bool file_stream_created;
+uint32_t g_frame_id;
 
 /********************************************************************************
  * Calibration definitions
@@ -205,6 +203,7 @@ bool capture_image(void)
         return false;
     }
 
+    ++g_frame_id;
     g_valid_image_rcvd = true;
     video_fps_actual = ((g_dt > (float)0.000001) ? (1 / g_dt) : (float)0.0);
 
@@ -359,6 +358,7 @@ bool VideoCV::init(void)
     g_image = NULL;
     g_end_of_video = false;
     video_fps_actual = (float)16.67;
+    g_frame_id = (uint32_t)0;
 
     if (!create_input_video_stream() ||
         !create_output_vid_stream())

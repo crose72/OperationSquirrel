@@ -72,7 +72,7 @@ extern bool g_valid_image_rcvd;
  * Exported objects
  ********************************************************************************/
 extern bool g_target_valid;
-extern int g_target_detection_id;
+extern int g_target_detection_num;
 extern int g_target_track_id;
 extern float g_target_cntr_offset_x;
 extern float g_target_cntr_offset_y;

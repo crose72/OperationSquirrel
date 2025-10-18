@@ -1,0 +1,8 @@
+syntax = "proto3";
+package os.logger;
+
+// Common time header: exact epoch ns + seconds for plotting.
+message Time {
+  double timestamp_ns = 1;  // epoch ns
+  double timestamp_sec = 2; // epoch seconds (double)
+}

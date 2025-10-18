@@ -42,7 +42,7 @@ float max_yaw;
 float g_yaw_adjust;
 float g_mav_veh_yaw_prv;
 float g_yaw_target_error;
-float g_mav_veh_yaw_adjusted;
+float g_mav_veh_yaw_adjusted_for_playback;
 float x_error_prv;
 float vx_adjust_prv;
 float vx_decel_prof_idx;
@@ -246,7 +246,7 @@ void calc_yaw_target_error(void)
         }
     }
 
-    g_mav_veh_yaw_adjusted = g_mav_veh_yaw - yaw_initial;
+    g_mav_veh_yaw_adjusted_for_playback = g_mav_veh_yaw - yaw_initial;
 
     // If the target is to the right of the center of the video then yaw right
     // If the target is to the left of the center of the video then yaw left
@@ -291,7 +291,7 @@ void calc_yaw_target_error(void)
     // because the goal is for the target to be in the center of the frame.
     if (g_use_video_playback)
     {
-        g_yaw_target_error = g_yaw_target - g_mav_veh_yaw_adjusted;
+        g_yaw_target_error = g_yaw_target - g_mav_veh_yaw_adjusted_for_playback;
     }
     else
     {
@@ -381,7 +381,7 @@ bool PathPlanner::init(void)
     g_yaw_adjust = (float)0.0;
     g_mav_veh_yaw_prv = (float)0.0;
     g_yaw_target_error = (float)0.0;
-    g_mav_veh_yaw_adjusted = (float)0.0;
+    g_mav_veh_yaw_adjusted_for_playback = (float)0.0;
     x_error_prv = (float)0.0;
     vx_adjust_prv = (float)0.0;
     vx_decel_prof_idx = (float)0.0;
