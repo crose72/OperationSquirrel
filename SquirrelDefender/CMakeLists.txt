@@ -218,7 +218,7 @@ if(BLD_JETSON_B01)
     find_package(Armadillo REQUIRED)
     find_package(LAPACK REQUIRED)
     find_package(BLAS REQUIRED)
-elseif(BLD_JETSON_ORIN_NANO)
+elseif(BLD_JETSON_ORIN_NANO OR BLD_WSL)
     find_package(CUDA REQUIRED)
     find_package(OpenCV REQUIRED)
     find_package(TensorRT REQUIRED)
@@ -229,24 +229,6 @@ elseif(BLD_JETSON_ORIN_NANO)
     find_package(BLAS REQUIRED)
     find_package(Protobuf REQUIRED)
     
-    # MCAP logging dependencies
-    find_package(ZLIB REQUIRED)
-    find_package(Threads REQUIRED)
-    find_library(LZ4_LIBRARY lz4)
-    find_library(ZSTD_LIBRARY zstd)
-    find_path(LZ4_INCLUDE_DIR lz4.h)
-    find_path(ZSTD_INCLUDE_DIR zstd.h)
-elseif(BLD_WSL)
-    find_package(CUDA REQUIRED)
-    find_package(OpenCV REQUIRED)
-    find_package(TensorRT REQUIRED)
-    find_package(vpi 3.2 REQUIRED)
-    find_package(Eigen3 REQUIRED)
-    find_package(Armadillo REQUIRED)
-    find_package(LAPACK REQUIRED)
-    find_package(BLAS REQUIRED)
-    find_package(Protobuf REQUIRED)
-
     # MCAP logging dependencies
     find_package(ZLIB REQUIRED)
     find_package(Threads REQUIRED)
@@ -311,7 +293,7 @@ if(USE_ENV_VAR)
         link_directories($ENV{LIB_OPENCV})
         link_directories($ENV{LIB_CUDA})
         link_directories($ENV{LIB_TEGRA})
-    elseif(BLD_JETSON_ORIN_NANO)
+    elseif(BLD_JETSON_ORIN_NANO OR BLD_WSL)
         # Validate required Jetson environment variables
         foreach(var LIB_JETSONINFERENCE LIB_JETSONUTILS LIB_OPENCV LIB_CUDA LIB_TEGRA
                     HDR_JETSONINFERENCE HDR_JETSONUTILS HDR_OPENCV HDR_CUDA)
@@ -362,45 +344,30 @@ else()
             /usr/lib/aarch64-linux-gnu/tegra
         )
 
-    elseif(BLD_JETSON_ORIN_NANO)
-        include_directories(
-            /usr/local/cuda/include
-            /usr/include/opencv4
-            ${EIGEN3_INCLUDE_DIR}
-            ${ARMADILLO_INCLUDE_DIRS}
-            ${ACADOS_INCLUDE_DIR}
-            # MCAP dependencies
-            ${LZ4_INCLUDE_DIR}
-            ${ZSTD_INCLUDE_DIR}
-            ${Protobuf_INCLUDE_DIRS}
-            #/usr/local/include/blasfeo/include # needed for ACADOS
-            #/usr/local/include/hpipm/include/ # needed for ACADOS
-            #/usr/local/include/acados_c # needed for ACADOS
-        )
-
-        link_directories(
-            /usr/local/lib
-            /usr/local/cuda/lib64
-            /usr/lib/aarch64-linux-gnu/tegra
-            ${ARMADILLO_LIBRARY_DIRS}
-            # ${ACADOS_LIB_DIR} # needed for ACADOS
-        )
-    elseif(BLD_WSL)
-        include_directories(
+    elseif(BLD_JETSON_ORIN_NANO OR BLD_WSL)
+        set(SD_COMMON_INCLUDE_DIRS
             /usr/local/cuda/include
             /usr/include/opencv4
             # Armadillo dependencies for kf
             ${EIGEN3_INCLUDE_DIR}
             ${ARMADILLO_INCLUDE_DIRS}
             ${ACADOS_INCLUDE_DIR}
-            # MCAP dependencies
+            # MCAP / Protobuf
             ${LZ4_INCLUDE_DIR}
             ${ZSTD_INCLUDE_DIR}
             ${Protobuf_INCLUDE_DIRS}
             #/usr/local/include/blasfeo/include # needed for ACADOS
             #/usr/local/include/hpipm/include/ # needed for ACADOS
             #/usr/local/include/acados_c # needed for ACADOS
-        )
+            )
+        set(SD_COMMON_LINK_DIRS
+            /usr/local/lib
+            /usr/local/cuda/lib64
+            /usr/lib/aarch64-linux-gnu/tegra
+            ${ARMADILLO_LIBRARY_DIRS}
+            )
+        include_directories(${SD_COMMON_INCLUDE_DIRS})
+        link_directories(${SD_COMMON_LINK_DIRS})
 
         link_directories(
             /usr/local/lib
@@ -410,6 +377,30 @@ else()
             # ${ACADOS_LIB_DIR} # needed for ACADOS
         )
     endif()
+endif()
+
+if (BLD_JETSON_ORIN_NANO OR BLD_WSL)
+    set(SD_COMMON_LINK_LIBS
+        # MCAP deps
+        mcap
+        ${LZ4_LIBRARY}
+        ${ZSTD_LIBRARY}
+        ZLIB::ZLIB
+        Threads::Threads
+        # Vision/AI stack
+        trtinfer
+        ${OpenCV_LIBS}
+        vpi
+        opencv_core
+        opencv_imgproc
+        opencv_imgcodecs
+        opencv_videoio
+        jsoncpp
+        # Math
+        ${ARMADILLO_LIBRARIES}
+        ${LAPACK_LIBRARIES}
+        ${BLAS_LIBRARIES}
+    )
 endif()
 
 #=============================================================================
@@ -496,10 +487,15 @@ list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HE
                     ${JSON_UTILS_HEADERS} ${PRINT_UTILS_HEADERS} ${YOLO_UTILS_HEADERS} 
                     ${PID_HEADERS} ${TIMER_HEADERS} ${KF_HEADERS} ${SS_HEADERS} ${MCAP_LOGGER_HEADERS})
 
-# ---- Squirrel protos (only ours, not submodules) ----
-find_package(Protobuf REQUIRED)  # keep this before using ${Protobuf_PROTOC_EXECUTABLE}
+#=============================================================================
+# Generate protobuf source code from protobuf definitions
+#=============================================================================
 
+
+# Path to protobufs
 set(OS_PROTO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/proto")
+
+# Collect protobuf files
 file(GLOB OS_PROTO_ABS "${OS_PROTO_DIR}/*.proto")
 
 if (OS_PROTO_ABS)
@@ -541,6 +537,7 @@ if (OS_PROTO_ABS)
     list(APPEND SQUIRREL_PROTO_SRCS ${out_cc})
     list(APPEND SQUIRREL_PROTO_HDRS ${out_h})
   endforeach()
+  # end protobuf generation
 
   add_library(squirrel_protos ${SQUIRREL_PROTO_SRCS} ${SQUIRREL_PROTO_HDRS})
   add_dependencies(squirrel_protos squirrel_protos_prep)
@@ -592,76 +589,20 @@ if (NOT BUILD_TEST_HARNESS)
                             ${ARMADILLO_LIBRARIES} 
                             ${LAPACK_LIBRARIES} 
                             ${BLAS_LIBRARIES})
-    elseif (BLD_JETSON_ORIN_NANO)
+    elseif (BLD_JETSON_ORIN_NANO OR BLD_WSL)
         cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
         set_target_debug_flags(squirreldefender)
 
         target_link_libraries(squirreldefender
                             squirrel_protos
                             ${Protobuf_LIBRARIES}
-                            # MCAP dependencies
-                            mcap
-                            ${LZ4_LIBRARY}
-                            ${ZSTD_LIBRARY}
-                            ZLIB::ZLIB
-                            Threads::Threads
-                            # end MCAP dependencies
-                            trtinfer 
-                            ${OpenCV_LIBS} 
-                            vpi 
-                            opencv_core
-                            opencv_imgproc 
-                            opencv_imgcodecs 
-                            opencv_videoio
-                            jsoncpp
-                            ${ARMADILLO_LIBRARIES} 
-                            ${LAPACK_LIBRARIES} 
-                            ${BLAS_LIBRARIES}
-                            #acados     # For acados, remove if you are not using qpOASES
-                            #hpipm      # For acados, remove if you are not using qpOASES
-                            #blasfeo    # For acados, remove if you are not using qpOASES
-                            #qpOASES_e  # For acados, remove if you are not using qpOASES
-                            #osqp       # For acados, remove if you are not using OSQP
-                            )
+                            ${SD_COMMON_LINK_LIBS})
 
-    elseif(BLD_WSL)
-        cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
-        set_target_debug_flags(squirreldefender)
-
-        target_link_libraries(squirreldefender  
-                            squirrel_protos
-                            ${Protobuf_LIBRARIES}
-                            # MCAP dependencies
-                            mcap
-                            ${LZ4_LIBRARY}
-                            ${ZSTD_LIBRARY}
-                            ZLIB::ZLIB
-                            Threads::Threads
-                            # end MCAP dependencies
-                            trtinfer 
-                            ${OpenCV_LIBS} 
-                            vpi 
-                            opencv_core
-                            opencv_imgproc 
-                            opencv_imgcodecs 
-                            opencv_videoio
-                            jsoncpp
-                            ${ARMADILLO_LIBRARIES} 
-                            ${LAPACK_LIBRARIES} 
-                            ${BLAS_LIBRARIES}
-                            #acados     # For acados, remove if you are not using qpOASES
-                            #hpipm      # For acados, remove if you are not using qpOASES
-                            #blasfeo    # For acados, remove if you are not using qpOASES
-                            #qpOASES_e  # For acados, remove if you are not using qpOASES
-                            #osqp       # For acados, remove if you are not using OSQP
-                            )
-                            
         # Wire in protos only if they were defined
         if (TARGET squirrel_protos)
-        target_link_libraries(squirreldefender squirrel_protos)  # <-- NO PRIVATE
-        add_dependencies(squirreldefender squirrel_protos squirrel_protos_desc)
-        # include dirs are PUBLIC on squirrel_protos, so no extra include needed
+            add_dependencies(squirreldefender squirrel_protos squirrel_protos_desc)
         endif()
+        
     elseif(BLD_WIN)
 
         if(USE_ENV_VAR)
@@ -800,46 +741,8 @@ if (BUILD_TEST_HARNESS)
         cuda_add_executable(test_localize_target ${LOC_TEST_SOURCES} ${LOC_TEST_HEADERS})
         set_target_debug_flags(test_localize_target)
 
-        if (BLD_JETSON_ORIN_NANO)
-            target_link_libraries(test_localize_target 
-                                trtinfer 
-                                ${OpenCV_LIBS} 
-                                vpi 
-                                opencv_core
-                                opencv_imgproc 
-                                opencv_imgcodecs 
-                                opencv_videoio
-                                jsoncpp
-                                ${ARMADILLO_LIBRARIES} 
-                                ${LAPACK_LIBRARIES} 
-                                ${BLAS_LIBRARIES})
-        elseif(BLD_WSL)
-            target_link_libraries(test_localize_target 
-                                ${Protobuf_LIBRARIES}
-                                # MCAP dependencies
-                                mcap
-                                ${LZ4_LIBRARY}
-                                ${ZSTD_LIBRARY}
-                                ZLIB::ZLIB
-                                Threads::Threads
-                                # end MCAP dependencies
-                                trtinfer 
-                                ${OpenCV_LIBS} 
-                                vpi 
-                                opencv_core
-                                opencv_imgproc 
-                                opencv_imgcodecs 
-                                opencv_videoio
-                                jsoncpp
-                                ${ARMADILLO_LIBRARIES} 
-                                ${LAPACK_LIBRARIES} 
-                                ${BLAS_LIBRARIES}
-                                #acados     # For acados, remove if you are not using qpOASES
-                                #hpipm      # For acados, remove if you are not using qpOASES
-                                #blasfeo    # For acados, remove if you are not using qpOASES
-                                #qpOASES_e  # For acados, remove if you are not using qpOASES
-                                #osqp       # For acados, remove if you are not using OSQP
-                                )
+        if (BLD_JETSON_ORIN_NANO OR BLD_WSL)
+            target_link_libraries(test_localize_target ${SD_COMMON_LINK_LIBS})
         endif()
 
         # Follow target test code
@@ -850,60 +753,8 @@ if (BUILD_TEST_HARNESS)
         cuda_add_executable(test_follow_target ${FOLLOW_TEST_SOURCES} ${FOLLOW_TEST_HEADERS})
         set_target_debug_flags(test_follow_target)
 
-        if (BLD_JETSON_ORIN_NANO)
-            target_link_libraries(test_follow_target 
-                                ${Protobuf_LIBRARIES}
-                                # MCAP dependencies
-                                mcap
-                                ${LZ4_LIBRARY}
-                                ${ZSTD_LIBRARY}
-                                ZLIB::ZLIB
-                                Threads::Threads
-                                # end MCAP dependencies
-                                trtinfer 
-                                ${OpenCV_LIBS} 
-                                vpi 
-                                opencv_core
-                                opencv_imgproc 
-                                opencv_imgcodecs 
-                                opencv_videoio
-                                jsoncpp
-                                ${ARMADILLO_LIBRARIES} 
-                                ${LAPACK_LIBRARIES} 
-                                ${BLAS_LIBRARIES}
-                                #acados     # For acados, remove if you are not using qpOASES
-                                #hpipm      # For acados, remove if you are not using qpOASES
-                                #blasfeo    # For acados, remove if you are not using qpOASES
-                                #qpOASES_e  # For acados, remove if you are not using qpOASES
-                                #osqp       # For acados, remove if you are not using OSQP
-                                )
-        elseif(BLD_WSL)
-            target_link_libraries(test_follow_target 
-                                ${Protobuf_LIBRARIES}
-                                # MCAP dependencies
-                                mcap
-                                ${LZ4_LIBRARY}
-                                ${ZSTD_LIBRARY}
-                                ZLIB::ZLIB
-                                Threads::Threads
-                                # end MCAP dependencies
-                                trtinfer 
-                                ${OpenCV_LIBS} 
-                                vpi 
-                                opencv_core
-                                opencv_imgproc 
-                                opencv_imgcodecs 
-                                opencv_videoio
-                                jsoncpp
-                                ${ARMADILLO_LIBRARIES} 
-                                ${LAPACK_LIBRARIES} 
-                                ${BLAS_LIBRARIES}
-                                #acados     # For acados, remove if you are not using qpOASES
-                                #hpipm      # For acados, remove if you are not using qpOASES
-                                #blasfeo    # For acados, remove if you are not using qpOASES
-                                #qpOASES_e  # For acados, remove if you are not using qpOASES
-                                #osqp       # For acados, remove if you are not using OSQP
-                                )
+        if (BLD_JETSON_ORIN_NANO OR BLD_WSL)
+            target_link_libraries(test_follow_target ${SD_COMMON_LINK_LIBS})
         endif()
 
         # Delivery test code
@@ -914,60 +765,8 @@ if (BUILD_TEST_HARNESS)
         cuda_add_executable(test_payload_delivery ${DELIVERY_TEST_SOURCES} ${DELIVERY_TEST_HEADERS})
         set_target_debug_flags(test_payload_delivery)
 
-        if (BLD_JETSON_ORIN_NANO)
-            target_link_libraries(test_payload_delivery 
-                                ${Protobuf_LIBRARIES}
-                                # MCAP dependencies
-                                mcap
-                                ${LZ4_LIBRARY}
-                                ${ZSTD_LIBRARY}
-                                ZLIB::ZLIB
-                                Threads::Threads
-                                # end MCAP dependencies
-                                trtinfer 
-                                ${OpenCV_LIBS} 
-                                vpi 
-                                opencv_core
-                                opencv_imgproc 
-                                opencv_imgcodecs 
-                                opencv_videoio
-                                jsoncpp
-                                ${ARMADILLO_LIBRARIES} 
-                                ${LAPACK_LIBRARIES} 
-                                ${BLAS_LIBRARIES}
-                                #acados     # For acados, remove if you are not using qpOASES
-                                #hpipm      # For acados, remove if you are not using qpOASES
-                                #blasfeo    # For acados, remove if you are not using qpOASES
-                                #qpOASES_e  # For acados, remove if you are not using qpOASES
-                                #osqp       # For acados, remove if you are not using OSQP
-                                )
-        elseif(BLD_WSL)
-            target_link_libraries(test_payload_delivery 
-                                ${Protobuf_LIBRARIES}
-                                # MCAP dependencies
-                                mcap
-                                ${LZ4_LIBRARY}
-                                ${ZSTD_LIBRARY}
-                                ZLIB::ZLIB
-                                Threads::Threads
-                                # end MCAP dependencies
-                                trtinfer 
-                                ${OpenCV_LIBS} 
-                                vpi 
-                                opencv_core
-                                opencv_imgproc 
-                                opencv_imgcodecs 
-                                opencv_videoio
-                                jsoncpp
-                                ${ARMADILLO_LIBRARIES} 
-                                ${LAPACK_LIBRARIES} 
-                                ${BLAS_LIBRARIES}
-                                #acados     # For acados, remove if you are not using qpOASES
-                                #hpipm      # For acados, remove if you are not using qpOASES
-                                #blasfeo    # For acados, remove if you are not using qpOASES
-                                #qpOASES_e  # For acados, remove if you are not using qpOASES
-                                #osqp       # For acados, remove if you are not using OSQP
-                                )
+        if (BLD_JETSON_ORIN_NANO OR BLD_WSL)
+            target_link_libraries(test_payload_delivery ${SD_COMMON_LINK_LIBS})
         endif()
     endif()
 endif()
