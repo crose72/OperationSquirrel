@@ -24,6 +24,8 @@
  ********************************************************************************/
 std::mutex scheduler_mutex;
 bool controller_initialiazed;
+Timer main_loop(std::chrono::milliseconds(25));
+Timer timer1;
 
 /********************************************************************************
  * Calibration definitions
@@ -34,8 +36,8 @@ bool controller_initialiazed;
  ********************************************************************************/
 
 /********************************************************************************
- * Function: 
- * Description: 
+ * Function:
+ * Description:
  ********************************************************************************/
 
 /********************************************************************************
@@ -59,7 +61,7 @@ int Scheduler::init(void)
 {
 
 #ifdef ENABLE_CV
-    
+
     if (!Video::init() ||
         !Detection::init() ||
         !Track::init() ||
@@ -68,7 +70,7 @@ int Scheduler::init(void)
     {
         return 1;
     }
-    
+
 #endif // ENABLE_CV
 
     if (!MavMsg::init() ||
@@ -91,27 +93,47 @@ int Scheduler::init(void)
  ********************************************************************************/
 void Scheduler::loop(void)
 {
-    Timer main_loop(std::chrono::milliseconds(25));
     std::lock_guard<std::mutex> lock(scheduler_mutex);
-    main_loop.start_time();
+    main_loop.start();
     SystemController::loop();
     MavMsg::loop();
 
 #ifdef ENABLE_CV
 
+    timer1.start();
     Video::in_loop();
+    timer1.stop();
+    spdlog::info("Video in loop time: {}", timer1.getLoopTime().count());
+    timer1.start();
     Detection::loop();
+    timer1.stop();
+    spdlog::info("Detection loop time: {}", timer1.getLoopTime().count());
+    timer1.start();
     Track::loop();
+    timer1.stop();
+    spdlog::info("Track loop time: {}", timer1.getLoopTime().count());
+    timer1.start();
     Localize::loop();
+    timer1.stop();
+    spdlog::info("Localization loop time: {}", timer1.getLoopTime().count());
+    timer1.start();
     PathPlanner::loop();
+    timer1.stop();
+    spdlog::info("Path planner loop time: {}", timer1.getLoopTime().count());
+    timer1.start();
     Video::out_loop();
+    timer1.stop();
+    spdlog::info("Video out loop time: {}", timer1.getLoopTime().count());
 
 #endif // ENABLE_CV
 
     VehicleController::loop();
+    timer1.start();
     DataLogger::loop();
+    timer1.stop();
+    spdlog::info("Datalogger loop time: {}", timer1.getLoopTime().count());
     Time::loop();
-    main_loop.end_time();
+    main_loop.stop();
     main_loop.wait();
 }
 
@@ -128,7 +150,7 @@ void Scheduler::shutdown(void)
     Time::shutdown();
 
 #ifdef ENABLE_CV
-    
+
     Track::shutdown();
     Localize::shutdown();
     PathPlanner::shutdown();
