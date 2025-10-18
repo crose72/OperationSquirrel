@@ -83,9 +83,8 @@ uint16_t MCAPLogger::addChannel(const std::string &topic,
     const auto descBytes = readAllBytes(descPath);
     if (descBytes.empty())
     {
-        std::cerr << "[MCAP] ERROR: Could not read descriptor set at "
-                  << descPath << " — Foxglove will show 'no such type: "
-                  << schemaName << "'\n";
+        spdlog::error("[MCAP] ERROR: Could not read descriptor set at {} — Foxglove will show 'no such type: {}",
+                      descPath, schemaName);
         return 0;
     }
 
@@ -108,9 +107,8 @@ uint16_t MCAPLogger::addChannel(const std::string &topic,
 
     mChannelMap[topic] = static_cast<uint16_t>(ch.id);
 
-    std::cout << "[MCAP] Added channel: " << topic
-              << " schema=" << schemaName
-              << " chId=" << ch.id << std::endl;
+    spdlog::info("[MCAP] Added channel: {} schema={} chId={}",
+                 topic, schemaName, ch.id);
 
     return static_cast<uint16_t>(ch.id);
 }

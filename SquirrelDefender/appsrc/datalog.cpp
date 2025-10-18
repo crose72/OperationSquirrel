@@ -64,6 +64,10 @@ std::string generate_unique_filename(const std::string &filename, const std::str
     return new_file_name;
 }
 
+/********************************************************************************
+ * Function: mkColor
+ * Description: Color for detected object annotations.
+ ********************************************************************************/
 static inline foxglove::Color mkColor(double r, double g, double b, double a = 1.0)
 {
     foxglove::Color c;
@@ -74,7 +78,11 @@ static inline foxglove::Color mkColor(double r, double g, double b, double a = 1
     return c;
 }
 
-void DataLogger::publishAnnotations(uint64_t ts_ns, const logger::Objects &objs)
+/********************************************************************************
+ * Function: publishAnnotations
+ * Description: Color for detected object annotations.
+ ********************************************************************************/
+void DataLogger::publishAnnotations(uint64_t ts_ns, const os::logger::Objects &objs)
 {
     foxglove::ImageAnnotations anno;
 
@@ -115,6 +123,10 @@ void DataLogger::publishAnnotations(uint64_t ts_ns, const logger::Objects &objs)
     }
 }
 
+/********************************************************************************
+ * Function: log_data
+ * Description: Write data to mcap file.
+ ********************************************************************************/
 void DataLogger::log_data(void)
 {
     if (!mMCAPLogger)
@@ -122,56 +134,20 @@ void DataLogger::log_data(void)
         return;
     }
 
-    // --- System state ---
+    // System state
     {
-        logger::SystemStateMsg m;
+        os::logger::SystemStateMsg m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
         m.set_system_state(static_cast<int32_t>(g_system_state));
         m.set_app_elapsed_time(g_app_elapsed_time);
         DataLogger::publish("/system/state", m, g_epoch_ns);
     }
 
-    // --- Target detections/tracks ---
+    // MAV system / metadata
     {
-        logger::TargetDetectionTrack m;
+        os::logger::MavSystem m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
-        m.set_target_valid(g_target_valid);
-        m.set_target_detection_id(static_cast<int32_t>(g_target_detection_id));
-        m.set_target_track_id(static_cast<int32_t>(g_target_track_id));
-        m.set_detection_class(g_detection_class);
-        m.set_target_detection_conf(g_target_detection_conf);
-        m.set_target_cntr_offset_x(g_target_cntr_offset_x);
-        m.set_target_cntr_offset_y(g_target_cntr_offset_y);
-        m.set_target_cntr_offset_x_filt(g_target_cntr_offset_x_filt);
-        m.set_target_cntr_offset_y_filt(g_target_cntr_offset_y_filt);
-        m.set_target_height(g_target_height);
-        m.set_target_width(g_target_width);
-        m.set_target_aspect(g_target_aspect);
-        m.set_target_left(g_target_left);
-        m.set_target_right(g_target_right);
-        m.set_target_top(g_target_top);
-        m.set_target_bottom(g_target_bottom);
-        DataLogger::publish("/target/detections", m, g_epoch_ns);
-    }
-
-    // --- Control adjustments ---
-    {
-        logger::ControlAdjust m;
-        DataLogger::logTime(m.mutable_t(), g_epoch_ns);
-        m.set_target_too_close(g_target_too_close);
-        m.set_vx_adjust(g_vx_adjust);
-        m.set_vy_adjust(g_vy_adjust);
-        m.set_vz_adjust(g_vz_adjust);
-        m.set_yaw_target(g_yaw_target);
-        m.set_yaw_target_error(g_yaw_target_error);
-        m.set_mav_veh_yaw_adjusted(g_mav_veh_yaw_adjusted);
-        DataLogger::publish("/control/adjust", m, g_epoch_ns);
-    }
-
-    // --- MAV system / metadata ---
-    {
-        logger::MavSystem m;
-        DataLogger::logTime(m.mutable_t(), g_epoch_ns);
+        m.set_frame_id(g_frame_id);
         m.set_sys_stat_voltage_battery(static_cast<uint32_t>(g_mav_veh_sys_stat_voltage_battery));
         m.set_sys_stat_current_battery(static_cast<int32_t>(g_mav_veh_sys_stat_current_battery));
         m.set_sys_stat_battery_remaining(static_cast<int32_t>(g_mav_veh_sys_stat_battery_remaining));
@@ -185,10 +161,11 @@ void DataLogger::log_data(void)
         DataLogger::publish("/mav/system", m, g_epoch_ns);
     }
 
-    // --- MAV kinematics / attitude ---
+    // MAV kinematics / attitude
     {
-        logger::MavKinematics m;
+        os::logger::MavKinematics m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
+        m.set_frame_id(g_frame_id);
         m.set_gps_vx(static_cast<int32_t>(g_mav_veh_gps_vx));
         m.set_gps_vy(static_cast<int32_t>(g_mav_veh_gps_vy));
         m.set_gps_vz(static_cast<int32_t>(g_mav_veh_gps_vz));
@@ -217,32 +194,35 @@ void DataLogger::log_data(void)
         DataLogger::publish("/mav/kinematics", m, g_epoch_ns);
     }
 
-    // --- MAV IMU raw ---
+    // MAV IMU raw
     {
-        logger::MavImuRaw m;
+        os::logger::MavImuRaw m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
+        m.set_frame_id(g_frame_id);
         m.set_imu_ax(static_cast<int32_t>(g_mav_veh_imu_ax));
         m.set_imu_ay(static_cast<int32_t>(g_mav_veh_imu_ay));
         m.set_imu_az(static_cast<int32_t>(g_mav_veh_imu_az));
         m.set_imu_xgyro(static_cast<int32_t>(g_mav_veh_imu_xgyro));
         m.set_imu_ygyro(static_cast<int32_t>(g_mav_veh_imu_ygyro));
         m.set_imu_zgyro(static_cast<int32_t>(g_mav_veh_imu_zgyro));
-        DataLogger::publish("/mav/imu_raw", m, g_epoch_ns);
+        DataLogger::publish("/mav/imu", m, g_epoch_ns);
     }
 
-    // --- Rangefinder ---
+    // Rangefinder
     {
-        logger::MavRangefinder m;
+        os::logger::MavRangefinder m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
+        m.set_frame_id(g_frame_id);
         m.set_current_distance(static_cast<uint32_t>(g_mav_veh_rngfdr_current_distance));
         m.set_signal_quality(static_cast<uint32_t>(g_mav_veh_rngfdr_signal_quality));
         DataLogger::publish("/mav/rangefinder", m, g_epoch_ns);
     }
 
-    // --- Optical flow ---
+    // Optical flow
     {
-        logger::MavOpticalFlow m;
+        os::logger::MavOpticalFlow m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
+        m.set_frame_id(g_frame_id);
         m.set_flow_comp_m_x(g_mav_veh_flow_comp_m_x);
         m.set_flow_comp_m_y(g_mav_veh_flow_comp_m_y);
         m.set_flow_x(static_cast<int32_t>(g_mav_veh_flow_x));
@@ -253,35 +233,11 @@ void DataLogger::log_data(void)
         DataLogger::publish("/mav/flow", m, g_epoch_ns);
     }
 
-    // --- Target estimate ---
+    // Detected objects
     {
-        logger::TargetEstimate m;
+        os::logger::Objects m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
-        m.set_d_target_h(g_d_target_h);
-        m.set_d_target_w(g_d_target_w);
-        m.set_x_target(g_x_target);
-        m.set_y_target(g_y_target);
-        m.set_z_target(g_z_target);
-        m.set_d_target(g_d_target);
-        m.set_x_error(g_x_error);
-        m.set_y_error(g_y_error);
-        m.set_delta_angle(g_delta_angle);
-        m.set_camera_tilt_angle(g_camera_tilt_angle);
-        m.set_delta_d_x(g_delta_d_x);
-        m.set_delta_d_z(g_delta_d_z);
-        m.set_x_target_ekf(g_x_target_ekf);
-        m.set_y_target_ekf(g_y_target_ekf);
-        m.set_vx_target_ekf(g_vx_target_ekf);
-        m.set_vy_target_ekf(g_vy_target_ekf);
-        m.set_ax_target_ekf(g_ax_target_ekf);
-        m.set_ay_target_ekf(g_ay_target_ekf);
-        m.set_target_data_useful(g_target_data_useful);
-        DataLogger::publish("/target/estimate", m, g_epoch_ns);
-    }
-
-    {
-        logger::Objects m;
-        DataLogger::logTime(m.mutable_t(), g_epoch_ns);
+        m.set_frame_id(g_frame_id);
 
         // Reserve to avoid reallocs
         m.mutable_detections()->Reserve(static_cast<int>(g_yolo_detections.size()));
@@ -307,9 +263,76 @@ void DataLogger::log_data(void)
             ++detectionCount;
         }
 
-        // Same publish style you used for TargetEstimate
+        // Same publish style you used for TargetLocation
         DataLogger::publish("/detection/objects", m, g_epoch_ns);
         publish("/camera/annotations", m, g_epoch_ns); // schema name must be foxglove.ImageAnnotations
+    }
+
+    // Target detections/tracks
+    {
+        os::logger::TargetDetection m;
+        DataLogger::logTime(m.mutable_t(), g_epoch_ns);
+        m.set_frame_id(g_frame_id);
+        m.set_target_valid(g_target_valid);
+        m.set_target_detection_num(static_cast<int32_t>(g_target_detection_num));
+        m.set_target_track_id(static_cast<int32_t>(g_target_track_id));
+        m.set_detection_class(g_detection_class);
+        m.set_target_detection_conf(g_target_detection_conf);
+        m.set_target_cntr_offset_x(g_target_cntr_offset_x);
+        m.set_target_cntr_offset_y(g_target_cntr_offset_y);
+        m.set_target_cntr_offset_x_filt(g_target_cntr_offset_x_filt);
+        m.set_target_cntr_offset_y_filt(g_target_cntr_offset_y_filt);
+        m.set_target_height(g_target_height);
+        m.set_target_width(g_target_width);
+        m.set_target_aspect(g_target_aspect);
+        m.set_target_left(g_target_left);
+        m.set_target_right(g_target_right);
+        m.set_target_top(g_target_top);
+        m.set_target_bottom(g_target_bottom);
+        DataLogger::publish("/target/detection", m, g_epoch_ns);
+    }
+
+    // Target estimate
+    {
+        os::logger::TargetLocation m;
+        DataLogger::logTime(m.mutable_t(), g_epoch_ns);
+        m.set_frame_id(g_frame_id);
+        m.set_d_target_h(g_d_target_h);
+        m.set_d_target_w(g_d_target_w);
+        m.set_x_target(g_x_target);
+        m.set_y_target(g_y_target);
+        m.set_z_target(g_z_target);
+        m.set_d_target(g_d_target);
+        m.set_delta_angle(g_delta_angle);
+        m.set_camera_tilt_angle(g_camera_tilt_angle);
+        m.set_delta_d_x(g_delta_d_x);
+        m.set_delta_d_z(g_delta_d_z);
+        m.set_x_target_ekf(g_x_target_ekf);
+        m.set_y_target_ekf(g_y_target_ekf);
+        m.set_vx_target_ekf(g_vx_target_ekf);
+        m.set_vy_target_ekf(g_vy_target_ekf);
+        m.set_ax_target_ekf(g_ax_target_ekf);
+        m.set_ay_target_ekf(g_ay_target_ekf);
+        m.set_target_data_useful(g_target_data_useful);
+        DataLogger::publish("/target/location", m, g_epoch_ns);
+    }
+
+    // Control adjustments
+    {
+        os::logger::ControlOutput m;
+        DataLogger::logTime(m.mutable_t(), g_epoch_ns);
+        m.set_frame_id(g_frame_id);
+        m.set_target_too_close(g_target_too_close);
+        m.set_x_error(g_x_error);
+        m.set_y_error(g_y_error);
+        m.set_yaw_error(g_yaw_target_error);
+        m.set_yaw_adjusted_for_playback(g_mav_veh_yaw_adjusted_for_playback);
+        m.set_yaw_target(g_yaw_target);
+        m.set_vx_adjust(g_vx_adjust);
+        m.set_vy_adjust(g_vy_adjust);
+        m.set_vz_adjust(g_vz_adjust);
+        m.set_yaw_adjust(g_yaw_adjust);
+        DataLogger::publish("/path/control", m, g_epoch_ns);
     }
 }
 
@@ -353,17 +376,17 @@ bool DataLogger::init(void)
     mMCAPLogger = std::make_unique<MCAPLogger>(path, "profile");
 
     // Register channels (schema names must match package.Message)
-    mMCAPLogger->addChannel("/system/state", "logger.SystemStateMsg", "protobuf");
-    mMCAPLogger->addChannel("/target/detections", "logger.TargetDetectionTrack", "protobuf");
-    mMCAPLogger->addChannel("/target/estimate", "logger.TargetEstimate", "protobuf");
-    mMCAPLogger->addChannel("/control/adjust", "logger.ControlAdjust", "protobuf");
-    mMCAPLogger->addChannel("/mav/system", "logger.MavSystem", "protobuf");
-    mMCAPLogger->addChannel("/mav/kinematics", "logger.MavKinematics", "protobuf");
-    mMCAPLogger->addChannel("/mav/imu_raw", "logger.MavImuRaw", "protobuf");
-    mMCAPLogger->addChannel("/mav/rangefinder", "logger.MavRangefinder", "protobuf");
-    mMCAPLogger->addChannel("/mav/flow", "logger.MavOpticalFlow", "protobuf");
-    mMCAPLogger->addChannel("/detection/objects", "logger.Objects", "protobuf");
-    mMCAPLogger->addChannel("/image/annotation", "foxglove.ImageAnnotations", "protobuf");
+    mMCAPLogger->addChannel("/system/state", "os.logger.SystemStateMsg", "protobuf");
+    mMCAPLogger->addChannel("/target/detection", "os.logger.TargetDetection", "protobuf");
+    mMCAPLogger->addChannel("/target/location", "os.logger.TargetLocation", "protobuf");
+    mMCAPLogger->addChannel("/path/control", "os.logger.ControlOutput", "protobuf");
+    mMCAPLogger->addChannel("/mav/system", "os.logger.MavSystem", "protobuf");
+    mMCAPLogger->addChannel("/mav/kinematics", "os.logger.MavKinematics", "protobuf");
+    mMCAPLogger->addChannel("/mav/imu", "os.logger.MavImuRaw", "protobuf");
+    mMCAPLogger->addChannel("/mav/rangefinder", "os.logger.MavRangefinder", "protobuf");
+    mMCAPLogger->addChannel("/mav/flow", "os.logger.MavOpticalFlow", "protobuf");
+    mMCAPLogger->addChannel("/detection/objects", "os.logger.Objects", "protobuf");
+    mMCAPLogger->addChannel("/detection/annotations", "foxglove.ImageAnnotations", "protobuf");
 
     return true;
 }

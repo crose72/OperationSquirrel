@@ -18,6 +18,7 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <spdlog/spdlog.h>
 
 /********************************************************************************
  * Imported objects

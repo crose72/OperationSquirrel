@@ -1,6 +1,6 @@
 // detection.proto
 syntax = "proto3";
-package logger;
+package os.logger;
 
 import "Common.proto";
 
@@ -27,5 +27,7 @@ message Detection {
 
 message Objects {
   Time t          = 1;
+  uint32 frame_id  = 2;
+  
   repeated Detection detections = 4;
 }

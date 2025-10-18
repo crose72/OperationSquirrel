@@ -32,7 +32,7 @@ float target_detection_thresh;
 float target_class;
 bool target_valid_prv;
 bool g_target_valid;
-int g_target_detection_id;
+int g_target_detection_num;
 int g_target_track_id;
 float g_target_cntr_offset_x;
 float g_target_cntr_offset_y;
@@ -111,18 +111,18 @@ void get_tracking_params(void)
  ********************************************************************************/
 void identify_target(void)
 {
-    g_target_detection_id = -1;
+    g_target_detection_num = -1;
 
 #if defined(BLD_JETSON_B01)
 
     for (int n = 0; n < g_detection_count; ++n)
     {
-        g_detection_class = g_detections[n].ClassID;
-        g_target_detection_conf = g_detections[n].Confidence;
         /* A tracked object, classified as a person with some confidence level */
-        if (g_detections[n].TrackID >= 0 && g_detection_class == target_class && g_target_detection_conf > target_detection_thresh)
+        if (g_detections[n].TrackID >= 0 && g_detections[n].ClassID == target_class && g_detections[n].Confidence > target_detection_thresh)
         {
-            g_target_detection_id = n;
+            g_detection_class = g_detections[n].ClassID;
+            g_target_detection_conf = g_detections[n].Confidence;
+            g_target_detection_num = n;
             return;
         }
     }
@@ -131,12 +131,12 @@ void identify_target(void)
 
     for (int n = 0; n < g_yolo_detection_count; ++n)
     {
-        g_detection_class = g_yolo_detections[n].label;
-        g_target_detection_conf = g_yolo_detections[n].probability;
         /* A tracked object, classified as a person with some confidence level */
-        if (g_detection_class == target_class && g_yolo_detections[n].probability > target_detection_thresh)
+        if (g_yolo_detections[n].label == target_class && g_yolo_detections[n].probability > target_detection_thresh)
         {
-            g_target_detection_id = n;
+            g_detection_class = g_yolo_detections[n].label;
+            g_target_detection_conf = g_yolo_detections[n].probability;
+            g_target_detection_num = n;
             return;
         }
     }
@@ -145,12 +145,12 @@ void identify_target(void)
 
     for (int n = 0; n < g_yolo_detection_count; ++n)
     {
-        g_detection_class = g_yolo_detections[n].ClassID;
-        g_target_detection_conf = g_yolo_detections[n].Confidence;
         /* A tracked object, classified as a person with some confidence level */
-        if (g_detection_class == target_class && g_target_detection_conf > target_detection_thresh)
+        if (g_yolo_detections[n].ClassID == target_class && g_yolo_detections[n].Confidence > target_detection_thresh)
         {
-            g_target_detection_id = n;
+            g_detection_class = g_yolo_detections[n].ClassID;
+            g_target_detection_conf = g_yolo_detections[n].Confidence;
+            g_target_detection_num = n;
             return;
         }
     }
@@ -169,41 +169,43 @@ void identify_target(void)
  ********************************************************************************/
 void get_target_info(void)
 {
+    g_target_track_id = (int)-1;
+
 #if defined(BLD_JETSON_B01)
 
-    if (g_target_detection_id >= 0)
+    if (g_target_detection_num >= 0)
     {
-        g_target_height = g_detections[g_target_detection_id].Height();
-        g_target_width = g_detections[g_target_detection_id].Width();
-        g_target_track_id = g_detections[g_target_detection_id].TrackID;
-        g_target_left = g_detections[g_target_detection_id].Left;
-        g_target_right = g_detections[g_target_detection_id].Right;
-        g_target_top = g_detections[g_target_detection_id].Top;
-        g_target_bottom = g_detections[g_target_detection_id].Bottom;
+        g_target_height = g_detections[g_target_detection_num].Height();
+        g_target_width = g_detections[g_target_detection_num].Width();
+        g_target_track_id = g_detections[g_target_detection_num].TrackID;
+        g_target_left = g_detections[g_target_detection_num].Left;
+        g_target_right = g_detections[g_target_detection_num].Right;
+        g_target_top = g_detections[g_target_detection_num].Top;
+        g_target_bottom = g_detections[g_target_detection_num].Bottom;
     }
 
 #elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-    if (g_target_detection_id >= 0)
+    if (g_target_detection_num >= 0)
     {
-        g_target_height = g_yolo_detections[g_target_detection_id].rect.height;
-        g_target_width = g_yolo_detections[g_target_detection_id].rect.width;
+        g_target_height = g_yolo_detections[g_target_detection_num].rect.height;
+        g_target_width = g_yolo_detections[g_target_detection_num].rect.width;
         g_target_track_id = 0;
-        g_target_left = g_yolo_detections[g_target_detection_id].rect.x;
+        g_target_left = g_yolo_detections[g_target_detection_num].rect.x;
         g_target_right = g_target_left + g_target_width;
-        g_target_top = g_yolo_detections[g_target_detection_id].rect.y;
+        g_target_top = g_yolo_detections[g_target_detection_num].rect.y;
     }
 
 #elif defined(BLD_WIN)
 
-    if (g_target_detection_id >= 0)
+    if (g_target_detection_num >= 0)
     {
-        g_target_height = g_yolo_detections[g_target_detection_id].rect.height;
-        g_target_width = g_yolo_detections[g_target_detection_id].rect.width;
+        g_target_height = g_yolo_detections[g_target_detection_num].rect.height;
+        g_target_width = g_yolo_detections[g_target_detection_num].rect.width;
         g_target_track_id = 0;
-        g_target_left = g_yolo_detections[g_target_detection_id].rect.x;
+        g_target_left = g_yolo_detections[g_target_detection_num].rect.x;
         g_target_right = g_target_left + g_target_width;
-        g_target_top = g_yolo_detections[g_target_detection_id].rect.y;
+        g_target_top = g_yolo_detections[g_target_detection_num].rect.y;
     }
 
 #else
@@ -233,7 +235,7 @@ void validate_target(void)
 
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
         implimented. */
-    if (g_target_detection_id >= 0 && g_target_track_id >= 0 && g_target_height > 1 && g_target_width > 1)
+    if (g_target_detection_num >= 0 && g_target_track_id >= 0 && g_target_height > 1 && g_target_width > 1)
     {
         g_target_valid = true;
     }
@@ -246,7 +248,7 @@ void validate_target(void)
 
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
     implimented. */
-    if (g_target_detection_id >= 0 && g_target_height > 1 && g_target_width > 1)
+    if (g_target_detection_num >= 0 && g_target_height > 1 && g_target_width > 1)
     {
         g_target_valid = true;
     }
@@ -438,7 +440,7 @@ bool Track::init(void)
     g_target_right = (float)0.0;
     g_target_top = (float)0.0;
     g_target_bottom = (float)0.0;
-    g_target_detection_id = -1;
+    g_target_detection_num = -1;
     g_detection_class = (float)0.0;
     g_target_detection_conf = (float)0.0;
 

@@ -1,5 +1,5 @@
 syntax = "proto3";
-package logger;
+package os.logger;
 
 // Common time header: exact epoch ns + seconds for plotting.
 message Time {

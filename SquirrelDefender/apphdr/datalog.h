@@ -29,6 +29,7 @@
 #include "Mavlink.pb.h"
 #include "System.pb.h"
 #include "Detection.pb.h"
+#include "Path.pb.h"
 #include "ImageAnnotations.pb.h"
 
 /********************************************************************************
@@ -36,6 +37,8 @@
  ********************************************************************************/
 /* Mavlink variables */
 extern float g_app_elapsed_time;
+extern uint64_t g_epoch_ns;
+extern uint32_t g_frame_id;
 
 extern uint16_t g_mav_veh_sys_stat_voltage_battery;
 extern int16_t g_mav_veh_sys_stat_current_battery;
@@ -97,7 +100,7 @@ extern uint8_t g_mav_veh_mavlink_version;
 /* Detect/Track target variables */
 extern std::vector<Object> g_yolo_detections;
 extern bool g_target_valid;
-extern int g_target_detection_id;
+extern int g_target_detection_num;
 extern int g_target_track_id;
 extern float g_target_cntr_offset_x;
 extern float g_target_cntr_offset_y;
@@ -139,14 +142,12 @@ extern float g_vy_adjust;
 extern float g_vz_adjust;
 extern float g_yaw_target;
 extern float g_yaw_target_error;
-extern float g_mav_veh_yaw_adjusted;
+extern float g_mav_veh_yaw_adjusted_for_playback;
 extern float g_target_cntr_offset_x_filt;
 extern float g_target_cntr_offset_y_filt;
 
 /* System variables */
 extern SystemState g_system_state;
-
-extern uint64_t g_epoch_ns;
 
 /********************************************************************************
  * Exported objects
@@ -167,9 +168,9 @@ public:
     static void shutdown();
     static void log_data();
 
-    void publishAnnotations(uint64_t ts_ns, const logger::Objects &objs);
+    void publishAnnotations(uint64_t ts_ns, const os::logger::Objects &objs);
 
-    static inline void logTime(logger::Time *t, uint64_t ts_ns)
+    static inline void logTime(os::logger::Time *t, uint64_t ts_ns)
     {
         t->set_timestamp_ns(ts_ns);
         t->set_timestamp_sec(static_cast<double>(ts_ns) * 1e-9);
