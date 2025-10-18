@@ -1,3 +1,5 @@
+#pragma once
+
 /********************************************************************************
  * @file    path_planner
  * @author  Cameron Rose
@@ -53,7 +55,7 @@ extern float g_vy_adjust;
 extern float g_vz_adjust;
 extern float g_yaw_target;
 extern float g_yaw_adjust;
-extern float g_mav_veh_yaw_adjusted;
+extern float g_mav_veh_yaw_adjusted_for_playback;
 extern float g_yaw_target_error;
 
 /********************************************************************************

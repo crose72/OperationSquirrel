@@ -1,5 +1,5 @@
 # Ensure ${OS_WS} is defined
-docker pull crose72/os-dev:cuda12.6-trt10.5-cv4.10-sm86-vpi3.2-ubuntu22
+docker pull crose72/os-dev:cuda12.6-trt10.5-cv4.10-sm86-vpi3.2-mcap-ubuntu22
 sudo docker run --gpus all -it --rm --network host \
   --add-host=host.docker.internal:host-gateway \
   --privileged --ipc=host \
@@ -33,6 +33,6 @@ sudo docker run --gpus all -it --rm --network host \
   --volume ${OS_WS}:/workspace \
   --volume ${OS_WS}/OperationSquirrel/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender \
   --name squirreldefender-dev \
-  crose72/os-dev:cuda12.6-trt10.5-cv4.10-sm86-vpi3.2-ubuntu22 \
+  crose72/os-dev:cuda12.6-trt10.5-cv4.10-sm86-vpi3.2-mcap-ubuntu22 \
   bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build \
     && exec bash"

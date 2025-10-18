@@ -1,3 +1,5 @@
+#pragma once
+
 /********************************************************************************
  * @file    localize_target.h
  * @author  Cameron Rose
@@ -19,13 +21,14 @@
 #include "time_calc.h"
 #include "kf.h"
 #include <cmath>
+#include "datalog.h"
 
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
 extern float g_mav_veh_pitch;
 extern bool g_target_valid;
-extern int g_target_detection_id;
+extern int g_target_detection_num;
 extern int g_target_track_id;
 extern float g_target_cntr_offset_x;
 extern float g_target_cntr_offset_y;
@@ -43,6 +46,7 @@ extern float g_mav_veh_local_ned_z;
 extern float g_target_cntr_offset_x_filt;
 extern float g_target_cntr_offset_x;
 extern const float g_input_video_height;
+extern uint64_t g_epoch_ns;
 
 /********************************************************************************
  * Exported objects

@@ -73,10 +73,10 @@ int Scheduler::init(void)
 
 #endif // ENABLE_CV
 
-    if (!MavMsg::init() ||
+    if (!Time::init() ||
+        !MavMsg::init() ||
         !DataLogger::init() ||
         !VehicleController::init() ||
-        !Time::init() ||
         !SystemController::init())
     {
         return 1;

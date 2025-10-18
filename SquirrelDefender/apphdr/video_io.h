@@ -70,6 +70,7 @@ extern cv::Mat g_image;
 extern const float g_input_video_width;
 extern const float g_input_video_height;
 extern bool g_end_of_video;
+extern uint32_t g_frame_id;
 
 #else
 
