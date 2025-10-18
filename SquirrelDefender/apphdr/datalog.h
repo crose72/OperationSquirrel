@@ -23,6 +23,9 @@
 #include "localize_target.h"
 #include "detect_target.h"
 #include "time_calc.h"
+
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+
 #include "mcap_logger.h"
 #include "Common.pb.h"
 #include "Target.pb.h"
@@ -31,6 +34,8 @@
 #include "Detection.pb.h"
 #include "Path.pb.h"
 #include "ImageAnnotations.pb.h"
+
+#endif // logger options
 
 /********************************************************************************
  * Imported objects
@@ -157,6 +162,8 @@ extern SystemState g_system_state;
  * Function prototypes and Class Definitions
  ********************************************************************************/
 
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+
 class DataLogger
 {
 public:
@@ -193,5 +200,22 @@ private:
     static std::unique_ptr<MCAPLogger> mMCAPLogger;
     static std::mutex s_mtx;
 };
+
+#else // default to old logger
+
+class DataLogger
+{
+public:
+    DataLogger();
+    ~DataLogger();
+
+    static bool init(void);
+    static void loop(void);
+    static void shutdown(void);
+
+private:
+};
+
+#endif // logger options
 
 #endif // DATALOG_H
