@@ -163,6 +163,36 @@ public:
         return requireColumn(header);
     }
 
+    void eraseRow(size_t i)
+    {
+        if (i >= nrows_)
+            return; // or throw, if you prefer
+
+        for (auto &kv : columns_)
+        {
+            auto &col = kv.second;
+            if (i < col.size())
+            {
+                col.erase(col.begin() + static_cast<std::ptrdiff_t>(i));
+            }
+        }
+        --nrows_;
+    }
+
+    bool dropFirstRowIfDuplicateZero(const std::string &timeHeader)
+    {
+        if (nrows_ < 2)
+            return false;
+        float t0 = static_cast<float>((*this)(timeHeader, 0));
+        float t1 = static_cast<float>((*this)(timeHeader, 1));
+        if (t0 == 0.0f && t1 == 0.0f)
+        {
+            eraseRow(0);
+            return true;
+        }
+        return false;
+    }
+
 private:
     char delim_;
     size_t nrows_ = 0;
