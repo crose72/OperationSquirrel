@@ -1,4 +1,5 @@
 #include "test_utils/test_csv_utils.h"
+#include "test_utils/csv_reader.h"
 #include "global_objects.h"
 #include "localize_target.h"
 #include "delivery_planner.h"
@@ -15,100 +16,63 @@ std::string test_output_path;
 std::string test_output_file_name;
 std::string test_unique_output_file_name;
 std::ofstream test_output_file;
-size_t num_test_steps;
-float time_prv;
+size_t num_test_steps = 0;
+float time_prv = 0.0f;
 
-std::vector<float> g_app_elapsed_time_arr;
-std::vector<float> g_target_valid_arr;
-std::vector<float> g_target_detection_num_arr;
-std::vector<float> g_target_track_id_arr;
-std::vector<float> g_detection_class_arr;
-std::vector<float> g_target_detection_conf_arr;
-std::vector<float> g_target_cntr_offset_x_arr;
-std::vector<float> g_target_cntr_offset_y_arr;
-std::vector<float> g_target_cntr_offset_x_filt_arr;
-std::vector<float> g_target_cntr_offset_y_filt_arr;
-std::vector<float> g_target_height_arr;
-std::vector<float> g_target_width_arr;
-std::vector<float> g_target_aspect_arr;
-std::vector<float> g_target_left_arr;
-std::vector<float> g_target_right_arr;
-std::vector<float> g_target_top_arr;
-std::vector<float> g_target_bottom_arr;
-std::vector<float> g_mav_veh_local_ned_vx_arr;
-std::vector<float> g_mav_veh_local_ned_vy_arr;
-std::vector<float> g_mav_veh_imu_ax_arr;
-std::vector<float> g_mav_veh_imu_ay_arr;
-std::vector<float> g_mav_veh_imu_az_arr;
-std::vector<float> g_mav_veh_yaw_arr;
-std::vector<float> g_mav_veh_pitch_arr;
-std::vector<float> g_mav_veh_local_ned_z_arr;
-std::vector<float> g_yaw_target_arr;
+// NEW: single CSV loader, no more per-column vectors
+std::unique_ptr<CSVReader> g_csv;
 
 void init_test_inputs(void)
 {
     test_inputs = test_params.get_string_param("Input_File", "File_Name");
 
-    // Create array of input signals for playback
-    g_app_elapsed_time_arr = get_column_data<float>(test_inputs, "g_app_elapsed_time");
-    g_target_valid_arr = get_column_data<float>(test_inputs, "g_target_valid");
-    g_target_detection_num_arr = get_column_data<float>(test_inputs, "g_target_detection_num");
-    g_target_track_id_arr = get_column_data<float>(test_inputs, "g_target_track_id");
-    g_detection_class_arr = get_column_data<float>(test_inputs, "g_detection_class");
-    g_target_detection_conf_arr = get_column_data<float>(test_inputs, "g_target_detection_conf");
-    g_target_cntr_offset_x_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_x");
-    g_target_cntr_offset_y_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_y");
-    g_target_cntr_offset_x_filt_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_x_filt");
-    g_target_cntr_offset_y_filt_arr = get_column_data<float>(test_inputs, "g_target_cntr_offset_y_filt");
-    g_target_height_arr = get_column_data<float>(test_inputs, "g_target_height");
-    g_target_width_arr = get_column_data<float>(test_inputs, "g_target_width");
-    g_target_aspect_arr = get_column_data<float>(test_inputs, "g_target_aspect");
-    g_target_left_arr = get_column_data<float>(test_inputs, "g_target_left");
-    g_target_right_arr = get_column_data<float>(test_inputs, "g_target_right");
-    g_target_top_arr = get_column_data<float>(test_inputs, "g_target_top");
-    g_target_bottom_arr = get_column_data<float>(test_inputs, "g_target_bottom");
-    g_mav_veh_local_ned_vx_arr = get_column_data<float>(test_inputs, "g_mav_veh_local_ned_vx");
-    g_mav_veh_local_ned_vy_arr = get_column_data<float>(test_inputs, "g_mav_veh_local_ned_vy");
-    g_mav_veh_imu_ax_arr = get_column_data<float>(test_inputs, "g_mav_veh_imu_ax");
-    g_mav_veh_imu_ay_arr = get_column_data<float>(test_inputs, "g_mav_veh_imu_ay");
-    g_mav_veh_imu_az_arr = get_column_data<float>(test_inputs, "g_mav_veh_imu_az");
-    g_mav_veh_yaw_arr = get_column_data<float>(test_inputs, "g_mav_veh_yaw");
-    g_mav_veh_pitch_arr = get_column_data<float>(test_inputs, "g_mav_veh_pitch");
-    g_mav_veh_local_ned_z_arr = get_column_data<float>(test_inputs, "g_mav_veh_local_ned_z");
-    g_yaw_target_arr = get_column_data<float>(test_inputs, "g_yaw_target");
+    // Load the CSV once
+    g_csv = std::make_unique<CSVReader>(test_inputs, ',');
 
-    // Check if any input signal arrays are empty
-    if (g_app_elapsed_time_arr.empty() ||
-        g_target_valid_arr.empty() ||
-        g_target_detection_num_arr.empty() ||
-        g_target_track_id_arr.empty() ||
-        g_target_cntr_offset_x_arr.empty() ||
-        g_target_cntr_offset_y_arr.empty() ||
-        g_target_cntr_offset_x_filt_arr.empty() ||
-        g_target_cntr_offset_y_filt_arr.empty() ||
-        g_target_height_arr.empty() ||
-        g_target_width_arr.empty() ||
-        g_target_aspect_arr.empty() ||
-        g_target_left_arr.empty() ||
-        g_target_right_arr.empty() ||
-        g_target_top_arr.empty() ||
-        g_target_bottom_arr.empty() ||
-        g_mav_veh_local_ned_vx_arr.empty() ||
-        g_mav_veh_local_ned_vy_arr.empty() ||
-        g_mav_veh_imu_ax_arr.empty() ||
-        g_mav_veh_imu_ay_arr.empty() ||
-        g_mav_veh_imu_az_arr.empty() ||
-        g_mav_veh_yaw_arr.empty() ||
-        g_mav_veh_pitch_arr.empty() ||
-        g_yaw_target_arr.empty())
+    // Basic sanity checks for required columns
+    const char *required_cols[] = {
+        "g_app_elapsed_time",
+        "g_target_valid",
+        "g_target_detection_num",
+        "g_target_track_id",
+        "g_detection_class",
+        "g_target_detection_conf",
+        "g_target_cntr_offset_x",
+        "g_target_cntr_offset_y",
+        "g_target_cntr_offset_x_filt",
+        "g_target_cntr_offset_y_filt",
+        "g_target_height",
+        "g_target_width",
+        "g_target_aspect",
+        "g_target_left",
+        "g_target_right",
+        "g_target_top",
+        "g_target_bottom",
+        "g_mav_veh_local_ned_vx",
+        "g_mav_veh_local_ned_vy",
+        "g_mav_veh_imu_ax",
+        "g_mav_veh_imu_ay",
+        "g_mav_veh_imu_az",
+        "g_mav_veh_yaw",
+        "g_mav_veh_pitch",
+        "g_mav_veh_local_ned_z",
+        "g_yaw_target"};
+
+    for (const char *col : required_cols)
     {
-        std::cerr << "Error: No signal data found!" << std::endl;
-        return;
+        if (!g_csv->hasColumn(col))
+        {
+            throw std::runtime_error(std::string("Missing required column in CSV: ") + col);
+        }
     }
 
-    // Additional initializations
-    time_prv = 0.0;
-    num_test_steps = g_app_elapsed_time_arr.size();
+    num_test_steps = g_csv->rows();
+    if (num_test_steps == 0)
+    {
+        std::cerr << "Error: No signal data rows found!\n";
+    }
+
+    time_prv = 0.0f;
 }
 
 void init_test_output(void)
@@ -203,41 +167,39 @@ void init_software_components(void)
 
 void get_test_inputs(size_t data_index)
 {
-    // Set inputs
-    g_app_elapsed_time = g_app_elapsed_time_arr[data_index];
-    g_target_valid = g_target_valid_arr[data_index];
-    g_target_detection_num = g_target_detection_num_arr[data_index];
-    g_target_track_id = g_target_track_id_arr[data_index];
-    g_detection_class = g_detection_class_arr[data_index];
-    g_target_detection_conf = g_target_detection_conf_arr[data_index];
-    g_target_cntr_offset_x = g_target_cntr_offset_x_arr[data_index];
-    g_target_cntr_offset_y = g_target_cntr_offset_y_arr[data_index];
-    g_target_cntr_offset_x_filt = g_target_cntr_offset_x_filt_arr[data_index];
-    g_target_cntr_offset_y_filt = g_target_cntr_offset_y_filt_arr[data_index];
-    g_target_height = g_target_height_arr[data_index];
-    g_target_width = g_target_width_arr[data_index];
-    g_target_aspect = g_target_aspect_arr[data_index];
-    g_target_left = g_target_left_arr[data_index];
-    g_target_right = g_target_right_arr[data_index];
-    g_target_top = g_target_top_arr[data_index];
-    g_target_bottom = g_target_bottom_arr[data_index];
-    g_mav_veh_local_ned_vx = g_mav_veh_local_ned_vx_arr[data_index];
-    g_mav_veh_local_ned_vy = g_mav_veh_local_ned_vy_arr[data_index];
-    g_mav_veh_imu_ax = g_mav_veh_imu_ax_arr[data_index];
-    g_mav_veh_imu_ay = g_mav_veh_imu_ay_arr[data_index];
-    g_mav_veh_imu_az = g_mav_veh_imu_az_arr[data_index];
-    g_mav_veh_yaw = g_mav_veh_yaw_arr[data_index];
-    g_mav_veh_pitch = g_mav_veh_pitch_arr[data_index];
-    g_mav_veh_local_ned_z = g_mav_veh_local_ned_z_arr[data_index];
-    g_yaw_target = g_yaw_target_arr[data_index];
+    // Read inputs directly from CSV by header at the row index
+    g_app_elapsed_time = (float)(*g_csv)("g_app_elapsed_time", data_index);
+    g_target_valid = (float)(*g_csv)("g_target_valid", data_index);
+    g_target_detection_num = (float)(*g_csv)("g_target_detection_num", data_index);
+    g_target_track_id = (float)(*g_csv)("g_target_track_id", data_index);
+    g_detection_class = (float)(*g_csv)("g_detection_class", data_index);
+    g_target_detection_conf = (float)(*g_csv)("g_target_detection_conf", data_index);
+    g_target_cntr_offset_x = (float)(*g_csv)("g_target_cntr_offset_x", data_index);
+    g_target_cntr_offset_y = (float)(*g_csv)("g_target_cntr_offset_y", data_index);
+    g_target_cntr_offset_x_filt = (float)(*g_csv)("g_target_cntr_offset_x_filt", data_index);
+    g_target_cntr_offset_y_filt = (float)(*g_csv)("g_target_cntr_offset_y_filt", data_index);
+    g_target_height = (float)(*g_csv)("g_target_height", data_index);
+    g_target_width = (float)(*g_csv)("g_target_width", data_index);
+    g_target_aspect = (float)(*g_csv)("g_target_aspect", data_index);
+    g_target_left = (float)(*g_csv)("g_target_left", data_index);
+    g_target_right = (float)(*g_csv)("g_target_right", data_index);
+    g_target_top = (float)(*g_csv)("g_target_top", data_index);
+    g_target_bottom = (float)(*g_csv)("g_target_bottom", data_index);
+    g_mav_veh_local_ned_vx = (float)(*g_csv)("g_mav_veh_local_ned_vx", data_index);
+    g_mav_veh_local_ned_vy = (float)(*g_csv)("g_mav_veh_local_ned_vy", data_index);
+    g_mav_veh_imu_ax = (float)(*g_csv)("g_mav_veh_imu_ax", data_index);
+    g_mav_veh_imu_ay = (float)(*g_csv)("g_mav_veh_imu_ay", data_index);
+    g_mav_veh_imu_az = (float)(*g_csv)("g_mav_veh_imu_az", data_index);
+    g_mav_veh_yaw = (float)(*g_csv)("g_mav_veh_yaw", data_index);
+    g_mav_veh_pitch = (float)(*g_csv)("g_mav_veh_pitch", data_index);
+    g_mav_veh_local_ned_z = (float)(*g_csv)("g_mav_veh_local_ned_z", data_index);
+    g_yaw_target = (float)(*g_csv)("g_yaw_target", data_index);
 
     // Calculate timestep manually since this is not running on the drone in real time
     g_dt = g_app_elapsed_time - time_prv;
     time_prv = g_app_elapsed_time;
 
-    // Have to calculate the bounding box for the localize algo since
-    // it's calculated in the track_target function (or update the inputs
-    // to this test case and call Track::loop)
+    // Derive bbox center for the localize algo (unchanged logic)
     g_target_center_y = (g_target_left + g_target_right) / 2.0f;
     g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
 }
@@ -322,7 +284,7 @@ void save_test_output(void)
 {
     // Close file after writing to it
     test_output_file.close();
-    std::cout << "Processing complete. Results saved to" << test_unique_output_file_name << "\n";
+    std::cout << "Processing complete. Results saved to " << test_unique_output_file_name << "\n";
 }
 
 void setup(void)
@@ -336,17 +298,10 @@ void run(void)
 {
     for (size_t i = 0; i < num_test_steps; ++i)
     {
-        if (g_app_elapsed_time_arr[i] != NULL)
-        {
-            // Input signals at the start of the loopp
-            get_test_inputs(i);
-
-            // Calculate outputs using desired functions
-            run_loops();
-
-            // Save results to csv file
-            write_test_outputs();
-        }
+        // Using CSV row count as source of truth; no NULL checks needed
+        get_test_inputs(i);
+        run_loops();
+        write_test_outputs();
     }
 
     save_test_output();
