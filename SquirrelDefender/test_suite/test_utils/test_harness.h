@@ -1,4 +1,16 @@
 #pragma once
+
+/********************************************************************************
+ * @file    test_harness.h
+ * @author  Cameron Rose
+ * @date    10/19/2025
+ ********************************************************************************/
+#ifndef TEST_HARNESS_H
+#define TEST_HARNESS_H
+
+/********************************************************************************
+ * Includes
+ ********************************************************************************/
 #include <unordered_map>
 #include <unordered_set>
 #include <functional>
@@ -7,10 +19,14 @@
 #include <ostream>
 #include <type_traits>
 #include "csv_reader.h"
-
 #include <memory>
 #include <fstream>
 #include <iostream>
+
+/********************************************************************************
+ * Function prototypes
+ ********************************************************************************/
+
 // Minimal, header-only harness.
 // Usage from your test file:
 //   1) Define INPUT_VARS(X) and OUTPUT_VARS(X)
@@ -172,3 +188,5 @@ private:
 #undef TESTHARNESS_REGISTER_OUTPUT
 #define TESTHARNESS_REGISTER_INPUT(name) g_h.regInput(#name, name);
 #define TESTHARNESS_REGISTER_OUTPUT(name) g_h.regOutput(#name, name);
+
+#endif // TEST_HARNESS_H

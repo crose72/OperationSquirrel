@@ -733,26 +733,6 @@ if (BUILD_TEST_HARNESS)
         list(APPEND TEST_SOURCE_BASE ${TEST_UTIL_SOURCES})
         include_directories(${CMAKE_CURRENT_SOURCE_DIR}/test_suite)
 
-        # Localize target test code
-        set(LOC_TEST_SOURCES ${TEST_SOURCE_BASE})
-        list(APPEND LOC_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_localize_target.cpp)
-        list(APPEND LOC_TEST_HEADERS ${TEST_UTIL_HEADERS})
-
-        cuda_add_executable(test_localize_target ${LOC_TEST_SOURCES} ${LOC_TEST_HEADERS})
-        set_target_debug_flags(test_localize_target)
-
-        target_link_libraries(test_localize_target 
-            squirrel_protos
-            ${Protobuf_LIBRARIES}
-            ${SD_COMMON_LINK_LIBS})
-
-        # Wire in protos only if they were defined
-        if (TARGET squirrel_protos)
-            add_dependencies(test_localize_target 
-                squirrel_protos 
-                squirrel_protos_desc)
-        endif()
-
         # Follow target test code
         set(FOLLOW_TEST_SOURCES ${TEST_SOURCE_BASE})
         list(APPEND FOLLOW_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_follow_target.cpp)

@@ -1,9 +1,9 @@
-#include "test_utils/test_csv_utils.h"
-#include "test_utils/csv_reader.h"
 #include "test_utils/test_harness.h"
-#include "global_objects.h"
+#include "test_utils/csv_reader.h"
+#include "test_utils/test_utils.h"
 
 // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
+#include "global_objects.h"
 #include "localize_target.h"
 #include "time_calc.h"
 #include "datalog.h"
