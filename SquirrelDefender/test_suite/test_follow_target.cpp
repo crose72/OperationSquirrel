@@ -5,7 +5,6 @@
 
 // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
 #include "localize_target.h"
-#include "delivery_planner.h"
 #include "time_calc.h"
 #include "datalog.h"
 #include "param_reader.h"
@@ -163,13 +162,6 @@ void init_test_outputs(void)
     g_h.writeHeader(test_output_file);
 }
 
-void init_software_components(void)
-{
-    // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
-    Localize::init();
-    PathPlanner::init();
-}
-
 void get_test_inputs(size_t data_index)
 {
     // Set inputs from CSV
@@ -186,13 +178,6 @@ void get_test_inputs(size_t data_index)
     g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
 }
 
-void run_loops(void)
-{
-    // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
-    Localize::loop();
-    PathPlanner::loop();
-}
-
 void write_test_outputs(void)
 {
     g_h.writeRow(test_output_file);
@@ -202,6 +187,21 @@ void save_test_output(void)
 {
     test_output_file.close();
     std::cout << "Processing complete. Results saved to " << test_unique_output_file_name << "\n";
+}
+
+void init_software_components(void)
+{
+    // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
+    // Initialize all inputs to the software component
+    Localize::init();
+    PathPlanner::init();
+}
+
+void run_loops(void)
+{
+    // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
+    Localize::loop();
+    PathPlanner::loop();
 }
 
 void setup(void)
@@ -227,8 +227,12 @@ void run(void)
  ********************************************************************************/
 int main()
 {
+    // Read in data from log file
     setup();
+
+    // Run the inputs through the function
     run();
+
     return 0;
 }
 
