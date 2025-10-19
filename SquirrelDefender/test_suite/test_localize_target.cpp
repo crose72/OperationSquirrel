@@ -18,7 +18,7 @@ float time_prv;
 
 std::vector<float> g_app_elapsed_time_arr;
 std::vector<float> g_target_valid_arr;
-std::vector<float> g_target_detection_id_arr;
+std::vector<float> g_target_detection_num_arr;
 std::vector<float> g_target_track_id_arr;
 std::vector<float> g_detection_class_arr;
 std::vector<float> g_target_detection_conf_arr;
@@ -47,7 +47,7 @@ void init_test_inputs(void)
     // Create array of input signals for playback
     g_app_elapsed_time_arr = get_column_data<float>(test_inputs, "g_app_elapsed_time");
     g_target_valid_arr = get_column_data<float>(test_inputs, "g_target_valid");
-    g_target_detection_id_arr = get_column_data<float>(test_inputs, "g_target_detection_id");
+    g_target_detection_num_arr = get_column_data<float>(test_inputs, "g_target_detection_num");
     g_target_track_id_arr = get_column_data<float>(test_inputs, "g_target_track_id");
     g_detection_class_arr = get_column_data<float>(test_inputs, "g_detection_class");
     g_target_detection_conf_arr = get_column_data<float>(test_inputs, "g_target_detection_conf");
@@ -72,7 +72,7 @@ void init_test_inputs(void)
     // Check if any input signal arrays are empty
     if (g_app_elapsed_time_arr.empty() ||
         g_target_valid_arr.empty() ||
-        g_target_detection_id_arr.empty() ||
+        g_target_detection_num_arr.empty() ||
         g_target_track_id_arr.empty() ||
         g_target_cntr_offset_x_arr.empty() ||
         g_target_cntr_offset_y_arr.empty() ||
@@ -120,7 +120,7 @@ void init_test_output(void)
     test_output_file
         << "g_app_elapsed_time,"
         << "g_target_valid,"
-        << "g_target_detection_id,"
+        << "g_target_detection_num,"
         << "g_target_track_id,"
         << "g_detection_class,"
         << "g_target_detection_conf,"
@@ -182,7 +182,7 @@ void get_test_inputs(size_t data_index)
     // Set inputs
     g_app_elapsed_time = g_app_elapsed_time_arr[data_index];
     g_target_valid = g_target_valid_arr[data_index];
-    g_target_detection_id = g_target_detection_id_arr[data_index];
+    g_target_detection_num = g_target_detection_num_arr[data_index];
     g_target_track_id = g_target_track_id_arr[data_index];
     g_detection_class = g_detection_class_arr[data_index];
     g_target_detection_conf = g_target_detection_conf_arr[data_index];
@@ -226,7 +226,7 @@ void write_test_outputs(void)
     test_output_file
         << g_app_elapsed_time << ","
         << g_target_valid << ","
-        << g_target_detection_id << ","
+        << g_target_detection_num << ","
         << g_target_track_id << ","
         << g_detection_class << ","
         << g_target_detection_conf << ","
