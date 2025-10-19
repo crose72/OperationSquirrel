@@ -1,5 +1,3 @@
-#pragma once
-
 #ifdef ENABLE_CV
 
 /********************************************************************************
@@ -22,8 +20,8 @@
  ********************************************************************************/
 #ifdef BLD_JETSON_B01
 
-extern videoSource* g_input;
-extern uchar3* g_image;
+extern videoSource *g_input;
+extern uchar3 *g_image;
 
 #elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 
@@ -34,7 +32,6 @@ extern cv::Mat g_image;
 #error "Please define a build platform."
 
 #endif
-
 
 /********************************************************************************
  * Exported objects

@@ -1,5 +1,3 @@
-#pragma once
-
 #ifdef ENABLE_CV
 #ifdef BLD_JETSON_B01
 
@@ -46,8 +44,7 @@ public:
     SSD(void);
     ~SSD(void);
 
-    
-    static bool init(void);
+        static bool init(void);
     static void loop(void);
     static void shutdown(void);
 

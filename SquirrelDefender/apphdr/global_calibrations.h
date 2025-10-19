@@ -1,5 +1,3 @@
-#pragma once
-
 /********************************************************************************
  * @file    global_calibrations.h
  * @author  Cameron Rose

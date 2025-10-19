@@ -1,5 +1,3 @@
-#pragma once
-
 #ifdef ENABLE_CV
 #ifdef BLD_JETSON_B01
 
