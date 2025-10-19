@@ -202,6 +202,7 @@ void calc_follow_error(void)
         g_x_error = (g_x_target_ekf - x_desired);
     }
 
+    // Currently set to 0 - not sending a y component velocity vector
     g_y_error = y_desired;
 }
 

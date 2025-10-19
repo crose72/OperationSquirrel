@@ -197,7 +197,7 @@ void init_kf_loc(void);
 void calc_fov(void);
 void dtrmn_target_loc_img(void);
 void dtrmn_target_loc_real(void);
-void update_target_loc(void);
+void update_target_loc_real(void);
 
 /********************************************************************************
  * Function: get_localization_params
@@ -461,7 +461,7 @@ void dtrmn_target_loc_real(void)
         y_idx_pix = get_float_index(std::fabs(g_target_cntr_offset_y), &y_offset_pixels[0], MAX_IDX_Y_PIXEL_OFFSET, true);
         float y_target_est = get_2d_interpolated_value(&y_offset[0][0], MAX_IDX_Y_PIXEL_OFFSET, MAX_IDX_Y_D_OFFSET, y_idx_pix, y_idx_d);
 
-        y_target_est = g_meter_per_pix * g_target_cntr_offset_y_mov_avg;
+        y_target_est = g_meter_per_pix * g_target_cntr_offset_y;
 
         g_y_target = y_target_est;
 
@@ -478,10 +478,10 @@ void dtrmn_target_loc_real(void)
 }
 
 /********************************************************************************
- * Function: update_target_loc
+ * Function: update_target_loc_real
  * Description: Update step in kalman filter.
  ********************************************************************************/
-void update_target_loc(void)
+void update_target_loc_real(void)
 {
     if (g_target_data_useful && g_dt > 0.0001)
     {
@@ -570,7 +570,7 @@ void Localize::loop(void)
     calc_fov();
     dtrmn_target_loc_img();
     dtrmn_target_loc_real();
-    update_target_loc();
+    update_target_loc_real();
 }
 
 /********************************************************************************
