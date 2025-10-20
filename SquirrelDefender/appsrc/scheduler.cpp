@@ -100,39 +100,18 @@ void Scheduler::loop(void)
 
 #ifdef ENABLE_CV
 
-    timer1.start();
     Video::in_loop();
-    timer1.stop();
-    spdlog::info("Video in loop time: {}", timer1.getLoopTime().count());
-    timer1.start();
     Detection::loop();
-    timer1.stop();
-    spdlog::info("Detection loop time: {}", timer1.getLoopTime().count());
-    timer1.start();
     Track::loop();
-    timer1.stop();
-    spdlog::info("Track loop time: {}", timer1.getLoopTime().count());
-    timer1.start();
     Localize::loop();
-    timer1.stop();
-    spdlog::info("Localization loop time: {}", timer1.getLoopTime().count());
-    timer1.start();
     PathPlanner::loop();
-    timer1.stop();
-    spdlog::info("Path planner loop time: {}", timer1.getLoopTime().count());
-    timer1.start();
     Video::out_loop();
-    timer1.stop();
-    spdlog::info("Video out loop time: {}", timer1.getLoopTime().count());
 
 #endif // ENABLE_CV
 
     VehicleController::loop();
-    timer1.start();
+    Time::loop(); // Keep this before the datalogger - else MCAP breaks
     DataLogger::loop();
-    timer1.stop();
-    spdlog::info("Datalogger loop time: {}", timer1.getLoopTime().count());
-    Time::loop();
     main_loop.stop();
     main_loop.wait();
 }
