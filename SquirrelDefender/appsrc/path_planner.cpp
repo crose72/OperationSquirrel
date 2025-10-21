@@ -11,6 +11,8 @@
  * Includes
  ********************************************************************************/
 #include "path_planner.h"
+#include <algorithm> // for std::min/std::max
+#include <cmath>     // for sin/cos/atan2
 
 /********************************************************************************
  * Typedefs
@@ -19,7 +21,68 @@
 /********************************************************************************
  * Private macros and defines
  ********************************************************************************/
-#define NUM_VX_DECEL_STEPS 10
+
+static inline float clampf(float v, float lo, float hi) { return std::max(lo, std::min(v, hi)); }
+
+struct Vector2f
+{
+    float x = 0.f;
+    float y = 0.f;
+};
+
+/* 1D jerk+accel limiter: tracks v toward v_cmd with bounded jerk & accel.
+   Use one of these structs per dimension being controlled. */
+struct MotionProfile1D
+{
+    float v = 0.f;      // shaped value
+    float a = 0.f;      // internal accel state
+    float a_max = 3.5f; // accel cap (m/s^2 or rad/s^2)
+    float j_max = 8.0f; // jerk  cap (m/s^3 or rad/s^3)
+
+    void update(float v_cmd, float dt, float k_v2a = 2.0f)
+    {
+        // desired accel is difference between the raw velocity
+        // command and the last shaped velocity command
+        const float a_des = (v_cmd - v) * k_v2a;
+
+        // limit the acceleration to min/max jerk
+        const float da = clampf(a_des - a, -j_max * dt, j_max * dt);
+
+        // limit accel to min/max allowed accel
+        a = clampf(a + da, -a_max, a_max);
+
+        // update velocity command
+        v += a * dt;
+    }
+};
+
+/* 2D velocity shaper: independent 1D limiters for x & y */
+struct MotionProfiler2D
+{
+    MotionProfile1D x;
+    MotionProfile1D y;
+
+    void setLimits(float a_max_xy, float j_max_xy)
+    {
+        x.a_max = y.a_max = a_max_xy;
+        x.j_max = y.j_max = j_max_xy;
+    }
+
+    void reset(float vx = 0.f, float vy = 0.f)
+    {
+        x.v = vx;
+        y.v = vy;
+        x.a = y.a = 0.f;
+    }
+
+    void update(const Vector2f &v_cmd, float dt)
+    {
+        x.update(v_cmd.x, dt);
+        y.update(v_cmd.y, dt);
+    }
+
+    Vector2f value() const { return {x.v, y.v}; }
+};
 
 /********************************************************************************
  * Object definitions
@@ -27,7 +90,7 @@
 PID pid_forwd;
 PID pid_rev;
 PID pid_yaw;
-
+MotionProfiler2D g_vel_shaper; // shapes (g_vx_adjust, g_vy_adjust)
 bool g_target_too_close;
 bool yaw_initial_latched;
 float g_x_error;
@@ -100,21 +163,9 @@ float w3_yaw = (float)0.0;
 float x_desired = (float)4.0;
 float y_desired = (float)0.0;
 
-float vx_cmd_max_allowed = (float)10.0;   // max allowed velocity
-float vx_cmd_ramp_step_size = (float)0.5; // m/s²
-float vx_cmd_max_ramp_rate = (float)2.5;  // m/s²
-float vx_cmd_diverge_sensitivity = (float)0.05;
-float vx_cmd_parabolic_easing_thresh = (float)1.0;
-float vx_cmd_parabolic_easing_max = (float)1.0;
-float vx_cmd_filt_coef = (float)0.05;
-
-const float camera_half_fov = (float)0.7423; // half of 83 degree FOV camera
-
-const float vx_decel_profile_start_idx[NUM_VX_DECEL_STEPS] = {
-    4.500, 2.757, 1.689, 1.034, 0.634, 0.389, 0.239, 0.146, 0.089, 0.054};
-
-const float vx_decel_profile[NUM_VX_DECEL_STEPS] = {
-    4.500, 2.757, 1.689, 1.034, 0.634, 0.389, 0.239, 0.146, 0.089, 0.054};
+float vxy_cmd_max_allowed_accel = (float)2.5; // m/s²  -> used as shaping accel cap
+float vxy_max_allowed_jerk = 8.0f;            // m/s^3 for x and y (jerk cap)
+float cam0_half_fov = (float)0.7423;          // half of 83 degree FOV camera
 
 /********************************************************************************
  * Function definitions
@@ -176,14 +227,11 @@ void get_path_params(void)
     x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_offset");
     y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_offset");
 
-    vx_cmd_max_allowed = follow_control.get_float_param("Follow_Params", "CMD_vel_max_cmd");
-    vx_cmd_max_ramp_rate = follow_control.get_float_param("Follow_Params", "CMD_vel_max_ramp_rate");
-    vx_cmd_ramp_step_size = follow_control.get_float_param("Follow_Params", "CMD_vel_ramp_step_size");
-    vx_cmd_diverge_sensitivity = follow_control.get_float_param("Follow_Params", "CMD_vel_diverge_sensitivity");
-    vx_cmd_parabolic_easing_thresh = follow_control.get_float_param("Follow_Params", "CMD_vel_parabolic_eas_thresh");
-    vx_cmd_parabolic_easing_max = follow_control.get_float_param("Follow_Params", "CMD_vel_parabolic_eas_max_cmd");
+    vxy_cmd_max_allowed_accel = follow_control.get_float_param("Follow_Params", "CMD_vxy_max_allowed_accel");
+    vxy_max_allowed_jerk = follow_control.get_float_param("Follow_Params", "CMD_vxy_max_allowed_jerk");
 
-    vx_cmd_filt_coef = follow_control.get_float_param("Follow_Params", "CMD_vel_X_filt_coef");
+    // Camera params
+    cam0_half_fov = follow_control.get_float_param("Follow_Params", "CAM0_FOV") * (float)0.5;
 }
 
 /********************************************************************************
@@ -219,31 +267,31 @@ void calc_yaw_target_error(void)
     {
         yaw_initial = g_mav_veh_yaw;
         yaw_initial_latched = true;
-        // Yaw has a max value of PI and a min value of - PI.
+        // Yaw has a max value of M_PI and a min value of - M_PI.
         // If the sum of the yaw target and the initial latched yaw state of the
-        // vehicle results in a value < -PI or > PI then the yaw value will have
-        // to account for that, since when yaw becomes > PI or < -PI it rolls over
+        // vehicle results in a value < -M_PI or > M_PI then the yaw value will have
+        // to account for that, since when yaw becomes > M_PI or < -M_PI it rolls over
         // positive sign to negative or visa versa.
-        float abs_min_yaw_temp = yaw_initial - camera_half_fov;
+        float abs_min_yaw_temp = yaw_initial - cam0_half_fov;
 
-        if (abs_min_yaw_temp >= -PI)
+        if (abs_min_yaw_temp >= -M_PI)
         {
             min_yaw = abs_min_yaw_temp;
         }
         else
         {
-            min_yaw = PI - (std::abs(abs_min_yaw_temp) - PI);
+            min_yaw = M_PI - (std::abs(abs_min_yaw_temp) - M_PI);
         }
 
-        float abs_max_yaw_temp = yaw_initial + camera_half_fov;
+        float abs_max_yaw_temp = yaw_initial + cam0_half_fov;
 
-        if (abs_max_yaw_temp <= PI)
+        if (abs_max_yaw_temp <= M_PI)
         {
             max_yaw = abs_max_yaw_temp;
         }
         else
         {
-            max_yaw = -(PI - (abs_max_yaw_temp - PI));
+            max_yaw = -(M_PI - (abs_max_yaw_temp - M_PI));
         }
     }
 
@@ -267,24 +315,24 @@ void calc_yaw_target_error(void)
     // Corrections for when yaw changes signs
     float abs_yaw_target = 0.0;
 
-    if ((g_yaw_target + g_mav_veh_yaw) < -PI)
+    if ((g_yaw_target + g_mav_veh_yaw) < -M_PI)
     {
-        abs_yaw_target = PI - (std::abs(g_yaw_target) - PI);
+        abs_yaw_target = M_PI - (std::abs(g_yaw_target) - M_PI);
     }
-    else if ((g_yaw_target + g_mav_veh_yaw) > PI)
+    else if ((g_yaw_target + g_mav_veh_yaw) > M_PI)
     {
-        abs_yaw_target = -(PI - (std::abs(g_yaw_target) - PI));
+        abs_yaw_target = -(M_PI - (std::abs(g_yaw_target) - M_PI));
     }
 
-    float abs_max_yaw_temp = yaw_initial + camera_half_fov;
+    float abs_max_yaw_temp = yaw_initial + cam0_half_fov;
 
-    if (abs_max_yaw_temp <= PI)
+    if (abs_max_yaw_temp <= M_PI)
     {
         max_yaw = abs_max_yaw_temp;
     }
     else
     {
-        max_yaw = -(PI - (abs_max_yaw_temp - PI));
+        max_yaw = -(M_PI - (abs_max_yaw_temp - M_PI));
     }
 
     // If using video playback then subtract the initial yaw to track
@@ -303,44 +351,59 @@ void calc_yaw_target_error(void)
 /********************************************************************************
  * Function: dtrmn_vel_cmd
  * Description: Determine the follow vector based on the vehicle's error between
-                the desired target offset and the actual target offset.
+ *              the desired target offset and the actual target offset.
  ********************************************************************************/
 void dtrmn_vel_cmd(void)
 {
-    g_target_too_close = (g_x_error < 0.0);
+    g_target_too_close = (g_x_error < 0.0f);
 
+    // PID control outputs - these are the control setpoints (vx, vy, etc)
     if (g_target_valid && g_target_too_close)
     {
         g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                   g_x_error, 0.0, 0.0,
-                                   w1_x_rev, 0.0, 0.0, ControlDim::X, g_dt);
+                                   g_x_error, 0.0f, 0.0f,
+                                   w1_x_rev, 0.0f, 0.0f, ControlDim::X, g_dt);
 
         g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                   g_y_error, 0.0, 0.0,
-                                   w1_y_rev, 0.0, 0.0, ControlDim::Y, g_dt);
+                                   g_y_error, 0.0f, 0.0f,
+                                   w1_y_rev, 0.0f, 0.0f, ControlDim::Y, g_dt);
+
         g_yaw_adjust = pid_yaw.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
-                                    g_yaw_target_error, 0.0, 0.0,
-                                    w1_yaw, 0.0, 0.0, ControlDim::YAW, g_dt);
+                                    g_yaw_target_error, 0.0f, 0.0f,
+                                    w1_yaw, 0.0f, 0.0f, ControlDim::YAW, g_dt);
     }
     else if (g_target_valid && !g_target_too_close)
     {
         g_vx_adjust = pid_forwd.pid3(Kp_x, Ki_x, Kd_x,
-                                     g_x_error, 0.0, 0.0,
-                                     w1_x, 0.0, 0.0, ControlDim::X, g_dt);
+                                     g_x_error, 0.0f, 0.0f,
+                                     w1_x, 0.0f, 0.0f, ControlDim::X, g_dt);
 
         g_vy_adjust = pid_forwd.pid3(Kp_y, Ki_y, Kd_y,
-                                     g_y_error, 0.0, 0.0,
-                                     w1_y, 0.0, 0.0, ControlDim::Y, g_dt);
+                                     g_y_error, 0.0f, 0.0f,
+                                     w1_y, 0.0f, 0.0f, ControlDim::Y, g_dt);
+
         g_yaw_adjust = pid_yaw.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
-                                    g_yaw_target_error, 0.0, 0.0,
-                                    w1_yaw, 0.0, 0.0, ControlDim::YAW, g_dt);
+                                    g_yaw_target_error, 0.0f, 0.0f,
+                                    w1_yaw, 0.0f, 0.0f, ControlDim::YAW, g_dt);
     }
     else
     {
-        g_vx_adjust = (float)0.0;
-        g_vy_adjust = (float)0.0;
-        g_yaw_adjust = (float)0.0;
+        // Raw commands go to zero when target invalid
+        g_vx_adjust = 0.0f;
+        g_vy_adjust = 0.0f;
+        g_yaw_adjust = 0.0f;
     }
+
+    // PID provides the raw command to reach the target
+    // Map your max-ramp-rate knob to the accel cap; jerk is separate.
+    // This ensures any update (including update-to-zero) is turned into a smooth S-curve.
+    // It does so by limiting the velocity command
+    g_vel_shaper.update(Vector2f{g_vx_adjust, g_vy_adjust}, g_dt);
+    const Vector2f v_shaped = g_vel_shaper.value();
+
+    // Updated control setpoints with smoothing
+    g_vx_adjust = v_shaped.x;
+    g_vy_adjust = v_shaped.y;
 
     target_valid_last_cycle = g_target_valid;
     vx_adjust_prv = g_vx_adjust;
@@ -351,13 +414,13 @@ void dtrmn_vel_cmd(void)
  * Function: PathPlanner
  * Description: PathPlanner class constructor.
  ********************************************************************************/
-PathPlanner::PathPlanner(void) {};
+PathPlanner::PathPlanner(void) {}
 
 /********************************************************************************
  * Function: ~PathPlanner
  * Description: PathPlanner class destructor.
  ********************************************************************************/
-PathPlanner::~PathPlanner(void) {};
+PathPlanner::~PathPlanner(void) {}
 
 /********************************************************************************
  * Function: init
@@ -385,10 +448,11 @@ bool PathPlanner::init(void)
     g_mav_veh_yaw_adjusted_for_playback = (float)0.0;
     x_error_prv = (float)0.0;
     vx_adjust_prv = (float)0.0;
-    vx_decel_prof_idx = (float)0.0;
-    decel_profile_active = false;
-    profile_sign = (int)1;
     target_valid_last_cycle = false;
+    g_vel_shaper.setLimits(/*a_max_xy=*/vxy_cmd_max_allowed_accel,
+                           /*j_max_xy=*/vxy_max_allowed_jerk);
+    g_vel_shaper.reset(/*vx=*/(float)0.0,
+                       /*vy=*/(float)0.0);
 
     return true;
 }

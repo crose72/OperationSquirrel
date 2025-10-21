@@ -11,6 +11,7 @@
  * Includes
  ********************************************************************************/
 #include "localize_target.h"
+#include <cmath>
 
 /********************************************************************************
  * Typedefs
@@ -413,7 +414,7 @@ void dtrmn_target_loc_real(void)
         }
 
         /* Calculate true camera angle relative to the ground, adjusting for pitch. */
-        g_camera_comp_angle = (PI / (float)2.0) - camera_fixed_angle;
+        g_camera_comp_angle = (M_PI / (float)2.0) - camera_fixed_angle;
         g_camera_tilt_angle = g_mav_veh_pitch - camera_fixed_angle;
 
         /* Calculate the x and z distances of the target relative to the drone camera (positive z is down).*/

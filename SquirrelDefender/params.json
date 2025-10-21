@@ -100,11 +100,8 @@
         "Desired_X_pix_offset": 0.0,
         "Desired_Y_pix_offset": 0.0,
         "CMD_vel_max_cmd": 10.0,
-        "CMD_vel_max_ramp_rate": 2.5,
-        "CMD_vel_ramp_step_size": 2.0,
-        "CMD_vel_diverge_sensitivity": 0.05,
-        "CMD_vel_parabolic_eas_thresh": 0.25,
-        "CMD_vel_parabolic_eas_max_cmd": 10.0,
-        "CMD_vel_X_filt_coef": 0.1
+        "CMD_vxy_max_allowed_accel": 3.5,
+        "CMD_vxy_max_allowed_jerk": 8.0,
+        "CAM0_FOV": 1.832596
     }
 }
