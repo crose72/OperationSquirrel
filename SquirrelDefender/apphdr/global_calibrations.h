@@ -18,6 +18,5 @@ extern const uint8_t SENDER_SYS_ID;
 extern const uint8_t SENDER_COMP_ID;
 extern const uint8_t TARGET_SYS_ID;
 extern const uint8_t TARGET_COMP_ID;
-extern const float PI;
 
 #endif // GLOBAL_CALIBRATIONS_H
