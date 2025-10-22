@@ -14,19 +14,6 @@
 #include "common_inc.h"
 #include "video_io.h"
 #include "detect_target.h"
-#include "param_reader.h"
-#include "signal_processing.h"
-#include <opencv2/opencv.hpp>
-#include <opencv2/tracking.hpp>
-#include <opencv2/core/utility.hpp>
-#include <opencv2/cudawarping.hpp>
-
-#ifdef BLD_JETSON_B01
-
-#include <jetson-utils/cudaMappedMemory.h> // Assuming Jetson Inference utilities are available
-#include <jetson-utils/cudaRGB.h>          // For cuda functions
-
-#endif // BLD_JETSON_B01
 
 /********************************************************************************
  * Imported objects
@@ -46,6 +33,7 @@ extern const float g_input_video_height;
 extern std::vector<Object> g_yolo_detections;
 extern int g_yolo_detection_count;
 extern cv::Mat g_image;
+extern cv::cuda::GpuMat g_image_gpu;
 extern const float g_input_video_width;
 extern const float g_input_video_height;
 

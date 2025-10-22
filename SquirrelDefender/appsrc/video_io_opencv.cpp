@@ -28,6 +28,7 @@
  ********************************************************************************/
 std::string base_path = "../data/";
 cv::Mat g_image;
+cv::cuda::GpuMat g_image_gpu;
 cv::Mat image_overlay;
 cv::VideoCapture cap;
 cv::VideoWriter video_writer;
@@ -203,9 +204,11 @@ bool capture_image(void)
         return false;
     }
 
-    ++g_frame_id;
     g_valid_image_rcvd = true;
     video_fps_actual = ((g_dt > (float)0.000001) ? (1 / g_dt) : (float)0.0);
+
+    g_image_gpu.upload(g_image);
+    ++g_frame_id;
 
     return true;
 }
@@ -253,6 +256,14 @@ void video_mods(void)
         "fps",
         std::to_string(video_fps_actual),
         cv::Point(10, g_image.rows - 30), // bottom-left
+        0.5,                              // font scale
+        cv::Scalar(255, 255, 255),        // white
+        1);
+    overlay_text(
+        g_image,
+        "f",
+        std::to_string(g_frame_id),
+        cv::Point(10, g_image.rows - 50), // bottom-left
         0.5,                              // font scale
         cv::Scalar(255, 255, 255),        // white
         1);

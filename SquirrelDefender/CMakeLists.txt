@@ -51,8 +51,8 @@ project(SquirrelDefender)
 
 # Choose ONLY ONE platform for the build (BLD_JETSON_B01, BLD_WSL, BLD_WIN) 
 option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" OFF)
-option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" ON)
-option(BLD_WSL "Compiling for BLD_WSL" OFF)
+option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" OFF)
+option(BLD_WSL "Compiling for BLD_WSL" ON)
 option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
@@ -417,6 +417,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/math)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/json)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/print)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/yolo)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/osnet)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/pid)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/timer)
 
@@ -430,6 +431,8 @@ file(GLOB JSON_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/json/*.cpp)
 file(GLOB JSON_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/json/*.h)
 file(GLOB YOLO_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/yolo/*.cpp)
 file(GLOB YOLO_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/yolo/*.h)
+file(GLOB OSNET_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/osnet/*.cpp)
+file(GLOB OSNET_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/osnet/*.h)
 file(GLOB PRINT_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/print/*.cpp)
 file(GLOB PRINT_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/print/*.h)
 file(GLOB PID_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/pid/*.cpp)
@@ -482,10 +485,12 @@ file(GLOB HEADERS ${HEADER_DIR}/*.h)
 # Additional source files to compile together
 list(APPEND SOURCES ${MAV_UTILS_SOURCES} ${SERIAL_UTILS_SOURCES} ${MATH_UTILS_SOURCES} 
                     ${JSON_UTILS_SOURCES} ${PRINT_UTILS_SOURCES} ${YOLO_UTILS_SOURCES} 
-                    ${PID_SOURCES} ${TIMER_SOURCES} ${KF_SOURCES} ${SS_SOURCES} ${MCAP_LOGGER_SOURCES})
+                    ${PID_SOURCES} ${TIMER_SOURCES} ${KF_SOURCES} ${SS_SOURCES} 
+                    ${MCAP_LOGGER_SOURCES} ${OSNET_UTILS_SOURCES})
 list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HEADERS} 
                     ${JSON_UTILS_HEADERS} ${PRINT_UTILS_HEADERS} ${YOLO_UTILS_HEADERS} 
-                    ${PID_HEADERS} ${TIMER_HEADERS} ${KF_HEADERS} ${SS_HEADERS} ${MCAP_LOGGER_HEADERS})
+                    ${PID_HEADERS} ${TIMER_HEADERS} ${KF_HEADERS} ${SS_HEADERS} 
+                    ${MCAP_LOGGER_HEADERS} ${OSNET_UTILS_HEADERS})
 
 #=============================================================================
 # Generate protobuf source code from protobuf definitions

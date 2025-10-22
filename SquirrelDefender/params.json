@@ -68,7 +68,8 @@
         "BBox_Filt_coeff": 0.75,
         "Detect_Thresh": 0.67,
         "Detect_Class_Orin": 0,
-        "Detect_Class_B01": 1
+        "Detect_Class_B01": 1,
+        "Track_similarity_thresh": 0.55
     },
     "Localization_Params": {
         "H_loc_00": 1.0,
