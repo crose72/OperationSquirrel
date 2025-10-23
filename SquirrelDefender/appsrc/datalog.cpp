@@ -276,7 +276,7 @@ void DataLogger::log_data(void)
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
         m.set_frame_id(g_frame_id);
         m.set_target_valid(g_target_valid);
-        m.set_target_detection_num(static_cast<int32_t>(g_target_detection_num));
+        m.set_target_detection_id(static_cast<int32_t>(g_target_detection_id));
         m.set_target_track_id(static_cast<int32_t>(g_target_track_id));
         m.set_detection_class(g_detection_class);
         m.set_target_detection_conf(g_target_detection_conf);
@@ -386,7 +386,7 @@ void write_headers(void)
                               "g_system_state",
                               "g_target_too_close",
                               "g_target_valid",
-                              "g_target_detection_num",
+                              "g_target_detection_id",
                               "g_target_track_id",
                               "g_detection_class",
                               "g_target_detection_conf",
@@ -494,7 +494,7 @@ void log_data(void)
                                std::to_string(g_system_state),
                                std::to_string(g_target_too_close),
                                std::to_string(g_target_valid),
-                               std::to_string(g_target_detection_num),
+                               std::to_string(g_target_detection_id),
                                std::to_string(g_target_track_id),
                                std::to_string(g_detection_class),
                                std::to_string(g_target_detection_conf),

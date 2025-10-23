@@ -58,7 +58,7 @@ extern bool g_valid_image_rcvd;
  * Exported objects
  ********************************************************************************/
 extern bool g_target_valid;
-extern int g_target_detection_num;
+extern int g_target_detection_id;
 extern int g_target_track_id;
 extern float g_target_cntr_offset_x;
 extern float g_target_cntr_offset_y;
@@ -79,11 +79,11 @@ extern float g_target_cntr_offset_y_filt;
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class Track
+class Tracking
 {
 public:
-    Track();
-    ~Track();
+    Tracking();
+    ~Tracking();
 
     static bool init(void);
     static void loop(void);

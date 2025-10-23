@@ -64,7 +64,7 @@ int Scheduler::init(void)
 
     if (!Video::init() ||
         !Detection::init() ||
-        !Track::init() ||
+        !Tracking::init() ||
         !Localize::init() ||
         !PathPlanner::init())
     {
@@ -102,7 +102,7 @@ void Scheduler::loop(void)
 
     Video::in_loop();
     Detection::loop();
-    Track::loop();
+    Tracking::loop();
     Localize::loop();
     PathPlanner::loop();
     Video::out_loop();
@@ -130,7 +130,7 @@ void Scheduler::shutdown(void)
 
 #ifdef ENABLE_CV
 
-    Track::shutdown();
+    Tracking::shutdown();
     Localize::shutdown();
     PathPlanner::shutdown();
     PathPlanner::shutdown();

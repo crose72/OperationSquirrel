@@ -35,7 +35,7 @@
 /********************************************************************************
  * Private macros and defines
  ********************************************************************************/
-struct ObjectTrack
+struct Track
 {
     Object obj;
     int id;
@@ -52,7 +52,7 @@ float target_detection_thresh;
 float target_class;
 bool target_valid_prv;
 bool g_target_valid;
-int g_target_detection_num;
+int g_target_detection_id;
 int g_target_track_id;
 float g_target_cntr_offset_x;
 float g_target_cntr_offset_y;
@@ -71,15 +71,13 @@ float g_target_cntr_offset_x_filt;
 float g_target_cntr_offset_y_filt;
 float target_cntr_offset_x_prv;
 float target_cntr_offset_y_prv;
-cv::cuda::GpuMat gpuImage;
-cv::Mat image_cv_wrapped;
-cv::Ptr<cv::TrackerCSRT> target_tracker;
 cv::Rect target_bounding_box;
 std::vector<int> target_candidates;
 std::vector<cv::cuda::GpuMat> target_candidate_imgs;
 std::vector<cv::Rect> target_candidate_bboxs;
 std::vector<std::vector<float>> target_candidate_embeddings; // one per crop
-std::vector<std::vector<float>> target_candidate_features;
+std::vector<std::vector<float>> tracked_object_features;
+std::vector<Track> tracked_targets;
 OSNet *osnet_extractor;
 
 /********************************************************************************
@@ -89,16 +87,17 @@ const float center_of_frame_width = 640.0f;
 const float center_of_frame_height = 360.0f;
 float target_bbox_center_filt_coeff = (float)0.75;
 float target_similarity_thresh = (float)0.55;
+int max_reid_batch = (int)32;
 
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
 void get_tracking_params(void);
 void filter_detections(void);
-void extract_det_features(void);
+void track_objects(void);
+void select_target(void);
 void get_target_info(void);
 void validate_target(void);
-void track_target(void);
 void update_target_info(void);
 static float cosineSimilarity(const std::vector<float> &a, const std::vector<float> &b);
 
@@ -132,6 +131,7 @@ void get_tracking_params(void)
 
     target_class = target_params.get_int_param("Tracking_Params", "Detect_Class_Orin");
     target_similarity_thresh = target_params.get_float_param("Tracking_Params", "Track_similarity_thresh");
+    max_reid_batch = target_params.get_int_param("Tracking_Params", "Track_max_reid_batch");
 
 #elif defined(BLD_WIN)
 
@@ -150,7 +150,7 @@ void get_tracking_params(void)
  ********************************************************************************/
 void filter_detections(void)
 {
-    g_target_detection_num = -1;
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
     target_candidates.clear();
     target_candidate_imgs.clear();
@@ -178,12 +178,20 @@ void filter_detections(void)
             target_candidate_imgs.emplace_back(g_image_gpu(bbox));
         }
     }
+
+#endif
 }
 
-void extract_det_features(void)
+/********************************************************************************
+ * Function: track_objects
+ * Description: Match detections to tracked objects.
+ ********************************************************************************/
+void track_objects(void)
 {
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+
     // Extract features of each detected target
-    if (!target_candidate_imgs.empty())
+    if (!target_candidate_imgs.empty() && target_candidate_imgs.size() <= max_reid_batch)
     {
         target_candidate_embeddings = osnet_extractor->extractFeatures(target_candidate_imgs);
     };
@@ -197,9 +205,12 @@ void extract_det_features(void)
         int best_idx = -1;
         float best_s = -std::numeric_limits<float>::infinity();
 
-        for (size_t j = 0; j < target_candidate_features.size(); ++j)
+        // Calculate similarity between a tracked object
+        // and all of the currently detected objects to find the
+        // detection that most closely matches the tracked object
+        for (size_t j = 0; j < tracked_object_features.size(); ++j)
         {
-            float s = cosineSimilarity(f_vec, target_candidate_features[j]);
+            float s = cosineSimilarity(f_vec, tracked_object_features[j]);
 
             if (s > best_s)
             {
@@ -208,15 +219,21 @@ void extract_det_features(void)
             }
         }
 
+        // if a match is found (one of the detected objects
+        // matches a previously tracked object) then update
+        // the feature vectore of the tracked object with the
+        // feature vector of the detection which most closely matches
         if (best_idx >= 0 && best_s >= target_similarity_thresh)
         {
             // replace (or EMA-average if you want smoother updates)
-            target_candidate_features[best_idx] = f_vec;
+            tracked_object_features[best_idx] = f_vec;
         }
         else
         {
-            target_candidate_features.push_back(f_vec);
-            best_idx = static_cast<int>(target_candidate_features.size() - 1);
+            // Add a detection to tracked objects since because no
+            // match was found
+            tracked_object_features.push_back(f_vec);
+            best_idx = static_cast<int>(tracked_object_features.size() - 1);
         }
 
         // Draw on CPU image
@@ -227,6 +244,69 @@ void extract_det_features(void)
         cv::putText(g_image, txt, {r.x, std::max(0, r.y - 5)},
                     cv::FONT_HERSHEY_SIMPLEX, 0.5, {255, 255, 255}, 1);
     }
+
+#endif
+}
+
+/********************************************************************************
+ * Function: select_target
+ * Description: Select the target to follow from one of the tracked objects.
+ ********************************************************************************/
+void select_target(void)
+{
+    g_target_detection_id = -1;
+
+#if defined(BLD_JETSON_B01)
+
+    for (int n = 0; n < g_detection_count; ++n)
+    {
+        /* A tracked object, classified as a person with some confidence level */
+        if (g_detections[n].TrackID >= 0 &&
+            g_detections[n].ClassID == target_class &&
+            g_detections[n].Confidence > target_detection_thresh)
+        {
+            g_detection_class = g_detections[n].ClassID;
+            g_target_detection_conf = g_detections[n].Confidence;
+            g_target_detection_id = n;
+            return;
+        }
+    }
+
+#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+
+    for (int n = 0; n < g_yolo_detection_count; ++n)
+    {
+        /* A tracked object, classified as a person with some confidence level */
+        if (g_yolo_detections[n].label == target_class &&
+            g_yolo_detections[n].probability > target_detection_thresh)
+        {
+            g_detection_class = g_yolo_detections[n].label;
+            g_target_detection_conf = g_yolo_detections[n].probability;
+            g_target_detection_id = n;
+            return;
+        }
+    }
+
+#elif defined(BLD_WIN)
+
+    for (int n = 0; n < g_yolo_detection_count; ++n)
+    {
+        /* A tracked object, classified as a person with some confidence level */
+        if (g_yolo_detections[n].ClassID == target_class &&
+            g_yolo_detections[n].Confidence > target_detection_thresh)
+        {
+            g_detection_class = g_yolo_detections[n].ClassID;
+            g_target_detection_conf = g_yolo_detections[n].Confidence;
+            g_target_detection_id = n;
+            return;
+        }
+    }
+
+#else
+
+#error "Please define build platform."
+
+#endif
 }
 
 /********************************************************************************
@@ -240,39 +320,39 @@ void get_target_info(void)
 
 #if defined(BLD_JETSON_B01)
 
-    if (g_target_detection_num >= 0)
+    if (g_target_detection_id >= 0)
     {
-        g_target_height = g_detections[g_target_detection_num].Height();
-        g_target_width = g_detections[g_target_detection_num].Width();
-        g_target_track_id = g_detections[g_target_detection_num].TrackID;
-        g_target_left = g_detections[g_target_detection_num].Left;
-        g_target_right = g_detections[g_target_detection_num].Right;
-        g_target_top = g_detections[g_target_detection_num].Top;
-        g_target_bottom = g_detections[g_target_detection_num].Bottom;
+        g_target_height = g_detections[g_target_detection_id].Height();
+        g_target_width = g_detections[g_target_detection_id].Width();
+        g_target_track_id = g_detections[g_target_detection_id].TrackID;
+        g_target_left = g_detections[g_target_detection_id].Left;
+        g_target_right = g_detections[g_target_detection_id].Right;
+        g_target_top = g_detections[g_target_detection_id].Top;
+        g_target_bottom = g_detections[g_target_detection_id].Bottom;
     }
 
 #elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-    if (g_target_detection_num >= 0)
+    if (g_target_detection_id >= 0)
     {
-        g_target_height = g_yolo_detections[g_target_detection_num].rect.height;
-        g_target_width = g_yolo_detections[g_target_detection_num].rect.width;
+        g_target_height = g_yolo_detections[g_target_detection_id].rect.height;
+        g_target_width = g_yolo_detections[g_target_detection_id].rect.width;
         g_target_track_id = 0;
-        g_target_left = g_yolo_detections[g_target_detection_num].rect.x;
+        g_target_left = g_yolo_detections[g_target_detection_id].rect.x;
         g_target_right = g_target_left + g_target_width;
-        g_target_top = g_yolo_detections[g_target_detection_num].rect.y;
+        g_target_top = g_yolo_detections[g_target_detection_id].rect.y;
     }
 
 #elif defined(BLD_WIN)
 
-    if (g_target_detection_num >= 0)
+    if (g_target_detection_id >= 0)
     {
-        g_target_height = g_yolo_detections[g_target_detection_num].rect.height;
-        g_target_width = g_yolo_detections[g_target_detection_num].rect.width;
+        g_target_height = g_yolo_detections[g_target_detection_id].rect.height;
+        g_target_width = g_yolo_detections[g_target_detection_id].rect.width;
         g_target_track_id = 0;
-        g_target_left = g_yolo_detections[g_target_detection_num].rect.x;
+        g_target_left = g_yolo_detections[g_target_detection_id].rect.x;
         g_target_right = g_target_left + g_target_width;
-        g_target_top = g_yolo_detections[g_target_detection_num].rect.y;
+        g_target_top = g_yolo_detections[g_target_detection_id].rect.y;
     }
 
 #else
@@ -302,7 +382,7 @@ void validate_target(void)
 
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
         implimented. */
-    if (g_target_detection_num >= 0 && g_target_track_id >= 0 && g_target_height > 1 && g_target_width > 1)
+    if (g_target_detection_id >= 0 && g_target_track_id >= 0 && g_target_height > 1 && g_target_width > 1)
     {
         g_target_valid = true;
     }
@@ -315,7 +395,7 @@ void validate_target(void)
 
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
     implimented. */
-    if (g_target_detection_num >= 0 && g_target_height > 1 && g_target_width > 1)
+    if (g_target_detection_id >= 0 && g_target_height > 1 && g_target_width > 1)
     {
         g_target_valid = true;
     }
@@ -354,23 +434,23 @@ void update_target_info(void)
 }
 
 /********************************************************************************
- * Function: Track
- * Description: Track class constructor.
+ * Function: Tracking
+ * Description: Tracking class constructor.
  ********************************************************************************/
-Track::Track(void) {};
+Tracking::Tracking(void) {};
 
 /********************************************************************************
- * Function: ~Track
- * Description: Track class destructor.
+ * Function: ~Tracking
+ * Description: Tracking class destructor.
  ********************************************************************************/
-Track::~Track(void) {};
+Tracking::~Tracking(void) {};
 
 /********************************************************************************
  * Function: init
  * Description: Initialize all track target variables.  Run once at the start
  *              of the program.
  ********************************************************************************/
-bool Track::init(void)
+bool Tracking::init(void)
 {
     get_tracking_params();
 
@@ -385,7 +465,7 @@ bool Track::init(void)
     g_target_right = (float)0.0;
     g_target_top = (float)0.0;
     g_target_bottom = (float)0.0;
-    g_target_detection_num = -1;
+    g_target_detection_id = -1;
     g_detection_class = (float)0.0;
     g_target_detection_conf = (float)0.0;
 
@@ -412,10 +492,11 @@ bool Track::init(void)
  * Description: Determine target to be tracked and maintain identity of target
  *              from loop to loop.
  ********************************************************************************/
-void Track::loop(void)
+void Tracking::loop(void)
 {
     filter_detections();
-    extract_det_features();
+    track_objects();
+    select_target();
     get_target_info();
     validate_target();
 }
@@ -424,7 +505,7 @@ void Track::loop(void)
  * Function: shutdown
  * Description: Cleanup code to run at the end of the program.
  ********************************************************************************/
-void Track::shutdown(void)
+void Tracking::shutdown(void)
 {
 }
 

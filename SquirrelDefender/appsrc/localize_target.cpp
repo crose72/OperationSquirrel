@@ -10,7 +10,13 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "localize_target.h"
+#include "param_reader.h"
+#include "interpolate.h"
+#include "signal_processing.h"
+#include "time_calc.h"
+#include "kf.h"
 #include <cmath>
 
 /********************************************************************************
@@ -63,6 +69,8 @@ float g_fov_height;
 float g_meter_per_pix;
 float g_target_cntr_offset_x_m;
 float g_line_of_sight;
+static bool target_valid_prv;
+bool kf_loc_reset;
 
 // Buffers for moving average of target centroid
 std::vector<float> target_y_pix_hist4avg;
@@ -486,6 +494,17 @@ void update_target_loc_real(void)
 {
     if (g_target_data_useful && g_dt > 0.0001)
     {
+        if (!target_valid_prv && !kf_loc_reset)
+        {
+            arma::colvec x0(n_states, arma::fill::zeros);
+            x0(0) = g_x_target; // pos x
+            x0(1) = g_y_target; // pos y
+            // vx, vy, ax, ay left at 0
+
+            kf_loc.InitSystemState(x0);
+            kf_loc_reset = true;
+        }
+
         // Measurement vector (observations)
         colvec z(2);
         z << g_x_target << g_y_target;
@@ -557,6 +576,8 @@ bool Localize::init(void)
     x_buffer_idx4avg = (int)0;
     x_sum = (float)0.0;
     g_line_of_sight = (float)0.0;
+    target_valid_prv = false;
+    kf_loc_reset = false;
 
     return true;
 }

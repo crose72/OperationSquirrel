@@ -105,7 +105,7 @@ extern uint8_t g_mav_veh_mavlink_version;
 /* Detect/Track target variables */
 extern std::vector<Object> g_yolo_detections;
 extern bool g_target_valid;
-extern int g_target_detection_num;
+extern int g_target_detection_id;
 extern int g_target_track_id;
 extern float g_target_cntr_offset_x;
 extern float g_target_cntr_offset_y;

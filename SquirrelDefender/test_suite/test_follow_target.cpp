@@ -32,7 +32,7 @@ TestHarness g_h;
 #define INPUT_VARS(X)              \
     X(g_app_elapsed_time)          \
     X(g_target_valid)              \
-    X(g_target_detection_num)      \
+    X(g_target_detection_id)       \
     X(g_target_track_id)           \
     X(g_detection_class)           \
     X(g_target_detection_conf)     \
@@ -94,7 +94,7 @@ TestHarness g_h;
     X(g_yaw_target)                                                        \
     /* Optionally repeat inputs you also want in output CSV (dedup OK): */ \
     X(g_app_elapsed_time)                                                  \
-    X(g_target_detection_num)                                              \
+    X(g_target_detection_id)                                               \
     X(g_target_track_id)                                                   \
     X(g_detection_class)                                                   \
     X(g_target_detection_conf)                                             \
