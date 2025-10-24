@@ -13,6 +13,7 @@
  * Includes
  ********************************************************************************/
 #include <sstream>
+#include <filesystem>
 #include "video_io_opencv.h"
 
 /********************************************************************************
@@ -116,22 +117,31 @@ bool create_input_video_stream(void)
         //       "video/x-raw,format=(string)BGR,width=1280,height=720 ! "
         //       "appsink drop=true max-buffers=1 sync=false";
         std::ostringstream ss;
-        ss << "nvarguscamerasrc sensor-mode=3 "
-              " wbmode=1 aeantibanding=2 "
-              " tnr-mode=0 ee-mode=0 "
-              " exposuretimerange=\"12000000 33333333\" "
-              " gainrange=\"1 10.5\" ispdigitalgainrange=\"1 1.5\" ! "
-              "video/x-raw(memory:NVMM),format=NV12,width=1640,height=1232,framerate=30/1 ! "
+        // best pipeline thus far
+        // ss << "nvarguscamerasrc sensor-mode=3 "
+        //       " wbmode=1 aeantibanding=2 "
+        //       " tnr-mode=0 ee-mode=0 "
+        //       " exposuretimerange=\"12000000 33333333\" "
+        //       " gainrange=\"1 10.5\" ispdigitalgainrange=\"1 1.5\" ! "
+        //       "video/x-raw(memory:NVMM),format=NV12,width=1640,height=1232,framerate=30/1 ! "
 
-              /* NVMM -> system memory first */
-              "nvvidconv ! video/x-raw,format=NV12,width=1640,height=1232 ! "
+        //       /* NVMM -> system memory first */
+        //       "nvvidconv ! video/x-raw,format=NV12,width=1640,height=1232 ! "
 
-              /* CPU crop + scale (never hits VIC limits) */
-              "videocrop top=155 bottom=155 left=0 right=0 ! "
-              "videoscale ! video/x-raw,width=1280,height=720 ! "
+        //       /* CPU crop + scale (never hits VIC limits) */
+        //       "videocrop top=155 bottom=155 left=0 right=0 ! "
+        //       "videoscale ! video/x-raw,width=1280,height=720 ! "
 
-              /* RGB for OpenCV */
-              "videoconvert ! video/x-raw,format=BGR ! "
+        //       /* RGB for OpenCV */
+        //       "videoconvert ! video/x-raw,format=BGR ! "
+        //       "appsink drop=true max-buffers=1 sync=false";
+        // this pipeline below is absolutely amazing! but it doesn't save to video
+        ss << "nvarguscamerasrc sensor-mode=0 "
+              " wbmode=1 aeantibanding=2 tnr-mode=0 ee-mode=0 "
+              " exposuretimerange=\"8000000 33333333\" gainrange=\"1 10\" ispdigitalgainrange=\"1 1.5\" ! "
+              "video/x-raw(memory:NVMM),format=NV12,width=3280,height=2464,framerate=21/1 ! "
+              "nvvidconv ! video/x-raw,format=BGRx,width=1640,height=1232 ! "
+              "videoconvert ! video/x-raw,format=BGR,width=1640,height=1232 ! "
               "appsink drop=true max-buffers=1 sync=false";
 
         std::string gst_pipeline = ss.str();
@@ -174,27 +184,46 @@ bool create_input_video_stream(void)
 bool create_output_vid_stream(void)
 {
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
-    std::string base_path = "file:///workspace/OperationSquirrel/SquirrelDefender/data/";
+    const std::string base_path = "/workspace/OperationSquirrel/SquirrelDefender/data/";
+#else
+    const std::string base_path = "./";
 #endif
 
-    std::string base_name = "output";
-    std::string extension = ".mp4";
-    std::string file_name = generate_unique_file_name(base_name, extension);
+    // Make sure the folder exists
+    std::error_code ec;
+    std::filesystem::create_directories(base_path, ec);
 
-    cv::Size frame_size(g_input_video_width, g_input_video_height); // 1280x720
-    int fourcc = cv::VideoWriter::fourcc('m', 'p', '4', 'v');       // Codec for MP4 format
-    video_writer.open(file_name, fourcc, g_input_video_fps, frame_size);
+    const std::string base_name = "output";
+    const std::string extension = ".mp4";
+    const std::string file_name = generate_unique_file_name(base_name, extension);
+    const std::string full_path = base_path + file_name; // <- plain path
 
-    if (!video_writer.isOpened())
+    // Your capture frames are BGR, 1640x1232 @ 21 fps
+    const int out_w = 1640;
+    const int out_h = 1232;
+    const double out_fps = 21.0;
+
+    std::ostringstream ss;
+    ss << "appsrc format=time is-live=true do-timestamp=true "
+       << "caps=video/x-raw,format=BGR,width=" << out_w
+       << ",height=" << out_h << ",framerate=" << (int)out_fps << "/1 ! "
+       << "videoconvert ! video/x-raw,format=I420 ! "
+       << "x264enc bitrate=20000 speed-preset=veryfast tune=zerolatency key-int-max=21 ! "
+       << "h264parse config-interval=1 ! mp4mux faststart=true ! "
+       << "filesink location=" << full_path;
+
+    const std::string writerPipe = ss.str();
+
+    // Open GStreamer writer
+    if (!video_writer.open(writerPipe, cv::CAP_GSTREAMER, 0, out_fps, cv::Size(out_w, out_h), true))
     {
-        std::cout << "video_io_opencv: failed to create output_vid_file stream\n"
-                  << std::endl;
+        std::cerr << "video_io_opencv: failed to open GStreamer VideoWriter\n";
         file_stream_created = false;
         return false;
     }
 
+    std::cout << "Recording to: " << full_path << std::endl;
     file_stream_created = true;
-
     return true;
 }
 
