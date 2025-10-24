@@ -44,7 +44,7 @@ uint32_t g_frame_id;
  ********************************************************************************/
 const float g_input_video_width = (float)1280.0;
 const float g_input_video_height = (float)720.0;
-const float g_input_video_fps = (float)16.67;
+const float g_input_video_fps = (float)13.0;
 
 /********************************************************************************
  * Function definitions
@@ -107,19 +107,36 @@ bool create_input_video_stream(void)
     {
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-        // gst_pipeline = std::format("nvarguscamerasrc ! video/x-raw(memory:NVMM), "
-        //     "width={}, height={}, framerate={}/1 ! nvvidconv ! "
-        //     "nvvidconv flip-method=2 ! "
-        //     "video/x-raw, format=(string)BGRx ! videoconvert ! "
-        //     "video/x-raw, format=(string)BGR ! appsink drop=true sync=false",
-        //     g_input_video_width, g_input_video_height, g_input_video_fps);
+        // std::ostringstream ss;
+        // ss << "nvarguscamerasrc sensor-mode=3 "
+        //       "tnr-mode=0 ee-mode=0 wbmode=1 aeantibanding=2 "
+        //       "exposuretimerange=\"8000000 8000000\" gainrange=\"1 6\" aelock=true awblock=true ! "
+        //       "video/x-raw(memory:NVMM),format=NV12,width=1640,height=1232,framerate=30/1 ! "
+        //       "nvvidconv ! videoconvert ! "
+        //       "video/x-raw,format=(string)BGR,width=1280,height=720 ! "
+        //       "appsink drop=true max-buffers=1 sync=false";
         std::ostringstream ss;
-        ss << "nvarguscamerasrc ! video/x-raw(memory:NVMM), "
-           << "width=" << g_input_video_width << ", height=" << g_input_video_height
-           << " ! nvvidconv ! "
-           << "nvvidconv flip-method=2 ! "
-           << "video/x-raw, format=(string)BGRx ! videoconvert ! "
-           << "video/x-raw, format=(string)BGR ! appsink drop=true sync=false";
+        ss << "nvarguscamerasrc sensor-mode=3 "
+              " wbmode=1 aeantibanding=2 "
+              " tnr-mode=0 ee-mode=0 "
+              " exposuretimerange=\"12000000 33333333\" "
+              " gainrange=\"1 10.5\" ispdigitalgainrange=\"1 1.5\" ! "
+              "video/x-raw(memory:NVMM),format=NV12,width=1640,height=1232,framerate=30/1 ! "
+
+              /* NVMM -> system memory first */
+              "nvvidconv ! video/x-raw,format=NV12,width=1640,height=1232 ! "
+
+              /* CPU crop + scale (never hits VIC limits) */
+              "videocrop top=155 bottom=155 left=0 right=0 ! "
+              "videoscale ! video/x-raw,width=1280,height=720 ! "
+
+              /* RGB for OpenCV */
+              "videoconvert ! video/x-raw,format=BGR ! "
+              "appsink drop=true max-buffers=1 sync=false";
+
+        std::string gst_pipeline = ss.str();
+        cap.open(gst_pipeline, cv::CAP_GSTREAMER);
+
         gst_pipeline = ss.str();
 
         cap.open(gst_pipeline, cv::CAP_GSTREAMER);
