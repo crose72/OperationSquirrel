@@ -237,12 +237,12 @@ void track_objects(void)
         }
 
         // Draw on CPU image
-        const cv::Rect &r = target_candidate_bboxs[i];
-        cv::rectangle(g_image, r, cv::Scalar(0, 255, 0), 2);
-        char txt[128];
-        std::snprintf(txt, sizeof(txt), "id=%d s=%.2f", best_idx, best_s);
-        cv::putText(g_image, txt, {r.x, std::max(0, r.y - 5)},
-                    cv::FONT_HERSHEY_SIMPLEX, 0.5, {255, 255, 255}, 1);
+        // const cv::Rect &r = target_candidate_bboxs[i];
+        // cv::rectangle(g_image, r, cv::Scalar(0, 255, 0), 2);
+        // char txt[128];
+        // std::snprintf(txt, sizeof(txt), "id=%d s=%.2f", best_idx, best_s);
+        // cv::putText(g_image, txt, {r.x, std::max(0, r.y - 5)},
+        //             cv::FONT_HERSHEY_SIMPLEX, 0.5, {255, 255, 255}, 1);
     }
 
 #endif

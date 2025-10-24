@@ -94,11 +94,12 @@ arma::mat P_loc;     // Estimate error covariance
 arma::colvec x0_loc; // Initial state
 arma::colvec u0_loc; // Observed initial measurements
 
+float center_of_frame_width;
+float center_of_frame_height;
+
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-const float center_of_frame_width = 640.0f;
-const float center_of_frame_height = 360.0f;
 const int n_states = 6;
 const int n_meas = 2;
 const float known_obj_heigh_all_dist = (float)1.778; // Height of known object at all distances
@@ -578,6 +579,8 @@ bool Localize::init(void)
     g_line_of_sight = (float)0.0;
     target_valid_prv = false;
     kf_loc_reset = false;
+    center_of_frame_width = g_input_video_width * (float)0.5;
+    center_of_frame_height = g_input_video_height * (float)0.5;
 
     return true;
 }

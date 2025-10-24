@@ -11,6 +11,7 @@
  * Includes
  ********************************************************************************/
 #include "path_planner.h"
+#include "video_io.h"
 #include <algorithm> // for std::min/std::max
 #include <cmath>     // for sin/cos/atan2
 
@@ -306,6 +307,20 @@ void calc_yaw_target_error(void)
     else if (g_target_cntr_offset_y < -50.0)
     {
         g_yaw_target = -(0.0011 * std::abs(g_target_cntr_offset_y));
+    }
+    else
+    {
+        g_yaw_target = 0.0;
+    }
+
+    const float angle = 2 * std::tan(g_camera_fov * 0.5) / g_input_video_width;
+
+    const float deadband_px = (float)50.0;
+
+    // Yaw in radians using pinhole model
+    if (std::abs(g_target_cntr_offset_y) > deadband_px)
+    {
+        g_yaw_target = g_target_cntr_offset_y * angle;
     }
     else
     {

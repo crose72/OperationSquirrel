@@ -40,11 +40,12 @@ bool file_stream_created;
 uint32_t g_frame_id;
 
 /********************************************************************************
- * Calibration definitions
+ * Calibration definitionscd
  ********************************************************************************/
 const float g_input_video_width = (float)1640.0;
 const float g_input_video_height = (float)1232.0;
 const float video_out_target_fps = (float)21.0;
+float g_camera_fov = (float)1.832595; // 1.832595 // for 105 fov // 1.4486 for 83 fov
 
 /********************************************************************************
  * Function definitions
@@ -177,7 +178,7 @@ bool create_output_vid_stream(void)
     // Your capture frames are BGR, 1640x1232 @ 21 fps
     ss << "appsrc format=time is-live=true do-timestamp=true "
        << "caps=video/x-raw,format=BGR,width=1640,height=1232,framerate=21/1 ! "
-       << "videoconvert ! videoscale ! video/x-raw,format=I420,width=1280,height=720 ! "
+       << "videoconvert ! "
        << "x264enc bitrate=16000 speed-preset=veryfast tune=zerolatency key-int-max=21 threads=0 ! "
        << "h264parse config-interval=1 ! mp4mux faststart=true ! filesink location=" << full_path;
 
