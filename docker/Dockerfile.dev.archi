@@ -1,0 +1,126 @@
+FROM nvcr.io/nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
+
+# ====== Build args ======
+# Pass your exact tarball name at build time:
+#   docker build -t trt-tar:11.8 \
+#     --build-arg TRT_TAR="TensorRT-8.6.1.6.Linux.x86_64-gnu.cuda-11.8.cudnn8.6.tar.gz" .
+# ARG TRT_TAR="TensorRT-8.6.1.6.Linux.x86_64-gnu.cuda-11.8.cudnn8.6.tar.gz"
+ARG TRT_TAR="TensorRT-8.5.3.1.Linux.x86_64-gnu.cuda-11.8.cudnn8.6.tar.gz"
+COPY docker/${TRT_TAR} /tmp/
+ARG TRT_PREFIX="/opt/tensorrt"
+# ====== Base deps ======
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    python3 python3-pip python3-dev \
+    build-essential cmake git pkg-config \
+    ca-certificates wget tree \
+ && rm -rf /var/lib/apt/lists/*
+# ====== Copy and extract the TensorRT tarball ======
+# Put the tar.gz next to your Dockerfile; this copies it into the image.
+RUN set -eux; \
+    # Create install prefix and extract
+    mkdir -p "${TRT_PREFIX}"; \
+    tar -xzf "/tmp/${TRT_TAR}" -C "${TRT_PREFIX}"; \
+    # Find the extracted top-level dir name (e.g., TensorRT-8.6.1.6)
+    EXTRACTED_DIR="$(tar -tzf /tmp/${TRT_TAR} | head -1 | cut -d/ -f1)"; \
+    # Move all contents up to /opt/tensorrt for a stable path
+    mv "${TRT_PREFIX}/${EXTRACTED_DIR}"/* "${TRT_PREFIX}/"; \
+    rmdir "${TRT_PREFIX}/${EXTRACTED_DIR}"; \
+    rm -f "/tmp/${TRT_TAR}"
+# ====== Env wiring ======
+# - Libraries in /opt/tensorrt/lib
+# - Python wheels live under subfolders: python/, uff/, graphsurgeon/, onnx_graphsurgeon/
+ENV TENSORRT_ROOT="${TRT_PREFIX}" \
+    LD_LIBRARY_PATH="${TRT_PREFIX}/lib:${LD_LIBRARY_PATH}" \
+    PYTHONPATH="${TRT_PREFIX}/python:${PYTHONPATH}"
+# ====== Install Python wheels (optional but handy) ======
+# # - TensorRT CP3x wheel (matches your host Python 3.x ABI inside the container)
+# # - GraphSurgeon & ONNX-GraphSurgeon wheels
+# # - UFF wheel (only needed if using TF/UFF workflow)
+# RUN set -eux; \
+#     python3 -m pip install --upgrade pip; \
+#     # TensorRT Python wheel
+#     python3 -m pip install ${TENSORRT_ROOT}/python/tensorrt-*-cp3*-none-linux_x86_64.whl; \
+#     # GraphSurgeon (common)
+#     python3 -m pip install ${TENSORRT_ROOT}/graphsurgeon/graphsurgeon-*.whl; \
+#     # ONNX-GraphSurgeon (common)
+#     python3 -m pip install ${TENSORRT_ROOT}/onnx_graphsurgeon/onnx_graphsurgeon-*.whl; \
+#     # UFF (optional; only if present in your tar and needed)
+#     if [ -d "${TENSORRT_ROOT}/uff" ]; then \
+#         python3 -m pip install ${TENSORRT_ROOT}/uff/uff-*.whl; \
+#     fi
+# ====== Sanity checks & list directories ======
+RUN set -eux; \
+    echo "Listing TensorRT directories:"; \
+    tree -d -L 2 ${TENSORRT_ROOT} || true; \
+    echo "cuDNN version (headers):"; \
+    grep -E "CUDNN_(MAJOR|MINOR|PATCHLEVEL)" /usr/include/cudnn_version.h || true; \
+    echo "TensorRT libs:"; \
+    ls -l ${TENSORRT_ROOT}/lib | head
+# ====== Build a C++ sample to verify (optional) ======
+# If this fails due to toolchain issues, it won't break your image (we '|| true').
+RUN set -eux; \
+    if [ -d "${TENSORRT_ROOT}/samples/sampleMNIST" ]; then \
+        make -C ${TENSORRT_ROOT}/samples/sampleMNIST -j"$(nproc)" || true; \
+        ${TENSORRT_ROOT}/samples/sampleMNIST/sample_mnist --help || true; \
+    fi
+
+    ENV DEBIAN_FRONTEND=noninteractive
+
+# Operation Squirrel dependencies
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3-pip \
+    python3-dev \
+    pkg-config \
+    build-essential \
+    git \
+    wget \
+    unzip \
+    libssl-dev \
+    zlib1g-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN wget https://cmake.org/files/v3.28/cmake-3.28.0-linux-x86_64.sh && \
+    chmod +x cmake-3.28.0-linux-x86_64.sh && \
+    ./cmake-3.28.0-linux-x86_64.sh --prefix=/usr/local --exclude-subdir && \
+    rm cmake-3.28.0-linux-x86_64.sh
+
+RUN apt-get update && apt-get install -y libtbb-dev
+
+# Compute capability: e.g., 61=Pascal, 75=Turing, 86=Ampere, 87=Jetson Orin, 89=Ada
+ARG OPENCV_CUDA_ARCH="6.1;7.5;8.6"
+  # leave empty to default PTX to ARCH inside the script
+ARG OPENCV_CUDA_PTX= 
+
+RUN apt-get update && apt install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-good1.0-dev && \
+	pkg-config --modversion gstreamer-1.0 && \
+    git clone https://github.com/crose72/Install-OpenCV.git && \
+    cd Install-OpenCV && \
+    chmod +x OpenCV-4-10-0-tracking.sh && \
+    sed -i 's/sudo //g' OpenCV-4-10-0-tracking.sh && \
+    apt-get update && \
+    ./OpenCV-4-10-0-tracking.sh --arch=${OPENCV_CUDA_ARCH} $( [ -n "${OPENCV_CUDA_PTX}" ] && echo --ptx=${OPENCV_CUDA_PTX} ) && \
+    cd .. && rm -rf Install-OpenCV
+
+RUN apt-get update && apt install -y \
+    libspdlog-dev \
+    libfmt-dev \
+    libjsoncpp-dev \
+    libarmadillo-dev \
+    liblapack-dev \
+    libblas-dev && \
+    pkg-config --cflags --libs armadillo
+
+RUN apt-get update && \
+    apt-get install -y liblz4-dev libzstd-dev pkg-config
+
+# Install all essential GStreamer components
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        gstreamer1.0-tools \
+        gstreamer1.0-plugins-base \
+        gstreamer1.0-plugins-good \
+        gstreamer1.0-plugins-bad \
+        gstreamer1.0-plugins-ugly \
+        gstreamer1.0-libav && \
+    rm -rf /var/lib/apt/lists/*

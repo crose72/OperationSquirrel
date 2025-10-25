@@ -208,6 +208,22 @@ endif()
 # Find External Libraries and Headers 
 #=============================================================================
 
+# --- TensorRT configuration ---
+set(TensorRT_ROOT /opt/tensorrt CACHE PATH "Path to TensorRT installation")
+set(TensorRT_INCLUDE_DIRS ${TensorRT_ROOT}/include)
+set(TensorRT_LIBRARY_DIRS ${TensorRT_ROOT}/lib)
+
+# Tell CMake where to search for TensorRT libs
+link_directories(${TensorRT_LIBRARY_DIRS})
+
+# Optional: explicit libs if you want to list them
+set(TensorRT_LIBS
+    ${TensorRT_LIBRARY_DIRS}/libnvinfer.so
+    ${TensorRT_LIBRARY_DIRS}/libnvinfer_plugin.so
+    ${TensorRT_LIBRARY_DIRS}/libnvonnxparser.so
+    ${TensorRT_LIBRARY_DIRS}/libnvparsers.so
+)
+
 # Additional required packages to find
 if(BLD_JETSON_B01)
     find_package(CUDA REQUIRED)
@@ -221,8 +237,6 @@ if(BLD_JETSON_B01)
 elseif(BLD_JETSON_ORIN_NANO OR BLD_WSL)
     find_package(CUDA REQUIRED)
     find_package(OpenCV REQUIRED)
-    find_package(TensorRT REQUIRED)
-    find_package(vpi 3.2 REQUIRED)
     find_package(Eigen3 REQUIRED)
     find_package(Armadillo REQUIRED)
     find_package(LAPACK REQUIRED)
@@ -390,7 +404,6 @@ if (BLD_JETSON_ORIN_NANO OR BLD_WSL)
         # Vision/AI stack
         trtinfer
         ${OpenCV_LIBS}
-        vpi
         opencv_core
         opencv_imgproc
         opencv_imgcodecs

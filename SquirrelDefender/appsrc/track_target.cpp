@@ -479,23 +479,23 @@ bool Tracking::init(void)
     tracking = false;
     target_candidates.clear();
 
-#if defined(BLD_WSL)
+    // #if defined(BLD_WSL)
 
-    OSNet::Config config;
-    const std::string engine_path =
-        "/workspace/OperationSquirrel/SquirrelDefender/models/osnet/oxnet_x0_25.engine.NVIDIAGeForceRTX3060LaptopGPU.fp16.batch32";
+    //     OSNet::Config config;
+    //     const std::string engine_path =
+    //         "/workspace/OperationSquirrel/SquirrelDefender/models/osnet/oxnet_x0_25.engine.NVIDIAGeForceRTX3060LaptopGPU.fp16.batch32";
 
-    osnet_extractor = new OSNet(engine_path, config);
+    //     osnet_extractor = new OSNet(engine_path, config);
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+    // #elif defined(BLD_JETSON_ORIN_NANO)
 
-    OSNet::Config config;
-    const std::string engine_path =
-        "/workspace/OperationSquirrel/SquirrelDefender/models/osnet/osnet_x0_25.engine.Orin.fp16.batch32";
+    //     OSNet::Config config;
+    //     const std::string engine_path =
+    //         "/workspace/OperationSquirrel/SquirrelDefender/models/osnet/osnet_x0_25.engine.Orin.fp16.batch32";
 
-    osnet_extractor = new OSNet(engine_path, config);
+    //     osnet_extractor = new OSNet(engine_path, config);
 
-#endif
+    // #endif
 
     return true;
 }
@@ -507,8 +507,8 @@ bool Tracking::init(void)
  ********************************************************************************/
 void Tracking::loop(void)
 {
-    filter_detections();
-    track_objects();
+    // filter_detections();
+    // track_objects();
     select_target();
     get_target_info();
     validate_target();
