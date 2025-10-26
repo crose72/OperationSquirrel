@@ -14,8 +14,10 @@
 #include "track_target.h"
 #include "OSNet.h"
 #include "YOLOv8.h"
+#include "video_io.h"
 #include "param_reader.h"
 #include "signal_processing.h"
+
 #include <opencv2/opencv.hpp>
 #include <opencv2/tracking.hpp>
 #include <opencv2/core/utility.hpp>
@@ -378,10 +380,8 @@ void get_target_info(void)
  ********************************************************************************/
 void validate_target(void)
 {
-#if defined(BLD_JETSON_B01)
-
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
-        implimented. */
+    implimented. */
     if (g_target_detection_id >= 0 && g_target_track_id >= 0 && g_target_height > 1 && g_target_width > 1)
     {
         g_target_valid = true;
@@ -390,25 +390,6 @@ void validate_target(void)
     {
         g_target_valid = false;
     }
-
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
-
-    /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
-    implimented. */
-    if (g_target_detection_id >= 0 && g_target_height > 1 && g_target_width > 1)
-    {
-        g_target_valid = true;
-    }
-    else
-    {
-        g_target_valid = false;
-    }
-
-#else
-
-#error "Please define build platform."
-
-#endif // defined(BLD_JETSON_B01)
 
     target_valid_prv = g_target_valid;
 }
@@ -428,7 +409,7 @@ void update_target_info(void)
     g_target_bottom = g_target_top + g_target_height;
     g_target_center_y = (g_target_left + g_target_right) / 2.0f;
     g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-    g_target_cntr_offset_y = g_target_center_y - center_of_frame_width;
+    g_target_cntr_offset_y = g_target_center_y - g_input_video_width * (float)0.5;
     g_target_cntr_offset_x = g_target_center_x - center_of_frame_height;
     g_target_aspect = g_target_width / g_target_height;
 }

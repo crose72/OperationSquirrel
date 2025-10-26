@@ -25,8 +25,8 @@ extern detectNet *g_net;
 extern detectNet::Detection *g_detections;
 extern uchar3 *g_image;
 extern int g_detection_count;
-extern const float g_input_video_width;
-extern const float g_input_video_height;
+extern float g_input_video_width;
+extern float g_input_video_height;
 
 #elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
@@ -34,8 +34,8 @@ extern std::vector<Object> g_yolo_detections;
 extern int g_yolo_detection_count;
 extern cv::Mat g_image;
 extern cv::cuda::GpuMat g_image_gpu;
-extern const float g_input_video_width;
-extern const float g_input_video_height;
+extern float g_input_video_width;
+extern float g_input_video_height;
 
 #elif defined(BLD_WIN)
 
@@ -43,8 +43,8 @@ extern cv::dnn::Net g_net;
 extern std::vector<YoloNet::detection> g_yolo_detections;
 extern int g_yolo_detection_count;
 extern cv::Mat g_image;
-extern const float g_input_video_width;
-extern const float g_input_video_height;
+extern float g_input_video_width;
+extern float g_input_video_height;
 
 #else
 

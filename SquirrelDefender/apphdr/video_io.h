@@ -13,10 +13,6 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include <string>
-#include <fstream>
-
 #ifdef BLD_JETSON_B01
 
 #include "video_io_nv.h"
@@ -34,50 +30,10 @@
 /********************************************************************************
  * Imported objects
  ********************************************************************************/
-#ifdef BLD_JETSON_B01
-
-extern detectNet *g_net;
-
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
-
-/* No imported objects */
-
-#elif defined(BLD_WIN)
-
-/* No imported objects */
-
-#else
-
-#error "Please define a build platform."
-
-#endif // BLD_JETSON_B01
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-#ifdef BLD_JETSON_B01
-
-extern bool g_valid_image_rcvd;
-extern videoSource *g_input;
-extern uchar3 *g_image;
-extern const float g_input_video_width;
-extern const float g_input_video_height;
-
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
-
-extern bool g_valid_image_rcvd;
-extern cv::Mat g_image;
-extern const float g_input_video_width;
-extern const float g_input_video_height;
-extern bool g_end_of_video;
-extern uint32_t g_frame_id;
-extern float g_camera_fov;
-
-#else
-
-#error "Please define a build platform."
-
-#endif // BLD_JETSON_B01
 
 /********************************************************************************
  * Function prototypes and Class Definitions

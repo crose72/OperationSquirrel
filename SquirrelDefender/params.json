@@ -105,5 +105,39 @@
         "CMD_vxy_max_allowed_accel": 3.5,
         "CMD_vxy_max_allowed_jerk": 8.0,
         "CAM0_FOV": 1.832596
+    },
+    "Camera_Params": {
+        "Sensor_Mode": 0,
+        "WBMode": 1,
+        "AEAntiBanding": 2,
+        "TNR_Mode": 0,
+        "EE_Mode": 0,
+        "Exposure_Min": 8000000,
+        "Exposure_Max": 33333333,
+        "Gain_Min": 1.0,
+        "Gain_Max": 10.0,
+        "ISP_DGain_Min": 1.0,
+        "ISP_DGain_Max": 1.5,
+        "Input_Format": "NV12",
+        "Capture_Width": 3280,
+        "Capture_Height": 2464,
+        "Input_Framerate": "21/1",
+        "Output_Format": "BGR",
+        "Output_Width": 1640,
+        "Output_Height": 1232
+    },
+    "Encoder_Params": {
+        "Bitrate": 16000,
+        "Speed_Preset": "veryfast",
+        "Tune": "zerolatency",
+        "KeyIntMax": 21,
+        "Threads": 0,
+        "Mux_FastStart": true
+    },
+    "Camera_Control_Params": {
+        "Input_Width": 1640.0,
+        "Input_Height": 1232.0,
+        "Output_Framerate": 21.0,
+        "CAM0_FOV": 105.0
     }
 }

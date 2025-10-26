@@ -12,9 +12,16 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
+#include "time_calc.h"
+#include "video_io_opencv.h"
+#include <opencv2/cudaimgproc.hpp>
+#include <spdlog/spdlog.h>
 #include <sstream>
 #include <filesystem>
-#include "video_io_opencv.h"
+#include <string>
+#include <fstream>
+#include <vector>
 
 /********************************************************************************
  * Typedefs
@@ -40,26 +47,23 @@ bool file_stream_created;
 uint32_t g_frame_id;
 
 /********************************************************************************
- * Calibration definitionscd
+ * Calibration definitions
  ********************************************************************************/
-const float g_input_video_width = (float)1640.0;
-const float g_input_video_height = (float)1232.0;
-const float video_out_target_fps = (float)21.0;
+float g_input_video_width = (float)1640.0;
+float g_input_video_height = (float)1232.0;
+float video_out_target_fps = (float)21.0;
 float g_camera_fov = (float)1.832595; // 1.832595 // for 105 fov // 1.4486 for 83 fov
 
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
-bool video_output_file_reset(void);
-bool create_input_video_stream(void);
-bool create_output_vid_stream(void);
-bool create_display_video_stream(void);
+void get_video_io_params(void);
+bool create_video_io_streams(void);
 bool capture_image(void);
 bool save_video(void);
 bool display_video(void);
 void delete_input_video_stream(void);
-void delete_video_file_stream(void);
-void delete_video_display_stream(void);
+void delete_output_video_stream(void);
 
 // File operations
 bool file_exists(const std::string &name);
@@ -97,32 +101,133 @@ std::string generate_unique_file_name(const std::string &base_name, const std::s
     return file_name;
 }
 
+#include <string>
+#include <sstream>
+#include "param_reader.h" // Your existing ParamReader class
+
 /********************************************************************************
- * Function: create_input_video_stream
+ * Function: get_video_io_params
+ * Description: Video input and output paramters.
+ ********************************************************************************/
+void get_video_io_params(void)
+{
+    ParamReader cfg("../params.json");
+
+    float g_input_video_width = cfg.get_float_param("Camera_Control_Params", "Input_Width");
+    float g_input_video_height = cfg.get_float_param("Camera_Control_Params", "Input_Height");
+    float video_out_target_fps = cfg.get_float_param("Camera_Control_Params", "Output_Framerate");
+    float g_camera_fov = cfg.get_float_param("Camera_Control_Params", "Output_Framerate");
+}
+
+/********************************************************************************
+ * Function: create_gstreamer_pipelines
+ * Description: Create the gstreamer pipelines for video input and output.
+ ********************************************************************************/
+void create_gstreamer_pipelines(std::string &capture_pipeline,
+                                std::string &writer_pipeline,
+                                const std::string &output_path)
+{
+    ParamReader cfg("../params.json");
+
+    /**************** CAMERA PARAMETERS ****************/
+    int sensor_mode = cfg.get_int_param("Camera_Params", "Sensor_Mode");
+    int wbmode = cfg.get_int_param("Camera_Params", "WBMode");
+    int aeantibanding = cfg.get_int_param("Camera_Params", "AEAntiBanding");
+    int tnr_mode = cfg.get_int_param("Camera_Params", "TNR_Mode");
+    int ee_mode = cfg.get_int_param("Camera_Params", "EE_Mode");
+    int exposure_min = cfg.get_int_param("Camera_Params", "Exposure_Min");
+    int exposure_max = cfg.get_int_param("Camera_Params", "Exposure_Max");
+    float gain_min = cfg.get_float_param("Camera_Params", "Gain_Min");
+    float gain_max = cfg.get_float_param("Camera_Params", "Gain_Max");
+    float isp_dgain_min = cfg.get_float_param("Camera_Params", "ISP_DGain_Min");
+    float isp_dgain_max = cfg.get_float_param("Camera_Params", "ISP_DGain_Max");
+
+    int input_width = cfg.get_int_param("Camera_Params", "Capture_Width");
+    int input_height = cfg.get_int_param("Camera_Params", "Capture_Height");
+    std::string input_format = cfg.get_string_param("Camera_Params", "Input_Format");
+    std::string input_rate = cfg.get_string_param("Camera_Params", "Input_Framerate");
+
+    int output_width = cfg.get_int_param("Camera_Params", "Output_Width");
+    int output_height = cfg.get_int_param("Camera_Params", "Output_Height");
+    std::string output_format = cfg.get_string_param("Camera_Params", "Output_Format");
+
+    /**************** ENCODER PARAMETERS ****************/
+    int bitrate = cfg.get_int_param("Encoder_Params", "Bitrate");
+    std::string speed_preset = cfg.get_string_param("Encoder_Params", "Speed_Preset");
+    std::string tune = cfg.get_string_param("Encoder_Params", "Tune");
+    int key_int_max = cfg.get_int_param("Encoder_Params", "KeyIntMax");
+    int threads = cfg.get_int_param("Encoder_Params", "Threads");
+    bool faststart = cfg.get_bool_param("Encoder_Params", "Mux_FastStart");
+
+    /**************** BUILD CAPTURE PIPELINE ****************/
+    std::ostringstream ss_cap;
+    ss_cap << "nvarguscamerasrc sensor-mode=" << sensor_mode
+           << " wbmode=" << wbmode
+           << " aeantibanding=" << aeantibanding
+           << " tnr-mode=" << tnr_mode
+           << " ee-mode=" << ee_mode
+           << " exposuretimerange=\"" << exposure_min << " " << exposure_max << "\""
+           << " gainrange=\"" << gain_min << " " << gain_max << "\""
+           << " ispdigitalgainrange=\"" << isp_dgain_min << " " << isp_dgain_max << "\" ! "
+           << "video/x-raw(memory:NVMM),format=" << input_format
+           << ",width=" << input_width << ",height=" << input_height
+           << ",framerate=" << input_rate << " ! "
+           << "nvvidconv ! video/x-raw,format=BGRx,width=" << output_width
+           << ",height=" << output_height << " ! "
+           << "videoconvert ! video/x-raw,format=" << output_format
+           << ",width=" << output_width << ",height=" << output_height << " ! "
+           << "appsink drop=true max-buffers=1 sync=false";
+
+    capture_pipeline = ss_cap.str();
+
+    /**************** BUILD OUTPUT PIPELINE ****************/
+    std::ostringstream ss_out;
+    ss_out << "appsrc format=time is-live=true do-timestamp=true "
+           << "caps=video/x-raw,format=" << output_format
+           << ",width=" << output_width << ",height=" << output_height
+           << ",framerate=" << input_rate << " ! "
+           << "videoconvert ! "
+           << "x264enc bitrate=" << bitrate
+           << " speed-preset=" << speed_preset
+           << " tune=" << tune
+           << " key-int-max=" << key_int_max
+           << " threads=" << threads
+           << " ! h264parse config-interval=1 ! "
+           << "mp4mux faststart=" << (faststart ? "true" : "false")
+           << " ! filesink location=" << output_path;
+
+    writer_pipeline = ss_out.str();
+}
+
+/********************************************************************************
+ * Function: create_video_io_streams
  * Description: Create an input video stream from the attached cameras.
  ********************************************************************************/
-bool create_input_video_stream(void)
+bool create_video_io_streams(void)
 {
+#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+    const std::string base_path = "/workspace/OperationSquirrel/SquirrelDefender/data/";
+#else
+    const std::string base_path = "./";
+#endif
+
+    // Make sure the folder exists
+    std::error_code ec;
+    std::filesystem::create_directories(base_path, ec);
+
+    const std::string base_name = "output";
+    const std::string extension = ".mp4";
+    const std::string file_name = generate_unique_file_name(base_name, extension);
+    const std::string full_path = base_path + file_name;
+    std::string video_cap_pipeline;
+    std::string video_out_pipeline;
+
     // Use live camera feed or use prerecorded video
     if (!g_use_video_playback)
     {
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-        std::ostringstream ss;
-
-        ss << "nvarguscamerasrc sensor-mode=0 "
-              " wbmode=1 aeantibanding=2 tnr-mode=0 ee-mode=0 "
-              " exposuretimerange=\"8000000 33333333\" gainrange=\"1 10\" ispdigitalgainrange=\"1 1.5\" ! "
-              "video/x-raw(memory:NVMM),format=NV12,width=3280,height=2464,framerate=21/1 ! "
-              "nvvidconv ! video/x-raw,format=BGRx,width=1640,height=1232 ! "
-              "videoconvert ! video/x-raw,format=BGR,width=1640,height=1232 ! "
-              "appsink drop=true max-buffers=1 sync=false";
-
-        std::string video_cap_pipeline = ss.str();
-
-        cap.open(video_cap_pipeline, cv::CAP_GSTREAMER);
-
-        video_cap_pipeline = ss.str();
+        create_gstreamer_pipelines(video_cap_pipeline, video_out_pipeline, full_path);
 
         cap.open(video_cap_pipeline, cv::CAP_GSTREAMER);
 
@@ -143,56 +248,22 @@ bool create_input_video_stream(void)
         cap.open(input_video_path);
     }
 
+    // Check that camera opens
     if (!cap.isOpened())
     {
-        std::cout << "Error: Could not open camera" << std::endl;
+        spdlog::error("Error: Could not open camera");
         return false;
     }
-
-    return true;
-}
-
-/********************************************************************************
- * Function: create_output_vid_stream
- * Description: Create an output video stream to save to a file
- ********************************************************************************/
-bool create_output_vid_stream(void)
-{
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
-    const std::string base_path = "/workspace/OperationSquirrel/SquirrelDefender/data/";
-#else
-    const std::string base_path = "./";
-#endif
-
-    // Make sure the folder exists
-    std::error_code ec;
-    std::filesystem::create_directories(base_path, ec);
-
-    const std::string base_name = "output";
-    const std::string extension = ".mp4";
-    const std::string file_name = generate_unique_file_name(base_name, extension);
-    const std::string full_path = base_path + file_name;
-
-    std::ostringstream ss;
-
-    // Your capture frames are BGR, 1640x1232 @ 21 fps
-    ss << "appsrc format=time is-live=true do-timestamp=true "
-       << "caps=video/x-raw,format=BGR,width=1640,height=1232,framerate=21/1 ! "
-       << "videoconvert ! "
-       << "x264enc bitrate=16000 speed-preset=veryfast tune=zerolatency key-int-max=21 threads=0 ! "
-       << "h264parse config-interval=1 ! mp4mux faststart=true ! filesink location=" << full_path;
-
-    const std::string video_out_pipeline = ss.str();
 
     // 21 is max fps for mode 0 (full resolution)
     if (!video_writer.open(video_out_pipeline, cv::CAP_GSTREAMER, 0, video_out_target_fps, cv::Size(g_input_video_width, g_input_video_height), true))
     {
-        std::cerr << "video_io_opencv: failed to open GStreamer VideoWriter\n";
+        spdlog::error("video_io_opencv: failed to open GStreamer VideoWriter\n");
         file_stream_created = false;
         return false;
     }
 
-    std::cout << "Recording to: " << full_path << std::endl;
+    spdlog::info("Recording to: " + full_path);
     file_stream_created = true;
 
     return true;
@@ -212,12 +283,12 @@ bool capture_image(void)
 
         if (g_use_video_playback)
         {
-            std::cout << "End of video playback" << std::endl;
+            spdlog::info("End of video playback");
             g_end_of_video = true;
             return false;
         }
 
-        std::cout << "Error: Could not capture image" << std::endl;
+        spdlog::error("Error: Could not capture image");
         return false;
     }
 
@@ -329,37 +400,12 @@ void delete_input_video_stream(void)
 }
 
 /********************************************************************************
- * Function: delete_video_file_stream
+ * Function: delete_output_video_stream
  * Description: Delete the output to the video file to stop using resources.
  ********************************************************************************/
-void delete_video_file_stream(void)
+void delete_output_video_stream(void)
 {
     video_writer.release();
-}
-
-/********************************************************************************
- * Function: delete_video_display_stream
- * Description: Delete the display to stop using resources.
- ********************************************************************************/
-void delete_video_display_stream(void)
-{
-    return;
-}
-
-/********************************************************************************
- * Function: video_output_file_reset
- * Description: Code to reset video streams.
- ********************************************************************************/
-bool video_output_file_reset(void)
-{
-    delete_video_file_stream();
-
-    if (!create_output_vid_stream())
-    {
-        return false;
-    }
-
-    return true;
 }
 
 /********************************************************************************
@@ -381,6 +427,7 @@ VideoCV::~VideoCV(void) {}
  ********************************************************************************/
 bool VideoCV::init(void)
 {
+    get_video_io_params();
 
     g_valid_image_rcvd = false;
     g_image = NULL;
@@ -388,8 +435,7 @@ bool VideoCV::init(void)
     video_fps_actual = (float)16.67;
     g_frame_id = (uint32_t)0;
 
-    if (!create_input_video_stream() ||
-        !create_output_vid_stream())
+    if (!create_video_io_streams())
     {
         return false;
     }
@@ -414,7 +460,6 @@ void VideoCV::out_loop(void)
 {
     video_mods();
     save_video();
-    display_video();
 }
 
 /********************************************************************************
@@ -425,7 +470,7 @@ void VideoCV::shutdown(void)
 {
     Print::cpp_cout("video:  shutting down...");
     delete_input_video_stream();
-    delete_video_file_stream();
+    delete_output_video_stream();
     Print::cpp_cout("video:  shutdown complete.\n");
 }
 

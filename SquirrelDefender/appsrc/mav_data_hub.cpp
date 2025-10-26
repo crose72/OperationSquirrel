@@ -436,8 +436,8 @@ void proc_mav_position_local_ned_msg(const mavlink_message_t *msg)
     // TODO - figure out why
     // Data showed Forward and right were -vx & -vy
     // Forward and right should be +vx & +vy
-    g_mav_veh_local_ned_vx = -position_local_ned.vx;
-    g_mav_veh_local_ned_vy = -position_local_ned.vy;
+    g_mav_veh_local_ned_vx = position_local_ned.vx;
+    g_mav_veh_local_ned_vy = position_local_ned.vy;
     g_mav_veh_local_ned_vz = position_local_ned.vz;
 
 #ifdef DEBUG_BUILD

@@ -14,14 +14,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "time_calc.h"
-#include <string>
-#include <fstream>
-#include <opencv2/cudaimgproc.hpp>
 #include <opencv2/opencv.hpp>
-#include <vector>
-#include <spdlog/spdlog.h>
 
 /********************************************************************************
  * Imported objects
@@ -40,8 +33,8 @@ extern float g_dt;
  ********************************************************************************/
 extern bool g_valid_image_rcvd;
 extern cv::Mat g_image;
-extern const float g_input_video_width;
-extern const float g_input_video_height;
+extern float g_input_video_width;
+extern float g_input_video_height;
 extern bool g_end_of_video;
 extern uint32_t g_frame_id;
 extern cv::cuda::GpuMat g_image_gpu;

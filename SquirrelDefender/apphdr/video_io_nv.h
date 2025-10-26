@@ -33,8 +33,8 @@ extern detectNet *g_net;
 extern bool g_valid_image_rcvd;
 extern videoSource *g_input;
 extern uchar3 *g_image;
-extern const float g_input_video_width;
-extern const float g_input_video_height;
+extern float g_input_video_width;
+extern float g_input_video_height;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
