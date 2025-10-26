@@ -222,12 +222,12 @@ bool create_video_io_streams(void)
     std::string video_cap_pipeline;
     std::string video_out_pipeline;
 
+    create_gstreamer_pipelines(video_cap_pipeline, video_out_pipeline, full_path);
+
     // Use live camera feed or use prerecorded video
     if (!g_use_video_playback)
     {
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
-
-        create_gstreamer_pipelines(video_cap_pipeline, video_out_pipeline, full_path);
 
         cap.open(video_cap_pipeline, cv::CAP_GSTREAMER);
 
