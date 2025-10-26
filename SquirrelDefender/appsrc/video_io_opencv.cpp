@@ -43,6 +43,8 @@ bool g_valid_image_rcvd;
 bool g_end_of_video;
 bool file_stream_created;
 uint32_t g_frame_id;
+float g_input_video_width_center;
+float g_input_video_height_center;
 
 /********************************************************************************
  * Calibration definitions
@@ -243,7 +245,11 @@ bool create_video_io_streams(void)
     }
     else
     {
-        cap.open(input_video_path);
+        // Use video playback - get input video's parameters
+        cap.open(g_input_video_path);
+        g_input_video_width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
+        g_input_video_height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+        video_out_target_fps = cap.get(cv::CAP_PROP_FPS);
     }
 
     // Check that camera opens
@@ -437,6 +443,10 @@ bool VideoCV::init(void)
     {
         return false;
     }
+
+    // Calculate new center if video playback has a different size
+    g_input_video_width_center = g_input_video_width * (float)0.5;
+    g_input_video_height_center = g_input_video_height * (float)0.5;
 
     return true;
 }

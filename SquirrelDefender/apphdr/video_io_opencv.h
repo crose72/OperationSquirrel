@@ -27,6 +27,8 @@ extern bool g_end_of_video;
 extern uint32_t g_frame_id;
 extern cv::cuda::GpuMat g_image_gpu;
 extern float g_camera_fov;
+extern float g_input_video_width_center;
+extern float g_input_video_height_center;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

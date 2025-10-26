@@ -64,13 +64,13 @@ void attach_sig_handler(void)
  ********************************************************************************/
 int main(int argc, char **argv)
 {
-    input_video_path = "";
+    g_input_video_path = "";
     g_use_video_playback = false;
     g_stop_program = false;
 
     if (argc > 1)
     {
-        input_video_path = argv[1];
+        g_input_video_path = argv[1];
         g_use_video_playback = true;
     }
 

@@ -84,8 +84,6 @@ OSNet *osnet_extractor;
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-const float center_of_frame_width = 640.0f;
-const float center_of_frame_height = 360.0f;
 float target_bbox_center_filt_coeff = (float)0.75;
 float target_similarity_thresh = (float)0.55;
 int max_reid_batch = (int)32;
@@ -365,8 +363,8 @@ void get_target_info(void)
     g_target_bottom = g_target_top + g_target_height;
     g_target_center_y = (g_target_left + g_target_right) / 2.0f;
     g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-    g_target_cntr_offset_y = g_target_center_y - center_of_frame_width;
-    g_target_cntr_offset_x = g_target_center_x - center_of_frame_height;
+    g_target_cntr_offset_y = g_target_center_y - g_input_video_width_center;
+    g_target_cntr_offset_x = g_target_center_x - g_input_video_height_center;
     g_target_aspect = g_target_width / g_target_height;
 
     g_target_cntr_offset_x_filt = low_pass_filter(g_target_cntr_offset_x, target_cntr_offset_x_prv, target_bbox_center_filt_coeff);
@@ -408,8 +406,8 @@ void update_target_info(void)
     g_target_bottom = g_target_top + g_target_height;
     g_target_center_y = (g_target_left + g_target_right) / 2.0f;
     g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-    g_target_cntr_offset_y = g_target_center_y - g_input_video_width * (float)0.5;
-    g_target_cntr_offset_x = g_target_center_x - center_of_frame_height;
+    g_target_cntr_offset_y = g_target_center_y - g_input_video_width_center;
+    g_target_cntr_offset_x = g_target_center_x - g_input_video_height_center;
     g_target_aspect = g_target_width / g_target_height;
 }
 
