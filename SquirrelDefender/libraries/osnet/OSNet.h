@@ -1,4 +1,5 @@
-#pragma once
+#ifndef OSNET_H
+#define OSNET_H
 
 #include "TRTEngine.h"
 #include <opencv2/opencv.hpp>
@@ -59,3 +60,5 @@ private:
     // Config flags
     bool mDoL2Normalize = true;
 };
+
+#endif // OSNET_H

@@ -11,15 +11,16 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "track_target.h"
+#include "video_io.h"
+#include "detect_target.h"
 #include "OSNet.h"
 #include "YOLOv8.h"
+#include "video_io.h"
 #include "param_reader.h"
 #include "signal_processing.h"
 #include <opencv2/opencv.hpp>
-#include <opencv2/tracking.hpp>
-#include <opencv2/core/utility.hpp>
-#include <opencv2/cudawarping.hpp>
 
 #ifdef BLD_JETSON_B01
 
@@ -83,8 +84,6 @@ OSNet *osnet_extractor;
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-const float center_of_frame_width = 640.0f;
-const float center_of_frame_height = 360.0f;
 float target_bbox_center_filt_coeff = (float)0.75;
 float target_similarity_thresh = (float)0.55;
 int max_reid_batch = (int)32;
@@ -166,7 +165,7 @@ void filter_detections(void)
             g_yolo_detections[n].probability > target_detection_thresh)
         {
             cv::Rect bbox = g_yolo_detections[n].rect; // Rect2f -> Rect (int)
-            bbox &= cv::Rect(0, 0, g_image_gpu.cols, g_image_gpu.rows);
+            bbox &= cv::Rect(0, 0, g_cam0_image_gpu.cols, g_cam0_image_gpu.rows);
 
             if (bbox.width <= 0 || bbox.height <= 0)
             {
@@ -175,7 +174,7 @@ void filter_detections(void)
 
             target_candidates.emplace_back(n);
             target_candidate_bboxs.push_back(bbox);
-            target_candidate_imgs.emplace_back(g_image_gpu(bbox));
+            target_candidate_imgs.emplace_back(g_cam0_image_gpu(bbox));
         }
     }
 
@@ -238,10 +237,10 @@ void track_objects(void)
 
         // Draw on CPU image
         // const cv::Rect &r = target_candidate_bboxs[i];
-        // cv::rectangle(g_image, r, cv::Scalar(0, 255, 0), 2);
+        // cv::rectangle(g_cam0_image, r, cv::Scalar(0, 255, 0), 2);
         // char txt[128];
         // std::snprintf(txt, sizeof(txt), "id=%d s=%.2f", best_idx, best_s);
-        // cv::putText(g_image, txt, {r.x, std::max(0, r.y - 5)},
+        // cv::putText(g_cam0_image, txt, {r.x, std::max(0, r.y - 5)},
         //             cv::FONT_HERSHEY_SIMPLEX, 0.5, {255, 255, 255}, 1);
     }
 
@@ -364,8 +363,8 @@ void get_target_info(void)
     g_target_bottom = g_target_top + g_target_height;
     g_target_center_y = (g_target_left + g_target_right) / 2.0f;
     g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-    g_target_cntr_offset_y = g_target_center_y - center_of_frame_width;
-    g_target_cntr_offset_x = g_target_center_x - center_of_frame_height;
+    g_target_cntr_offset_y = g_target_center_y - g_cam0_video_width_center;
+    g_target_cntr_offset_x = g_target_center_x - g_cam0_video_height_center;
     g_target_aspect = g_target_width / g_target_height;
 
     g_target_cntr_offset_x_filt = low_pass_filter(g_target_cntr_offset_x, target_cntr_offset_x_prv, target_bbox_center_filt_coeff);
@@ -378,10 +377,8 @@ void get_target_info(void)
  ********************************************************************************/
 void validate_target(void)
 {
-#if defined(BLD_JETSON_B01)
-
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
-        implimented. */
+    implimented. */
     if (g_target_detection_id >= 0 && g_target_track_id >= 0 && g_target_height > 1 && g_target_width > 1)
     {
         g_target_valid = true;
@@ -390,25 +387,6 @@ void validate_target(void)
     {
         g_target_valid = false;
     }
-
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
-
-    /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
-    implimented. */
-    if (g_target_detection_id >= 0 && g_target_height > 1 && g_target_width > 1)
-    {
-        g_target_valid = true;
-    }
-    else
-    {
-        g_target_valid = false;
-    }
-
-#else
-
-#error "Please define build platform."
-
-#endif // defined(BLD_JETSON_B01)
 
     target_valid_prv = g_target_valid;
 }
@@ -428,8 +406,8 @@ void update_target_info(void)
     g_target_bottom = g_target_top + g_target_height;
     g_target_center_y = (g_target_left + g_target_right) / 2.0f;
     g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-    g_target_cntr_offset_y = g_target_center_y - center_of_frame_width;
-    g_target_cntr_offset_x = g_target_center_x - center_of_frame_height;
+    g_target_cntr_offset_y = g_target_center_y - g_cam0_video_width_center;
+    g_target_cntr_offset_x = g_target_center_x - g_cam0_video_height_center;
     g_target_aspect = g_target_width / g_target_height;
 }
 
@@ -483,7 +461,7 @@ bool Tracking::init(void)
 
     OSNet::Config config;
     const std::string engine_path =
-        "/workspace/OperationSquirrel/SquirrelDefender/models/osnet/oxnet_x0_25.engine.NVIDIAGeForceRTX3060LaptopGPU.fp16.batch32";
+        "/workspace/OperationSquirrel/SquirrelDefender/networks/osnet/oxnet_x0_25.engine.NVIDIAGeForceRTX3060LaptopGPU.fp16.batch32";
 
     osnet_extractor = new OSNet(engine_path, config);
 
@@ -491,7 +469,7 @@ bool Tracking::init(void)
 
     OSNet::Config config;
     const std::string engine_path =
-        "/workspace/OperationSquirrel/SquirrelDefender/models/osnet/osnet_x0_25.engine.Orin.fp16.batch32";
+        "/workspace/OperationSquirrel/SquirrelDefender/networks/osnet/osnet_x0_25.engine.Orin.fp16.batch32";
 
     osnet_extractor = new OSNet(engine_path, config);
 

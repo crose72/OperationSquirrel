@@ -10,7 +10,10 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "mav_data_hub.h"
+#include "mav_utils.h"
+#include <spdlog/spdlog.h>
 
 /********************************************************************************
  * Typedefs
@@ -436,8 +439,8 @@ void proc_mav_position_local_ned_msg(const mavlink_message_t *msg)
     // TODO - figure out why
     // Data showed Forward and right were -vx & -vy
     // Forward and right should be +vx & +vy
-    g_mav_veh_local_ned_vx = -position_local_ned.vx;
-    g_mav_veh_local_ned_vy = -position_local_ned.vy;
+    g_mav_veh_local_ned_vx = position_local_ned.vx;
+    g_mav_veh_local_ned_vy = position_local_ned.vy;
     g_mav_veh_local_ned_vz = position_local_ned.vz;
 
 #ifdef DEBUG_BUILD
@@ -845,7 +848,7 @@ bool MavMsg::init(void)
     if (!start_mav_comm() ||
         !start_message_subscriptions())
     {
-        Print::c_fprintf("Failed to initialize MAVLink communication\n");
+        spdlog::error("Failed to initialize MAVLink communication\n");
         return false;
     }
 

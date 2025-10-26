@@ -12,7 +12,15 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "detect_target_nv.h"
+#include "video_io.h"
+#include "param_reader.h"
+#include "jetson-utils/videoSource.h"
+#include "jetson-utils/videoOutput.h"
+#include "jetson-inference/objectTracker.h"
+#include <jetson-inference/objectTrackerIOU.h>
+#include <jetson-inference/objectTrackerKLT.h>
 
 /********************************************************************************
  * Typedefs
@@ -65,10 +73,10 @@ bool create_detection_network(void)
 
 #endif // DEBUG_BUILD
 
-    const char *model = "../models/SSD-Mobilenet-v2/ssd_mobilenet_v2_coco.uff";
-    const char *class_labels = "../models/SSD-Mobilenet-v2/ssd_coco_labels.txt";
-    // const char *model = "../models/SSD-Inception-v2/ssd_inception_v2_coco.uff";
-    // const char *class_labels = "../models/SSD-Inception-v2/ssd_coco_labels.txt";
+    const char *model = "../networks/SSD-Mobilenet-v2/ssd_mobilenet_v2_coco.uff";
+    const char *class_labels = "../networks/SSD-Mobilenet-v2/ssd_coco_labels.txt";
+    // const char *model = "../networks/SSD-Inception-v2/ssd_inception_v2_coco.uff";
+    // const char *class_labels = "../networks/SSD-Inception-v2/ssd_coco_labels.txt";
     float thresh = (float)0.5;
     const char *input_blob = "Input";
     const char *output_blob = "NMS"; // for SSD
@@ -101,13 +109,13 @@ void detect_targets(void)
 
     overlay_flags = overlay_flags | detectNet::OVERLAY_LABEL | detectNet::OVERLAY_CONFIDENCE | detectNet::OVERLAY_TRACKING | detectNet::OVERLAY_LINES;
 
-    if (overlay_flags > 0 && g_image != NULL)
+    if (overlay_flags > 0 && g_cam0_image != NULL)
     {
-        g_detection_count = g_net->Detect(g_image, g_input->GetWidth(), g_input->GetHeight(), &g_detections, overlay_flags);
+        g_detection_count = g_net->Detect(g_cam0_image, g_input->GetWidth(), g_input->GetHeight(), &g_detections, overlay_flags);
     }
-    else if (g_image != NULL)
+    else if (g_cam0_image != NULL)
     {
-        g_detection_count = g_net->Detect(g_image, g_input->GetWidth(), g_input->GetHeight(), &g_detections);
+        g_detection_count = g_net->Detect(g_cam0_image, g_input->GetWidth(), g_input->GetHeight(), &g_detections);
     }
     else
     {
@@ -139,7 +147,7 @@ bool SSD::init(void)
 
     if (!create_detection_network())
     {
-        Print::c_fprintf("Failed to create detection network");
+        spdlog::error("Failed to create detection network");
         return false;
     }
 
