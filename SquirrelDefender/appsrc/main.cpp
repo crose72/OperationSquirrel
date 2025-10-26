@@ -42,7 +42,7 @@ void sig_handler(int signo)
     if (signo == SIGINT)
     {
         g_stop_program = true;
-        Print::c_fprintf("received SIGINT\n");
+        spdlog::info("received SIGINT\n");
     }
 }
 
@@ -54,7 +54,7 @@ void attach_sig_handler(void)
 {
     if (signal(SIGINT, sig_handler) == SIG_ERR)
     {
-        Print::c_fprintf("can't catch SIGINT");
+        spdlog::error("can't catch SIGINT");
     }
 }
 

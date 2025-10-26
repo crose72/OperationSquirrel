@@ -12,20 +12,6 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "detect_target.h"
-#include <string>
-#include <fstream>
-#include "jetson-utils/videoSource.h"
-#include "jetson-utils/videoOutput.h"
-#include "jetson-inference/detectNet.h"
-#include "jetson-inference/objectTracker.h"
-#include <jetson-inference/objectTrackerIOU.h>
-
-/********************************************************************************
- * Imported objects
- ********************************************************************************/
-extern detectNet *g_net;
 
 /********************************************************************************
  * Exported objects

@@ -9,23 +9,6 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "mav_data_hub.h"
-#include "mav_utils.h"
-#include "path_planner.h"
-#include "system_controller.h"
-
-/********************************************************************************
- * Imported objects
- ********************************************************************************/
-extern bool g_target_too_close;
-extern bool g_target_valid;
-extern float g_vx_adjust;
-extern float g_vy_adjust;
-extern float g_vz_adjust;
-extern float g_yaw_adjust;
-extern uint16_t g_mav_veh_rngfdr_current_distance;
-extern int32_t g_mav_veh_rel_alt;
 
 /********************************************************************************
  * Exported objects

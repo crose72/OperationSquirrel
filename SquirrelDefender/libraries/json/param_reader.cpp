@@ -11,6 +11,9 @@
  * Includes
  ********************************************************************************/
 #include "param_reader.h"
+#include <stdint.h>
+#include <fstream>
+#include <spdlog/spdlog.h>
 
 /********************************************************************************
  * Typedefs
@@ -42,7 +45,7 @@ ParamReader::ParamReader(const std::string &filename)
 
     if (!configFile.is_open())
     {
-        std::cerr << "Error: Unable to open parameter file: " << filename << std::endl;
+        spdlog::error("Error: Unable to open parameter file: " + filename);
         return;
     }
     configFile >> root;
@@ -94,7 +97,7 @@ bool ParamReader::get_bool_param(const std::string &group, const std::string &ke
  * Function: get_string_param
  * Description: Return the value of parameters that are of type string.
  ********************************************************************************/
-std::string ParamReader::get_string_param(const std::string &group, const std::string &key) const 
+std::string ParamReader::get_string_param(const std::string &group, const std::string &key) const
 {
     return root[group][key].asString();
 }

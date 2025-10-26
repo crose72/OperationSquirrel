@@ -12,21 +12,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "jetson-utils/videoSource.h"
-#include "jetson-utils/videoOutput.h"
 #include "jetson-inference/detectNet.h"
-#include "jetson-inference/objectTracker.h"
-#include <jetson-inference/objectTrackerIOU.h>
-#include <jetson-inference/objectTrackerKLT.h>
-#include "video_io.h"
-#include "param_reader.h"
-
-/********************************************************************************
- * Imported objects
- ********************************************************************************/
-extern videoSource *g_input;
-extern uchar3 *g_image;
 
 /********************************************************************************
  * Exported objects
@@ -44,7 +30,7 @@ public:
     SSD(void);
     ~SSD(void);
 
-        static bool init(void);
+    static bool init(void);
     static void loop(void);
     static void shutdown(void);
 

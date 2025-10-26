@@ -13,15 +13,13 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "time_calc.h"
 #include "video_io_opencv.h"
+#include "time_calc.h"
 #include <opencv2/cudaimgproc.hpp>
 #include <spdlog/spdlog.h>
 #include <sstream>
 #include <filesystem>
-#include <string>
 #include <fstream>
-#include <vector>
 
 /********************************************************************************
  * Typedefs
@@ -52,7 +50,7 @@ uint32_t g_frame_id;
 float g_input_video_width = (float)1640.0;
 float g_input_video_height = (float)1232.0;
 float video_out_target_fps = (float)21.0;
-float g_camera_fov = (float)1.832595; // 1.832595 // for 105 fov // 1.4486 for 83 fov
+float g_camera_fov = (float)105.0; // 1.832595 // for 105 fov // 1.4486 for 83 fov
 
 /********************************************************************************
  * Function definitions
@@ -468,10 +466,10 @@ void VideoCV::out_loop(void)
  ********************************************************************************/
 void VideoCV::shutdown(void)
 {
-    Print::cpp_cout("video:  shutting down...");
+    spdlog::info("video:  shutting down...");
     delete_input_video_stream();
     delete_output_video_stream();
-    Print::cpp_cout("video:  shutdown complete.\n");
+    spdlog::info("video:  shutdown complete.\n");
 }
 
 #endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)

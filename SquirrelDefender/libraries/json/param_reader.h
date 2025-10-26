@@ -13,17 +13,8 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include <stdint.h>
-#include <iostream>
-#include <fstream>
-#include <map>
 #include <string>
-#include <sstream>
 #include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
-
-/********************************************************************************
- * Imported objects
- ********************************************************************************/
 
 /********************************************************************************
  * Exported objects

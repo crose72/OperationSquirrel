@@ -12,7 +12,15 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "detect_target_nv.h"
+#include "video_io.h"
+#include "param_reader.h"
+#include "jetson-utils/videoSource.h"
+#include "jetson-utils/videoOutput.h"
+#include "jetson-inference/objectTracker.h"
+#include <jetson-inference/objectTrackerIOU.h>
+#include <jetson-inference/objectTrackerKLT.h>
 
 /********************************************************************************
  * Typedefs
@@ -139,7 +147,7 @@ bool SSD::init(void)
 
     if (!create_detection_network())
     {
-        Print::c_fprintf("Failed to create detection network");
+        spdlog::error("Failed to create detection network");
         return false;
     }
 

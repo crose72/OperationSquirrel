@@ -2,7 +2,7 @@
  * @file    system_controller.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   High level state machine monitoring the state of flight, video 
+ * @brief   High level state machine monitoring the state of flight, video
  *          readiness and other signals to determine if the vehicle is ready to
  *          proceed with a course of action (e.g. ready to takeoff, error need to
  *          land).
@@ -12,6 +12,19 @@
  * Includes
  ********************************************************************************/
 #include "system_controller.h"
+#include "scheduler.h"
+#include "mav_data_hub.h"
+#include "mav_utils.h"
+#include "datalog.h"
+#include "video_io.h"
+#include "status_io.h"
+#include "vehicle_controller.h"
+#include "detect_target.h"
+#include "track_target.h"
+#include "localize_target.h"
+#include "path_planner.h"
+#include "path_planner.h"
+#include "time_calc.h"
 
 /********************************************************************************
  * Typedefs
@@ -43,7 +56,7 @@ void dtrmn_program_stop_cond(void);
  * Description: Determine system state,.
  ********************************************************************************/
 void dtrmn_program_stop_cond(void)
-{   
+{
     if (g_mav_veh_custom_mode == (uint32_t)9 && g_mav_veh_custom_mode_prv != (uint32_t)9)
     {
         g_manual_override_land = true;
@@ -97,12 +110,12 @@ int system_state_machine(void)
 
 #endif // ENABLE_CV
 
-       // Switch case determines how we transition from one state to another
+        // Switch case determines how we transition from one state to another
         switch (g_system_state)
         {
         // Default state is the first state, nothing is initialialized, no systems are active
         case SystemState::DEFAULT:
-            if (controller_initialiazed)
+            if (g_controller_initialiazed)
             {
                 g_system_state = SystemState::INIT;
             }
@@ -183,7 +196,7 @@ SystemController::~SystemController(void) {}
  ********************************************************************************/
 bool SystemController::init(void)
 {
-    controller_initialiazed = false;
+    g_controller_initialiazed = false;
     g_mav_veh_custom_mode_prv = 0;
 
 #ifdef BLD_JETSON_B01
@@ -214,5 +227,4 @@ void SystemController::loop(void)
  ********************************************************************************/
 void SystemController::shutdown(void)
 {
-
 }

@@ -12,6 +12,9 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "localize_target.h"
+#include "mav_data_hub.h"
+#include "track_target.h"
+#include "video_io.h"
 #include "param_reader.h"
 #include "interpolate.h"
 #include "signal_processing.h"

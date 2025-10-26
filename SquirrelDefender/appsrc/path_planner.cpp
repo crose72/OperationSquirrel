@@ -10,8 +10,16 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "path_planner.h"
 #include "video_io.h"
+#include "param_reader.h"
+#include "pid.h"
+#include "localize_target.h"
+#include "time_calc.h"
+#include "track_target.h"
+#include "mav_data_hub.h"
+#include "path_planner.h"
 #include <algorithm> // for std::min/std::max
 #include <cmath>     // for sin/cos/atan2
 

@@ -9,7 +9,21 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "datalog.h"
+#include <string>
+#include <vector>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include "mav_data_hub.h"
+#include "path_planner.h"
+#include "track_target.h"
+#include "localize_target.h"
+#include "detect_target.h"
+#include "time_calc.h"
+#include "system_controller.h"
+#include "video_io.h"
 
 /********************************************************************************
  * Typedefs

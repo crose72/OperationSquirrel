@@ -9,11 +9,10 @@
  * Includes
  ********************************************************************************/
 #include "mcap_logger.h"
-#include <iostream>
-#include <fstream>
 #include <vector>
 #include <cstddef> // std::byte
 #include <cstring> // std::memcpy
+#include <spdlog/spdlog.h>
 
 /********************************************************************************
  * Typedefs

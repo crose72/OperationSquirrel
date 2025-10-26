@@ -10,7 +10,10 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "mav_data_hub.h"
+#include "mav_utils.h"
+#include <spdlog/spdlog.h>
 
 /********************************************************************************
  * Typedefs
@@ -845,7 +848,7 @@ bool MavMsg::init(void)
     if (!start_mav_comm() ||
         !start_message_subscriptions())
     {
-        Print::c_fprintf("Failed to initialize MAVLink communication\n");
+        spdlog::error("Failed to initialize MAVLink communication\n");
         return false;
     }
 

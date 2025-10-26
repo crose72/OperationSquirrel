@@ -15,10 +15,7 @@
 #include <mcap/writer.hpp>
 #include <mcap/types.hpp>
 #include <fstream>
-#include <string>
-#include <memory>
 #include <unordered_map>
-#include <spdlog/spdlog.h>
 
 /********************************************************************************
  * Imported objects

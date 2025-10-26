@@ -11,17 +11,16 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "track_target.h"
+#include "video_io.h"
+#include "detect_target.h"
 #include "OSNet.h"
 #include "YOLOv8.h"
 #include "video_io.h"
 #include "param_reader.h"
 #include "signal_processing.h"
-
 #include <opencv2/opencv.hpp>
-#include <opencv2/tracking.hpp>
-#include <opencv2/core/utility.hpp>
-#include <opencv2/cudawarping.hpp>
 
 #ifdef BLD_JETSON_B01
 

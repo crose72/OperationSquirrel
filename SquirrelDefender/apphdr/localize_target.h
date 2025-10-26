@@ -13,32 +13,6 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "track_target.h"
-
-/********************************************************************************
- * Imported objects
- ********************************************************************************/
-extern float g_mav_veh_pitch;
-extern bool g_target_valid;
-extern int g_target_detection_id;
-extern int g_target_track_id;
-extern float g_target_cntr_offset_x;
-extern float g_target_cntr_offset_y;
-extern float g_target_height;
-extern float g_target_width;
-extern float g_target_aspect;
-extern float g_target_left;
-extern float g_target_right;
-extern float g_target_top;
-extern float g_target_bottom;
-extern float g_target_center_x;
-extern float g_target_center_y;
-extern float g_dt;
-extern float g_mav_veh_local_ned_z;
-extern float g_target_cntr_offset_x_filt;
-extern float g_target_cntr_offset_x;
-extern float g_input_video_height;
-extern uint64_t g_epoch_ns;
 
 /********************************************************************************
  * Exported objects

@@ -2,14 +2,20 @@
  * @file    vehicle_controller.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Send vehicle motion requests or commands based on the state of 
+ * @brief   Send vehicle motion requests or commands based on the state of
  *          the system and feedback loop.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "vehicle_controller.h"
+#include "track_target.h"
+#include "mav_data_hub.h"
+#include "mav_utils.h"
+#include "path_planner.h"
+#include "system_controller.h"
 
 /********************************************************************************
  * Typedefs
@@ -78,7 +84,7 @@ void dtrmn_veh_control_action(void)
     }
     else if (g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
-        /* Debounce counter to avoid sending vehicle commands before the vehicle is 
+        /* Debounce counter to avoid sending vehicle commands before the vehicle is
            at the desired height */
         if (takeoff_dbc_cnt > 0)
         {
@@ -94,7 +100,7 @@ void dtrmn_veh_control_action(void)
         {
             start_follow_mode = true;
         }
-        
+
         if (start_follow_mode)
         {
             follow_mode();
@@ -142,5 +148,5 @@ void VehicleController::loop(void)
  ********************************************************************************/
 void VehicleController::shutdown(void)
 {
-	MavCmd::set_mode_land(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+    MavCmd::set_mode_land(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
 }
