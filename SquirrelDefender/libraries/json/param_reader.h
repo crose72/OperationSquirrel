@@ -1,7 +1,3 @@
-#pragma once
-
-#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
-
 /********************************************************************************
  * @file    param_reader.h
  * @author  Cameron Rose
@@ -17,7 +13,7 @@
 #include <jsoncpp/json/json.h> //sudo apt-get install libjsoncpp-dev THEN target_link_libraries(your_executable_name jsoncpp)
 
 /********************************************************************************
- * Exported objects
+ * Typedefs / Enums / Structs
  ********************************************************************************/
 
 /********************************************************************************
@@ -40,5 +36,3 @@ private:
 };
 
 #endif // JSON_UTILS_H
-
-#endif // BLD_JETSON_B01 || BLD_JETSON_ORIN_NANO
