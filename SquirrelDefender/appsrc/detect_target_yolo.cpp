@@ -62,17 +62,17 @@ void detect_targets(void);
  ********************************************************************************/
 void detect_targets(void)
 {
-    if (g_valid_image_rcvd)
+    if (g_cam0_valid_image_rcvd)
     {
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-        g_yolo_detections = yolov8_detector->detectObjects(g_image);
+        g_yolo_detections = yolov8_detector->detectObjects(g_cam0_image);
         g_yolo_detection_count = g_yolo_detections.size();
-        yolov8_detector->drawObjectLabels(g_image, g_yolo_detections);
+        yolov8_detector->drawObjectLabels(g_cam0_image, g_yolo_detections);
 
 #elif defined(BLD_WIN)
 
-        YoloNet::detect(g_image, g_net, g_yolo_detections);
+        YoloNet::detect(g_cam0_image, g_net, g_yolo_detections);
         g_yolo_detection_count = g_yolo_detections.size();
 
 #else

@@ -1,5 +1,3 @@
-#pragma once
-
 #ifdef ENABLE_CV
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 
@@ -19,16 +17,18 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool g_valid_image_rcvd;
-extern cv::Mat g_image;
-extern float g_input_video_width;
-extern float g_input_video_height;
+extern bool g_cam0_valid_image_rcvd;
+extern cv::Mat g_cam0_image;
+extern float g_cam0_video_width;
+extern float g_cam0_video_height;
 extern bool g_end_of_video;
-extern uint32_t g_frame_id;
-extern cv::cuda::GpuMat g_image_gpu;
+extern uint32_t g_cam0_frame_id;
+extern cv::cuda::GpuMat g_cam0_image_gpu;
 extern float g_camera_fov;
-extern float g_input_video_width_center;
-extern float g_input_video_height_center;
+extern float g_cam0_video_width_center;
+extern float g_cam0_video_height_center;
+extern float g_cam0_fov_rad;
+extern float g_cam0_fov_rad_half;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

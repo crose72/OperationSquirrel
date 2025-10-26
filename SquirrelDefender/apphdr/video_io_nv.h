@@ -16,11 +16,11 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool g_valid_image_rcvd;
+extern bool g_cam0_valid_image_rcvd;
 extern videoSource *g_input;
-extern uchar3 *g_image;
-extern float g_input_video_width;
-extern float g_input_video_height;
+extern uchar3 *g_cam0_image;
+extern float g_cam0_video_width;
+extern float g_cam0_video_height;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

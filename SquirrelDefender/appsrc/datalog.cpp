@@ -163,7 +163,7 @@ void DataLogger::log_data(void)
     {
         os::logger::MavSystem m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
-        m.set_frame_id(g_frame_id);
+        m.set_frame_id(g_cam0_frame_id);
         m.set_sys_stat_voltage_battery(static_cast<uint32_t>(g_mav_veh_sys_stat_voltage_battery));
         m.set_sys_stat_current_battery(static_cast<int32_t>(g_mav_veh_sys_stat_current_battery));
         m.set_sys_stat_battery_remaining(static_cast<int32_t>(g_mav_veh_sys_stat_battery_remaining));
@@ -181,7 +181,7 @@ void DataLogger::log_data(void)
     {
         os::logger::MavKinematics m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
-        m.set_frame_id(g_frame_id);
+        m.set_frame_id(g_cam0_frame_id);
         m.set_gps_vx(static_cast<int32_t>(g_mav_veh_gps_vx));
         m.set_gps_vy(static_cast<int32_t>(g_mav_veh_gps_vy));
         m.set_gps_vz(static_cast<int32_t>(g_mav_veh_gps_vz));
@@ -214,7 +214,7 @@ void DataLogger::log_data(void)
     {
         os::logger::MavImuRaw m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
-        m.set_frame_id(g_frame_id);
+        m.set_frame_id(g_cam0_frame_id);
         m.set_imu_ax(static_cast<int32_t>(g_mav_veh_imu_ax));
         m.set_imu_ay(static_cast<int32_t>(g_mav_veh_imu_ay));
         m.set_imu_az(static_cast<int32_t>(g_mav_veh_imu_az));
@@ -228,7 +228,7 @@ void DataLogger::log_data(void)
     {
         os::logger::MavRangefinder m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
-        m.set_frame_id(g_frame_id);
+        m.set_frame_id(g_cam0_frame_id);
         m.set_current_distance(static_cast<uint32_t>(g_mav_veh_rngfdr_current_distance));
         m.set_signal_quality(static_cast<uint32_t>(g_mav_veh_rngfdr_signal_quality));
         DataLogger::publish("/mav/rangefinder", m, g_epoch_ns);
@@ -238,7 +238,7 @@ void DataLogger::log_data(void)
     {
         os::logger::MavOpticalFlow m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
-        m.set_frame_id(g_frame_id);
+        m.set_frame_id(g_cam0_frame_id);
         m.set_flow_comp_m_x(g_mav_veh_flow_comp_m_x);
         m.set_flow_comp_m_y(g_mav_veh_flow_comp_m_y);
         m.set_flow_x(static_cast<int32_t>(g_mav_veh_flow_x));
@@ -253,7 +253,7 @@ void DataLogger::log_data(void)
     {
         os::logger::Objects m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
-        m.set_frame_id(g_frame_id);
+        m.set_frame_id(g_cam0_frame_id);
 
         // Reserve to avoid reallocs
         m.mutable_detections()->Reserve(static_cast<int>(g_yolo_detections.size()));
@@ -288,7 +288,7 @@ void DataLogger::log_data(void)
     {
         os::logger::TargetDetection m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
-        m.set_frame_id(g_frame_id);
+        m.set_frame_id(g_cam0_frame_id);
         m.set_target_valid(g_target_valid);
         m.set_target_detection_id(static_cast<int32_t>(g_target_detection_id));
         m.set_target_track_id(static_cast<int32_t>(g_target_track_id));
@@ -312,7 +312,7 @@ void DataLogger::log_data(void)
     {
         os::logger::TargetLocation m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
-        m.set_frame_id(g_frame_id);
+        m.set_frame_id(g_cam0_frame_id);
         m.set_d_target_h(g_d_target_h);
         m.set_d_target_w(g_d_target_w);
         m.set_x_target(g_x_target);
@@ -337,7 +337,7 @@ void DataLogger::log_data(void)
     {
         os::logger::ControlOutput m;
         DataLogger::logTime(m.mutable_t(), g_epoch_ns);
-        m.set_frame_id(g_frame_id);
+        m.set_frame_id(g_cam0_frame_id);
         m.set_target_too_close(g_target_too_close);
         m.set_x_error(g_x_error);
         m.set_y_error(g_y_error);

@@ -360,7 +360,7 @@ void calc_fov(void)
     // g_meter_per_pix = known_obj_heigh_all_dist / ghost_object_height;
     // Currently gonna use the target actual height
     g_meter_per_pix = known_obj_heigh_all_dist / g_target_height;
-    g_fov_height = g_meter_per_pix * g_input_video_height;
+    g_fov_height = g_meter_per_pix * g_cam0_video_height;
 }
 
 /********************************************************************************
@@ -582,8 +582,8 @@ bool Localize::init(void)
     g_line_of_sight = (float)0.0;
     target_valid_prv = false;
     kf_loc_reset = false;
-    center_of_frame_width = g_input_video_width * (float)0.5;
-    center_of_frame_height = g_input_video_height * (float)0.5;
+    center_of_frame_width = g_cam0_video_width * (float)0.5;
+    center_of_frame_height = g_cam0_video_height * (float)0.5;
 
     return true;
 }

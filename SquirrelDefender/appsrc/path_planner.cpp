@@ -174,7 +174,6 @@ float y_desired = (float)0.0;
 
 float vxy_cmd_max_allowed_accel = (float)2.5; // m/s²  -> used as shaping accel cap
 float vxy_max_allowed_jerk = 8.0f;            // m/s^3 for x and y (jerk cap)
-float cam0_half_fov = (float)0.7423;          // half of 83 degree FOV camera
 
 /********************************************************************************
  * Function definitions
@@ -238,9 +237,6 @@ void get_path_params(void)
 
     vxy_cmd_max_allowed_accel = follow_control.get_float_param("Follow_Params", "CMD_vxy_max_allowed_accel");
     vxy_max_allowed_jerk = follow_control.get_float_param("Follow_Params", "CMD_vxy_max_allowed_jerk");
-
-    // Camera params
-    cam0_half_fov = follow_control.get_float_param("Follow_Params", "CAM0_FOV") * (float)0.5;
 }
 
 /********************************************************************************
@@ -281,7 +277,7 @@ void calc_yaw_target_error(void)
         // vehicle results in a value < -M_PI or > M_PI then the yaw value will have
         // to account for that, since when yaw becomes > M_PI or < -M_PI it rolls over
         // positive sign to negative or visa versa.
-        float abs_min_yaw_temp = yaw_initial - cam0_half_fov;
+        float abs_min_yaw_temp = yaw_initial - g_cam0_fov_rad;
 
         if (abs_min_yaw_temp >= -M_PI)
         {
@@ -292,7 +288,7 @@ void calc_yaw_target_error(void)
             min_yaw = M_PI - (std::abs(abs_min_yaw_temp) - M_PI);
         }
 
-        float abs_max_yaw_temp = yaw_initial + cam0_half_fov;
+        float abs_max_yaw_temp = yaw_initial + g_cam0_fov_rad;
 
         if (abs_max_yaw_temp <= M_PI)
         {
@@ -321,7 +317,7 @@ void calc_yaw_target_error(void)
         g_yaw_target = 0.0;
     }
 
-    const float angle = 2 * std::tan(g_camera_fov * 0.5) / g_input_video_width;
+    const float angle = 2 * std::tan(g_camera_fov * 0.5) / g_cam0_video_width;
 
     const float deadband_px = (float)50.0;
 
@@ -347,7 +343,7 @@ void calc_yaw_target_error(void)
         abs_yaw_target = -(M_PI - (std::abs(g_yaw_target) - M_PI));
     }
 
-    float abs_max_yaw_temp = yaw_initial + cam0_half_fov;
+    float abs_max_yaw_temp = yaw_initial + g_cam0_fov_rad;
 
     if (abs_max_yaw_temp <= M_PI)
     {

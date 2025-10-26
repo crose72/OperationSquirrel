@@ -71,7 +71,7 @@ void dtrmn_program_stop_cond(void)
         g_stop_program = true;
     }
 
-    if (!g_valid_image_rcvd && g_use_video_playback && g_system_state == SystemState::IN_FLIGHT_GOOD)
+    if (!g_cam0_valid_image_rcvd && g_use_video_playback && g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
         g_stop_program = true;
     }
@@ -102,7 +102,7 @@ int system_state_machine(void)
 
 #ifdef ENABLE_CV
 
-        prearm_checks = ((g_mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && g_valid_image_rcvd);
+        prearm_checks = ((g_mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && g_cam0_valid_image_rcvd);
 
 #else
 

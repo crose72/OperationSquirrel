@@ -109,13 +109,13 @@ void detect_targets(void)
 
     overlay_flags = overlay_flags | detectNet::OVERLAY_LABEL | detectNet::OVERLAY_CONFIDENCE | detectNet::OVERLAY_TRACKING | detectNet::OVERLAY_LINES;
 
-    if (overlay_flags > 0 && g_image != NULL)
+    if (overlay_flags > 0 && g_cam0_image != NULL)
     {
-        g_detection_count = g_net->Detect(g_image, g_input->GetWidth(), g_input->GetHeight(), &g_detections, overlay_flags);
+        g_detection_count = g_net->Detect(g_cam0_image, g_input->GetWidth(), g_input->GetHeight(), &g_detections, overlay_flags);
     }
-    else if (g_image != NULL)
+    else if (g_cam0_image != NULL)
     {
-        g_detection_count = g_net->Detect(g_image, g_input->GetWidth(), g_input->GetHeight(), &g_detections);
+        g_detection_count = g_net->Detect(g_cam0_image, g_input->GetWidth(), g_input->GetHeight(), &g_detections);
     }
     else
     {

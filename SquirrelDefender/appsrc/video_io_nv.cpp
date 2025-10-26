@@ -33,20 +33,20 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool g_valid_image_rcvd;
+bool g_cam0_valid_image_rcvd;
 std::string base_path = "../data/";
 bool display_stream_created;
 bool file_stream_created;
 videoSource *g_input;
 videoOutput *output_vid_file;
 videoOutput *output_vid_disp;
-uchar3 *g_image;
+uchar3 *g_cam0_image;
 
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-const float g_input_video_width = 1280.0;
-const float g_input_video_height = 720.0;
+const float g_cam0_video_width = 1280.0;
+const float g_cam0_video_height = 720.0;
 const float g_input_video_fps = 30;
 
 /********************************************************************************
@@ -206,7 +206,7 @@ bool capture_image(void)
 {
     int status = 0;
 
-    if (!g_input->Capture(&g_image, &status))
+    if (!g_input->Capture(&g_cam0_image, &status))
     {
         if (status != videoSource::TIMEOUT)
         {
@@ -214,14 +214,14 @@ bool capture_image(void)
         }
     }
 
-    // Checking for valid g_image, Capture may return true while g_image may still be NULL
-    if (g_image == NULL)
+    // Checking for valid g_cam0_image, Capture may return true while g_cam0_image may still be NULL
+    if (g_cam0_image == NULL)
     {
-        g_valid_image_rcvd = false;
-        return false; // Return false if the g_image is not valid
+        g_cam0_valid_image_rcvd = false;
+        return false; // Return false if the g_cam0_image is not valid
     }
 
-    g_valid_image_rcvd = true;
+    g_cam0_valid_image_rcvd = true;
 
     return true;
 }
@@ -235,7 +235,7 @@ bool save_video(void)
     // render output_vid_disp to the display
     if (output_vid_file != NULL)
     {
-        output_vid_file->Render(g_image, g_input->GetWidth(), g_input->GetHeight());
+        output_vid_file->Render(g_cam0_image, g_input->GetWidth(), g_input->GetHeight());
 
         // check if the user quit
         if (!output_vid_file->IsStreaming())
@@ -249,14 +249,14 @@ bool save_video(void)
 
 /********************************************************************************
  * Function: display_video
- * Description: Display the g_image on the screen.
+ * Description: Display the g_cam0_image on the screen.
  ********************************************************************************/
 bool display_video(void)
 {
     // render output_vid_disp to the display
     if (output_vid_disp != NULL)
     {
-        output_vid_disp->Render(g_image, g_input->GetWidth(), g_input->GetHeight());
+        output_vid_disp->Render(g_cam0_image, g_input->GetWidth(), g_input->GetHeight());
 
 #ifdef DEBUG_BUILD
 
@@ -340,8 +340,8 @@ VideoNV::~VideoNV(void) {}
 bool VideoNV::init(void)
 {
 
-    g_valid_image_rcvd = false;
-    g_image = NULL;
+    g_cam0_valid_image_rcvd = false;
+    g_cam0_image = NULL;
 
     if (!create_input_video_stream() ||
         !create_output_vid_stream())

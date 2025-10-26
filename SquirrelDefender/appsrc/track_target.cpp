@@ -165,7 +165,7 @@ void filter_detections(void)
             g_yolo_detections[n].probability > target_detection_thresh)
         {
             cv::Rect bbox = g_yolo_detections[n].rect; // Rect2f -> Rect (int)
-            bbox &= cv::Rect(0, 0, g_image_gpu.cols, g_image_gpu.rows);
+            bbox &= cv::Rect(0, 0, g_cam0_image_gpu.cols, g_cam0_image_gpu.rows);
 
             if (bbox.width <= 0 || bbox.height <= 0)
             {
@@ -174,7 +174,7 @@ void filter_detections(void)
 
             target_candidates.emplace_back(n);
             target_candidate_bboxs.push_back(bbox);
-            target_candidate_imgs.emplace_back(g_image_gpu(bbox));
+            target_candidate_imgs.emplace_back(g_cam0_image_gpu(bbox));
         }
     }
 
@@ -237,10 +237,10 @@ void track_objects(void)
 
         // Draw on CPU image
         // const cv::Rect &r = target_candidate_bboxs[i];
-        // cv::rectangle(g_image, r, cv::Scalar(0, 255, 0), 2);
+        // cv::rectangle(g_cam0_image, r, cv::Scalar(0, 255, 0), 2);
         // char txt[128];
         // std::snprintf(txt, sizeof(txt), "id=%d s=%.2f", best_idx, best_s);
-        // cv::putText(g_image, txt, {r.x, std::max(0, r.y - 5)},
+        // cv::putText(g_cam0_image, txt, {r.x, std::max(0, r.y - 5)},
         //             cv::FONT_HERSHEY_SIMPLEX, 0.5, {255, 255, 255}, 1);
     }
 
@@ -363,8 +363,8 @@ void get_target_info(void)
     g_target_bottom = g_target_top + g_target_height;
     g_target_center_y = (g_target_left + g_target_right) / 2.0f;
     g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-    g_target_cntr_offset_y = g_target_center_y - g_input_video_width_center;
-    g_target_cntr_offset_x = g_target_center_x - g_input_video_height_center;
+    g_target_cntr_offset_y = g_target_center_y - g_cam0_video_width_center;
+    g_target_cntr_offset_x = g_target_center_x - g_cam0_video_height_center;
     g_target_aspect = g_target_width / g_target_height;
 
     g_target_cntr_offset_x_filt = low_pass_filter(g_target_cntr_offset_x, target_cntr_offset_x_prv, target_bbox_center_filt_coeff);
@@ -406,8 +406,8 @@ void update_target_info(void)
     g_target_bottom = g_target_top + g_target_height;
     g_target_center_y = (g_target_left + g_target_right) / 2.0f;
     g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-    g_target_cntr_offset_y = g_target_center_y - g_input_video_width_center;
-    g_target_cntr_offset_x = g_target_center_x - g_input_video_height_center;
+    g_target_cntr_offset_y = g_target_center_y - g_cam0_video_width_center;
+    g_target_cntr_offset_x = g_target_center_x - g_cam0_video_height_center;
     g_target_aspect = g_target_width / g_target_height;
 }
 
