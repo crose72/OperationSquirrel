@@ -73,10 +73,10 @@ bool create_detection_network(void)
 
 #endif // DEBUG_BUILD
 
-    const char *model = "../models/SSD-Mobilenet-v2/ssd_mobilenet_v2_coco.uff";
-    const char *class_labels = "../models/SSD-Mobilenet-v2/ssd_coco_labels.txt";
-    // const char *model = "../models/SSD-Inception-v2/ssd_inception_v2_coco.uff";
-    // const char *class_labels = "../models/SSD-Inception-v2/ssd_coco_labels.txt";
+    const char *model = "../networks/SSD-Mobilenet-v2/ssd_mobilenet_v2_coco.uff";
+    const char *class_labels = "../networks/SSD-Mobilenet-v2/ssd_coco_labels.txt";
+    // const char *model = "../networks/SSD-Inception-v2/ssd_inception_v2_coco.uff";
+    // const char *class_labels = "../networks/SSD-Inception-v2/ssd_coco_labels.txt";
     float thresh = (float)0.5;
     const char *input_blob = "Input";
     const char *output_blob = "NMS"; // for SSD
