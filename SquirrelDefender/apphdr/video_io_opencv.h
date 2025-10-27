@@ -29,6 +29,8 @@ extern float g_cam0_video_width_center;
 extern float g_cam0_video_height_center;
 extern float g_cam0_fov_rad;
 extern float g_cam0_fov_rad_half;
+extern float g_cam0_tilt_down_angle;
+extern float g_cam0_tilt_down_angle_rad;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

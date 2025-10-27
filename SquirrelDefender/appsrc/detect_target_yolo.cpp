@@ -68,7 +68,12 @@ void detect_targets(void)
 
         g_yolo_detections = yolov8_detector->detectObjects(g_cam0_image);
         g_yolo_detection_count = g_yolo_detections.size();
+
+#if defined(BLD_WSL)
+
         yolov8_detector->drawObjectLabels(g_cam0_image, g_yolo_detections);
+
+#endif
 
 #elif defined(BLD_WIN)
 

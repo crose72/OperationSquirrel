@@ -277,16 +277,25 @@ private:
     {
         if constexpr (std::is_same_v<T, bool>)
         {
-            // Accept 1/0/true/false (case-insensitive for words)
-            if (s == "1")
-                return true;
-            if (s == "0")
+            // Handle numeric or textual bool representations
+            if (s.empty())
                 return false;
-            if (ieq(s, "true"))
+
+            if (s == "1" || ieq(s, "true") || ieq(s, "yes") || ieq(s, "on"))
                 return true;
-            if (ieq(s, "false"))
+            if (s == "0" || s == "0.0" || ieq(s, "false") || ieq(s, "no") || ieq(s, "off"))
                 return false;
-            throw std::runtime_error("CSVReader: cannot parse bool from '" + s + "'");
+
+            // Try parsing numerically (handles "0.0", "1.0", etc.)
+            try
+            {
+                float f = std::stof(s);
+                return f != 0.0f;
+            }
+            catch (...)
+            {
+                throw std::runtime_error("CSVReader: cannot parse bool from '" + s + "'");
+            }
         }
         else if constexpr (std::is_integral_v<T>)
         {

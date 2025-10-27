@@ -77,6 +77,17 @@ std::chrono::milliseconds Timer::getLoopTime(void)
 }
 
 /********************************************************************************
+ * Function: start_time
+ * Description: Get loop start time.
+ ********************************************************************************/
+std::chrono::milliseconds Timer::getDur(void)
+{
+    std::chrono::time_point<std::chrono::steady_clock> currTime = std::chrono::steady_clock::now();
+    std::chrono::milliseconds timerDur = std::chrono::duration_cast<std::chrono::milliseconds>(currTime - mStartTime);
+    return timerDur;
+}
+
+/********************************************************************************
  * Function: wait
  * Description: If loop finished early wait until the desired frequency is
  *              achieved before executing the next loop.

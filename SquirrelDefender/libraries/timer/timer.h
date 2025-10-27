@@ -27,6 +27,7 @@ public:
     ~Timer();
 
     std::chrono::milliseconds getLoopTime();
+    std::chrono::milliseconds getDur(void);
     void start(void);
     void stop(void);
     void wait(void);

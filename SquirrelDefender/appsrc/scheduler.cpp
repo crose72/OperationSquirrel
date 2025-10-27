@@ -9,7 +9,31 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "scheduler.h"
+#include "datalog.h"
+#include "video_io.h"
+#include "system_controller.h"
+#include "mav_data_hub.h"
+#include "mav_utils.h"
+#include "vehicle_controller.h"
+#include "detect_target.h"
+#include "track_target.h"
+#include "localize_target.h"
+#include "path_planner.h"
+#include "time_calc.h"
+#include "timer.h"
+#include "path_planner.h"
+#include <mutex>
+#include <signal.h>
+#include <chrono>
+#include <thread>
+
+#ifdef BLD_JETSON_B01
+
+#include "status_io.h"
+
+#endif // BLD_JETSON_B01
 
 /********************************************************************************
  * Typedefs

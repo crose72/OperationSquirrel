@@ -56,6 +56,8 @@ float g_cam0_video_width = (float)1640.0;
 float g_cam0_video_height = (float)1232.0;
 float g_camera_fov = (float)105.0; // 1.832595 rad for 105 fov // 1.4486 rad for 83 fov
 float cam0_video_out_fps = (float)21.0;
+float g_cam0_tilt_down_angle = (float)0.0;
+float g_cam0_tilt_down_angle_rad = (float)0.0;
 
 /********************************************************************************
  * Function definitions
@@ -120,6 +122,8 @@ void get_video_io_params(void)
     g_cam0_video_height = cfg.get_float_param("Camera_Control_Params", "Input_Height");
     cam0_video_out_fps = cfg.get_float_param("Camera_Control_Params", "Output_Framerate");
     g_camera_fov = cfg.get_float_param("Camera_Control_Params", "Output_Framerate");
+    g_cam0_tilt_down_angle = cfg.get_float_param("Camera_Control_Params", "CAM0_Tilt_Down_Angle");
+    g_cam0_tilt_down_angle_rad = g_cam0_tilt_down_angle * M_PI / (float)180.0;
     g_cam0_fov_rad = g_camera_fov * M_PI / (float)180.0;
     g_cam0_fov_rad_half = g_cam0_fov_rad * (float)0.5;
 }
@@ -473,6 +477,12 @@ void VideoCV::out_loop(void)
 {
     video_mods();
     save_video();
+
+#if defined(BLD_WSL)
+
+    display_video();
+
+#endif
 }
 
 /********************************************************************************

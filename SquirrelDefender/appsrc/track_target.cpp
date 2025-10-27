@@ -408,7 +408,7 @@ void update_target_info(void)
     g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
     g_target_cntr_offset_y = g_target_center_y - g_cam0_video_width_center;
     g_target_cntr_offset_x = g_target_center_x - g_cam0_video_height_center;
-    g_target_aspect = g_target_width / g_target_height;
+    g_target_aspect = (g_target_height >= 0.0000001 ? g_target_width / g_target_height : (float)0.0);
 }
 
 /********************************************************************************
