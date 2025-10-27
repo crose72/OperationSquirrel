@@ -103,6 +103,8 @@ arma::colvec u0_loc; // Observed initial measurements
 
 std::chrono::milliseconds target_lost_dbc;
 std::chrono::milliseconds target_lost_dbc_reset;
+bool target_is_lost;
+bool target_is_lost_prv;
 
 /********************************************************************************
  * Calibration definitions
@@ -340,7 +342,6 @@ void calc_fov(void)
  ********************************************************************************/
 void dtrmn_target_loc_img(void)
 {
-    target_lost_dbc = (std::chrono::milliseconds)0;
     // Only consider targets whose bounding boxes are not smashed against the
     // video frame, and at least a certain size (to prevent bad estimation)
     g_target_data_useful = (g_target_valid &&
@@ -350,48 +351,39 @@ void dtrmn_target_loc_img(void)
                                g_target_center_y > (g_cam0_video_width - target_det_edge_of_frame_buffer)) &&
                              !((g_target_width * g_target_height) < min_target_bbox_area)));
 
-    if (!g_target_data_useful)
+    if (g_target_data_useful)
     {
-        return;
+        target_lost_dbc = (std::chrono::milliseconds)0;
     }
-    // else if (target_data_useful_prv && !g_target_data_useful)
-    // {
-    //     target_data_useful_dbc.start();
-    // }
-    // else
-    // {
-    //     target_lost_dbc = target_data_useful_dbc.getDur();
-    // }
-    // Moving average for more smoothing - modifies the history vector
-    g_target_cntr_offset_x_mov_avg = moving_average(target_x_pix_hist4avg, g_target_cntr_offset_x, x_buffer_idx4avg, x_sum);
-    g_target_cntr_offset_y_mov_avg = moving_average(target_y_pix_hist4avg, g_target_cntr_offset_y, y_buffer_idx4avg, y_sum);
+    else if (target_data_useful_prv && !g_target_data_useful)
+    {
+        target_data_useful_dbc.start(); // start timing the outage
+    }
+    else
+    {
+        target_lost_dbc = target_data_useful_dbc.getDur(); // how long without a measurement we could use
+    }
 
-    // Convert the offset to meters
-    g_target_cntr_offset_x_m = g_target_cntr_offset_x_mov_avg * g_meter_per_pix;
+    target_is_lost = target_lost_dbc > target_lost_dbc_reset;
+
+    if (!target_is_lost)
+    {
+        // Moving average for more smoothing - modifies the history vector
+        g_target_cntr_offset_x_mov_avg = moving_average(target_x_pix_hist4avg, g_target_cntr_offset_x, x_buffer_idx4avg, x_sum);
+        g_target_cntr_offset_y_mov_avg = moving_average(target_y_pix_hist4avg, g_target_cntr_offset_y, y_buffer_idx4avg, y_sum);
+
+        // Convert the offset to meters
+        g_target_cntr_offset_x_m = g_target_cntr_offset_x_mov_avg * g_meter_per_pix;
+    }
+    else
+    {
+        g_target_cntr_offset_x_mov_avg = (float)0.0;
+        g_target_cntr_offset_y_mov_avg = (float)0.0;
+        g_target_cntr_offset_x_m = (float)0.0;
+    }
+
     target_data_useful_prv = g_target_data_useful;
 }
-
-// void dtrmn_target_loc_img(void)
-// {
-//     // Only consider targets whose bounding boxes are not smashed against the
-//     // video frame, and at least a certain size (to prevent bad estimation)
-//     g_target_data_useful = (g_target_valid &&
-//                             (!(g_target_center_x < 50.0 || g_target_center_x > 670) &&
-//                              !(g_target_center_y < 50.0 || g_target_center_x > 1230) &&
-//                              !((g_target_width * g_target_height) < 3500.0)));
-
-//     if (!g_target_data_useful)
-//     {
-//         return;
-//     }
-
-//     // Moving average for more smoothing - modifies the history vector
-//     g_target_cntr_offset_x_mov_avg = moving_average(target_x_pix_hist4avg, g_target_cntr_offset_x, x_buffer_idx4avg, x_sum);
-//     g_target_cntr_offset_y_mov_avg = moving_average(target_y_pix_hist4avg, g_target_cntr_offset_y, y_buffer_idx4avg, y_sum);
-
-//     // Convert the
-//     g_target_cntr_offset_x_m = g_target_cntr_offset_x_mov_avg * g_meter_per_pix;
-// }
 
 /********************************************************************************
  * Function: dtrmn_target_loc_real
@@ -410,7 +402,7 @@ void dtrmn_target_loc_real(void)
     float delta_d;
     float target_bounding_box_rate;
 
-    if (g_target_data_useful)
+    if (g_target_data_useful && !target_is_lost)
     {
         /* Calculate distance from camera offset */
         g_d_target_h = powf(g_target_height / pix_height_x_coef, (float)1.0 / pix_height_x_pow);
@@ -485,6 +477,17 @@ void dtrmn_target_loc_real(void)
         x_target_prv = g_x_target;
         y_target_prv = g_y_target;
     }
+    else
+    {
+        g_x_target = (float)0.0;
+        g_y_target = (float)0.0;
+        g_z_target = (float)0.0;
+        g_d_target = (float)0.0;
+        g_d_target_h = (float)0.0;
+        g_d_target_w = (float)0.0;
+        g_delta_d_x = (float)0.0;
+        g_delta_d_z = (float)0.0;
+    }
 
     loc_target_valid_prv = g_target_valid;
 }
@@ -495,18 +498,18 @@ void dtrmn_target_loc_real(void)
  ********************************************************************************/
 void update_target_loc_real(void)
 {
-    if (g_target_data_useful && g_dt > 0.0001)
+    if (g_target_data_useful && !target_is_lost)
     {
-        // if (!target_valid_prv && !kf_loc_reset /*target_lost_dbc > target_lost_dbc_reset*/)
-        // {
-        //     arma::colvec x0(n_states, arma::fill::zeros);
-        //     x0(0) = g_x_target; // pos x
-        //     x0(1) = g_y_target; // pos y
-        //     // vx, vy, ax, ay left at 0
+        if (target_is_lost_prv)
+        {
+            arma::colvec x0(n_states, arma::fill::zeros);
+            x0(0) = g_x_target; // pos x
+            x0(1) = g_y_target; // pos y
+            // vx, vy, ax, ay left at 0
 
-        //     kf_loc.InitSystemState(x0);
-        //     kf_loc_reset = true;
-        // }
+            kf_loc.InitSystemState(x0);
+            kf_loc_reset = true;
+        }
 
         // Measurement vector (observations)
         colvec z(2);
@@ -531,6 +534,8 @@ void update_target_loc_real(void)
         g_ax_target_ekf = state->at(4);
         g_ay_target_ekf = state->at(5);
     }
+
+    target_is_lost_prv = target_is_lost;
 };
 
 /********************************************************************************
@@ -581,6 +586,9 @@ bool Localize::init(void)
     g_line_of_sight = (float)0.0;
     target_valid_prv = false;
     kf_loc_reset = false;
+    target_is_lost = false;
+    target_is_lost_prv = false;
+    target_data_useful_prv = false;
 
     return true;
 }
