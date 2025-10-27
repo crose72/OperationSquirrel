@@ -13,6 +13,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include <chrono>
 
 /********************************************************************************
  * Exported objects
@@ -43,6 +44,8 @@ extern float g_target_cntr_offset_x_m;
 extern float g_target_cntr_offset_x_mov_avg;
 extern float g_target_cntr_offset_y_mov_avg;
 extern float g_line_of_sight;
+extern bool g_target_is_lost;
+extern float g_target_lost_dbc_sec;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

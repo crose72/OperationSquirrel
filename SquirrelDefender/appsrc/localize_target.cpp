@@ -101,10 +101,11 @@ arma::mat P_loc;     // Estimate error covariance
 arma::colvec x0_loc; // Initial state
 arma::colvec u0_loc; // Observed initial measurements
 
-std::chrono::milliseconds target_lost_dbc;
+std::chrono::milliseconds g_target_lost_dbc;
 std::chrono::milliseconds target_lost_dbc_reset;
-bool target_is_lost;
+bool g_target_is_lost;
 bool target_is_lost_prv;
+float g_target_lost_dbc_sec;
 
 /********************************************************************************
  * Calibration definitions
@@ -353,7 +354,8 @@ void dtrmn_target_loc_img(void)
 
     if (g_target_data_useful)
     {
-        target_lost_dbc = (std::chrono::milliseconds)0;
+        g_target_lost_dbc = (std::chrono::milliseconds)0;
+        g_target_lost_dbc_sec = (float)0.0;
     }
     else if (target_data_useful_prv && !g_target_data_useful)
     {
@@ -361,12 +363,22 @@ void dtrmn_target_loc_img(void)
     }
     else
     {
-        target_lost_dbc = target_data_useful_dbc.getDur(); // how long without a measurement we could use
+#if defined(BLD_WSL)
+
+        g_target_lost_dbc += std::chrono::milliseconds((int)(g_dt * 1000));
+
+#else
+
+        g_target_lost_dbc = target_data_useful_dbc.getDur(); // how long without a measurement we could use
+
+#endif
+
+        g_target_lost_dbc_sec += g_dt;
     }
 
-    target_is_lost = target_lost_dbc > target_lost_dbc_reset;
+    g_target_is_lost = g_target_lost_dbc > target_lost_dbc_reset;
 
-    if (!target_is_lost)
+    if (!g_target_is_lost)
     {
         // Moving average for more smoothing - modifies the history vector
         g_target_cntr_offset_x_mov_avg = moving_average(target_x_pix_hist4avg, g_target_cntr_offset_x, x_buffer_idx4avg, x_sum);
@@ -402,7 +414,7 @@ void dtrmn_target_loc_real(void)
     float delta_d;
     float target_bounding_box_rate;
 
-    if (g_target_data_useful && !target_is_lost)
+    if (g_target_data_useful && !g_target_is_lost)
     {
         /* Calculate distance from camera offset */
         g_d_target_h = powf(g_target_height / pix_height_x_coef, (float)1.0 / pix_height_x_pow);
@@ -498,7 +510,7 @@ void dtrmn_target_loc_real(void)
  ********************************************************************************/
 void update_target_loc_real(void)
 {
-    if (g_target_data_useful && !target_is_lost)
+    if (g_target_data_useful && !g_target_is_lost)
     {
         if (target_is_lost_prv)
         {
@@ -535,7 +547,17 @@ void update_target_loc_real(void)
         g_ay_target_ekf = state->at(5);
     }
 
-    target_is_lost_prv = target_is_lost;
+    if (g_target_is_lost)
+    {
+        g_x_target_ekf = (float)0.0;
+        g_y_target_ekf = (float)0.0;
+        g_vx_target_ekf = (float)0.0;
+        g_vy_target_ekf = (float)0.0;
+        g_ax_target_ekf = (float)0.0;
+        g_ay_target_ekf = (float)0.0;
+    }
+
+    target_is_lost_prv = g_target_is_lost;
 };
 
 /********************************************************************************
@@ -586,7 +608,7 @@ bool Localize::init(void)
     g_line_of_sight = (float)0.0;
     target_valid_prv = false;
     kf_loc_reset = false;
-    target_is_lost = false;
+    g_target_is_lost = false;
     target_is_lost_prv = false;
     target_data_useful_prv = false;
 
