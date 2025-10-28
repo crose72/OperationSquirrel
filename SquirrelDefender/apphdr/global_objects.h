@@ -16,6 +16,6 @@
  ********************************************************************************/
 extern bool g_stop_program;
 extern bool g_use_video_playback;
-extern std::string input_video_path;
+extern std::string g_input_video_path;
 
 #endif // GLOBAL_OBJECTS_H

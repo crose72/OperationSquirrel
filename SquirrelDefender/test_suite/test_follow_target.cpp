@@ -4,10 +4,20 @@
 
 // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
 #include "global_objects.h"
-#include "localize_target.h"
-#include "time_calc.h"
-#include "datalog.h"
 #include "param_reader.h"
+#include "datalog.h"
+#include "video_io.h"
+#include "system_controller.h"
+#include "mav_data_hub.h"
+#include "mav_utils.h"
+#include "vehicle_controller.h"
+#include "detect_target.h"
+#include "track_target.h"
+#include "localize_target.h"
+#include "path_planner.h"
+#include "time_calc.h"
+#include "timer.h"
+#include "path_planner.h"
 
 /********************************************************************************
  * Globals
@@ -29,31 +39,29 @@ TestHarness g_h;
 
 // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
 // Input variables
-#define INPUT_VARS(X)              \
-    X(g_app_elapsed_time)          \
-    X(g_target_valid)              \
-    X(g_target_detection_num)      \
-    X(g_target_track_id)           \
-    X(g_detection_class)           \
-    X(g_target_detection_conf)     \
-    X(g_target_cntr_offset_x)      \
-    X(g_target_cntr_offset_y)      \
-    X(g_target_cntr_offset_x_filt) \
-    X(g_target_cntr_offset_y_filt) \
-    X(g_target_height)             \
-    X(g_target_width)              \
-    X(g_target_aspect)             \
-    X(g_target_left)               \
-    X(g_target_right)              \
-    X(g_target_top)                \
-    X(g_target_bottom)             \
-    X(g_mav_veh_local_ned_vx)      \
-    X(g_mav_veh_local_ned_vy)      \
-    X(g_mav_veh_imu_ax)            \
-    X(g_mav_veh_imu_ay)            \
-    X(g_mav_veh_imu_az)            \
-    X(g_mav_veh_yaw)               \
-    X(g_mav_veh_pitch)             \
+#define INPUT_VARS(X)          \
+    X(g_app_elapsed_time)      \
+    X(g_target_valid)          \
+    X(g_target_detection_id)   \
+    X(g_target_track_id)       \
+    X(g_detection_class)       \
+    X(g_target_detection_conf) \
+    X(g_target_cntr_offset_x)  \
+    X(g_target_cntr_offset_y)  \
+    X(g_target_height)         \
+    X(g_target_width)          \
+    X(g_target_aspect)         \
+    X(g_target_left)           \
+    X(g_target_right)          \
+    X(g_target_top)            \
+    X(g_target_bottom)         \
+    X(g_mav_veh_local_ned_vx)  \
+    X(g_mav_veh_local_ned_vy)  \
+    X(g_mav_veh_imu_ax)        \
+    X(g_mav_veh_imu_ay)        \
+    X(g_mav_veh_imu_az)        \
+    X(g_mav_veh_yaw)           \
+    X(g_mav_veh_pitch)         \
     X(g_mav_veh_local_ned_z)
 
 // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
@@ -94,7 +102,7 @@ TestHarness g_h;
     X(g_yaw_target)                                                        \
     /* Optionally repeat inputs you also want in output CSV (dedup OK): */ \
     X(g_app_elapsed_time)                                                  \
-    X(g_target_detection_num)                                              \
+    X(g_target_detection_id)                                               \
     X(g_target_track_id)                                                   \
     X(g_detection_class)                                                   \
     X(g_target_detection_conf)                                             \

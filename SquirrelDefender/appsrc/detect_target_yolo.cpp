@@ -12,7 +12,10 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "detect_target_yolo.h"
+#include "video_io.h"
+#include <opencv2/cudaimgproc.hpp>
 
 /********************************************************************************
  * Typedefs
@@ -59,17 +62,22 @@ void detect_targets(void);
  ********************************************************************************/
 void detect_targets(void)
 {
-    if (g_valid_image_rcvd)
+    if (g_cam0_valid_image_rcvd)
     {
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-        g_yolo_detections = yolov8_detector->detectObjects(g_image);
+        g_yolo_detections = yolov8_detector->detectObjects(g_cam0_image);
         g_yolo_detection_count = g_yolo_detections.size();
-        // yolov8_detector->drawObjectLabels(g_image, g_yolo_detections);
+
+#if defined(BLD_WSL)
+
+        yolov8_detector->drawObjectLabels(g_cam0_image, g_yolo_detections);
+
+#endif
 
 #elif defined(BLD_WIN)
 
-        YoloNet::detect(g_image, g_net, g_yolo_detections);
+        YoloNet::detect(g_cam0_image, g_net, g_yolo_detections);
         g_yolo_detection_count = g_yolo_detections.size();
 
 #else
@@ -101,7 +109,7 @@ bool YOLO::init(void)
 #if defined(BLD_JETSON_ORIN_NANO)
 
     YOLOv8::Config config;
-    const std::string engine_path = "/workspace/OperationSquirrel/SquirrelDefender/models/yolov8s/yolov8s.engine.orin.fp16";
+    const std::string engine_path = "/workspace/OperationSquirrel/SquirrelDefender/networks/yolov8s/yolov8s.engine.orin.fp16";
     yolov8_detector = new YOLOv8(engine_path, config);
 
     g_yolo_detections = std::vector<Object>();
@@ -110,7 +118,7 @@ bool YOLO::init(void)
 #elif defined(BLD_WSL)
 
     YOLOv8::Config config;
-    const std::string engine_path = "/workspace/OperationSquirrel/SquirrelDefender/models/yolov8s/yolov8s.engine.NVIDIAGeForceRTX3060LaptopGPU.fp16";
+    const std::string engine_path = "/workspace/OperationSquirrel/SquirrelDefender/networks/yolov8s/yolov8s.engine.NVIDIAGeForceRTX3060LaptopGPU.fp16.batch1";
     yolov8_detector = new YOLOv8(engine_path, config);
 
     g_yolo_detections = std::vector<Object>();
@@ -118,8 +126,8 @@ bool YOLO::init(void)
 
 #elif defined(BLD_WIN)
 
-    const std::string class_list_path = "../../models/yolov5m/coco.names";
-    const std::string model = "../../models/yolov5m/yolov5m.onnx";
+    const std::string class_list_path = "../../networks/yolov5m/coco.names";
+    const std::string model = "../../networks/yolov5m/yolov5m.onnx";
     g_net = YoloNet::create(model, class_list_path, cv::dnn::DNN_BACKEND_CUDA, cv::dnn::DNN_TARGET_CUDA);
     g_yolo_detections = std::vector<YoloNet::detection>();
     g_yolo_detections.reserve(100);

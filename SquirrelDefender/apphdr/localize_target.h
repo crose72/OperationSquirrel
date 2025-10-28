@@ -13,40 +13,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "track_target.h"
-#include "param_reader.h"
-#include "interpolate.h"
-#include "signal_processing.h"
-#include "time_calc.h"
-#include "kf.h"
-#include <cmath>
-#include "datalog.h"
-
-/********************************************************************************
- * Imported objects
- ********************************************************************************/
-extern float g_mav_veh_pitch;
-extern bool g_target_valid;
-extern int g_target_detection_num;
-extern int g_target_track_id;
-extern float g_target_cntr_offset_x;
-extern float g_target_cntr_offset_y;
-extern float g_target_height;
-extern float g_target_width;
-extern float g_target_aspect;
-extern float g_target_left;
-extern float g_target_right;
-extern float g_target_top;
-extern float g_target_bottom;
-extern float g_target_center_x;
-extern float g_target_center_y;
-extern float g_dt;
-extern float g_mav_veh_local_ned_z;
-extern float g_target_cntr_offset_x_filt;
-extern float g_target_cntr_offset_x;
-extern const float g_input_video_height;
-extern uint64_t g_epoch_ns;
+#include <chrono>
 
 /********************************************************************************
  * Exported objects
@@ -77,6 +44,8 @@ extern float g_target_cntr_offset_x_m;
 extern float g_target_cntr_offset_x_mov_avg;
 extern float g_target_cntr_offset_y_mov_avg;
 extern float g_line_of_sight;
+extern bool g_target_is_lost;
+extern float g_target_lost_dbc_sec;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

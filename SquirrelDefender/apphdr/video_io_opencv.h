@@ -1,5 +1,3 @@
-#pragma once
-
 #ifdef ENABLE_CV
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 
@@ -14,36 +12,25 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "time_calc.h"
-#include <string>
-#include <fstream>
-#include <opencv2/cudaimgproc.hpp>
 #include <opencv2/opencv.hpp>
-#include <vector>
-#include <spdlog/spdlog.h>
-
-/********************************************************************************
- * Imported objects
- ********************************************************************************/
-extern float g_app_elapsed_time;
-extern uint8_t g_mav_veh_state;
-extern float g_x_target_ekf;
-extern float g_y_target_ekf;
-extern int32_t g_mav_veh_rel_alt;
-extern std::string input_video_path;
-extern bool g_use_video_playback;
-extern float g_dt;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool g_valid_image_rcvd;
-extern cv::Mat g_image;
-extern const float g_input_video_width;
-extern const float g_input_video_height;
+extern bool g_cam0_valid_image_rcvd;
+extern cv::Mat g_cam0_image;
+extern float g_cam0_video_width;
+extern float g_cam0_video_height;
 extern bool g_end_of_video;
-extern uint32_t g_frame_id;
+extern uint32_t g_cam0_frame_id;
+extern cv::cuda::GpuMat g_cam0_image_gpu;
+extern float g_camera_fov;
+extern float g_cam0_video_width_center;
+extern float g_cam0_video_height_center;
+extern float g_cam0_fov_rad;
+extern float g_cam0_fov_rad_half;
+extern float g_cam0_tilt_down_angle;
+extern float g_cam0_tilt_down_angle_rad;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

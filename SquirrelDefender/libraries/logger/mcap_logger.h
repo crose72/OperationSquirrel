@@ -1,5 +1,3 @@
-#pragma once
-
 /********************************************************************************
  * @file    mcap_logger.h
  * @author  Cameron Rose
@@ -15,21 +13,14 @@
 #include <mcap/writer.hpp>
 #include <mcap/types.hpp>
 #include <fstream>
-#include <string>
-#include <memory>
 #include <unordered_map>
-#include <spdlog/spdlog.h>
 
 /********************************************************************************
- * Imported objects
+ * Typedefs / Enums / Structs
  ********************************************************************************/
 
 /********************************************************************************
- * Exported objects
- ********************************************************************************/
-
-/********************************************************************************
- * Function prototypes
+ * Function prototypes and Class Definitions
  ********************************************************************************/
 class MCAPLogger
 {

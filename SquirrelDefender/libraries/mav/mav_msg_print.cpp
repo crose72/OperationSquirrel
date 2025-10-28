@@ -11,19 +11,7 @@
 #include "mav_msg_print.h"
 
 /********************************************************************************
- * Typedefs
- ********************************************************************************/
-
-/********************************************************************************
  * Private macros and defines
- ********************************************************************************/
-
-/********************************************************************************
- * Object definitions
- ********************************************************************************/
-
-/********************************************************************************
- * Calibration definitions
  ********************************************************************************/
 
 /********************************************************************************
@@ -229,21 +217,21 @@ void print_distance_sensor(mavlink_distance_sensor_t &distance_sensor)
 
     printf("Distance Sensor data:\n");
     printf("\tTimestamp: %ums\n", distance_sensor.time_boot_ms);
-    printf("\tMinimum distance: %ucm\n",distance_sensor.min_distance);
-    printf("\tMaximum distance: %ucm\n",distance_sensor.max_distance);
-    printf("\tCurrent distance reading: %ucm\n",distance_sensor.current_distance);
-    printf("\tType of distance sensor: %ucm\n",distance_sensor.type);
-    printf("\tOnboard ID of the sensor: %ucm\n",distance_sensor.id);
-    printf("\tOrientation of the sensor: %u\n",distance_sensor.orientation);
-    printf("\tMeasurement variance: %ucm^2\n",distance_sensor.covariance);
-    printf("\tHorizontal Field of View: %urad\n",distance_sensor.horizontal_fov);
-    printf("\tVertical Field of View: %urad\n",distance_sensor.vertical_fov);
+    printf("\tMinimum distance: %ucm\n", distance_sensor.min_distance);
+    printf("\tMaximum distance: %ucm\n", distance_sensor.max_distance);
+    printf("\tCurrent distance reading: %ucm\n", distance_sensor.current_distance);
+    printf("\tType of distance sensor: %ucm\n", distance_sensor.type);
+    printf("\tOnboard ID of the sensor: %ucm\n", distance_sensor.id);
+    printf("\tOrientation of the sensor: %u\n", distance_sensor.orientation);
+    printf("\tMeasurement variance: %ucm^2\n", distance_sensor.covariance);
+    printf("\tHorizontal Field of View: %urad\n", distance_sensor.horizontal_fov);
+    printf("\tVertical Field of View: %urad\n", distance_sensor.vertical_fov);
     printf("\tSensor orientation quaternion: %.3f, %.3f, %.3f, %.3f\n",
-            distance_sensor.quaternion[0],
-            distance_sensor.quaternion[1],
-            distance_sensor.quaternion[2],
-            distance_sensor.quaternion[3]);
-    printf("\tSignal quality: %u\n",distance_sensor.signal_quality);
+           distance_sensor.quaternion[0],
+           distance_sensor.quaternion[1],
+           distance_sensor.quaternion[2],
+           distance_sensor.quaternion[3]);
+    printf("\tSignal quality: %u\n", distance_sensor.signal_quality);
 }
 
 /********************************************************************************
@@ -727,8 +715,8 @@ void print_command_ack(mavlink_command_ack_t &command_ack)
         printf("Unkown result\n");
     }
 
-    printf("\tprogress: %u\n",command_ack.progress);
-    printf("\tresult param 2: %u\n",command_ack.result_param2);
-    printf("\ttarget sys: %u\n",command_ack.target_system);
-    printf("\ttarget comp: %u\n",command_ack.target_component);
+    printf("\tprogress: %u\n", command_ack.progress);
+    printf("\tresult param 2: %u\n", command_ack.result_param2);
+    printf("\ttarget sys: %u\n", command_ack.target_system);
+    printf("\ttarget comp: %u\n", command_ack.target_component);
 }

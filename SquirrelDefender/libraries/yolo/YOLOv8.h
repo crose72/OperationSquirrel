@@ -1,4 +1,5 @@
-#pragma once
+#ifndef YOLOv8_H
+#define YOLOv8_H
 
 #include "TRTEngine.h"
 #include <opencv2/opencv.hpp>
@@ -247,3 +248,5 @@ private:
     const std::vector<std::vector<unsigned int>> mLimbColors = {
         {51, 153, 255}, {51, 153, 255}, {51, 153, 255}, {51, 153, 255}, {255, 51, 255}, {255, 51, 255}, {255, 51, 255}, {255, 128, 0}, {255, 128, 0}, {255, 128, 0}, {255, 128, 0}, {255, 128, 0}, {0, 255, 0}, {0, 255, 0}, {0, 255, 0}, {0, 255, 0}, {0, 255, 0}, {0, 255, 0}, {0, 255, 0}};
 };
+
+#endif // YOLOv8_H
