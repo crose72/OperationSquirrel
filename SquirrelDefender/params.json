@@ -149,22 +149,29 @@
         "CAM0_Tilt_Down_Angle": 28.017636
     },
     "PID_thrust": {
-        "Kp": 0.24,
-        "Ki": 0.04,
-        "Kd": 0.35,
-        "w1": 1.0,
-        "w2": 0.0,
-        "w3": 0.0
-    },
-    "ClimbAssist": {
-        "BoostStep": 0.005,
-        "BoostMax": 0.3,
-        "BoostDecay": 0.1,
-        "AltTol": 0.3,
-        "SlowZone": 1.0,
-        "VzMin": 0.15
-    },
-    "Target": {
+        "Kp": 0.25,
+        "Ki": 0.02,
+        "Kd": 0.15,
+        "w1": 20.0
+      },
+      "Takeoff": {
+        "ThrottleMax": 0.9,
+        "ThrottleSlewTime": 2.0,
+        "AltTolerance": 0.3,
+        "ClimbDetectVz": 0.1,
+        "ClimbDetectAlt": 0.3
+      },
+      "Target": {
         "Altitude": 8.0
-    }
+      },
+      "PID_alt": { 
+        "Kp": 0.4, 
+        "Ki": 0.02, 
+        "Kd": 0.2, 
+        "w1": 5.0 },
+      "PID_vel": { 
+        "Kp": 0.6, 
+        "Ki": 0.1, 
+        "Kd": 0.05, 
+        "w1": 10.0 }
 }
