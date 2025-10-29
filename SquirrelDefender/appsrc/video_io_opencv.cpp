@@ -480,7 +480,7 @@ void VideoCV::out_loop(void)
 
 #if defined(BLD_WSL)
 
-    display_video();
+    // display_video();
 
 #endif
 }

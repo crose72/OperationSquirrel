@@ -197,3 +197,40 @@ void MavCmd::send_cmd_long(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_
     mavlink_msg_command_long_encode(sender_sys_id, sender_comp_id, &msg, &command_long);
     send_mav_cmd(msg);
 }
+
+/********************************************************************************
+ * Function: read_param
+ * Description: This function sends mavlink message to read a flight controller
+ *              internal parameter.
+ ********************************************************************************/
+void MavCmd::read_param(uint8_t sender_sys_id,
+                        uint8_t sender_comp_id,
+                        uint8_t target_sys_id,
+                        uint8_t target_comp_id,
+                        const char *param_id,
+                        int16_t param_index)
+{
+    mavlink_message_t msg;
+    mavlink_param_request_read_t req;
+
+    req.target_system = target_sys_id;
+    req.target_component = target_comp_id;
+
+    // Choose between name or index
+    if (param_id && param_id[0] != '\0')
+    {
+        // Use name
+        strncpy(req.param_id, param_id, sizeof(req.param_id));
+        req.param_index = -1; // tells FCU to use param_id
+    }
+    else
+    {
+        // Use index
+        req.param_index = param_index;
+        req.param_id[0] = '\0'; // name ignored
+    }
+
+    // Encode and send
+    mavlink_msg_param_request_read_encode(sender_sys_id, sender_comp_id, &msg, &req);
+    send_mav_cmd(msg);
+}

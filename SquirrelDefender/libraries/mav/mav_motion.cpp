@@ -283,3 +283,56 @@ void MavMotion::send_cmd_set_position_target_global_int(uint8_t sender_sys_id, u
     mavlink_msg_set_position_target_global_int_encode(sender_sys_id, sender_comp_id, &msg, set_position_target_global_int);
     send_mav_cmd(msg);
 }
+
+static inline void euler_to_quaternion(float roll, float pitch, float yaw, float q[4])
+{
+    float cr = cosf(roll * 0.5f);
+    float sr = sinf(roll * 0.5f);
+    float cp = cosf(pitch * 0.5f);
+    float sp = sinf(pitch * 0.5f);
+    float cy = cosf(yaw * 0.5f);
+    float sy = sinf(yaw * 0.5f);
+
+    q[0] = cr * cp * cy + sr * sp * sy; // w
+    q[1] = sr * cp * cy - cr * sp * sy; // x
+    q[2] = cr * sp * cy + sr * cp * sy; // y
+    q[3] = cr * cp * sy - sr * sp * cy; // z
+}
+
+/********************************************************************************
+ * Function: send_cmd_set_attitude_target
+ * Description: This function uses the mavlink message set attitude target to
+ *              allow for manually controlling the roll, pitch, yaw, and thrust
+ *              of a vehicle using an external controller.
+ ********************************************************************************/
+void MavMotion::send_cmd_set_attitude_target(
+    uint8_t sender_sys_id,
+    uint8_t sender_comp_id,
+    uint8_t target_system,
+    uint8_t target_component,
+    uint8_t type_mask,
+    const float q[4],          // Attitude quaternion (w, x, y, z)
+    float body_roll_rate,      // [rad/s]
+    float body_pitch_rate,     // [rad/s]
+    float body_yaw_rate,       // [rad/s]
+    float thrust,              // [0..1] or [-1..1]
+    const float thrust_body[3] // optional 3D thrust vector
+)
+{
+    mavlink_set_attitude_target_t att{};
+    mavlink_message_t msg;
+
+    att.target_system = target_system;
+    att.target_component = target_component;
+    att.type_mask = type_mask;
+    memcpy(att.q, q, sizeof(att.q));
+    att.body_roll_rate = body_roll_rate;
+    att.body_pitch_rate = body_pitch_rate;
+    att.body_yaw_rate = body_yaw_rate;
+    att.thrust = thrust;
+    memcpy(att.thrust_body, thrust_body, sizeof(att.thrust_body));
+
+    // Encode and send
+    mavlink_msg_set_attitude_target_encode(sender_sys_id, sender_comp_id, &msg, &att);
+    send_mav_cmd(msg);
+}

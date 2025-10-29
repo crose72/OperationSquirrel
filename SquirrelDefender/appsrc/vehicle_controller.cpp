@@ -16,6 +16,7 @@
 #include "mav_utils.h"
 #include "path_planner.h"
 #include "system_controller.h"
+#include "sim_flight_test_2_AttitudeControl.h"
 
 /********************************************************************************
  * Typedefs
@@ -72,7 +73,8 @@ void dtrmn_veh_control_action(void)
 {
     if (g_system_state == SystemState::INIT)
     {
-        MavCmd::set_mode_guided(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+        // MavCmd::set_mode_guided(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+        MavCmd::set_mode_guided_nogps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
     }
     else if (g_system_state == SystemState::PRE_ARM_GOOD)
     {
@@ -80,7 +82,7 @@ void dtrmn_veh_control_action(void)
     }
     else if (g_system_state == SystemState::STANDBY)
     {
-        MavCmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, (float)7.0);
+        // MavCmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, (float)7.0);
     }
     else if (g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
@@ -101,10 +103,12 @@ void dtrmn_veh_control_action(void)
             start_follow_mode = true;
         }
 
-        if (start_follow_mode)
-        {
-            follow_mode();
-        }
+        // if (start_follow_mode)
+        // {
+        //     follow_mode();
+        // }
+
+        test_flight();
     }
 }
 
@@ -139,7 +143,8 @@ bool VehicleController::init(void)
  ********************************************************************************/
 void VehicleController::loop(void)
 {
-    dtrmn_veh_control_action();
+    // dtrmn_veh_control_action();
+    test_flight();
 }
 
 /********************************************************************************

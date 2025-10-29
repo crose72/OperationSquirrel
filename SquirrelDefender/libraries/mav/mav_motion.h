@@ -43,7 +43,18 @@ public:
                                                        uint16_t type_mask, uint8_t coordinate_frame);
     static void send_cmd_set_position_target_local_ned(mavlink_set_position_target_local_ned_t *desired_target);
     static void send_cmd_set_position_target_global_int(uint8_t sender_sys_id, uint8_t sender_comp_id, const mavlink_set_position_target_global_int_t *set_position_target_global_int); // coordinate_frame, type_mask, lat_int, lon_int, alt, vx, vy, vz, afx, afy, afz, yaw, yaw_rate
-    static void send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired_attitude_target);                                                                                   // type_mask, *q, body_roll_rate, body_pitch_rate, body_yaw_rate, thrust, *thrust_body
+    static void send_cmd_set_attitude_target(
+        uint8_t sender_sys_id,
+        uint8_t sender_comp_id,
+        uint8_t target_system,
+        uint8_t target_component,
+        uint8_t type_mask,
+        const float q[4],
+        float body_roll_rate,
+        float body_pitch_rate,
+        float body_yaw_rate,
+        float thrust,
+        const float thrust_body[3]);
     static void go_to_waypoint(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, int32_t lat, int32_t lon, float alt);
 
 private:

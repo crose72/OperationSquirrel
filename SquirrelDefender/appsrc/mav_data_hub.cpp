@@ -141,6 +141,16 @@ float g_mav_veh_local_ned_vx; /*< [m/s] X Speed*/
 float g_mav_veh_local_ned_vy; /*< [m/s] Y Speed*/
 float g_mav_veh_local_ned_vz; /*< [m/s] Z Speed*/
 
+// Parameter read
+
+float g_param_value;    /*<  Onboard parameter value*/
+uint16_t g_param_count; /*<  Total number of onboard parameters*/
+uint16_t g_param_index; /*<  Index of this onboard parameter*/
+char g_param_id[17];    /*<  Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string*/
+uint8_t g_param_type;   /*<  Onboard parameter type.*/
+std::string param_name;
+bool g_param_read;
+
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
@@ -319,14 +329,31 @@ void proc_mav_statustext_msg(const mavlink_message_t *msg)
  ********************************************************************************/
 void proc_mav_param_value_msg(const mavlink_message_t *msg)
 {
-    mavlink_param_value_t param_value;
-    mavlink_msg_param_value_decode(msg, &param_value);
+    mavlink_param_value_t param;
+    mavlink_msg_param_value_decode(msg, &param);
 
-#ifdef DEBUG_BUILD
+    // Copy param_id safely for internal use
+    memcpy(g_param_id, param.param_id, 16);
+    g_param_id[16] = '\0';
 
-    print_param_value(param_value);
+    g_param_value = param.param_value;
+    g_param_count = param.param_count;
+    g_param_index = param.param_index;
+    g_param_type = param.param_type;
+    param_name = g_param_id;
+    g_param_read = true;
 
-#endif // DEBUG_BUILD
+    // // --- Debug: print all raw MAVLink values ---
+    // char name_buf[17];
+    // memcpy(name_buf, param.param_id, 16);
+    // name_buf[16] = '\0'; // ensure null termination
+
+    // spdlog::info("[MAVLINK] PARAM_VALUE message received:");
+    // spdlog::info("  param_id:     {}", name_buf);
+    // spdlog::info("  param_value:  {}", param.param_value);
+    // spdlog::info("  param_type:   {}", static_cast<int>(param.param_type));
+    // spdlog::info("  param_index:  {}", param.param_index);
+    // spdlog::info("  param_count:  {}", param.param_count);
 }
 
 /********************************************************************************
@@ -661,6 +688,9 @@ void parse_mav_msgs(void)
     mavlink_message_t msg;        // initialize the Mavlink message buffer
     mavlink_status_t status = {}; // Initialize the Mavlink status
     uint8_t byte;
+
+    // reset param read status
+    g_param_read = false;
 
     int n = MavSerial::bytes_available();
 

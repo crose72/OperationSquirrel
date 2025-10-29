@@ -147,5 +147,24 @@
         "Output_Framerate": 21.0,
         "CAM0_FOV": 105.0,
         "CAM0_Tilt_Down_Angle": 28.017636
+    },
+    "PID_thrust": {
+        "Kp": 0.24,
+        "Ki": 0.04,
+        "Kd": 0.35,
+        "w1": 1.0,
+        "w2": 0.0,
+        "w3": 0.0
+    },
+    "ClimbAssist": {
+        "BoostStep": 0.005,
+        "BoostMax": 0.3,
+        "BoostDecay": 0.1,
+        "AltTol": 0.3,
+        "SlowZone": 1.0,
+        "VzMin": 0.15
+    },
+    "Target": {
+        "Altitude": 8.0
     }
 }
