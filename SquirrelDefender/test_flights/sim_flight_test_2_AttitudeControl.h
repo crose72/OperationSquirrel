@@ -164,7 +164,7 @@ void test_flight(void)
     float vz_target = pid_alt.pid(Kp_alt, Ki_alt, Kd_alt, alt_error, 2, dt);
 
     // limit climb/descend rate (like ArduPilot)
-    const float VZ_MAX = 1.0f; // m/s
+    const float VZ_MAX = 2.5f; // m/s
     vz_target = std::clamp(vz_target, -VZ_MAX, VZ_MAX);
 
     // --- Inner loop: velocity PID -> thrust delta ---
@@ -172,7 +172,7 @@ void test_flight(void)
     float thrust_delta = pid_vel.pid(Kp_vel, Ki_vel, Kd_vel, vz_error, 2, dt);
 
     // clamp thrust delta to ±20% of hover
-    thrust_delta = std::clamp(thrust_delta, -0.20f, 0.20f);
+    thrust_delta = std::clamp(thrust_delta, -0.20f, 0.50f);
 
     // --- Combine ---
     float thrust_cmd = hover_thrust + thrust_delta;
