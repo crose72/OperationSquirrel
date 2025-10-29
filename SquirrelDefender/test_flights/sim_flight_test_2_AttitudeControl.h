@@ -2,8 +2,7 @@
  * @file    sim_flight_test_2_AttitudeControl.h
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   A test to understand the set attitude target message for controlling
- *          the drone.
+ * @brief   Cascade altitude controller (ArduPilot-style)
  ********************************************************************************/
 
 #include "common_inc.h"
@@ -20,26 +19,27 @@
 float timerVal = 0.0f;
 int stage = 0;
 bool init = false;
-// --- PID controllers ---
-PID pid_alt; // altitude -> velocity
-PID pid_vel; // velocity -> thrust
 
-PID pid_thrust;
+// --- PID controllers (single error each) ---
+PID pid_alt;    // altitude -> velocity
+PID pid_vel;    // velocity -> thrust
+PID pid_thrust; // legacy (unused)
+
 float alt_error = 0.0f;
 
-// --- PID Thrust Parameters ---
-float Kp_thrust = 0.0f;
-float Ki_thrust = 0.0f;
-float Kd_thrust = 0.0f;
-float w1_thrust = 0.0f;
-float Kp_alt;
-float Ki_alt;
-float Kd_alt;
-float w1_alt;
-float Kp_vel;
-float Ki_vel;
-float Kd_vel;
-float w1_vel;
+// --- PID Gains ---
+float Kp_alt = 0.0f, Ki_alt = 0.0f, Kd_alt = 0.0f;
+float Kp_vel = 0.0f, Ki_vel = 0.0f, Kd_vel = 0.0f;
+
+// --- PID filter/tuning constants ---
+float w1_alt = 1.0f; // optional weights (unused)
+float w1_vel = 1.0f;
+float tau_alt = 0.15f; // derivative filter time constant (s)
+float tau_vel = 0.10f;
+float decay_alt = 0.98f;
+float decay_vel = 0.98f;
+float max_int_alt = 10.0f;
+float max_int_vel = 10.0f;
 
 // --- Hover & Target ---
 float hover_thrust = 0.35f;      // default if param read fails
@@ -99,11 +99,6 @@ void init_flight(void)
     ParamReader height_control("../params.json");
 
     // --- PID Parameters ---
-    Kp_thrust = height_control.get_float_param("PID_thrust", "Kp");
-    Ki_thrust = height_control.get_float_param("PID_thrust", "Ki");
-    Kd_thrust = height_control.get_float_param("PID_thrust", "Kd");
-    w1_thrust = height_control.get_float_param("PID_thrust", "w1");
-
     Kp_alt = height_control.get_float_param("PID_alt", "Kp");
     Ki_alt = height_control.get_float_param("PID_alt", "Ki");
     Kd_alt = height_control.get_float_param("PID_alt", "Kd");
@@ -113,6 +108,22 @@ void init_flight(void)
     Ki_vel = height_control.get_float_param("PID_vel", "Ki");
     Kd_vel = height_control.get_float_param("PID_vel", "Kd");
     w1_vel = height_control.get_float_param("PID_vel", "w1");
+
+    // Optional: filter & decay tuning
+    tau_alt = height_control.get_float_param("PID_alt", "Tau");
+    tau_vel = height_control.get_float_param("PID_vel", "Tau");
+    decay_alt = height_control.get_float_param("PID_alt", "Decay");
+    decay_vel = height_control.get_float_param("PID_vel", "Decay");
+    max_int_alt = height_control.get_float_param("PID_alt", "MaxIntegral");
+    max_int_vel = height_control.get_float_param("PID_vel", "MaxIntegral");
+
+    // --- Apply tuning to PID instances ---
+    pid_alt.deriv_tau = tau_alt;
+    pid_vel.deriv_tau = tau_vel;
+    pid_alt.integral_decay = decay_alt;
+    pid_vel.integral_decay = decay_vel;
+    pid_alt.max_integral = max_int_alt;
+    pid_vel.max_integral = max_int_vel;
 
     // --- Takeoff Parameters ---
     TAKEOFF_THR_MAX = height_control.get_float_param("Takeoff", "ThrottleMax");
@@ -150,10 +161,7 @@ void test_flight(void)
     float vz_up = -g_mav_veh_local_ned_vz; // +up
 
     // --- Outer loop: altitude PID -> climb rate target ---
-    float vz_target = pid_alt.pid3(
-        Kp_alt, Ki_alt, Kd_alt,
-        alt_error, 0, 0,
-        w1_alt, 0, 0, ControlDim::Z, dt);
+    float vz_target = pid_alt.pid(Kp_alt, Ki_alt, Kd_alt, alt_error, 2, dt);
 
     // limit climb/descend rate (like ArduPilot)
     const float VZ_MAX = 1.0f; // m/s
@@ -161,10 +169,7 @@ void test_flight(void)
 
     // --- Inner loop: velocity PID -> thrust delta ---
     float vz_error = vz_target - vz_up;
-    float thrust_delta = pid_vel.pid3(
-        Kp_vel, Ki_vel, Kd_vel,
-        vz_error, 0, 0,
-        w1_vel, 0, 0, ControlDim::Z, dt);
+    float thrust_delta = pid_vel.pid(Kp_vel, Ki_vel, Kd_vel, vz_error, 2, dt);
 
     // clamp thrust delta to ±20% of hover
     thrust_delta = std::clamp(thrust_delta, -0.20f, 0.20f);

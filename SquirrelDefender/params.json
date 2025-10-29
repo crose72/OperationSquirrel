@@ -148,11 +148,23 @@
         "CAM0_FOV": 105.0,
         "CAM0_Tilt_Down_Angle": 28.017636
     },
-    "PID_thrust": {
-        "Kp": 0.25,
-        "Ki": 0.02,
+    "PID_alt": {
+        "Kp": 0.6,
+        "Ki": 0.05,
         "Kd": 0.15,
-        "w1": 20.0
+        "w1": 1.0,
+        "Tau": 0.15,
+        "Decay": 0.98,
+        "MaxIntegral": 10.0
+      },
+      "PID_vel": {
+        "Kp": 0.4,
+        "Ki": 0.1,
+        "Kd": 0.05,
+        "w1": 1.0,
+        "Tau": 0.10,
+        "Decay": 0.98,
+        "MaxIntegral": 10.0
       },
       "Takeoff": {
         "ThrottleMax": 0.9,
@@ -163,15 +175,5 @@
       },
       "Target": {
         "Altitude": 8.0
-      },
-      "PID_alt": { 
-        "Kp": 0.4, 
-        "Ki": 0.02, 
-        "Kd": 0.2, 
-        "w1": 5.0 },
-      "PID_vel": { 
-        "Kp": 0.6, 
-        "Ki": 0.1, 
-        "Kd": 0.05, 
-        "w1": 10.0 }
+      }
 }
