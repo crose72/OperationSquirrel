@@ -96,9 +96,8 @@ struct MotionProfiler2D
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-PID3 pid_forwd;
-PID3 pid_rev;
-PID3 pid_yaw;
+PID pid_forwd;
+PID pid_rev;
 MotionProfiler2D g_vel_shaper; // shapes (g_vx_adjust, g_vy_adjust)
 bool g_target_too_close;
 bool yaw_initial_latched;
@@ -223,7 +222,7 @@ void get_path_params(void)
     w2_y_rev = follow_control.get_float_param("PID_vy_reverse", "w2");
     w3_y_rev = follow_control.get_float_param("PID_vy_reverse", "w3");
 
-    // Accessing Yaw PID3 parameters
+    // Accessing Yaw PID parameters
     Kp_yaw = follow_control.get_float_param("PID_yaw", "Kp");
     Ki_yaw = follow_control.get_float_param("PID_yaw", "Ki");
     Kd_yaw = follow_control.get_float_param("PID_yaw", "Kd");
@@ -376,34 +375,28 @@ void dtrmn_vel_cmd(void)
 {
     g_target_too_close = (g_x_error < 0.0f);
 
-    // PID3 control outputs - these are the control setpoints (vx, vy, etc)
+    // PID control outputs - these are the control setpoints (vx, vy, etc)
     if (g_target_valid && g_target_too_close)
     {
-        g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                   g_x_error, 0.0f, 0.0f,
-                                   w1_x_rev, 0.0f, 0.0f, ControlDim::X, g_dt);
+        g_vx_adjust = pid_rev.pid(Kp_x_rev, Ki_x_rev, Kd_x_rev,
+                                  g_x_error, ControlDim::X, g_dt);
 
-        g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                   g_y_error, 0.0f, 0.0f,
-                                   w1_y_rev, 0.0f, 0.0f, ControlDim::Y, g_dt);
+        g_vy_adjust = pid_rev.pid(Kp_y_rev, Ki_y_rev, Kd_y_rev,
+                                  g_y_error, ControlDim::Y, g_dt);
 
-        g_yaw_adjust = pid_yaw.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
-                                    g_yaw_target_error, 0.0f, 0.0f,
-                                    w1_yaw, 0.0f, 0.0f, ControlDim::YAW, g_dt);
+        g_yaw_adjust = pid_rev.pid(Kp_yaw, Ki_yaw, Kd_yaw,
+                                   g_yaw_target_error, ControlDim::YAW, g_dt);
     }
     else if (g_target_valid && !g_target_too_close)
     {
-        g_vx_adjust = pid_forwd.pid3(Kp_x, Ki_x, Kd_x,
-                                     g_x_error, 0.0f, 0.0f,
-                                     w1_x, 0.0f, 0.0f, ControlDim::X, g_dt);
+        g_vx_adjust = pid_forwd.pid(Kp_x, Ki_x, Kd_x,
+                                    g_x_error, ControlDim::X, g_dt);
 
-        g_vy_adjust = pid_forwd.pid3(Kp_y, Ki_y, Kd_y,
-                                     g_y_error, 0.0f, 0.0f,
-                                     w1_y, 0.0f, 0.0f, ControlDim::Y, g_dt);
+        g_vy_adjust = pid_forwd.pid(Kp_y, Ki_y, Kd_y,
+                                    g_y_error, ControlDim::Y, g_dt);
 
-        g_yaw_adjust = pid_yaw.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
-                                    g_yaw_target_error, 0.0f, 0.0f,
-                                    w1_yaw, 0.0f, 0.0f, ControlDim::YAW, g_dt);
+        g_yaw_adjust = pid_forwd.pid(Kp_yaw, Ki_yaw, Kd_yaw,
+                                     g_yaw_target_error, ControlDim::YAW, g_dt);
     }
     else
     {
@@ -413,7 +406,7 @@ void dtrmn_vel_cmd(void)
         g_yaw_adjust = 0.0f;
     }
 
-    // PID3 provides the raw command to reach the target
+    // PID provides the raw command to reach the target
     // Map your max-ramp-rate knob to the accel cap; jerk is separate.
     // This ensures any update (including update-to-zero) is turned into a smooth S-curve.
     // It does so by limiting the velocity command

@@ -21,9 +21,7 @@ int stage = 0;
 bool init = false;
 
 // --- PID controllers (single error each) ---
-PID pid_alt;    // altitude -> velocity
-PID pid_vel;    // velocity -> thrust
-PID pid_thrust; // legacy (unused)
+PID pid;
 
 float alt_error = 0.0f;
 
@@ -118,12 +116,9 @@ void init_flight(void)
     max_int_vel = height_control.get_float_param("PID_vel", "MaxIntegral");
 
     // --- Apply tuning to PID instances ---
-    pid_alt.deriv_tau = tau_alt;
-    pid_vel.deriv_tau = tau_vel;
-    pid_alt.integral_decay = decay_alt;
-    pid_vel.integral_decay = decay_vel;
-    pid_alt.max_integral = max_int_alt;
-    pid_vel.max_integral = max_int_vel;
+    pid.deriv_tau = tau_alt;
+    pid.integral_decay = decay_alt;
+    pid.max_integral = max_int_alt;
 
     // --- Takeoff Parameters ---
     TAKEOFF_THR_MAX = height_control.get_float_param("Takeoff", "ThrottleMax");
@@ -161,7 +156,7 @@ void test_flight(void)
     float vz_up = -g_mav_veh_local_ned_vz; // +up
 
     // --- Outer loop: altitude PID -> climb rate target ---
-    float vz_target = pid_alt.pid(Kp_alt, Ki_alt, Kd_alt, alt_error, 2, dt);
+    float vz_target = pid.pid(Kp_alt, Ki_alt, Kd_alt, alt_error, ControlDim::Z, dt);
 
     // limit climb/descend rate (like ArduPilot)
     const float VZ_MAX = 2.5f; // m/s
@@ -169,7 +164,7 @@ void test_flight(void)
 
     // --- Inner loop: velocity PID -> thrust delta ---
     float vz_error = vz_target - vz_up;
-    float thrust_delta = pid_vel.pid(Kp_vel, Ki_vel, Kd_vel, vz_error, 2, dt);
+    float thrust_delta = pid.pid(Kp_vel, Ki_vel, Kd_vel, vz_error, ControlDim::THRUST, dt);
 
     // clamp thrust delta to ±20% of hover
     thrust_delta = std::clamp(thrust_delta, -0.20f, 0.50f);
