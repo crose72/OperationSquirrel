@@ -17,7 +17,7 @@
  * Typedefs / Enums / Structs
  ********************************************************************************/
 // Auto Pilot Modes enumeration - same as in ArduPilot firmware
-enum class FlightMode : uint8_t
+enum class ArduPilotMode : uint8_t
 {
     STABILIZE = 0,     // manual airframe angle with manual throttle
     ACRO = 1,          // manual body-frame angular rate with manual throttle

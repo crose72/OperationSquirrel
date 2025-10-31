@@ -18,6 +18,7 @@ enum SystemState
     DEFAULT,
     INIT,
     PRE_ARM_GOOD,
+    ARMED,
     STANDBY,
     IN_FLIGHT_GOOD,
     IN_FLIGHT_ERROR
@@ -31,6 +32,7 @@ enum ControlDim
     ROLL,
     PITCH,
     YAW,
+    THRUST,
     N_DIMS
 };
 

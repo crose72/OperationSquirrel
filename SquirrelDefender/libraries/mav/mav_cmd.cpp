@@ -87,7 +87,7 @@ void MavCmd::disarm_vehicle(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8
 void MavCmd::set_mode_land(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
 {
     set_flight_mode(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
-                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::LAND, 0);
+                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)ArduPilotMode::LAND, 0);
 }
 
 /********************************************************************************
@@ -97,7 +97,7 @@ void MavCmd::set_mode_land(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_
 void MavCmd::set_mode_guided(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
 {
     set_flight_mode(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
-                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::GUIDED, 0);
+                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)ArduPilotMode::GUIDED, 0);
 }
 
 /********************************************************************************
@@ -107,7 +107,7 @@ void MavCmd::set_mode_guided(uint8_t sender_sys_id, uint8_t sender_comp_id, uint
 void MavCmd::set_mode_guided_nogps(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
 {
     set_flight_mode(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
-                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::GUIDED_NOGPS, 0);
+                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)ArduPilotMode::GUIDED_NOGPS, 0);
 }
 
 /********************************************************************************
@@ -117,7 +117,7 @@ void MavCmd::set_mode_guided_nogps(uint8_t sender_sys_id, uint8_t sender_comp_id
 void MavCmd::set_mode_rtl(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
 {
     set_flight_mode(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
-                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::RTL, 0);
+                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)ArduPilotMode::RTL, 0);
 }
 
 /********************************************************************************
