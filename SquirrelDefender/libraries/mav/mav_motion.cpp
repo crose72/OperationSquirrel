@@ -2,7 +2,7 @@
  * @file    mav_motion_utils.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Utilities for controlling the position, velocity, acceleration, or 
+ * @brief   Utilities for controlling the position, velocity, acceleration, or
  *          attitude of the vehicle.
  ********************************************************************************/
 
@@ -12,39 +12,24 @@
 #include "mav_motion.h"
 
 /********************************************************************************
- * Typedefs
- ********************************************************************************/
-
-/********************************************************************************
  * Private macros and defines
  ********************************************************************************/
-
-/********************************************************************************
- * Object definitions
- ********************************************************************************/
-mavlink_set_attitude_target_t desired_attitude_target;
-bool attitude_target_error = false;
-
-/********************************************************************************
- * Calibration definitions
- ********************************************************************************/
-const float error_cal = 0.1;
 
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
 
 /********************************************************************************
-* Function: MavMotion
-* Description: Constructor of the MavMotion class.
-********************************************************************************/
-MavMotion::MavMotion(void){}
+ * Function: MavMotion
+ * Description: Constructor of the MavMotion class.
+ ********************************************************************************/
+MavMotion::MavMotion(void) {}
 
 /********************************************************************************
-* Function: MavMotion
-* Description: Constructor of the MavMotion class.
-********************************************************************************/
-MavMotion::~MavMotion(void){}
+ * Function: MavMotion
+ * Description: Constructor of the MavMotion class.
+ ********************************************************************************/
+MavMotion::~MavMotion(void) {}
 
 /********************************************************************************
  * Function: cmd_position_NED
@@ -55,14 +40,14 @@ void MavMotion::cmd_position_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, 
     float yaw_target = 0.0;
     uint16_t options = 0;
 
-    options |= POSITION_TARGET_TYPEMASK_VX_IGNORE | POSITION_TARGET_TYPEMASK_VY_IGNORE | POSITION_TARGET_TYPEMASK_VZ_IGNORE | 
-        POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE |
-        POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
+    options |= POSITION_TARGET_TYPEMASK_VX_IGNORE | POSITION_TARGET_TYPEMASK_VY_IGNORE | POSITION_TARGET_TYPEMASK_VZ_IGNORE |
+               POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE |
+               POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
 
     yaw_target = calc_yaw_target(position_target[0], position_target[1]);
 
-    send_cmd_velocity_target(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, 
-                                      position_target[0], position_target[1], position_target[2], yaw_target, options, MAV_FRAME_BODY_OFFSET_NED);
+    send_cmd_velocity_target(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
+                             position_target[0], position_target[1], position_target[2], yaw_target, options, MAV_FRAME_BODY_OFFSET_NED);
 }
 
 /********************************************************************************
@@ -73,12 +58,12 @@ void MavMotion::cmd_velocity_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, 
 {
     uint16_t options = 0;
 
-    options |= POSITION_TARGET_TYPEMASK_X_IGNORE | POSITION_TARGET_TYPEMASK_Y_IGNORE | POSITION_TARGET_TYPEMASK_Z_IGNORE | 
-        POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE |
-        POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
+    options |= POSITION_TARGET_TYPEMASK_X_IGNORE | POSITION_TARGET_TYPEMASK_Y_IGNORE | POSITION_TARGET_TYPEMASK_Z_IGNORE |
+               POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE |
+               POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
 
-    send_cmd_velocity_target(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, 
-                                      velocity_target[0], velocity_target[1], velocity_target[2], yaw_target, options, MAV_FRAME_BODY_OFFSET_NED);
+    send_cmd_velocity_target(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
+                             velocity_target[0], velocity_target[1], velocity_target[2], yaw_target, options, MAV_FRAME_BODY_OFFSET_NED);
 }
 
 /********************************************************************************
@@ -90,13 +75,13 @@ void MavMotion::cmd_velocity_xy_NED(uint8_t sender_sys_id, uint8_t sender_comp_i
     float yaw_target = 0.0;
     uint16_t options = 0;
 
-    options |= POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE | 
-            POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
+    options |= POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE |
+               POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
 
     yaw_target = calc_yaw_target(velocity_target[0], velocity_target[1]);
 
-    send_cmd_velocity_target(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, 
-                                      velocity_target[0], velocity_target[1], 0.0, yaw_target, options, MAV_FRAME_BODY_OFFSET_NED);
+    send_cmd_velocity_target(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
+                             velocity_target[0], velocity_target[1], 0.0, yaw_target, options, MAV_FRAME_BODY_OFFSET_NED);
 }
 
 /********************************************************************************
@@ -107,11 +92,11 @@ void MavMotion::cmd_velocity_x_NED(uint8_t sender_sys_id, uint8_t sender_comp_id
 {
     uint16_t options = 0;
 
-    options |= POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE | 
-            POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
+    options |= POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE |
+               POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
 
-    send_cmd_velocity_target(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, 
-                                      velocity_target, 0.0, 0.0, 0.0, options, MAV_FRAME_BODY_OFFSET_NED);
+    send_cmd_velocity_target(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
+                             velocity_target, 0.0, 0.0, 0.0, options, MAV_FRAME_BODY_OFFSET_NED);
 }
 
 /********************************************************************************
@@ -122,13 +107,13 @@ void MavMotion::cmd_velocity_y_NED(uint8_t sender_sys_id, uint8_t sender_comp_id
 {
     uint16_t options = 0;
 
-    options |= POSITION_TARGET_TYPEMASK_X_IGNORE | POSITION_TARGET_TYPEMASK_Y_IGNORE | POSITION_TARGET_TYPEMASK_Z_IGNORE | 
-            POSITION_TARGET_TYPEMASK_VX_IGNORE | POSITION_TARGET_TYPEMASK_VZ_IGNORE | 
-            POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE | 
-            POSITION_TARGET_TYPEMASK_YAW_IGNORE | POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
+    options |= POSITION_TARGET_TYPEMASK_X_IGNORE | POSITION_TARGET_TYPEMASK_Y_IGNORE | POSITION_TARGET_TYPEMASK_Z_IGNORE |
+               POSITION_TARGET_TYPEMASK_VX_IGNORE | POSITION_TARGET_TYPEMASK_VZ_IGNORE |
+               POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE |
+               POSITION_TARGET_TYPEMASK_YAW_IGNORE | POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
 
-    send_cmd_velocity_target(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, 
-                                      0.0, velocity_target, 0.0, 0.0, options, MAV_FRAME_BODY_OFFSET_NED);
+    send_cmd_velocity_target(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
+                             0.0, velocity_target, 0.0, 0.0, options, MAV_FRAME_BODY_OFFSET_NED);
 }
 
 /********************************************************************************
@@ -139,13 +124,13 @@ void MavMotion::cmd_velocity_z_NED(uint8_t sender_sys_id, uint8_t sender_comp_id
 {
     uint16_t options = 0;
 
-    options |= POSITION_TARGET_TYPEMASK_X_IGNORE | POSITION_TARGET_TYPEMASK_Y_IGNORE | POSITION_TARGET_TYPEMASK_Z_IGNORE | 
-            POSITION_TARGET_TYPEMASK_VX_IGNORE | POSITION_TARGET_TYPEMASK_VY_IGNORE | 
-            POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE | 
-            POSITION_TARGET_TYPEMASK_YAW_IGNORE | POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
+    options |= POSITION_TARGET_TYPEMASK_X_IGNORE | POSITION_TARGET_TYPEMASK_Y_IGNORE | POSITION_TARGET_TYPEMASK_Z_IGNORE |
+               POSITION_TARGET_TYPEMASK_VX_IGNORE | POSITION_TARGET_TYPEMASK_VY_IGNORE |
+               POSITION_TARGET_TYPEMASK_AX_IGNORE | POSITION_TARGET_TYPEMASK_AY_IGNORE | POSITION_TARGET_TYPEMASK_AZ_IGNORE |
+               POSITION_TARGET_TYPEMASK_YAW_IGNORE | POSITION_TARGET_TYPEMASK_YAW_RATE_IGNORE;
 
-    send_cmd_velocity_target(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id, 
-                                      0.0, 0.0, velocity_target, 0.0, options, MAV_FRAME_BODY_OFFSET_NED);
+    send_cmd_velocity_target(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
+                             0.0, 0.0, velocity_target, 0.0, options, MAV_FRAME_BODY_OFFSET_NED);
 }
 
 /********************************************************************************
@@ -155,7 +140,7 @@ void MavMotion::cmd_velocity_z_NED(uint8_t sender_sys_id, uint8_t sender_comp_id
  ********************************************************************************/
 float MavMotion::calc_yaw_target(float x, float y)
 {
-    return atan2(y,x);
+    return atan2(y, x);
 }
 
 /********************************************************************************
@@ -165,71 +150,7 @@ float MavMotion::calc_yaw_target(float x, float y)
  ********************************************************************************/
 float MavMotion::calc_yaw_rate_target(float x, float y)
 {
-    return atan2(y,x);
-}
-
-/********************************************************************************
- * Function: dtrmn_attitude_target_error
- * Description: Determine if error between desired and actual attitude target
- *              is large
- ********************************************************************************/
-bool dtrmn_attitude_target_error(void)
-{
-    /*
-    if (std::fabs(g_mav_veh_q1_actual - g_mav_veh_q1_target) > error_cal ||
-        std::fabs(g_mav_veh_q2_actual - g_mav_veh_q2_target) > error_cal ||
-        std::fabs(g_mav_veh_q3_actual - g_mav_veh_q3_target) > error_cal ||
-        std::fabs(g_mav_veh_q4_actual - g_mav_veh_q4_target) > error_cal ||
-        std::fabs(g_mav_veh_roll_rate_actual - g_mav_veh_roll_rate_target) > error_cal ||
-        std::fabs(g_mav_veh_pitch_rate_actual - g_mav_veh_pitch_rate_target) > error_cal ||
-        std::fabs(g_mav_veh_yaw_rate_actual - g_mav_veh_yaw_rate_target) > error_cal)
-    {
-        attitude_target_error = true;
-    }
-    else
-    {
-        attitude_target_error = false;
-    }
-    */
-    return true;
-}
-
-/********************************************************************************
- * Function: move_forward
- * Description: Command drone to move forward until otherwise directed
- ********************************************************************************/
-void move_forward(void)
-{
-}
-
-/********************************************************************************
- * Function: brake
- * Description: Command drone to air brake
- ********************************************************************************/
-void brake(void)
-{
-}
-
-/********************************************************************************
- * Function: attitude_yaw
- * Description: Command drone to yaw about the z axis.
- ********************************************************************************/
-void attitude_yaw(float yaw_pos, float yaw_rate)
-{
-}
-
-/********************************************************************************
- * Function: send_cmd_set_attitude_target
- * Description: This function uses the mavlink message set attitude target to
- *              allow for manually controlling the roll, pitch, yaw, and thrust
- *              of a vehicle using an external controller.
- ********************************************************************************/
-void MavMotion::send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desired_attitude_target)
-{
-    mavlink_message_t msg;
-
-    //mavlink_msg_set_attitude_target_encode(sender_sys_id, sender_comp_id, &msg, desired_attitude_target);
-    send_mav_cmd(msg);
+    return atan2(y, x);
 }
 
 /********************************************************************************
@@ -237,8 +158,8 @@ void MavMotion::send_cmd_set_attitude_target(mavlink_set_attitude_target_t *desi
  * Description: This function accepts an x, y, z vector target and sends a
  *              request to move to move the drone to that desired position.
  ********************************************************************************/
-void MavMotion::send_cmd_position_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component, 
-                                      float x, float y, float z, float yaw, uint16_t type_mask, uint8_t coordinate_frame)
+void MavMotion::send_cmd_position_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component,
+                                         float x, float y, float z, float yaw, uint16_t type_mask, uint8_t coordinate_frame)
 {
     mavlink_message_t msg;
     mavlink_set_position_target_local_ned_t command_position_target;
@@ -261,8 +182,8 @@ void MavMotion::send_cmd_position_target(uint8_t sender_sys_id, uint8_t sender_c
  * Description: This function accepts an x, y, z vector target and sends a
  *              request to move to move the drone to that desired position.
  ********************************************************************************/
-void MavMotion::send_cmd_velocity_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component, 
-                                      float vx, float vy, float vz, float yaw, uint16_t type_mask, uint8_t coordinate_frame)
+void MavMotion::send_cmd_velocity_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component,
+                                         float vx, float vy, float vz, float yaw, uint16_t type_mask, uint8_t coordinate_frame)
 {
     mavlink_message_t msg;
     mavlink_set_position_target_local_ned_t command_position_target;
@@ -282,15 +203,15 @@ void MavMotion::send_cmd_velocity_target(uint8_t sender_sys_id, uint8_t sender_c
 
 /********************************************************************************
  * Function: send_cmd_position_target
- * 
+ *
  * Description: This function accepts an x, y, z vector target and sends a
  *              request to move to move the drone to that desired position.
  ********************************************************************************/
-void MavMotion::send_cmd_acccel_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component, 
-                                      float ax, float ay, float az, float yaw, float yaw_rate, uint16_t type_mask, uint8_t coordinate_frame)
+void MavMotion::send_cmd_acccel_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component,
+                                       float ax, float ay, float az, float yaw, float yaw_rate, uint16_t type_mask, uint8_t coordinate_frame)
 {
-    //send_cmd_set_position_target_local_ned(sender_sys_id, sender_comp_id, target_system, target_component, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, ax, ay, az, 
-    //                                       yaw, yaw_rate, type_mask, coordinate_frame);
+    // send_cmd_set_position_target_local_ned(sender_sys_id, sender_comp_id, target_system, target_component, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, ax, ay, az,
+    //                                        yaw, yaw_rate, type_mask, coordinate_frame);
 }
 
 /********************************************************************************
@@ -299,11 +220,11 @@ void MavMotion::send_cmd_acccel_target(uint8_t sender_sys_id, uint8_t sender_com
  *              allow for manually controlling the position, velocity, or
  *              acceleration of a vehicle using an external controller.
  ********************************************************************************/
-void MavMotion::send_cmd_set_position_target_local_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, 
-                                                    uint8_t target_system, uint8_t target_component,
-                                                    float x, float y, float z, float vx, float vy, float vz, 
-                                                    float afx, float afy, float afz, float yaw, float yaw_rate,
-                                                    uint16_t type_mask, uint8_t coordinate_frame)
+void MavMotion::send_cmd_set_position_target_local_ned(uint8_t sender_sys_id, uint8_t sender_comp_id,
+                                                       uint8_t target_system, uint8_t target_component,
+                                                       float x, float y, float z, float vx, float vy, float vz,
+                                                       float afx, float afy, float afz, float yaw, float yaw_rate,
+                                                       uint16_t type_mask, uint8_t coordinate_frame)
 {
     mavlink_message_t msg;
     mavlink_set_position_target_local_ned_t command_position_target;
@@ -345,8 +266,7 @@ void MavMotion::go_to_waypoint(uint8_t sender_sys_id, uint8_t sender_comp_id, ui
     position_target_glob_int.coordinate_frame = MAV_FRAME_GLOBAL_RELATIVE_ALT_INT;
     position_target_glob_int.type_mask = (uint16_t)0b111111111000;
 
-   
-    //send_cmd_set_position_target_global_int (sender_sys_id, sender_comp_id, &position_target_glob_int); // mavlink_msg_command_int_pack(sender_sys_id, sender_comp_id, &msg, target_sys_id, target_comp_id, MAV_CMD_DO_SET_MODE, 0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, 6, 0, 0, -35.3671 * 1e7, 149.1649 * 1e7, 0); is used for AUTO mode?
+    // send_cmd_set_position_target_global_int (sender_sys_id, sender_comp_id, &position_target_glob_int); // mavlink_msg_command_int_pack(sender_sys_id, sender_comp_id, &msg, target_sys_id, target_comp_id, MAV_CMD_DO_SET_MODE, 0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, 6, 0, 0, -35.3671 * 1e7, 149.1649 * 1e7, 0); is used for AUTO mode?
 }
 
 /********************************************************************************
@@ -355,7 +275,7 @@ void MavMotion::go_to_waypoint(uint8_t sender_sys_id, uint8_t sender_comp_id, ui
  *              global int message to send a vehicle to a specific GPS location
  *              using an external controller.
  ********************************************************************************/
-void MavMotion::send_cmd_set_position_target_global_int(uint8_t sender_sys_id, uint8_t sender_comp_id, const mavlink_set_position_target_global_int_t* set_position_target_global_int)
+void MavMotion::send_cmd_set_position_target_global_int(uint8_t sender_sys_id, uint8_t sender_comp_id, const mavlink_set_position_target_global_int_t *set_position_target_global_int)
 {
     mavlink_message_t msg;
 

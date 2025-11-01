@@ -59,6 +59,7 @@ option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
 option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" OFF)
 option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" OFF)
+option(ENABLE_SECRET_SQUIRREL "Compile custom code with the open source Operation Squirrel" ON)
 
 # Option to use environment variables for library paths
 option(USE_ENV_VAR "Use environment variables for library paths" OFF)
@@ -217,7 +218,7 @@ if(BLD_JETSON_B01)
     find_package(Armadillo REQUIRED)
     find_package(LAPACK REQUIRED)
     find_package(BLAS REQUIRED)
-elseif(BLD_JETSON_ORIN_NANO)
+elseif(BLD_JETSON_ORIN_NANO OR BLD_WSL)
     find_package(CUDA REQUIRED)
     find_package(OpenCV REQUIRED)
     find_package(TensorRT REQUIRED)
@@ -226,15 +227,15 @@ elseif(BLD_JETSON_ORIN_NANO)
     find_package(Armadillo REQUIRED)
     find_package(LAPACK REQUIRED)
     find_package(BLAS REQUIRED)
-elseif(BLD_WSL)
-    find_package(CUDA REQUIRED)
-    find_package(OpenCV REQUIRED)
-    find_package(TensorRT REQUIRED)
-    #find_package(vpi 3.2 REQUIRED)
-    find_package(Eigen3 REQUIRED)
-    find_package(Armadillo REQUIRED)
-    find_package(LAPACK REQUIRED)
-    find_package(BLAS REQUIRED)
+    find_package(Protobuf REQUIRED)
+    
+    # MCAP logging dependencies
+    find_package(ZLIB REQUIRED)
+    find_package(Threads REQUIRED)
+    find_library(LZ4_LIBRARY lz4)
+    find_library(ZSTD_LIBRARY zstd)
+    find_path(LZ4_INCLUDE_DIR lz4.h)
+    find_path(ZSTD_INCLUDE_DIR zstd.h)
 endif()
 
 # TODO: Specify the path to TensorRT root dir
@@ -292,7 +293,7 @@ if(USE_ENV_VAR)
         link_directories($ENV{LIB_OPENCV})
         link_directories($ENV{LIB_CUDA})
         link_directories($ENV{LIB_TEGRA})
-    elseif(BLD_JETSON_ORIN_NANO)
+    elseif(BLD_JETSON_ORIN_NANO OR BLD_WSL)
         # Validate required Jetson environment variables
         foreach(var LIB_JETSONINFERENCE LIB_JETSONUTILS LIB_OPENCV LIB_CUDA LIB_TEGRA
                     HDR_JETSONINFERENCE HDR_JETSONUTILS HDR_OPENCV HDR_CUDA)
@@ -343,36 +344,30 @@ else()
             /usr/lib/aarch64-linux-gnu/tegra
         )
 
-    elseif(BLD_JETSON_ORIN_NANO)
-        include_directories(
+    elseif(BLD_JETSON_ORIN_NANO OR BLD_WSL)
+        set(SD_COMMON_INCLUDE_DIRS
             /usr/local/cuda/include
             /usr/include/opencv4
+            # Armadillo dependencies for kf
             ${EIGEN3_INCLUDE_DIR}
             ${ARMADILLO_INCLUDE_DIRS}
             ${ACADOS_INCLUDE_DIR}
+            # MCAP / Protobuf
+            ${LZ4_INCLUDE_DIR}
+            ${ZSTD_INCLUDE_DIR}
+            ${Protobuf_INCLUDE_DIRS}
             #/usr/local/include/blasfeo/include # needed for ACADOS
             #/usr/local/include/hpipm/include/ # needed for ACADOS
             #/usr/local/include/acados_c # needed for ACADOS
-        )
-
-        link_directories(
+            )
+        set(SD_COMMON_LINK_DIRS
             /usr/local/lib
             /usr/local/cuda/lib64
             /usr/lib/aarch64-linux-gnu/tegra
             ${ARMADILLO_LIBRARY_DIRS}
-            # ${ACADOS_LIB_DIR} # needed for ACADOS
-        )
-    elseif(BLD_WSL)
-        include_directories(
-            /usr/local/cuda/include
-            /usr/include/opencv4
-            ${EIGEN3_INCLUDE_DIR}
-            ${ARMADILLO_INCLUDE_DIRS}
-            ${ACADOS_INCLUDE_DIR}
-            #/usr/local/include/blasfeo/include # needed for ACADOS
-            #/usr/local/include/hpipm/include/ # needed for ACADOS
-            #/usr/local/include/acados_c # needed for ACADOS
-        )
+            )
+        include_directories(${SD_COMMON_INCLUDE_DIRS})
+        link_directories(${SD_COMMON_LINK_DIRS})
 
         link_directories(
             /usr/local/lib
@@ -382,6 +377,30 @@ else()
             # ${ACADOS_LIB_DIR} # needed for ACADOS
         )
     endif()
+endif()
+
+if (BLD_JETSON_ORIN_NANO OR BLD_WSL)
+    set(SD_COMMON_LINK_LIBS
+        # MCAP deps
+        mcap
+        ${LZ4_LIBRARY}
+        ${ZSTD_LIBRARY}
+        ZLIB::ZLIB
+        Threads::Threads
+        # Vision/AI stack
+        trtinfer
+        ${OpenCV_LIBS}
+        vpi
+        opencv_core
+        opencv_imgproc
+        opencv_imgcodecs
+        opencv_videoio
+        jsoncpp
+        # Math
+        ${ARMADILLO_LIBRARIES}
+        ${LAPACK_LIBRARIES}
+        ${BLAS_LIBRARIES}
+    )
 endif()
 
 #=============================================================================
@@ -398,6 +417,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/math)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/json)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/print)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/yolo)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/osnet)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/pid)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/timer)
 
@@ -411,6 +431,8 @@ file(GLOB JSON_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/json/*.cpp)
 file(GLOB JSON_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/json/*.h)
 file(GLOB YOLO_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/yolo/*.cpp)
 file(GLOB YOLO_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/yolo/*.h)
+file(GLOB OSNET_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/osnet/*.cpp)
+file(GLOB OSNET_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/osnet/*.h)
 file(GLOB PRINT_UTILS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/print/*.cpp)
 file(GLOB PRINT_UTILS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/print/*.h)
 file(GLOB PID_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/pid/*.cpp)
@@ -426,14 +448,23 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman)
 file(GLOB KF_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.cpp)
 file(GLOB KF_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.h)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src)
-file(GLOB SS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.cpp)
-file(GLOB SS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.h)
+if(ENABLE_SECRET_SQUIRREL)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src)
+
+    file(GLOB SS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.cpp)
+    file(GLOB SS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.h)
+endif()
 
 if(BLD_JETSON_ORIN_NANO OR BLD_WSL)    
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/trtinfer/src)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/trtinfer/include)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/logger)
+
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/trtinfer)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/mcap)
+    
+    file(GLOB MCAP_LOGGER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/logger/*.cpp)
+    file(GLOB MCAP_LOGGER_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/logger/*.h)
 endif()
 
 #=============================================================================
@@ -454,10 +485,94 @@ file(GLOB HEADERS ${HEADER_DIR}/*.h)
 # Additional source files to compile together
 list(APPEND SOURCES ${MAV_UTILS_SOURCES} ${SERIAL_UTILS_SOURCES} ${MATH_UTILS_SOURCES} 
                     ${JSON_UTILS_SOURCES} ${PRINT_UTILS_SOURCES} ${YOLO_UTILS_SOURCES} 
-                    ${PID_SOURCES} ${TIMER_SOURCES} ${KF_SOURCES} ${SS_SOURCES})
+                    ${PID_SOURCES} ${TIMER_SOURCES} ${KF_SOURCES} ${SS_SOURCES} 
+                    ${MCAP_LOGGER_SOURCES} ${OSNET_UTILS_SOURCES})
 list(APPEND HEADERS ${MAV_UTILS_HEADERS} ${SERIAL_UTILS_HEADERS} ${MATH_UTILS_HEADERS} 
                     ${JSON_UTILS_HEADERS} ${PRINT_UTILS_HEADERS} ${YOLO_UTILS_HEADERS} 
-                    ${PID_HEADERS} ${TIMER_HEADERS} ${KF_HEADERS} ${SS_HEADERS})
+                    ${PID_HEADERS} ${TIMER_HEADERS} ${KF_HEADERS} ${SS_HEADERS} 
+                    ${MCAP_LOGGER_HEADERS} ${OSNET_UTILS_HEADERS})
+
+#=============================================================================
+# Generate protobuf source code from protobuf definitions
+#=============================================================================
+
+
+# Path to protobufs
+set(OS_PROTO_DIR "${CMAKE_CURRENT_SOURCE_DIR}/proto")
+
+# Collect protobuf files
+file(GLOB OS_PROTO_ABS "${OS_PROTO_DIR}/*.proto")
+
+if (OS_PROTO_ABS)
+  message(STATUS "[squirrel_protos] Found:")
+  foreach(_p IN LISTS OS_PROTO_ABS)
+    message(STATUS "  ${_p}")
+  endforeach()
+
+  # Unique generated dir (top-level build tree)
+  set(SQUIRREL_GEN_DIR "${CMAKE_BINARY_DIR}/generated_squirrel_protos")
+
+  # One-time prep: ensure the output dir exists before any proto rules
+  add_custom_target(squirrel_protos_prep
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${SQUIRREL_GEN_DIR}
+    COMMENT "[squirrel_protos] Preparing ${SQUIRREL_GEN_DIR}"
+  )
+
+  # --proto_path only to our proto folder
+  set(PROTO_PATH_ARGS "--proto_path=${OS_PROTO_DIR}")
+
+  # Generate C++ for each .proto
+  set(SQUIRREL_PROTO_SRCS "")
+  set(SQUIRREL_PROTO_HDRS "")
+  foreach(p IN LISTS OS_PROTO_ABS)
+    get_filename_component(name "${p}" NAME_WE)
+    set(out_cc "${SQUIRREL_GEN_DIR}/${name}.pb.cc")
+    set(out_h  "${SQUIRREL_GEN_DIR}/${name}.pb.h")
+
+    add_custom_command(
+      OUTPUT ${out_cc} ${out_h}
+      COMMAND ${Protobuf_PROTOC_EXECUTABLE}
+              ${PROTO_PATH_ARGS}
+              --cpp_out=${SQUIRREL_GEN_DIR}
+              ${p}
+      DEPENDS ${p} squirrel_protos_prep
+      COMMENT "[squirrel_protos] Generating C++ for ${p}"
+      VERBATIM
+    )
+    list(APPEND SQUIRREL_PROTO_SRCS ${out_cc})
+    list(APPEND SQUIRREL_PROTO_HDRS ${out_h})
+  endforeach()
+  # end protobuf generation
+
+  add_library(squirrel_protos ${SQUIRREL_PROTO_SRCS} ${SQUIRREL_PROTO_HDRS})
+  add_dependencies(squirrel_protos squirrel_protos_prep)
+  target_include_directories(squirrel_protos PUBLIC ${SQUIRREL_GEN_DIR})
+  target_link_libraries(squirrel_protos PUBLIC protobuf::libprotobuf)
+
+  # Single descriptor set for our protos
+  set(SQUIRREL_DESC_OUT ${SQUIRREL_GEN_DIR}/schemas.desc)
+  add_custom_command(
+    OUTPUT ${SQUIRREL_DESC_OUT}
+    COMMAND ${Protobuf_PROTOC_EXECUTABLE}
+            ${PROTO_PATH_ARGS}
+            --include_imports
+            --descriptor_set_out=${SQUIRREL_DESC_OUT}
+            ${OS_PROTO_ABS}
+    DEPENDS ${OS_PROTO_ABS} squirrel_protos_prep
+    COMMENT "[squirrel_protos] Generating descriptor set: ${SQUIRREL_DESC_OUT}"
+    VERBATIM
+  )
+  add_custom_target(squirrel_protos_desc ALL DEPENDS ${SQUIRREL_DESC_OUT})
+  add_dependencies(squirrel_protos_desc squirrel_protos_prep)
+
+  # Optional: copy descriptor next to top-level binaries
+  add_custom_command(TARGET squirrel_protos_desc POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            ${SQUIRREL_DESC_OUT} ${CMAKE_BINARY_DIR}/schemas.desc)
+
+else()
+  message(STATUS "[squirrel_protos] No .proto files in ${OS_PROTO_DIR}")
+endif()
 
 #=============================================================================
 # Build Executable for each supported platform
@@ -479,51 +594,20 @@ if (NOT BUILD_TEST_HARNESS)
                             ${ARMADILLO_LIBRARIES} 
                             ${LAPACK_LIBRARIES} 
                             ${BLAS_LIBRARIES})
-    elseif (BLD_JETSON_ORIN_NANO)
+    elseif (BLD_JETSON_ORIN_NANO OR BLD_WSL)
         cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
         set_target_debug_flags(squirreldefender)
 
-        target_link_libraries(squirreldefender 
-                            trtinfer 
-                            ${OpenCV_LIBS} 
-                            vpi 
-                            opencv_core
-                            opencv_imgproc 
-                            opencv_imgcodecs 
-                            opencv_videoio
-                            jsoncpp
-                            ${ARMADILLO_LIBRARIES} 
-                            ${LAPACK_LIBRARIES} 
-                            ${BLAS_LIBRARIES}
-                            #acados     # For acados, remove if you are not using qpOASES
-                            #hpipm      # For acados, remove if you are not using qpOASES
-                            #blasfeo    # For acados, remove if you are not using qpOASES
-                            #qpOASES_e  # For acados, remove if you are not using qpOASES
-                            #osqp       # For acados, remove if you are not using OSQP
-                            )
+        target_link_libraries(squirreldefender
+                            squirrel_protos
+                            ${Protobuf_LIBRARIES}
+                            ${SD_COMMON_LINK_LIBS})
 
-    elseif(BLD_WSL)
-        cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
-        set_target_debug_flags(squirreldefender)
-
-        target_link_libraries(squirreldefender 
-                            trtinfer 
-                            ${OpenCV_LIBS} 
-                            #vpi 
-                            opencv_core
-                            opencv_imgproc 
-                            opencv_imgcodecs 
-                            opencv_videoio
-                            jsoncpp
-                            ${ARMADILLO_LIBRARIES} 
-                            ${LAPACK_LIBRARIES} 
-                            ${BLAS_LIBRARIES}
-                            #acados     # For acados, remove if you are not using qpOASES
-                            #hpipm      # For acados, remove if you are not using qpOASES
-                            #blasfeo    # For acados, remove if you are not using qpOASES
-                            #qpOASES_e  # For acados, remove if you are not using qpOASES
-                            #osqp       # For acados, remove if you are not using OSQP
-                            )
+        # Wire in protos only if they were defined
+        if (TARGET squirrel_protos)
+            add_dependencies(squirreldefender squirrel_protos squirrel_protos_desc)
+        endif()
+        
     elseif(BLD_WIN)
 
         if(USE_ENV_VAR)
@@ -654,42 +738,6 @@ if (BUILD_TEST_HARNESS)
         list(APPEND TEST_SOURCE_BASE ${TEST_UTIL_SOURCES})
         include_directories(${CMAKE_CURRENT_SOURCE_DIR}/test_suite)
 
-        # Localize target test code
-        set(LOC_TEST_SOURCES ${TEST_SOURCE_BASE})
-        list(APPEND LOC_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_localize_target.cpp)
-        list(APPEND LOC_TEST_HEADERS ${TEST_UTIL_HEADERS})
-
-        cuda_add_executable(test_localize_target ${LOC_TEST_SOURCES} ${LOC_TEST_HEADERS})
-        set_target_debug_flags(test_localize_target)
-
-        if (BLD_JETSON_ORIN_NANO)
-            target_link_libraries(test_localize_target 
-                                trtinfer 
-                                ${OpenCV_LIBS} 
-                                vpi 
-                                opencv_core
-                                opencv_imgproc 
-                                opencv_imgcodecs 
-                                opencv_videoio
-                                jsoncpp
-                                ${ARMADILLO_LIBRARIES} 
-                                ${LAPACK_LIBRARIES} 
-                                ${BLAS_LIBRARIES})
-        elseif(BLD_WSL)
-            target_link_libraries(test_localize_target 
-                                trtinfer 
-                                ${OpenCV_LIBS} 
-                                #vpi 
-                                opencv_core
-                                opencv_imgproc 
-                                opencv_imgcodecs 
-                                opencv_videoio
-                                jsoncpp
-                                ${ARMADILLO_LIBRARIES} 
-                                ${LAPACK_LIBRARIES} 
-                                ${BLAS_LIBRARIES})
-        endif()
-
         # Follow target test code
         set(FOLLOW_TEST_SOURCES ${TEST_SOURCE_BASE})
         list(APPEND FOLLOW_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_follow_target.cpp)
@@ -698,33 +746,18 @@ if (BUILD_TEST_HARNESS)
         cuda_add_executable(test_follow_target ${FOLLOW_TEST_SOURCES} ${FOLLOW_TEST_HEADERS})
         set_target_debug_flags(test_follow_target)
 
-        if (BLD_JETSON_ORIN_NANO)
-            target_link_libraries(test_follow_target 
-                                trtinfer 
-                                ${OpenCV_LIBS} 
-                                vpi 
-                                opencv_core
-                                opencv_imgproc 
-                                opencv_imgcodecs 
-                                opencv_videoio
-                                jsoncpp
-                                ${ARMADILLO_LIBRARIES} 
-                                ${LAPACK_LIBRARIES} 
-                                ${BLAS_LIBRARIES})
-        elseif(BLD_WSL)
-            target_link_libraries(test_follow_target 
-                                trtinfer 
-                                ${OpenCV_LIBS} 
-                                #vpi 
-                                opencv_core
-                                opencv_imgproc 
-                                opencv_imgcodecs 
-                                opencv_videoio
-                                jsoncpp
-                                ${ARMADILLO_LIBRARIES} 
-                                ${LAPACK_LIBRARIES} 
-                                ${BLAS_LIBRARIES})
+        target_link_libraries(test_follow_target 
+            squirrel_protos
+            ${Protobuf_LIBRARIES}
+            ${SD_COMMON_LINK_LIBS})
+
+        # Wire in protos only if they were defined
+        if (TARGET squirrel_protos)
+            add_dependencies(test_follow_target 
+                squirrel_protos 
+                squirrel_protos_desc)
         endif()
+
 
         # Delivery test code
         set(DELIVERY_TEST_SOURCES ${TEST_SOURCE_BASE})
@@ -733,33 +766,16 @@ if (BUILD_TEST_HARNESS)
 
         cuda_add_executable(test_payload_delivery ${DELIVERY_TEST_SOURCES} ${DELIVERY_TEST_HEADERS})
         set_target_debug_flags(test_payload_delivery)
+        target_link_libraries(test_payload_delivery 
+            squirrel_protos
+            ${Protobuf_LIBRARIES}
+            ${SD_COMMON_LINK_LIBS})
 
-        if (BLD_JETSON_ORIN_NANO)
-            target_link_libraries(test_payload_delivery 
-                                trtinfer 
-                                ${OpenCV_LIBS} 
-                                vpi 
-                                opencv_core
-                                opencv_imgproc 
-                                opencv_imgcodecs 
-                                opencv_videoio
-                                jsoncpp
-                                ${ARMADILLO_LIBRARIES} 
-                                ${LAPACK_LIBRARIES} 
-                                ${BLAS_LIBRARIES})
-        elseif(BLD_WSL)
-            target_link_libraries(test_payload_delivery 
-                                trtinfer 
-                                ${OpenCV_LIBS} 
-                                #vpi 
-                                opencv_core
-                                opencv_imgproc 
-                                opencv_imgcodecs 
-                                opencv_videoio
-                                jsoncpp
-                                ${ARMADILLO_LIBRARIES} 
-                                ${LAPACK_LIBRARIES} 
-                                ${BLAS_LIBRARIES})
+        # Wire in protos only if they were defined
+        if (TARGET squirrel_protos)
+            add_dependencies(test_payload_delivery 
+                squirrel_protos 
+                squirrel_protos_desc)
         endif()
     endif()
 endif()

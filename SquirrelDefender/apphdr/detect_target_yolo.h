@@ -1,5 +1,3 @@
-#pragma once
-
 #ifdef ENABLE_CV
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
 
@@ -14,16 +12,8 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "video_io.h"
 #include "YOLOv8.h"
-#include <opencv2/cudaimgproc.hpp>
 #include <vector>
-
-/********************************************************************************
- * Imported objects
- ********************************************************************************/
-extern cv::Mat g_image;
 
 /********************************************************************************
  * Exported objects

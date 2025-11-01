@@ -10,7 +10,10 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "mav_data_hub.h"
+#include "mav_utils.h"
+#include <spdlog/spdlog.h>
 
 /********************************************************************************
  * Typedefs
@@ -57,12 +60,12 @@ uint32_t g_mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd; /*<  Bitmap showing 
                                                             Value of 1: healthy.*/
 uint32_t g_mav_veh_custom_mode;                             /*<  A bitfield for use for autopilot-specific flags*/
 bool g_manual_override_land;
-uint8_t g_mav_veh_type;                                     /*<  Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the
-                                                            component type (e.g. camera, gimbal, etc.). This should be used in preference to component id for identifying the component type.*/
-uint8_t g_mav_veh_autopilot_type;                           /*<  Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.*/
-uint8_t g_mav_veh_base_mode;                                /*<  System mode bitmap.*/
-uint8_t g_mav_veh_state;                                    /*<  System status flag.*/
-uint8_t g_mav_veh_mavlink_version;                          /*<  MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version*/
+uint8_t g_mav_veh_type;            /*<  Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the
+                                   component type (e.g. camera, gimbal, etc.). This should be used in preference to component id for identifying the component type.*/
+uint8_t g_mav_veh_autopilot_type;  /*<  Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.*/
+uint8_t g_mav_veh_base_mode;       /*<  System mode bitmap.*/
+uint8_t g_mav_veh_state;           /*<  System status flag.*/
+uint8_t g_mav_veh_mavlink_version; /*<  MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version*/
 
 int32_t g_mav_veh_lat;      /*< [degE7] Latitude, expressed*/
 int32_t g_mav_veh_lon;      /*< [degE7] Longitude, expressed*/
@@ -98,7 +101,7 @@ float g_mav_veh_roll_rate_target;  /*< [rad/s] Roll angular speed*/
 float g_mav_veh_pitch_rate_target; /*< [rad/s] Pitch angular speed*/
 float g_mav_veh_yaw_rate_target;   /*< [rad/s] Yaw angular speed*/
 float g_mav_veh_thrust_target;     /*<  Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)*/
-uint8_t attitude_target_mask;    /*<  Bitmap to indicate which dimensions should be ignored by the vehicle.*/
+uint8_t attitude_target_mask;      /*<  Bitmap to indicate which dimensions should be ignored by the vehicle.*/
 
 float g_mav_veh_q1_actual;         /*<  Quaternion component 1, w (1 in null-rotation)*/
 float g_mav_veh_q2_actual;         /*<  Quaternion component 2, x (0 in null-rotation)*/
@@ -150,8 +153,8 @@ const int32_t MESSAGE_RATE_1Hz = 1000000;
  ********************************************************************************/
 bool start_mav_comm(void) { return MavSerial::start_mav_comm(); }; // Open up uart port for mavlink messages
 void stop_mav_comm(void) { MavSerial::stop_mav_comm(); };          // Stop mavlink comms on uart port
-uint8_t read_mav_msg(void) { return MavSerial::read_mav_msg(); };      // Read a byte
-void subscribe(uint16_t msg_id, float msg_interval);             // Subscribe to a mavlink message at desired rate
+uint8_t read_mav_msg(void) { return MavSerial::read_mav_msg(); };  // Read a byte
+void subscribe(uint16_t msg_id, float msg_interval);               // Subscribe to a mavlink message at desired rate
 void set_msg_rate(uint16_t msg_id, float msg_interval) { MavCmd::set_mav_msg_rate(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, msg_id, msg_interval); };
 void req_msg(uint16_t msg_id) { MavCmd::req_mav_msg(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, msg_id); };
 bool start_message_subscriptions(void);
@@ -433,6 +436,9 @@ void proc_mav_position_local_ned_msg(const mavlink_message_t *msg)
     g_mav_veh_local_ned_x = position_local_ned.x;
     g_mav_veh_local_ned_y = position_local_ned.y;
     g_mav_veh_local_ned_z = position_local_ned.z;
+    // TODO - figure out why
+    // Data showed Forward and right were -vx & -vy
+    // Forward and right should be +vx & +vy
     g_mav_veh_local_ned_vx = position_local_ned.vx;
     g_mav_veh_local_ned_vy = position_local_ned.vy;
     g_mav_veh_local_ned_vz = position_local_ned.vz;
@@ -614,11 +620,10 @@ void proc_mav_unknown(const mavlink_message_t *msg)
 {
 #ifdef DEBUG_BUILD
 
-    printf("Received message with ID: %u\n",msg.msgid);
+    printf("Received message with ID: %u\n", msg.msgid);
 
 #endif // DEBUG_BUILD
 }
-
 
 /********************************************************************************
  * Function: start_message_subscriptions
@@ -843,7 +848,7 @@ bool MavMsg::init(void)
     if (!start_mav_comm() ||
         !start_message_subscriptions())
     {
-        Print::c_fprintf("Failed to initialize MAVLink communication\n");
+        spdlog::error("Failed to initialize MAVLink communication\n");
         return false;
     }
 

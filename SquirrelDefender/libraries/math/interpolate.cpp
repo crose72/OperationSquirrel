@@ -9,21 +9,11 @@
  * Includes
  ********************************************************************************/
 #include "interpolate.h"
-
-/********************************************************************************
- * Typedefs
- ********************************************************************************/
+#include <stdint.h>
+#include <cmath>
 
 /********************************************************************************
  * Private macros and defines
- ********************************************************************************/
-
-/********************************************************************************
- * Object definitions
- ********************************************************************************/
-
-/********************************************************************************
- * Calibration definitions
  ********************************************************************************/
 
 /********************************************************************************
@@ -41,7 +31,7 @@ float get_float_index(float input, const float *array, int max_idx, bool is_asce
     {
         if (input <= array[0])
         {
-            return 0.0f; // Input is less than or equal to the first element (ascending)
+            return (float)0.0; // Input is less than or equal to the first element (ascending)
         }
         if (input >= array[max_idx - 1])
         {
@@ -52,7 +42,7 @@ float get_float_index(float input, const float *array, int max_idx, bool is_asce
     {
         if (input >= array[0])
         {
-            return 0.0f; // Input is greater than or equal to the first element (descending)
+            return (float)0.0; // Input is greater than or equal to the first element (descending)
         }
         if (input <= array[max_idx - 1])
         {

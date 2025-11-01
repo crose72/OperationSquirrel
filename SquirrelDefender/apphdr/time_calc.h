@@ -1,5 +1,3 @@
-#pragma once
-
 /********************************************************************************
  * @file    time_calc.h
  * @date    1/22/2025
@@ -10,21 +8,16 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include <chrono>
-#include <thread>
-#include <cmath>
-
-/********************************************************************************
- * Imported objects
- ********************************************************************************/
+#include <cstdint>
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
 extern float g_app_elapsed_time;
+extern uint64_t g_app_elapsed_time_ns;
 extern float g_dt;
 extern bool g_first_loop_after_start;
+extern uint64_t g_epoch_ns;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
@@ -32,15 +25,15 @@ extern bool g_first_loop_after_start;
 
 class Time
 {
-    public:
-        Time();
-        ~Time();
+public:
+    Time();
+    ~Time();
 
-        static bool init(void);
-        static void loop(void);
-        static void shutdown(void);
+    static bool init(void);
+    static void loop(void);
+    static void shutdown(void);
 
-    private:
-    };
+private:
+};
 
 #endif // TIME_CALC_H
