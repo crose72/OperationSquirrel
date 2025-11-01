@@ -10,14 +10,32 @@
  * Includes
  ********************************************************************************/
 #include "mav_serial.h"
+#include <cstdint> // for uint8_t, uint16_t, etc.
 
-/********************************************************************************
- * Typedefs
- ********************************************************************************/
+#if defined(BLD_LINUX_SERIAL) || defined(BLD_WSL) // for linux
 
-/********************************************************************************
- * Private macros and defines
- ********************************************************************************/
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <cstdio>  // for perror
+#include <cstdint> // for uint8_t, uint16_t, etc.
+#include <termios.h>
+
+#elif defined(BLD_WIN)
+
+#include <winsock2.h> // For TCP/IP sockets
+#include <ws2tcpip.h>
+#include <windows.h>               // For COM ports (serial communication)
+#pragma comment(lib, "Ws2_32.lib") // Link WinSock2 library for TCP
+#include <windows.h>               // For WinAPI functions and types (CreateFile, HANDLE, DCB, etc.)
+#include <stdio.h>                 // For standard input/output (e.g., printf)
+#include <stdlib.h>                // For standard functions
+#include <string.h>                // For string manipulation
+
+#endif
 
 /********************************************************************************
  * Private macros and defines
@@ -53,9 +71,8 @@
 
 #endif // BLD_LINUX_SERIAL
 
-/********************************************************************************
- * Object definitions
- ********************************************************************************/
+// Serial comm handlers
+// TODO: put this in a class
 #ifdef BLD_LINUX_SERIAL
 
 int uart_fd; // UART file descriptor for Linux

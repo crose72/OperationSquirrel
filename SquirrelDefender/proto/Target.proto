@@ -1,0 +1,55 @@
+syntax = "proto3";
+package os.logger;
+
+import "Common.proto";
+
+message TargetDetection {
+  Time   t = 1;
+  uint32 frame_id  = 2;
+  
+  bool   target_valid              = 10;
+  int32  target_detection_id       = 11; // int -> int32
+  int32  target_track_id           = 12; // int -> int32
+  float  detection_class           = 13; // you declared float
+  float  target_detection_conf     = 14;
+
+  float  target_cntr_offset_x      = 20;
+  float  target_cntr_offset_y      = 21;
+  float  target_cntr_offset_x_filt = 22;
+  float  target_cntr_offset_y_filt = 23;
+
+  float  target_height             = 30;
+  float  target_width              = 31;
+  float  target_aspect             = 32;
+  float  target_left               = 33;
+  float  target_right              = 34;
+  float  target_top                = 35;
+  float  target_bottom             = 36;
+}
+
+message TargetLocation {
+  Time  t = 1;
+  uint32 frame_id  = 2;
+  
+  float d_target_h   = 10;
+  float d_target_w   = 11;
+  float d_target     = 12;
+
+  float x_target     = 20;
+  float y_target     = 21;
+  float z_target     = 22;
+
+  float delta_angle        = 30;
+  float camera_tilt_angle  = 31;
+  float delta_d_x          = 32;
+  float delta_d_z          = 33;
+
+  float x_target_ekf = 40;
+  float y_target_ekf = 41;
+  float vx_target_ekf= 42;
+  float vy_target_ekf= 43;
+  float ax_target_ekf= 44;
+  float ay_target_ekf= 45;
+
+  bool  target_data_useful = 50;
+}

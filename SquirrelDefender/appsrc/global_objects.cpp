@@ -15,4 +15,4 @@
  ********************************************************************************/
 bool g_stop_program = false;
 bool g_use_video_playback = false;
-std::string input_video_path = "";
+std::string g_input_video_path = "";

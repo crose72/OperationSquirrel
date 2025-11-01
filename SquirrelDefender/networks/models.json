@@ -1,0 +1,524 @@
+{
+    "classification": {
+        "alexnet": {
+            "url": "https://nvidia.box.com/shared/static/2y1x8v1q7g6w5d1355dqaxd3snx6bpze.gz",
+            "tar": "Alexnet.tar.gz",
+            "dir": "Alexnet",
+            "model": "bvlc_alexnet.caffemodel",
+            "prototxt": "alexnet.prototxt",
+            "labels": "networks/ilsvrc12_synset_words.txt",
+            "description": "Alexnet trained on 1000-class ILSVRC12"
+        },
+        
+        "googlenet": {
+            "url": "https://nvidia.box.com/shared/static/u28j5jm4hnf1ex94dnhsuyu8p799l5d5.gz",
+            "tar": "Googlenet.tar.gz",
+            "dir": "Googlenet",
+            "model": "bvlc_googlenet.caffemodel",
+            "prototxt": "googlenet.prototxt",
+            "labels": "networks/ilsvrc12_synset_words.txt",
+            "description": "Googlenet trained 1000-class ILSVRC12"
+        },
+        
+        "googlenet-12": {
+            "url": "https://nvidia.box.com/shared/static/zb8i3zcg39sdjjxfty7o5935hpbd64y4.gz",
+            "tar": "GoogleNet-ILSVRC12-subset.tar.gz",
+            "dir": "GoogleNet-ILSVRC12-subset",
+            "model": "snapshot_iter_184080.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "labels.txt",
+            "description": "GoogleNet trained on 12-class subset of ImageNet ILSVRC12"
+        },
+        
+        "resnet-18": {
+            "alias": ["resnet_18", "resnet18"],
+            "url": "https://nvidia.box.com/shared/static/gph1qfor89vh498op8cicvwc13zltu3h.gz",
+            "tar": "ResNet-18.tar.gz",
+            "dir": "ResNet-18",
+            "model": "ResNet-18.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "networks/ilsvrc12_synset_words.txt",
+            "description": "ResNet-18 trained on 1000-class ILSVRC15"
+        },
+        
+        "resnet-50": {
+            "alias": ["resnet_50", "resnet50"],
+            "url": "https://nvidia.box.com/shared/static/ht46fmnwvow0o0n0ke92x6bzkht8g5xb.gz",
+            "tar": "ResNet-50.tar.gz",
+            "dir": "ResNet-50",
+            "model": "ResNet-50.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "networks/ilsvrc12_synset_words.txt",
+            "description": "ResNet-50 trained on 1000-class ILSVRC15"
+        },
+        
+        "resnet-101": {
+            "alias": ["resnet_101", "resnet101"],
+            "url": "https://nvidia.box.com/shared/static/7zog25pu70nxjh2irni49e5ujlg4dl82.gz",
+            "tar": "ResNet-101.tar.gz",
+            "dir": "ResNet-101",
+            "model": "ResNet-101.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "networks/ilsvrc12_synset_words.txt",
+            "description": "ResNet-101 trained on 1000-class ILSVRC15"
+        },
+        
+        "resnet-152": {
+            "alias": ["resnet_152", "resnet152"],
+            "url": "https://nvidia.box.com/shared/static/6t621ru1i054vscvhx3rqck8597es7w8.gz",
+            "tar": "ResNet-152.tar.gz",
+            "dir": "ResNet-152",
+            "model": "ResNet-152.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "networks/ilsvrc12_synset_words.txt",
+            "description": "ResNet-152 trained on 1000-class ILSVRC15"
+        },
+        
+        "vgg-16": {
+            "alias": ["vgg_16", "vgg16"],
+            "url": "https://nvidia.box.com/shared/static/ar2ttdpnw1drzxnvpw0umzkw67fka3h0.gz",
+            "tar": "VGG-16.tar.gz",
+            "dir": "VGG-16",
+            "model": "VGG-16.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "networks/ilsvrc12_synset_words.txt",
+            "description": "VGG-16 trained on 1000-class ILSVRC14"
+        },
+        
+        "vgg-19": {
+            "alias": ["vgg_19", "vgg19"],
+            "url": "https://nvidia.box.com/shared/static/1ubk73f1akhh4h7mo0iq7erars7j5yyu.gz",
+            "tar": "VGG-19.tar.gz",
+            "dir": "VGG-19",
+            "model": "VGG-19.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "networks/ilsvrc12_synset_words.txt",
+            "description": "VGG-19 trained on 1000-class ILSVRC14"
+        },
+        
+        "inception-v4": {
+            "alias": ["inception_v4", "inceptionv4"],
+            "url": "https://nvidia.box.com/shared/static/maidbjiwkg6bz2bk7drwq7rj8v4whdl9.gz",
+            "tar": "Inception-v4.tar.gz",
+            "dir": "Inception-v4",
+            "model": "Inception-v4.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "networks/ilsvrc12_synset_words.txt",
+            "description": "Inception-v4 trained on 1000-class ILSVRC12"
+        },
+        
+        "resnet18-tagging-voc": {
+            "alias": ["resnet18_tagging_voc", "resnet-18-tagging-voc", "resnet_18_tagging_voc", "resnet18-tagging", "resnet18_tagging", "resnet-18-tagging", "resnet_18_tagging"],
+            "url": "https://nvidia.box.com/shared/static/52wubs0ao7lzg8z5a3mu1ut133kuoth3.gz",
+            "tar": "ResNet18-Tagging-VOC.tar.gz",
+            "dir": "ResNet18-Tagging-VOC",
+            "model": "resnet18.onnx",
+            "labels": "labels.txt",
+            "input": "input_0",
+            "output": "output_0",
+            "description": "Multi-label image tagging classifier using ResNet-18 architecture trained on Pascal VOC"
+        }
+    },
+    
+    "detection": {
+        "ssd-mobilenet-v1": {
+            "alias": ["ssd_mobilenet_v1", "ssd_mobilenet_v1_coco", "ssd-mobilenet-v1-coco"],
+            "url": "https://nvidia.box.com/shared/static/0pg3xi9opwio65df14rdgrtw40ivbk1o.gz",
+            "tar": "SSD-Mobilenet-v1.tar.gz",
+            "dir": "SSD-Mobilenet-v1",
+            "model": "ssd_mobilenet_v1_coco.uff",
+            "labels": "ssd_coco_labels.txt",
+            "input": "Input",
+            "input_dims": [3, 300, 300],
+            "output": {"bbox": "Postprocessor", "count": "PostProcessor_1"},
+            "description": "SSD Mobilenet-v1 UFF model, trained on 90-class MS-COCO"
+        },
+        
+        "ssd-mobilenet-v2": {
+                "alias": ["ssd_mobilenet_v2", "ssd_mobilenet_v2_coco", "ssd-mobilenet-v2-coco", "ssd-mobilenet", "ssd_mobilenet"],
+                "url": "https://nvidia.box.com/shared/static/jcdewxep8vamzm71zajcovza938lygre.gz",
+                "tar": "SSD-Mobilenet-v2.tar.gz",
+                "dir": "SSD-Mobilenet-v2",
+                "model": "ssd_mobilenet_v2_coco.uff",
+                "labels": "ssd_coco_labels.txt",
+                "input": "Input",
+                "input_dims": [3, 300, 300],
+                "output": {"bbox": "NMS", "count": "NMS_1"},
+                "description": "SSD Mobilenet-v2 UFF model, trained on 90-class MS-COCO"
+        },
+        
+        "ssd-inception-v2": {
+            "alias": ["ssd_inception_v2", "ssd_inception_v2_coco", "ssd-inception-v2-coco"],
+            "url": "https://nvidia.box.com/shared/static/mjq1cel6r5mdk94yb9o6v4nj8gxzlflr.gz",
+            "tar": "SSD-Inception-v2.tar.gz",
+            "dir": "SSD-Inception-v2",
+            "model": "ssd_inception_v2_coco.uff",
+            "labels": "ssd_coco_labels.txt",
+            "input": "Input",
+            "input_dims": [3, 300, 300],
+            "output": {"bbox": "NMS", "count": "NMS_1"},
+            "description": "SSD Inception-v2 UFF model, trained on 90-class MS-COCO"
+        },
+        
+        "peoplenet_deployable_quantized_v2.6.1": {
+            "alias": ["peoplenet", "peoplenet_v2.6.1", "peoplenet-v2.6.1", "peoplenet-deployable-quantized-v2.6.1"],
+            "cmd": "tao-model-downloader.sh peoplenet_deployable_quantized_v2.6.1",
+            "dir": "peoplenet_deployable_quantized_v2.6.1",
+            "model": "resnet34_peoplenet_int8.etlt.engine",
+            "labels": "labels.txt",
+            "colors": "colors.txt",
+            "input": "input_1",
+            "output": {"bbox": "output_bbox/BiasAdd", "cvg": "output_cov/Sigmoid"},
+            "description": "TAO PeopleNet model from https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplenet"
+        },
+        
+        "peoplenet_pruned_quantized_v2.3.2": {
+            "alias": ["peoplenet_pruned", "peoplenet-pruned", "peoplenet_pruned_v2.3.2", "peoplenet-pruned-v2.3.2", "peoplenet_v2.3.2", "peoplenet-pruned-quantized-v2.3.2"],
+            "cmd": "tao-model-downloader.sh peoplenet_pruned_quantized_v2.3.2",
+            "dir": "peoplenet_pruned_quantized_v2.3.2",
+            "model": "resnet34_peoplenet_pruned_int8.etlt.engine",
+            "labels": "labels.txt",
+            "colors": "colors.txt",
+            "input": "input_1",
+            "output": {"bbox": "output_bbox/BiasAdd", "cvg": "output_cov/Sigmoid"},
+            "description": "TAO PeopleNet model from https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/peoplenet"
+        },
+        
+        "dashcamnet_pruned_v1.0.3": {
+            "alias": ["dashcamnet", "dashcamnet-pruned", "dashcamnet_pruned", "dashcamnet-pruned-v1.0.3", "dashcamnet_v1.0.3", "dashcamnet-v1.0.3" ],
+            "cmd": "tao-model-downloader.sh dashcamnet_pruned_v1.0.3",
+            "dir": "dashcamnet_pruned_v1.0.3",
+            "model": "resnet18_dashcamnet_pruned.etlt.engine",
+            "labels": "labels.txt",
+            "colors": "colors.txt",
+            "input": "input_1",
+            "output": {"bbox": "output_bbox/BiasAdd", "cvg": "output_cov/Sigmoid"},
+            "description": "TAO DashCamNet model from https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/dashcamnet"
+        },
+        
+        "trafficcamnet_pruned_v1.0.3": {
+            "alias": ["trafficcamnet", "trafficcamnet-pruned", "trafficcamnet_pruned", "trafficcamnet-pruned-v1.0.3", "trafficcamnet_v1.0.3", "trafficcamnet-v1.0.3" ],
+            "cmd": "tao-model-downloader.sh trafficcamnet_pruned_v1.0.3",
+            "dir": "trafficcamnet_pruned_v1.0.3",
+            "model": "resnet18_trafficcamnet_pruned.etlt.engine",
+            "labels": "labels.txt",
+            "colors": "colors.txt",
+            "input": "input_1",
+            "output": {"bbox": "output_bbox/BiasAdd", "cvg": "output_cov/Sigmoid"},
+            "description": "TAO TrafficCamNet model from https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/trafficcamnet"
+        },
+   
+        "facedetect_pruned_quantized_v2.0.1": {
+            "alias": ["facedetect", "facedetect-pruned", "facedetect_pruned", "facedetect-pruned-quantized-v2.0.1", "facedetect-v1.0.3", "facedetect_v1.0.3" ],
+            "cmd": "tao-model-downloader.sh facedetect_pruned_quantized_v2.0.1",
+            "dir": "facedetect_pruned_quantized_v2.0.1",
+            "model": "resnet18_facedetect_pruned.etlt.engine",
+            "labels": "labels.txt",
+            "colors": "colors.txt",
+            "input": "input_1",
+            "output": {"bbox": "output_bbox/BiasAdd", "cvg": "output_cov/Sigmoid"},
+            "description": "TAO FaceDetect model from https://catalog.ngc.nvidia.com/orgs/nvidia/teams/tao/models/facenet"
+        },
+        
+        "pednet": {
+            "alias": ["pednet", "ped-100", "ped_100"],
+            "url": "https://nvidia.box.com/shared/static/0wbxo6lmxfamm1dk90l8uewmmbpbcffb.gz",
+            "tar": "ped-100.tar.gz",
+            "dir": "ped-100",
+            "model": "snapshot_iter_70800.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "class_labels.txt",
+            "description": "Single-class pedestrian (person) detector"
+        },
+        
+        "multiped": {
+            "alias": ["multiped-500", "multiped_500"],
+            "url": "https://nvidia.box.com/shared/static/r3bq08qh7zb0ap2lf4ysjujdx64j8ofw.gz",
+            "tar": "multiped-500.tar.gz",
+            "dir": "multiped-500",
+            "model": "snapshot_iter_178000.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "class_labels.txt",
+            "mean_pixel": 117,
+            "description": "Multi-class pedestrian + baggage detector"
+        },
+        
+        "facenet": {
+            "alias": ["facenet-120", "face-120"],
+            "url": "https://nvidia.box.com/shared/static/wjitc00ef8j6shjilffibm6r2xxcpigz.gz",
+            "tar": "facenet-120.tar.gz",
+            "dir": "facenet-120",
+            "model": "snapshot_iter_24000.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "class_labels.txt",
+            "description": "Human face detector trained on FDDB"
+        },
+        
+        "coco-airplane": {
+            "alias": ["coco_airplane"],
+            "url": "https://nvidia.box.com/shared/static/xi71hlsht5b0y66loeg73rxfa73q561s.gz",
+            "tar": "DetectNet-COCO-Airplane.tar.gz",
+            "dir": "DetectNet-COCO-Airplane",
+            "model": "snapshot_iter_22500.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "class_labels.txt",
+            "description": "MS-COCO airplane class"
+        },
+        
+        "coco-bottle": {
+            "alias": ["coco_bottle"],
+            "url": "https://nvidia.box.com/shared/static/8bhm91o9yldpf97dcz5d0welgmjy7ucw.gz",
+            "tar": "DetectNet-COCO-Bottle.tar.gz",
+            "dir": "DetectNet-COCO-Bottle",
+            "model": "snapshot_iter_59700.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "class_labels.txt",
+            "description": "MS-COCO bottle class"
+        },
+        
+        "coco-chair": {
+            "alias": ["coco_chair"],
+            "url": "https://nvidia.box.com/shared/static/fq0m0en5mmssiizhs9nxw3xtwgnoltf2.gz",
+            "tar": "DetectNet-COCO-Chair.tar.gz",
+            "dir": "DetectNet-COCO-Chair",
+            "model": "snapshot_iter_89500.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "class_labels.txt",
+            "description": "MS-COCO chair class"
+        },
+        
+        "coco-dog": {
+            "alias": ["coco_dog"],
+            "url": "https://nvidia.box.com/shared/static/3qdg3z5qvl8iwjlds6bw7bwi2laloytu.gz",
+            "tar": "DetectNet-COCO-Dog.tar.gz",
+            "dir": "DetectNet-COCO-Dog",
+            "model": "snapshot_iter_38600.caffemodel",
+            "prototxt": "deploy.prototxt",
+            "labels": "class_labels.txt",
+            "description": "MS-COCO dog class"
+        }
+    },
+    
+    "segmentation": {
+        "fcn-resnet18-cityscapes-512x256": {
+            "alias": ["fcn_resnet18_cityscapes_512x256", "fcn_resnet18_cityscapes", "fcn-resnet18-cityscapes"],
+            "url": "https://nvidia.box.com/shared/static/k7s7gdgi098309fndm2xbssj553vf71s.gz",
+            "tar": "FCN-ResNet18-Cityscapes-512x256.tar.gz",
+            "dir": "FCN-ResNet18-Cityscapes-512x256",
+            "model": "fcn_resnet18.onnx",
+            "labels": "classes.txt",
+            "colors": "colors.txt",
+            "description": "FCN-ResNet18 trained on Cityscapes dataset (512x256)"
+        },
+    
+        "fcn-resnet18-cityscapes-1024x512": {
+            "alias": ["fcn_resnet18_cityscapes_1024x512"],
+            "url": "https://nvidia.box.com/shared/static/9aqg4gpjmk7ipz4z0raa5mvs35om6emy.gz",
+            "tar": "FCN-ResNet18-Cityscapes-1024x512.tar.gz",
+            "dir": "FCN-ResNet18-Cityscapes-1024x512",
+            "model": "fcn_resnet18.onnx",
+            "labels": "classes.txt",
+            "colors": "colors.txt",
+            "description": "FCN-ResNet18 trained on Cityscapes dataset (1024x512)"
+        },
+        
+        "fcn-resnet18-cityscapes-2048x1024": {
+            "alias": ["fcn_resnet18_cityscapes_2048x1024"],
+            "url": "https://nvidia.box.com/shared/static/ylh3d2qk8qvitalq8sy803o7avrb6w0h.gz",
+            "tar": "FCN-ResNet18-Cityscapes-2048x1024.tar.gz",
+            "dir": "FCN-ResNet18-Cityscapes-2048x1024",
+            "model": "fcn_resnet18.onnx",
+            "labels": "classes.txt",
+            "colors": "colors.txt",
+            "description": "FCN-ResNet18 trained on Cityscapes dataset (2048x1024)"
+        },
+        
+        "fcn-resnet18-deepscene-576x320": {
+            "alias": ["fcn_resnet18_deepscene_576x320", "fcn_resnet18_deepscene", "fcn-resnet18-deepscene"],
+            "url": "https://nvidia.box.com/shared/static/jm0zlezvweiimpzluohg6453s0u0nvcv.gz",
+            "tar": "FCN-ResNet18-DeepScene-576x320.tar.gz",
+            "dir": "FCN-ResNet18-DeepScene-576x320",
+            "model": "fcn_resnet18.onnx",
+            "labels": "classes.txt",
+            "colors": "colors.txt",
+            "description": "FCN-ResNet18 trained on DeepScene Forest dataset (576x320)"
+        },
+        
+        "fcn-resnet18-deepscene-864x480": {
+            "alias": ["fcn_resnet18_deepscene_864x480"],
+            "url": "https://nvidia.box.com/shared/static/gooux9b5nknk8wlk60ou9s2unpo760iq.gz",
+            "tar": "FCN-ResNet18-DeepScene-864x480.tar.gz",
+            "dir": "FCN-ResNet18-DeepScene-864x480",
+            "model": "fcn_resnet18.onnx",
+            "labels": "classes.txt",
+            "colors": "colors.txt",
+            "description": "FCN-ResNet18 trained on DeepScene Forest dataset (864x480)"
+        },
+        
+        "fcn-resnet18-mhp-512x320": {
+            "alias": ["fcn_resnet18_mhp_512x320", "fcn_resnet18_mhp", "fcn-resnet18-mhp"],
+            "url": "https://nvidia.box.com/shared/static/dgaw0ave3bdws1t5ed333ftx5dbpt9zv.gz",
+            "tar": "FCN-ResNet18-MHP-512x320.tar.gz",
+            "dir": "FCN-ResNet18-MHP-512x320",
+            "model": "fcn_resnet18.onnx",
+            "labels": "classes.txt",
+            "colors": "colors.txt",
+            "description": "FCN-ResNet18 trained on Multi-Human Parsing dataset (512x320)"
+        },
+        
+        "fcn-resnet18-mhp-640x360": {
+            "alias": ["fcn_resnet18_mhp_640x360"],
+            "url": "https://nvidia.box.com/shared/static/50mvlrjwbq9ugkmnnqp1sm99g2j21sfn.gz",
+            "tar": "FCN-ResNet18-MHP-640x360.tar.gz",
+            "dir": "FCN-ResNet18-MHP-640x360",
+            "model": "fcn_resnet18.onnx",
+            "labels": "classes.txt",
+            "colors": "colors.txt",
+            "description": "FCN-ResNet18 trained on Multi-Human Parsing dataset (640x360)"
+        },
+        
+        "fcn-resnet18-voc-320x320": {
+            "alias": ["fcn_resnet18_voc_320x320", "fcn_resnet18_voc", "fcn-resnet18-voc", "fcn_resnet18_pascal_voc", "fcn-resnet18-pascal-voc", "fcn-resnet18-pascal-voc-320x320", "fcn_resnet18_pascal_voc_320x320"],
+            "url": "https://nvidia.box.com/shared/static/p63pgrr6tm33tn23913gq6qvaiarydaj.gz",
+            "tar": "FCN-ResNet18-Pascal-VOC-320x320.tar.gz",
+            "dir": "FCN-ResNet18-Pascal-VOC-320x320",
+            "model": "fcn_resnet18.onnx",
+            "labels": "classes.txt",
+            "colors": "colors.txt",
+            "description": "FCN-ResNet18 trained on Pascal VOC dataset (320x320)"
+        },
+        
+        "fcn-resnet18-voc-512x320": {
+            "alias": ["fcn_resnet18_voc_512x320", "fcn_resnet18_pascal_voc_512x320", "fcn-resnet18-pascal-voc-512x320"],
+            "url": "https://nvidia.box.com/shared/static/njup7f3vu4mgju89kfre98olwljws5pk.gz",
+            "tar": "FCN-ResNet18-Pascal-VOC-512x320.tar.gz",
+            "dir": "FCN-ResNet18-Pascal-VOC-512x320",
+            "model": "fcn_resnet18.onnx",
+            "labels": "classes.txt",
+            "colors": "colors.txt",
+            "description": "FCN-ResNet18 trained on Pascal VOC dataset (512x320)"
+        },
+        
+        "fcn-resnet18-sun-512x400": {
+            "alias": ["fcn_resnet18_sun_512x400", "fcn_resnet18_sun", "fcn-resnet18-sun"],
+            "url": "https://nvidia.box.com/shared/static/5vs9t2wah5axav11k8o3l9skb7yy3xgd.gz",
+            "tar": "FCN-ResNet18-SUN-RGBD-512x400.tar.gz",
+            "dir": "FCN-ResNet18-SUN-RGBD-512x400",
+            "model": "fcn_resnet18.onnx",
+            "labels": "classes.txt",
+            "colors": "colors.txt",
+            "description": "FCN-ResNet18 trained on SUN RGB-D dataset (512x400)"
+        },
+        
+        "fcn-resnet18-sun-640x512": {
+            "alias": ["fcn_resnet18_sun_640x512"],
+            "url": "https://nvidia.box.com/shared/static/z5llxysbcqd8zzzsm7vjqeihs7ihdw20.gz",
+            "tar": "FCN-ResNet18-SUN-RGBD-640x512.tar.gz",
+            "dir": "FCN-ResNet18-SUN-RGBD-640x512",
+            "model": "fcn_resnet18.onnx",
+            "labels": "classes.txt",
+            "colors": "colors.txt",
+            "description": "FCN-ResNet18 trained on SUN RGB-D dataset (640x512)"
+        }
+    },
+    
+    "pose": {
+        "resnet18-body": {
+            "alias": ["resnet18_body"],
+            "url": "https://nvidia.box.com/shared/static/waf8bsu58v9qh9qj3sp3wsw1nyj61xm5.gz",
+            "tar": "Pose-ResNet18-Body.tar.gz",
+            "dir": "Pose-ResNet18-Body",
+            "model": "pose_resnet18_body.onnx",
+            "topology": "human_pose.json",
+            "colors": "colors.txt",
+            "description": "ResNet18-based human body model with PAF attention"
+        },
+        
+        "resnet18-hand": {
+            "alias": ["resnet18_hand"],
+            "url": "https://nvidia.box.com/shared/static/srfcadyqv4eaeq6lvu5qpsm6l5oatcnq.gz",
+            "tar": "Pose-ResNet18-Hand.tar.gz",
+            "dir": "Pose-ResNet18-Hand",
+            "model": "pose_resnet18_hand.onnx",
+            "topology": "hand_pose.json",
+            "colors": "colors.txt",
+            "description": "ResNet18-based human hand model with PAF attention"
+        },
+        
+        "densenet121-body": {
+            "alias": ["densenet121_body"],
+            "url": "https://nvidia.box.com/shared/static/sizfwdkjmvzlo96serrs7u175wxldrv5.gz",
+            "tar": "Pose-DenseNet121-Body.tar.gz",
+            "dir": "Pose-DenseNet121-Body",
+            "model": "pose_densenet121_body.onnx",
+            "topology": "human_pose.json",
+            "colors": "colors.txt",
+            "description": "DenseNet121-based human body model with PAF attention"
+        }
+    },
+    
+    "monodepth": {
+        "fcn-mobilenet": {
+            "alias": ["fcn_mobilenet", "monodepth-mobilenet", "monodepth_mobilenet", "monodepth_fcn_mobilenet", "monodepth-fcn-mobilenet", "mobilenet"],
+            "url": "https://nvidia.box.com/shared/static/frgbiqeieaja0o8b0eyb87fjbsqd4zup.gz",
+            "tar": "MonoDepth-FCN-Mobilenet.tar.gz",
+            "dir": "MonoDepth-FCN-Mobilenet",
+            "model": "monodepth_fcn_mobilenet.onnx",
+            "description": "FCN-Mobilenet monocular depth estimation model"
+        },
+        
+        "fcn-resnet18": {
+            "alias": ["fcn_resnet18", "monodepth-resnet18", "monodepth_resnet18", "resnet18"],
+            "url": "https://nvidia.box.com/shared/static/ai2sxrp1tg8mk4j0jbrw3vthqjp8x0af.gz",
+            "tar": "MonoDepth-FCN-ResNet18.tar.gz",
+            "dir": "MonoDepth-FCN-ResNet18",
+            "model": "monodepth_fcn_resnet18.onnx",
+            "description": "FCN-ResNet18 monocular depth estimation model"
+        },
+        
+        "fcn-resnet50": {
+            "alias": ["fcn_resnet50", "monodepth-resnet50", "monodepth_resnet50", "resnet50"],
+            "url": "https://nvidia.box.com/shared/static/3umpq9yrv3nj3ltiwlooijx5of414gbh.gz",
+            "tar": "MonoDepth-FCN-ResNet50.tar.gz",
+            "dir": "MonoDepth-FCN-ResNet50",
+            "model": "monodepth_fcn_resnet50.onnx",
+            "description": "FCN-ResNet50 monocular depth estimation model"
+        }
+    },
+    
+    "action": {
+        "resnet-18": {
+            "alias": ["resnet_18", "resnet18", "resnet18-kinetics"],
+            "url": "https://nvidia.box.com/shared/static/rhuvudgijtefzno55092fgwy0xn485n0.gz",
+            "tar": "Action-ResNet18.tar.gz",
+            "dir": "Action-ResNet18",
+            "model": "resnet-18-kinetics-moments.onnx",
+            "labels": "labels.txt",
+            "input": "0",
+            "output": "198",
+            "description": "ResNet-18 trained on 1040-class Kinetics-700 and Moments-In-Time dataset"
+        },
+        
+        "resnet-34": {
+            "alias": ["resnet_34", "resnet34", "resnet34-kinetics"],
+            "url": "https://nvidia.box.com/shared/static/gr9kgox9zpwh93v0v28f9zjkzr1n4ffs.gz",
+            "tar": "Action-ResNet34.tar.gz",
+            "dir": "Action-ResNet34",
+            "model": "resnet-34-kinetics-moments.onnx",
+            "labels": "labels.txt",
+            "input": "0",
+            "output": "350",
+            "description": "ResNet-34 trained on 1040-class Kinetics-700 and Moments-In-Time dataset"
+        }
+    },
+    
+    "background": {
+        "u2net": {
+            "url": "https://nvidia.box.com/shared/static/pp72renayt4do23sxyqtzu406nsftxg4.gz",
+            "tar": "Background-U2Net.tar.gz",
+            "dir": "Background-U2Net",
+            "model": "u2net.onnx",
+            "description": "U2-Net (U-Square Net) for Salient Object Detection"
+        }
+    }
+}

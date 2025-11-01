@@ -9,7 +9,31 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "scheduler.h"
+#include "datalog.h"
+#include "video_io.h"
+#include "system_controller.h"
+#include "mav_data_hub.h"
+#include "mav_utils.h"
+#include "vehicle_controller.h"
+#include "detect_target.h"
+#include "track_target.h"
+#include "localize_target.h"
+#include "path_planner.h"
+#include "time_calc.h"
+#include "timer.h"
+#include "path_planner.h"
+#include <mutex>
+#include <signal.h>
+#include <chrono>
+#include <thread>
+
+#ifdef BLD_JETSON_B01
+
+#include "status_io.h"
+
+#endif // BLD_JETSON_B01
 
 /********************************************************************************
  * Typedefs
@@ -23,7 +47,9 @@
  * Object definitions
  ********************************************************************************/
 std::mutex scheduler_mutex;
-bool controller_initialiazed;
+bool g_controller_initialiazed;
+Timer main_loop(std::chrono::milliseconds(25));
+Timer timer1;
 
 /********************************************************************************
  * Calibration definitions
@@ -34,8 +60,8 @@ bool controller_initialiazed;
  ********************************************************************************/
 
 /********************************************************************************
- * Function: 
- * Description: 
+ * Function:
+ * Description:
  ********************************************************************************/
 
 /********************************************************************************
@@ -59,28 +85,28 @@ int Scheduler::init(void)
 {
 
 #ifdef ENABLE_CV
-    
+
     if (!Video::init() ||
         !Detection::init() ||
-        !Track::init() ||
+        !Tracking::init() ||
         !Localize::init() ||
         !PathPlanner::init())
     {
         return 1;
     }
-    
+
 #endif // ENABLE_CV
 
-    if (!MavMsg::init() ||
+    if (!Time::init() ||
+        !MavMsg::init() ||
         !DataLogger::init() ||
         !VehicleController::init() ||
-        !Time::init() ||
         !SystemController::init())
     {
         return 1;
     }
 
-    controller_initialiazed = true;
+    g_controller_initialiazed = true;
 
     return 0;
 }
@@ -91,9 +117,8 @@ int Scheduler::init(void)
  ********************************************************************************/
 void Scheduler::loop(void)
 {
-    Timer main_loop(std::chrono::milliseconds(25));
     std::lock_guard<std::mutex> lock(scheduler_mutex);
-    main_loop.start_time();
+    main_loop.start();
     SystemController::loop();
     MavMsg::loop();
 
@@ -101,7 +126,7 @@ void Scheduler::loop(void)
 
     Video::in_loop();
     Detection::loop();
-    Track::loop();
+    Tracking::loop();
     Localize::loop();
     PathPlanner::loop();
     Video::out_loop();
@@ -109,9 +134,9 @@ void Scheduler::loop(void)
 #endif // ENABLE_CV
 
     VehicleController::loop();
+    Time::loop(); // Keep this before the datalogger - else MCAP breaks
     DataLogger::loop();
-    Time::loop();
-    main_loop.end_time();
+    main_loop.stop();
     main_loop.wait();
 }
 
@@ -128,8 +153,8 @@ void Scheduler::shutdown(void)
     Time::shutdown();
 
 #ifdef ENABLE_CV
-    
-    Track::shutdown();
+
+    Tracking::shutdown();
     Localize::shutdown();
     PathPlanner::shutdown();
     PathPlanner::shutdown();

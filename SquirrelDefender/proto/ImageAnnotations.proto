@@ -1,0 +1,32 @@
+// FoxgloveImageAnnotations.proto
+syntax = "proto3";
+package foxglove;
+
+import "google/protobuf/timestamp.proto";
+
+message Color { double r = 1; double g = 2; double b = 3; double a = 4; }
+message Point2 { double x = 1; double y = 2; }
+
+enum PointsAnnotationType { POINTS = 0; LINE_STRIP = 1; LINE_LOOP = 2; POLYGON = 3; }
+
+message PointsAnnotation {
+  google.protobuf.Timestamp timestamp = 1;
+  repeated Point2 points = 2;
+  PointsAnnotationType type = 3;
+  Color outline_color = 4;
+  double thickness = 5;
+}
+
+message TextAnnotation {
+  google.protobuf.Timestamp timestamp = 1;
+  Point2 position = 2;
+  string text = 3;
+  double font_size = 4;
+  Color text_color = 5;
+  Color background_color = 6;
+}
+
+message ImageAnnotations {
+  repeated PointsAnnotation points = 1;
+  repeated TextAnnotation  texts  = 2;
+}

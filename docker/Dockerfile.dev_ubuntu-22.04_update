@@ -1,0 +1,15 @@
+FROM crose72/os-dev:cuda12.6-trt10.5-cv4.10-sm86-vpi3.2-mcap-ubuntu22
+
+# RUN apt-get update && \
+#     apt-get install -y liblz4-dev libzstd-dev pkg-config
+
+# Install all essential GStreamer components
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        gstreamer1.0-tools \
+        gstreamer1.0-plugins-base \
+        gstreamer1.0-plugins-good \
+        gstreamer1.0-plugins-bad \
+        gstreamer1.0-plugins-ugly \
+        gstreamer1.0-libav && \
+    rm -rf /var/lib/apt/lists/*

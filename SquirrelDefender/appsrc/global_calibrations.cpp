@@ -2,7 +2,7 @@
  * @file    global_calibrations.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   
+ * @brief
  ********************************************************************************/
 
 /********************************************************************************
@@ -17,4 +17,3 @@ const uint8_t SENDER_SYS_ID = 0;
 const uint8_t SENDER_COMP_ID = 0;
 const uint8_t TARGET_SYS_ID = 1;
 const uint8_t TARGET_COMP_ID = 1;
-const float PI = 3.14159;

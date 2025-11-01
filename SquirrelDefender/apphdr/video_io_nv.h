@@ -1,5 +1,3 @@
-#pragma once
-
 #ifdef ENABLE_CV
 #ifdef BLD_JETSON_B01
 
@@ -14,29 +12,15 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "detect_target.h"
-#include <string>
-#include <fstream>
-#include "jetson-utils/videoSource.h"
-#include "jetson-utils/videoOutput.h"
-#include "jetson-inference/detectNet.h"
-#include "jetson-inference/objectTracker.h"
-#include <jetson-inference/objectTrackerIOU.h>
-
-/********************************************************************************
- * Imported objects
- ********************************************************************************/
-extern detectNet *g_net;
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool g_valid_image_rcvd;
+extern bool g_cam0_valid_image_rcvd;
 extern videoSource *g_input;
-extern uchar3 *g_image;
-extern const float g_input_video_width;
-extern const float g_input_video_height;
+extern uchar3 *g_cam0_image;
+extern float g_cam0_video_width;
+extern float g_cam0_video_height;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

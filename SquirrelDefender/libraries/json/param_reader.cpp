@@ -1,5 +1,3 @@
-#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
-
 /********************************************************************************
  * @file    param_reader.cpp
  * @author  Cameron Rose
@@ -11,21 +9,12 @@
  * Includes
  ********************************************************************************/
 #include "param_reader.h"
-
-/********************************************************************************
- * Typedefs
- ********************************************************************************/
+#include <stdint.h>
+#include <fstream>
+#include <spdlog/spdlog.h>
 
 /********************************************************************************
  * Private macros and defines
- ********************************************************************************/
-
-/********************************************************************************
- * Object definitions
- ********************************************************************************/
-
-/********************************************************************************
- * Calibration definitions
  ********************************************************************************/
 
 /********************************************************************************
@@ -42,7 +31,7 @@ ParamReader::ParamReader(const std::string &filename)
 
     if (!configFile.is_open())
     {
-        std::cerr << "Error: Unable to open parameter file: " << filename << std::endl;
+        spdlog::error("Error: Unable to open parameter file: " + filename);
         return;
     }
     configFile >> root;
@@ -94,9 +83,7 @@ bool ParamReader::get_bool_param(const std::string &group, const std::string &ke
  * Function: get_string_param
  * Description: Return the value of parameters that are of type string.
  ********************************************************************************/
-std::string ParamReader::get_string_param(const std::string &group, const std::string &key) const 
+std::string ParamReader::get_string_param(const std::string &group, const std::string &key) const
 {
     return root[group][key].asString();
 }
-
-#endif // BLD_JETSON_B01 || BLD_JETSON_ORIN_NANO

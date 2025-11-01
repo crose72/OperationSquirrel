@@ -1,6 +1,9 @@
-[submodule "SquirrelDefender/modules/yolov8_tensorrt"]
-	path = SquirrelDefender/modules/yolov8_tensorrt
-	url = https://github.com/crose72/YOLOv8-TensorRT-CPP.git
 [submodule "SquirrelDefender/modules/kf"]
 	path = SquirrelDefender/modules/kf
 	url = https://github.com/auralius/kalman-cpp.git
+[submodule "SquirrelDefender/modules/trtinfer"]
+	path = SquirrelDefender/modules/trtinfer
+	url = https://github.com/crose72/trtinfer.git
+[submodule "SquirrelDefender/modules/mcap"]
+	path = SquirrelDefender/modules/mcap
+	url = https://github.com/crose72/mcap_builder.git

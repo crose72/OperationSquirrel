@@ -8,7 +8,10 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include "common_inc.h"
 #include "time_calc.h"
+#include <chrono>
+#include <cmath>
 
 /********************************************************************************
  * Typedefs
@@ -23,10 +26,18 @@
  ********************************************************************************/
 float app_elapsed_time_prv;
 float g_app_elapsed_time;
+uint64_t g_app_elapsed_time_ns;
 float g_dt;
 bool g_first_loop_after_start;
 std::chrono::time_point<std::chrono::steady_clock> start_time;
 std::chrono::duration<float, std::milli> elapsed_time((float)0.0);
+
+// single steady baseline for elapsed time
+static std::chrono::steady_clock::time_point g_start_steady;
+
+// offset that maps steady_clock → system_clock epoch (computed at init)
+static uint64_t g_offset_ns = 0;
+uint64_t g_epoch_ns = 0;
 
 /********************************************************************************
  * Calibration definitions
@@ -36,6 +47,39 @@ std::chrono::duration<float, std::milli> elapsed_time((float)0.0);
  * Function definitions
  ********************************************************************************/
 void calc_app_runtime(void);
+uint64_t now_epoch_ns();   // monotonic, in ns since Unix epoch
+uint64_t now_elapsed_ns(); // ns since app start (monotonic)
+
+static inline uint64_t steady_now_ns()
+{
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(
+               std::chrono::steady_clock::now().time_since_epoch())
+        .count();
+}
+static inline uint64_t system_now_ns()
+{
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(
+               std::chrono::system_clock::now().time_since_epoch())
+        .count();
+}
+
+uint64_t now_epoch_ns()
+{
+    // monotonic steady time + fixed offset → epoch ns
+    return g_offset_ns + steady_now_ns();
+}
+
+uint64_t now_elapsed_ns()
+{
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(
+               std::chrono::steady_clock::now() - g_start_steady)
+        .count();
+}
+
+static inline uint64_t epoch_now_ns()
+{
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+}
 
 /********************************************************************************
  * Function: calc_app_runtime
@@ -46,24 +90,25 @@ void calc_app_runtime(void)
     if (g_first_loop_after_start)
     {
         g_first_loop_after_start = false;
+        app_elapsed_time_prv = 0.0f;
+        g_app_elapsed_time = 0.0f;
+        g_dt = 0.0f;
+        return;
     }
-    else if (!g_first_loop_after_start)
-    {
-        // Get the current timestamp
-        std::chrono::time_point<std::chrono::steady_clock> current_time = std::chrono::steady_clock::now();
 
-        // Calculate the elapsed time since the start of the program
-        elapsed_time = current_time - start_time;
+    // elapsed (ns) since app start using the same baseline as now_elapsed_ns()
+    const uint64_t elapsed_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                                    std::chrono::steady_clock::now() - g_start_steady)
+                                    .count();
 
-        // Convert elapsed time to seconds with millisecond precision
-        float app_elapsed_time_tmp = elapsed_time.count() / 1000.0f;
+    // convert to seconds (float) for your existing API, with ms precision
+    const float app_elapsed_time_tmp = static_cast<float>(elapsed_ns) * 1e-9f;
 
-        g_dt = app_elapsed_time_tmp - app_elapsed_time_prv;
+    g_dt = app_elapsed_time_tmp - app_elapsed_time_prv;
 
-        // Truncate the number to three decimal places
-        g_app_elapsed_time = (std::floor(app_elapsed_time_tmp * 1000.0f) / 1000.0f);
-        app_elapsed_time_prv = g_app_elapsed_time;
-    }
+    // Truncate to three decimal places (ms)
+    g_app_elapsed_time = std::floor(app_elapsed_time_tmp * 1000.0f) / 1000.0f;
+    app_elapsed_time_prv = g_app_elapsed_time;
 }
 
 /********************************************************************************
@@ -88,8 +133,12 @@ bool Time::init(void)
     g_dt = (float)0.0;
     app_elapsed_time_prv = (float)0.0;
     g_first_loop_after_start = true;
-    
-    start_time = std::chrono::steady_clock::now();
+    g_app_elapsed_time_ns = (uint64_t)0;
+
+    g_start_steady = std::chrono::steady_clock::now();
+
+    // compute fixed offset so steady→epoch is monotonic but epoch-referenced
+    g_offset_ns = system_now_ns() - steady_now_ns();
     return true;
 }
 
@@ -100,6 +149,8 @@ bool Time::init(void)
 void Time::loop(void)
 {
     calc_app_runtime();
+    g_app_elapsed_time_ns = now_elapsed_ns();
+    g_epoch_ns = epoch_now_ns();
 }
 
 /********************************************************************************
@@ -108,5 +159,4 @@ void Time::loop(void)
  ********************************************************************************/
 void Time::shutdown(void)
 {
-    
 }
