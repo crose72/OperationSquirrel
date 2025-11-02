@@ -20,6 +20,9 @@
 #include "track_target.h"
 #include "mav_data_hub.h"
 #include "path_planner.h"
+#include "signal_processing.h"
+#include <spdlog/spdlog.h>
+
 #include <algorithm> // for std::min/std::max
 #include <cmath>     // for sin/cos/atan2
 
@@ -121,6 +124,10 @@ float vx_decel_prof_idx;
 bool decel_profile_active;
 int profile_sign;
 bool target_valid_last_cycle;
+float g_veh_vx_est;
+float g_veh_vy_est;
+float g_x_error_dot;
+float x_error_dot_prv;
 
 /********************************************************************************
  * Calibration definitions
@@ -173,7 +180,12 @@ float x_desired = (float)4.0;
 float y_desired = (float)0.0;
 
 float vxy_cmd_max_allowed_accel = (float)2.5; // m/s²  -> used as shaping accel cap
-float vxy_max_allowed_jerk = 8.0f;            // m/s^3 for x and y (jerk cap)
+float vxy_cmd_max_allowed_jerk = (float)8.0;  // m/s^3 for x and y (jerk cap)
+float vxy_cmd_max_accel_lims[5] = {(float)2.5, (float)2.0, (float)1.5, (float)1.0, (float)0.5};
+float vxy_cmd_max_jerk_lims[5] = {(float)5.5, (float)4.0, (float)3.5, (float)2.0, (float)1.5};
+float vxy_error_thresh[5] = {(float)2.5, (float)2.0, (float)1.5, (float)1.0, (float)0.5};
+
+float x_error_dot_filt_coef = (float)0.0;
 
 /********************************************************************************
  * Function definitions
@@ -182,6 +194,7 @@ void get_path_params(void);
 void calc_follow_error(void);
 void calc_yaw_target_error(void);
 void dtrmn_vel_cmd(void);
+void calc_veh_speed(void);
 
 /********************************************************************************
  * Function: get_path_params
@@ -236,7 +249,20 @@ void get_path_params(void)
     y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_offset");
 
     vxy_cmd_max_allowed_accel = follow_control.get_float_param("Follow_Params", "CMD_vxy_max_allowed_accel");
-    vxy_max_allowed_jerk = follow_control.get_float_param("Follow_Params", "CMD_vxy_max_allowed_jerk");
+    vxy_cmd_max_allowed_jerk = follow_control.get_float_param("Follow_Params", "CMD_vxy_max_allowed_jerk");
+
+    for (int i = 0; i < 5; ++i)
+    {
+        std::string key_accel = "CMD_vxy_max_allowed_accel_" + std::to_string(i);
+        std::string key_jerk = "CMD_vxy_max_allowed_jerk_" + std::to_string(i);
+        std::string key_err = "CMD_vxy_error_thresh_" + std::to_string(i);
+
+        vxy_cmd_max_accel_lims[i] = follow_control.get_float_param("Follow_Params", key_accel);
+        vxy_cmd_max_jerk_lims[i] = follow_control.get_float_param("Follow_Params", key_jerk);
+        vxy_error_thresh[i] = follow_control.get_float_param("Follow_Params", "CMD_vxy_max_allowed_jerk");
+    }
+
+    x_error_dot_filt_coef = follow_control.get_float_param("Follow_Params", "X_error_dot_filt");
 }
 
 /********************************************************************************
@@ -257,6 +283,27 @@ void calc_follow_error(void)
 
     // Currently set to 0 - not sending a y component velocity vector
     g_y_error = y_desired;
+
+    // Error derivative
+    if (!target_valid_last_cycle && g_target_valid ||
+        !g_target_valid && target_valid_last_cycle)
+    {
+        g_x_error_dot = (float)0.0;
+    }
+    else
+    {
+
+        g_x_error_dot = (g_x_error - x_error_prv) / g_dt;
+        g_x_error_dot = low_pass_filter(g_x_error_dot, x_error_dot_prv, x_error_dot_filt_coef);
+    }
+
+    x_error_dot_prv = g_x_error_dot;
+}
+
+void calc_veh_speed(void)
+{
+    g_veh_vx_est = cosf(g_mav_veh_yaw) * g_mav_veh_local_ned_vx + sinf(g_mav_veh_yaw) * g_mav_veh_local_ned_vy;
+    g_veh_vy_est = cosf(g_mav_veh_yaw) * g_mav_veh_local_ned_vy - sinf(g_mav_veh_yaw) * g_mav_veh_local_ned_vx;
 }
 
 /********************************************************************************
@@ -413,6 +460,29 @@ void dtrmn_vel_cmd(void)
         g_yaw_adjust = 0.0f;
     }
 
+    float err_abs = std::fabs(g_x_error);
+    int lim_idx = (int)-1;
+
+    // thresholds assumed sorted descending (like your JSON)
+    for (int i = 0; i < 5; ++i)
+    {
+        if (err_abs < vxy_error_thresh[i])
+            lim_idx = i;
+    }
+
+    if (lim_idx > 10)
+    {
+        g_vel_shaper.setLimits(/*a_max_xy=*/vxy_cmd_max_accel_lims[lim_idx],
+                               /*j_max_xy=*/vxy_cmd_max_jerk_lims[lim_idx]);
+    }
+    else
+    {
+        g_vel_shaper.setLimits(/*a_max_xy=*/vxy_cmd_max_allowed_accel,
+                               /*j_max_xy=*/vxy_cmd_max_allowed_jerk);
+    }
+
+    spdlog::info("Idx: {}", lim_idx);
+
     // PID provides the raw command to reach the target
     // Map your max-ramp-rate knob to the accel cap; jerk is separate.
     // This ensures any update (including update-to-zero) is turned into a smooth S-curve.
@@ -469,7 +539,7 @@ bool PathPlanner::init(void)
     vx_adjust_prv = (float)0.0;
     target_valid_last_cycle = false;
     g_vel_shaper.setLimits(/*a_max_xy=*/vxy_cmd_max_allowed_accel,
-                           /*j_max_xy=*/vxy_max_allowed_jerk);
+                           /*j_max_xy=*/vxy_cmd_max_allowed_jerk);
     g_vel_shaper.reset(/*vx=*/(float)0.0,
                        /*vy=*/(float)0.0);
 
@@ -482,6 +552,7 @@ bool PathPlanner::init(void)
  ********************************************************************************/
 void PathPlanner::loop(void)
 {
+    calc_veh_speed();
     calc_follow_error();
     calc_yaw_target_error();
     dtrmn_vel_cmd();

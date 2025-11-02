@@ -24,6 +24,9 @@ extern float g_yaw_target;
 extern float g_yaw_adjust;
 extern float g_mav_veh_yaw_adjusted_for_playback;
 extern float g_yaw_target_error;
+extern float g_veh_vx_est;
+extern float g_veh_vy_est;
+extern float g_x_error_dot;
 
 /********************************************************************************
  * Function prototypes
