@@ -1,6 +1,6 @@
 {
     "PID_vx_forward": {
-            "Kp": 0.6,
+            "Kp": 0.4,
             "Ki": 0.0,
             "Kd": 0.1,
             "w1": 1.0,
@@ -24,7 +24,7 @@
         "w3": 0.0
     },
     "PID_vx_reverse": {
-        "Kp": 0.7,
+        "Kp": 0.4,
         "Ki": 0.009,
         "Kd": 0.1,
         "w1": 1.0,
@@ -81,7 +81,7 @@
         "Q_loc_33": 0.00001,
         "Q_loc_44": 0.00001,
         "Q_loc_55": 0.00001,
-        "R_loc_00": 10.0,
+        "R_loc_00": 0.01,
         "R_loc_11": 0.001,
         "P_loc_00": 0.1,
         "P_loc_11": 0.1,
@@ -110,15 +110,15 @@
         "Desired_X_pix_offset": 0.0,
         "Desired_Y_pix_offset": 0.0,
         "CMD_vel_max_cmd": 10.0,
-        "CMD_vxy_max_allowed_accel": 5.5,
-        "CMD_vxy_max_allowed_jerk": 10.0,
-        "CMD_vxy_max_allowed_accel_0": 3.5,
+        "CMD_vxy_max_allowed_accel": 2.5,
+        "CMD_vxy_max_allowed_jerk": 5.0,
+        "CMD_vxy_max_allowed_accel_0": 1.5,
         "CMD_vxy_max_allowed_accel_1": 2.6,
         "CMD_vxy_max_allowed_accel_2": 1.6,
         "CMD_vxy_max_allowed_accel_3": 0.9,
         "CMD_vxy_max_allowed_accel_4": 0.4,
     
-        "CMD_vxy_max_allowed_jerk_0": 10.0,
+        "CMD_vxy_max_allowed_jerk_0": 2.0,
         "CMD_vxy_max_allowed_jerk_1": 6.5,
         "CMD_vxy_max_allowed_jerk_2": 4.0,
         "CMD_vxy_max_allowed_jerk_3": 2.0,
@@ -129,7 +129,8 @@
         "CMD_vxy_error_thresh_2": 0.5,
         "CMD_vxy_error_thresh_3": 0.4,
         "CMD_vxy_error_thresh_4": 0.35,
-        "X_error_dot_filt": 0.8
+        "X_error_dot_filt": 0.8,
+        "CMD_vxy_ff_brake_gain": 0.25
     },
     "Camera_Params": {
         "Sensor_Mode": 0,

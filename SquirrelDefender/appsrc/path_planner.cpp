@@ -186,6 +186,7 @@ float vxy_cmd_max_jerk_lims[5] = {(float)5.5, (float)4.0, (float)3.5, (float)2.0
 float vxy_error_thresh[5] = {(float)2.5, (float)2.0, (float)1.5, (float)1.0, (float)0.5};
 
 float x_error_dot_filt_coef = (float)0.0;
+float vxy_cmd_ff_brake_gain = (float)0.0;
 
 /********************************************************************************
  * Function definitions
@@ -263,6 +264,7 @@ void get_path_params(void)
     }
 
     x_error_dot_filt_coef = follow_control.get_float_param("Follow_Params", "X_error_dot_filt");
+    vxy_cmd_ff_brake_gain = follow_control.get_float_param("Follow_Params", "CMD_vxy_ff_brake_gain");
 }
 
 /********************************************************************************
@@ -464,24 +466,24 @@ void dtrmn_vel_cmd(void)
     int lim_idx = (int)-1;
 
     // thresholds assumed sorted descending (like your JSON)
-    for (int i = 0; i < 5; ++i)
-    {
-        if (err_abs < vxy_error_thresh[i])
-            lim_idx = i;
-    }
+    // for (int i = 0; i < 5; ++i)
+    // {
+    //     if (err_abs < vxy_error_thresh[i])
+    //         lim_idx = i;
+    // }
 
-    if (lim_idx > 10)
-    {
-        g_vel_shaper.setLimits(/*a_max_xy=*/vxy_cmd_max_accel_lims[lim_idx],
-                               /*j_max_xy=*/vxy_cmd_max_jerk_lims[lim_idx]);
-    }
-    else
-    {
-        g_vel_shaper.setLimits(/*a_max_xy=*/vxy_cmd_max_allowed_accel,
-                               /*j_max_xy=*/vxy_cmd_max_allowed_jerk);
-    }
-
-    spdlog::info("Idx: {}", lim_idx);
+    // if (err_abs < vxy_error_thresh[0])
+    // {
+    //     g_vel_shaper.setLimits(/*a_max_xy=*/vxy_cmd_max_accel_lims[0],
+    //                            /*j_max_xy=*/vxy_cmd_max_jerk_lims[0]);
+    // }
+    // else
+    // {
+    //     g_vel_shaper.setLimits(/*a_max_xy=*/vxy_cmd_max_allowed_accel,
+    //                            /*j_max_xy=*/vxy_cmd_max_allowed_jerk);
+    // }
+    g_vel_shaper.setLimits(/*a_max_xy=*/vxy_cmd_max_allowed_accel,
+                           /*j_max_xy=*/vxy_cmd_max_allowed_jerk);
 
     // PID provides the raw command to reach the target
     // Map your max-ramp-rate knob to the accel cap; jerk is separate.
@@ -493,6 +495,65 @@ void dtrmn_vel_cmd(void)
     // Updated control setpoints with smoothing
     g_vx_adjust = v_shaped.x;
     g_vy_adjust = v_shaped.y;
+
+    // // Apply ff braking gain
+    bool ff_applied = false;
+    if (g_veh_vx_est > (float)0.0 && g_x_error <= (float)4.0 && g_x_error > (float)0.0)
+    {
+        // Approaching the target - slow down early to account for inertia
+        g_vx_adjust -= vxy_cmd_ff_brake_gain * g_veh_vx_est;
+        ff_applied = true;
+    }
+
+    // // --- After smoothing and optional FF braking ---
+    // g_vx_adjust = v_shaped.x;
+    // g_vy_adjust = v_shaped.y;
+
+    // Soft floor so command never goes negative while error is positive.
+    // Uses a parabolic easing to gently approach zero.
+    //
+    // Tunables (set defaults somewhere global + load from JSON if you want):
+    //   vx_soft_knee       : speed where easing begins (e.g., 0.5 m/s)
+    //   vx_soft_pow        : easing exponent (>1 = more gentle), e.g., 2.0
+
+    const float vx_soft_knee = (float)0.25;
+    const float vx_soft_pow = (float)1.5;
+
+    if (g_x_error >= 0.0f && ff_applied)
+    {
+        // We are still "behind" target; do not reverse yet.
+        if (g_vx_adjust <= 0.0f)
+        {
+            g_vx_adjust = 0.0f; // hard stop from going negative
+        }
+        else
+        {
+            // Parabolic easing in [0, vx_soft_knee]
+            if (g_vx_adjust < vx_soft_knee)
+            {
+                float r = g_vx_adjust / vx_soft_knee; // 0..1
+                float eased = vx_soft_knee * std::pow(r, vx_soft_pow);
+                g_vx_adjust = eased; // stays > 0, smoothly goes to 0
+            }
+        }
+    }
+    else if (g_x_error < 0.0 && ff_applied)
+    {
+        // (Optional symmetry) If error is negative, don't go positive:
+        if (g_vx_adjust >= 0.0f)
+        {
+            g_vx_adjust = 0.0f;
+        }
+        else
+        {
+            if (-g_vx_adjust < vx_soft_knee)
+            {
+                float r = (-g_vx_adjust) / vx_soft_knee;
+                float eased = vx_soft_knee * std::pow(r, vx_soft_pow);
+                g_vx_adjust = -eased;
+            }
+        }
+    }
 
     target_valid_last_cycle = g_target_valid;
     vx_adjust_prv = g_vx_adjust;
