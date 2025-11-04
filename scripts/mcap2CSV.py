@@ -148,48 +148,63 @@ def flatten(msg, prefix=""):
 # 🧩 Process one MCAP file
 # --------------------------------------------------------------------------
 def process_mcap(input_mcap: str):
+    """Read one .mcap file, extract selected data, and export it to CSV."""
     output_csv = os.path.splitext(input_mcap)[0] + "_test.csv"
     print(f"\n🧩 Processing {input_mcap} → {output_csv}")
 
-    # --- Parse all messages ---
+    # Step 1: Parse every message from the MCAP log.
+    # Each MCAP file contains a series of "channels" (topics),
+    # each with binary-encoded protobuf messages.
     raw_rows = []
     with open(input_mcap, "rb") as f:
         for schema, channel, message in make_reader(f).iter_messages():
             topic = channel.topic
             if topic not in TOPICS:
+                # Skip topics we don't recognize.
                 continue
+            # Create the appropriate protobuf object for this topic.
             msg = TOPICS[topic]()
+            # Deserialize raw bytes into that protobuf message.
             msg.ParseFromString(message.data)
+            # Flatten into a dict of {field_name: value}
             data = flatten(msg)
+            # Record the timestamp (ns since epoch) and topic.
             data["timestamp_ns"] = message.log_time
             data["topic"] = topic
             raw_rows.append(data)
 
-    # --- Convert to unified format ---
+    # Step 2: Convert each raw dict to a standardized CSV-ready format.
+    # We use the TOPIC_CONFIG mapping above to decide which fields to include.
     processed = []
     for r in raw_rows:
         topic = r.get("topic", "")
         newr = {}
-        for out_field, src_field in TOPIC_CONFIG.get(topic, {}).items():
-            newr[out_field] = r.get(src_field, 0.0)
+        for csv_field, proto_field in TOPIC_CONFIG.get(topic, {}).items():
+            newr[csv_field] = r.get(proto_field, 0.0)
         newr["timestamp_ns"] = r.get("timestamp_ns", 0.0)
         processed.append(newr)
 
-    # --- Merge by 10ms bins ---
-    BIN_NS = 1e7  # 10ms
+    # Step 3: Merge messages into 10ms time bins.
+    # This smooths out timing differences between asynchronous topics.
+    BIN_NS = 1e7  # 10 ms in nanoseconds
     buckets = defaultdict(dict)
     for row in processed:
+        # Round timestamp to the nearest 10ms bin.
         key = int(round(row["timestamp_ns"] / BIN_NS) * BIN_NS)
         merged = buckets[key]
+        # For each field, only overwrite if it has a nonzero or non-empty value.
         for k, v in row.items():
             if v != 0.0 or isinstance(v, str):
                 merged[k] = v
 
+    # Step 4: Convert merged data into a DataFrame (table).
+    # Missing values → 0, NaN → 0, all numbers parsed correctly.
     df = pd.DataFrame([buckets[k] for k in sorted(buckets.keys())])
     df = df.replace(["NaN", "nan", "None", ""], 0).fillna(0)
     df = df.apply(pd.to_numeric, errors="ignore")
-    df.to_csv(output_csv, index=False)
 
+    # Step 5: Write the final, clean CSV file.
+    df.to_csv(output_csv, index=False)
     print(f"✅ Wrote {len(df)} merged rows → {output_csv}")
 
 # --------------------------------------------------------------------------
