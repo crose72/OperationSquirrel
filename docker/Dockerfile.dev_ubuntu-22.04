@@ -2,6 +2,7 @@ FROM nvcr.io/nvidia/cuda-dl-base:24.10-cuda12.6-devel-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Can't remember why we need the second half of these, but the first half is build tools and python tools
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-pip \
     python3-dev \
@@ -14,13 +15,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zlib1g-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# We are cool - we use an awesome CMake version
 RUN wget https://cmake.org/files/v3.28/cmake-3.28.0-linux-x86_64.sh && \
     chmod +x cmake-3.28.0-linux-x86_64.sh && \
     ./cmake-3.28.0-linux-x86_64.sh --prefix=/usr/local --exclude-subdir && \
     rm cmake-3.28.0-linux-x86_64.sh
 
+# Dependency for OpenCV on x86_64 linux I think
 RUN apt-get update && apt-get install -y libtbb-dev
 
+# Almost the same script used to install OpenCV on the Jetsons
 RUN apt-get update && apt install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-good1.0-dev && \
 	pkg-config --modversion gstreamer-1.0 && \
     git clone https://github.com/crose72/Install-OpenCV.git && \
@@ -31,6 +35,7 @@ RUN apt-get update && apt install -y libgstreamer1.0-dev libgstreamer-plugins-ba
     ./OpenCV-4-10-0-tracking.sh && \
     cd .. && rm -rf Install-OpenCV
 
+# KF module dependencies
 RUN apt-get update && apt install -y \
     libspdlog-dev \
     libfmt-dev \
@@ -39,3 +44,18 @@ RUN apt-get update && apt install -y \
     liblapack-dev \
     libblas-dev && \
     pkg-config --cflags --libs armadillo
+
+# MCAP dependencies
+RUN apt-get update && \
+    apt-get install -y liblz4-dev libzstd-dev pkg-config
+
+# Install all essential GStreamer components - for video input/output using gstreamer pipelines
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        gstreamer1.0-tools \
+        gstreamer1.0-plugins-base \
+        gstreamer1.0-plugins-good \
+        gstreamer1.0-plugins-bad \
+        gstreamer1.0-plugins-ugly \
+        gstreamer1.0-libav && \
+    rm -rf /var/lib/apt/lists/*
