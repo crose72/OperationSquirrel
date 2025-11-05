@@ -10,6 +10,7 @@ This folder contains scripts used to **build, run, and configure** the Operation
 | Script | Purpose |
 |--------|----------|
 | **`run.sh`** | Runs either the **development** or **SquirrelDefender** container for a specified target (e.g. Orin, B01, Ubuntu). |
+| **`build.sh`** | Builds the **SquirrelDefender** container for a specified target (e.g. Orin, B01). |
 | **`setup_squirreldefender.sh`** | Configures a Jetson to automatically start SquirrelDefender on power-up. |
 | **`gen_test_csv_from_mcap.sh`** | Converts `.mcap` logs into test-harness compatible CSVs. |
 
@@ -34,6 +35,20 @@ cd OperationSquirrel/scripts
 
 # for the jetson nano b01
 ./run.sh squirreldefender b01
+```
+
+## 🚀 Example: `build.sh`
+
+```bash
+cd OperationSquirrel/scripts
+
+# squirreldefender containers (deployment)
+
+# for the orin
+./build.sh squirreldefender orin
+
+# for the jetson nano b01
+./build.sh squirreldefender b01
 ```
 
 ## ⚙️ Example: `setup_squirreldefender.sh`
