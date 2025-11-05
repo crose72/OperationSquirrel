@@ -41,6 +41,7 @@ cd OperationSquirrel/scripts
 ```bash
 # After starting up the jetson
 cd OperationSquirrel/scripts
+# Don't run as sudo - will cause the squirreldefender.service to look for the run script in the /home/root/ path, you want /home/$USER/
 ./setup_squirreldefender.sh
 
 # This should setup the necessary components to enable the squirreldefender program to start as soon as the jetson is powered (useful when putting the jetson on a vehicle).
