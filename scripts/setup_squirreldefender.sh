@@ -33,7 +33,6 @@ CLOCK_FIX_SCRIPT="/usr/local/bin/clock-skew-fix.sh"
 SQUIRRELDEFENDER_SERVICE="/etc/systemd/system/squirreldefender.service"
 CLOCK_FIX_SERVICE="/etc/systemd/system/clock-skew-fix.service"
 BUILD_DIR=".$SCRIPT_DIR/../SquirrelDefender/build"
-ENGINE_FILE=".$SCRIPT_DIR/../SquirrelDefender/networks/yolov8s/yolov8s.engine.Orin.fp16.1.1.-1.-1.-1"
 
 # 1. Add user to docker
 # Note: commented out, doesn't work in script apparently
@@ -68,7 +67,7 @@ Wants=graphical.target
 Environment="OS_WS=$WORKSPACE_PATH"
 Restart=off
 ExecStartPre=/bin/bash -c 'sleep 5'
-ExecStart=/bin/bash $WORKSPACE_PATH/OperationSquirrel/scripts/run_squirreldefender_${JETSON_TYPE}.sh
+ExecStart=/bin/bash $WORKSPACE_PATH/OperationSquirrel/scripts/run.sh squirreldefender ${JETSON_TYPE}
 ExecStop=/usr/bin/docker stop squirreldefender
 StandardOutput=journal
 StandardError=journal
@@ -111,17 +110,6 @@ EOF
 # 7. Create build folder and copy engine file ()
 echo "Ensuring build directory exists at $BUILD_DIR..."
 mkdir -p "$BUILD_DIR"
-
-# Only the orin needs the engine file moved into the build folder
-if [[ "$JETSON_TYPE" == "orin" ]]; then
-    echo "Copying engine file to build directory..."
-    if [ -f "$ENGINE_FILE" ]; then
-        cp "$ENGINE_FILE" "$BUILD_DIR/"
-        echo "Copied: $(basename "$ENGINE_FILE")"
-    else
-        echo "Warning: Engine file not found at $ENGINE_FILE"
-    fi
-fi
 
 # 8. Enable the systemd services
 # sudo systemctl enable squirreldefender.service # allow users to enable the program when they want

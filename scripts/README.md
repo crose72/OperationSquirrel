@@ -1,25 +1,102 @@
-# Scripts
+## Overview
 
-## Description
+This folder contains scripts used to **build, run, and configure** the Operation Squirrel containers and Jetson environments.
 
-This folder contains scripts that perform useful tasks, such as installing a particular version a CMake, installing the dependencies needed 
-to compile the program on your jetson, and building and running the docker containers which can be used for developing and running the program.  Descriptions of only a few of the scripts will be included below.  
+- `helpers/` — contains platform-specific or supporting scripts called by the main ones  
+- `archive/` — contains older or optional scripts for installation and development reference  
 
-Please note that if you are building the containers using these scripts you will not be able to push to my repo, so if you want to create your own container then you need to changes the username of the docker hub repo you're pushing to.
+## 🧱 Primary Scripts
 
-The `Install-Jetson-<rest of name here>` scripts Are used for installing SLAM, OpenCV, Jetson-Inference, and a few other things that were needed for the program.  It was used when developing on the Jetson itself, but docker containers have simplified that workflow so you don't have to install those things yourself, you just run the container :) They are a little dated, but they should work if you need them.
+| Script | Purpose |
+|--------|----------|
+| **`run.sh`** | Runs either the **development** or **SquirrelDefender** container for a specified target (e.g. Orin, B01, Ubuntu). |
+| **`build.sh`** | Builds the **SquirrelDefender** container for a specified target (e.g. Orin, B01). |
+| **`setup_squirreldefender.sh`** | Configures a Jetson to automatically start SquirrelDefender on power-up. |
+| **`gen_test_csv_from_mcap.sh`** | Converts `.mcap` logs into test-harness compatible CSVs. |
+
+## 🚀 Example: `run.sh`
+
+```bash
+cd OperationSquirrel/scripts
+
+# dev containers
+# for the orin
+./run.sh dev orin
+
+# for the jetson nano b01
+./run dev b01
+
+# for ubuntu-22.02 with gpu sm 8.6
+./run.sh dev ubuntu-22.04_sm86
+
+# squirreldefender containers (deployment)
+# for the orin
+./run.sh squirreldefender orin
+
+# for the jetson nano b01
+./run.sh squirreldefender b01
+```
+
+## 🚀 Example: `build.sh`
+
+```bash
+cd OperationSquirrel/scripts
+
+# squirreldefender containers (deployment)
+
+# for the orin
+./build.sh squirreldefender orin
+
+# for the jetson nano b01
+./build.sh squirreldefender b01
+```
+
+## ⚙️ Example: `setup_squirreldefender.sh`
+
+```bash
+# After starting up the jetson
+cd OperationSquirrel/scripts
+# Don't run as sudo - will cause the squirreldefender.service to look for the run script in the /home/root/ path, you want /home/$USER/
+./setup_squirreldefender.sh
+
+# This should setup the necessary components to enable the squirreldefender program to start as soon as the jetson is powered (useful when putting the jetson on a vehicle).
+```
+
+## 🧩 Example: `gen_test_csv_from_mcap.sh`
+
+```bash
+# Create and activate virtual environment
+python3 -m venv os-venv
+source os-venv/bin/activate
+
+cd OperationSquirrel/scripts
+./gen_test_csv_from_mcap.sh --proto ../proto ../test_data/2025-10-31-test-flight/*.mcap
+```
+
+The script will automatically:
+- Detect your active Python virtual environment  
+- Install the required dependencies (`protobuf`, `grpcio-tools`, `pandas`, `mcap`) if they are missing  
+- Generate Python protobuf bindings (`*_pb2.py`) from `.proto` files if they don’t exist  
+- Run the `mcap2CSV.py` conversion script to produce CSV files  
+
+## 🗃️ Archived / Legacy Notes
+
+The archive/ folder contains older scripts used for development setup, including:
+- Installing specific versions of CMake or Jetson dependencies (SLAM, OpenCV, Jetson-Inference, etc.)
+- Building and running Docker containers manually
+- Experimental or early setup utilities for direct Jetson development (before containerization simplified this workflow)
+
+#### ⚠️ These scripts may be outdated but remain useful for reference or manual builds.
+
+If you wish to build your own Docker images from these scripts, update the Docker Hub username in the image tags to your own account before pushing.
+
+Example: Copying the device model before building a dev container (only needed on the jetson when building from the opencv install script)
+
+The dev container builds OpenCV from source and needs the correct Jetson model to target the right GPU architecture.
+Before building for the first time, copy the device tree model:
 
 The dev container builds opencv from a script, and that script needs to know which Jetson is being used so it can compile opencv for the correct GPU generation/architecture.  So before building dev for the first time you need to copy the device tree model to the `docker/fake-proc/device-tree/` folder before building the container, like so.
 
 ```
 sudo cp /proc/device-tree/model <path-to-OperationSquirrel-repo>/docker/fake-proc/device-tree/model
 ```
-
-## The Scripts
-
-- `build_dev_r36.4.0.sh` - builds Jetpack r36.4.0 based container with all dependencies needed to compile and run the program
-- `build_squirreldefender_r36.4.0.sh` - builds Jetpack r36.4.0 based container to run the pre-compiled squirreldefender program
-- `build_field_r36.4.0.sh` - builds Jetpack r36.4.0 based container with code built into the container
-- `run_dev_orin.sh` - runs Jetpack r36.4.0 based container with mounted code to develop, compile, and run on the Jetson Orin Nano
-- `run_field_orin.sh` - runs Jetpack r36.4.0 based container with code built in to develop, compile, and run on the Jetson Orin Nano
-- `run_squirreldefender_orin.sh` - runs Jetpack r36.4.0 based container which immediately runs the squirreldefender program
