@@ -20,10 +20,18 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# --- Check for active venv ---
+# --- Check for active Python virtual environment ---
 if [ -z "${VIRTUAL_ENV:-}" ]; then
     echo "⚠️  No Python virtual environment detected."
-    echo "Please activate one first (e.g. 'source ~/path/to/mcap-test/bin/activate')"
+    echo ""
+    echo "👉 To continue, please activate one first:"
+    echo "   source ~/path/to/os-venv/bin/activate"
+    echo ""
+    echo "💡 Or create a new one if needed:"
+    echo "   python3 -m venv os-venv"
+    echo "   source os-venv/bin/activate"
+    echo ""
+    echo "Exiting to avoid installing system-wide packages."
     exit 1
 fi
 
@@ -57,6 +65,8 @@ fi
 
 # --- Run your converter ---
 echo "🚀 Running MCAP to CSV conversion..."
-python3 mcap2CSV.py "${ARGS[@]}"
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+python3 "$SCRIPT_DIR/gen_test_csv_from_mcap.py" "${ARGS[@]}"
+
 
 echo "✅ Conversion complete."
