@@ -71,6 +71,7 @@ TOPIC_CONFIG = {
         "g_app_elapsed_time": "app_elapsed_time",
         "g_system_state": "system_state",
     },
+
     "/target/detection": {
         "g_target_valid": "target_valid",
         "g_target_detection_id": "target_detection_id",
@@ -89,6 +90,7 @@ TOPIC_CONFIG = {
         "g_target_top": "target_top",
         "g_target_bottom": "target_bottom",
     },
+
     "/target/location": {
         "g_d_target_h": "d_target_h",
         "g_d_target_w": "d_target_w",
@@ -101,6 +103,7 @@ TOPIC_CONFIG = {
         "g_delta_d_x": "delta_d_x",
         "g_delta_d_z": "delta_d_z",
     },
+
     "/path/control": {
         "g_target_too_close": "target_too_close",
         "g_x_error": "x_error",
@@ -109,10 +112,84 @@ TOPIC_CONFIG = {
         "g_vy_adjust": "vy_adjust",
         "g_vz_adjust": "vz_adjust",
     },
+
+    # MAVLink system/status
+    "/mav/system": {
+        "g_mav_veh_sys_stat_voltage_battery": "sys_stat_voltage_battery",
+        "g_mav_veh_sys_stat_current_battery": "sys_stat_current_battery",
+        "g_mav_veh_sys_stat_battery_remaining": "sys_stat_battery_remaining",
+        "g_mav_veh_rel_alt": "rel_alt",
+        "g_mav_veh_type": "veh_type",
+        "g_mav_veh_autopilot_type": "autopilot_type",
+        "g_mav_veh_base_mode": "base_mode",
+        "g_mav_veh_custom_mode": "custom_mode",
+        "g_mav_veh_state": "state",
+        "g_mav_veh_mavlink_version": "mavlink_version",
+    },
+
+    # MAVLink kinematics (GPS / attitude / rates / local NED / quats)
+    "/mav/kinematics": {
+        # GPS velocities + heading
+        "g_mav_veh_gps_vx": "gps_vx",
+        "g_mav_veh_gps_vy": "gps_vy",
+        "g_mav_veh_gps_vz": "gps_vz",
+        "g_mav_veh_gps_hdg": "gps_hdg",
+
+        # Orientation (Euler)
+        "g_mav_veh_roll": "roll",
+        "g_mav_veh_pitch": "pitch",
+        "g_mav_veh_yaw": "yaw",
+
+        # Angular rates
+        "g_mav_veh_rollspeed": "rollspeed",
+        "g_mav_veh_pitchspeed": "pitchspeed",
+        "g_mav_veh_yawspeed": "yawspeed",
+
+        # Local NED position
+        "g_mav_veh_local_ned_x": "local_ned_x",
+        "g_mav_veh_local_ned_y": "local_ned_y",
+        "g_mav_veh_local_ned_z": "local_ned_z",
+
+        # Local NED velocities
+        "g_mav_veh_local_ned_vx": "local_ned_vx",
+        "g_mav_veh_local_ned_vy": "local_ned_vy",
+        "g_mav_veh_local_ned_vz": "local_ned_vz",
+
+        # Quaternions (attitude)
+        "g_mav_veh_q1_actual": "q1_actual",
+        "g_mav_veh_q2_actual": "q2_actual",
+        "g_mav_veh_q3_actual": "q3_actual",
+        "g_mav_veh_q4_actual": "q4_actual",
+
+        # Rate setpoints / actual
+        "g_mav_veh_roll_rate_actual": "roll_rate_actual",
+        "g_mav_veh_pitch_rate_actual": "pitch_rate_actual",
+        "g_mav_veh_yaw_rate_actual": "yaw_rate_actual",
+
+        # Repr offset quaternion (array fields as flattened keys)
+        "g_mav_veh_repr_offset_q[0]": "repr_offset_q[0]",
+        "g_mav_veh_repr_offset_q[1]": "repr_offset_q[1]",
+        "g_mav_veh_repr_offset_q[2]": "repr_offset_q[2]",
+        "g_mav_veh_repr_offset_q[3]": "repr_offset_q[3]",
+    },
+
+    # MAVLink IMU
+    "/mav/imu": {
+        "g_mav_veh_imu_ax": "imu_ax",
+        "g_mav_veh_imu_ay": "imu_ay",
+        "g_mav_veh_imu_az": "imu_az",
+        "g_mav_veh_imu_xgyro": "imu_xgyro",
+        "g_mav_veh_imu_ygyro": "imu_ygyro",
+        "g_mav_veh_imu_zgyro": "imu_zgyro",
+    },
+
+    # MAVLink rangefinder
     "/mav/rangefinder": {
         "g_mav_veh_rngfdr_current_distance": "current_distance",
         "g_mav_veh_rngfdr_signal_quality": "signal_quality",
     },
+
+    # MAVLink optical flow
     "/mav/flow": {
         "g_mav_veh_flow_comp_m_x": "flow_comp_m_x",
         "g_mav_veh_flow_comp_m_y": "flow_comp_m_y",
@@ -194,8 +271,10 @@ def process_mcap(input_mcap: str):
         merged = buckets[key]
         # For each field, only overwrite if it has a nonzero or non-empty value.
         for k, v in row.items():
-            if v != 0.0 or isinstance(v, str):
+            # Keep any value that's not None, NaN, or an empty string
+            if v is not None and not (isinstance(v, float) and math.isnan(v)) and v != "":
                 merged[k] = v
+
 
     # Step 4: Convert merged data into a DataFrame (table).
     # Missing values → 0, NaN → 0, all numbers parsed correctly.
