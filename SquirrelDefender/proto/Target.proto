@@ -10,7 +10,7 @@ message TargetDetection {
   bool   target_valid              = 10;
   int32  target_detection_id       = 11; // int -> int32
   int32  target_track_id           = 12; // int -> int32
-  float  detection_class           = 13; // you declared float
+  int32  detection_class           = 13; // you declared float
   float  target_detection_conf     = 14;
 
   float  target_cntr_offset_x      = 20;
