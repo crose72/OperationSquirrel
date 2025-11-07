@@ -11,3 +11,4 @@ scripts/mcap-test/
 **.mp4
 **.csv
 **/misc
+**/data
