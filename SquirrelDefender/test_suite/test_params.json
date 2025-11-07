@@ -1,22 +1,11 @@
 {
     "Input_File": {
-        "File_Name": "../test_data/2025-11-05-mtn-rd-park/data_test.csv",
-        "File_NameX": "../test_data/2025-07-23_mtn-rd-park/2025-07-23_mtn-rd-park_data_.csv",
-        "File_NameX": "../test_data/2025-05-10_ann-arbor/playback/follow_1_ann-arbor_yolo-boxes.csv",
-        "File_NameX": "../test_data/2025-05-10_ann-arbor/playback/follow_2_ann-arbor_yolo-boxes.csv",
-        "File_NameX": "../test_data/2025-05-10_ann-arbor/playback/follow_4_ann-arbor_yolo-boxes.csv",
-        "File_NameX": "../test_data/2025-05-10_ann-arbor/playback/follow_6_ann-arbor_yolo-boxes.csv",
+        "File_Path": "../test_suite/test_data/2025-11-05-mtn-rd-park/",
+        "File_Name": "data_test.csv"
     },
     "Output_File": {
-        "File_Path": "../test_data/follow-testing/",
-        "File_PathX": "../test_data/decision2Throw-testing/follow_1_ann-arbor_yolo-boxes/",
-        "File_PathX": "../test_data/decision2Throw-testing/follow_2_ann-arbor_yolo-boxes/",
-        "File_PathX": "../test_data/decision2Throw-testing/follow_4_ann-arbor_yolo-boxes/",
-        "File_PathX": "../test_data/decision2Throw-testing/follow_6_ann-arbor_yolo-boxes/",
-        "File_Name": "follow_data_mtn-rd-park_2025-11-05_test",
-        "File_NameX": "follow_1_time2throw",
-        "File_NameX": "follow_2_time2throw",
-        "File_NameX": "follow_4_time2throw",
-        "File_NameX": "follow_6_time2throw"
+        "File_Path": "../test_suite/test_data/decision_to_throw/",
+        "File_NameX": "follow_data_mtn-rd-park_2025-11-05_test",
+        "File_Name": "data_2025-11-05_mtn-rd-park_test_d2t"
     }
 }

@@ -132,7 +132,9 @@ TestHarness g_h;
 void init_test_inputs(void)
 {
     // Load the CSV input file
-    test_inputs = test_params.get_string_param("Input_File", "File_Name");
+    std::string test_input_file_path = test_params.get_string_param("Input_File", "File_Path");
+    std::string test_input_file_name = test_params.get_string_param("Input_File", "File_Name");
+    test_inputs = test_input_file_path + test_input_file_name;
     g_csv = std::make_unique<CSVReader>(test_inputs, ',');
 
     // Attach CSV to the test harness and assign inputs to be set

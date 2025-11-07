@@ -472,7 +472,7 @@ endif()
 #=============================================================================
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/test_flights)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_flights)
 
 # squirreldefender and source file paths
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/appsrc)
