@@ -167,6 +167,7 @@ float pix_width_x = (float)540.456;
 float pix_width_x_pow = (float)(-0.758);
 float target_det_edge_of_frame_buffer = (float)50.0;
 float min_target_bbox_area = (float)3500.0;
+float target_lost_dbc_sec_reset = (float)1.0;
 
 /********************************************************************************
  * Function definitions
@@ -223,6 +224,7 @@ void get_localization_params(void)
     min_target_bbox_area = localization_params.get_float_param("Localization_Params", "Min_Target_Bbox_Area");
     int target_lost_dbc_reset_val = localization_params.get_float_param("Localization_Params", "Target_Lost_Debounce_Reset");
     target_lost_dbc_reset = static_cast<std::chrono::milliseconds>(target_lost_dbc_reset_val);
+    target_lost_dbc_sec_reset = target_lost_dbc_reset_val * (float)0.001; // ms -> s
 }
 
 /********************************************************************************
@@ -376,7 +378,15 @@ void dtrmn_target_loc_img(void)
         g_target_lost_dbc_sec += g_dt;
     }
 
+#if defined(BLD_WSL)
+
+    g_target_is_lost = g_target_lost_dbc_sec > 1.0;
+
+#else
+
     g_target_is_lost = g_target_lost_dbc > target_lost_dbc_reset;
+
+#endif
 
     if (!g_target_is_lost)
     {

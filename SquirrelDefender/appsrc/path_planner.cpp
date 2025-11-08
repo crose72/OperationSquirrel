@@ -128,6 +128,10 @@ float g_veh_vx_est;
 float g_veh_vy_est;
 float g_x_error_dot;
 float x_error_dot_prv;
+float g_vx_cmd_ff;
+float g_vx_dot_des;
+float g_target_sim_r; // predicted relative distance
+float g_veh_sim_vd;
 
 /********************************************************************************
  * Calibration definitions
@@ -183,6 +187,11 @@ float vxy_cmd_max_allowed_accel = (float)2.5; // m/s²  -> used as shaping accel
 float vxy_cmd_max_allowed_jerk = (float)8.0;  // m/s^3 for x and y (jerk cap)
 float x_error_dot_filt_coef = (float)0.0;
 float vxy_cmd_ff_brake_gain = (float)0.0;
+float alpha_ff_x = (float)0.0;
+float beta_ff_x = (float)0.0;
+float ff_accel_thresh = (float)0.2;
+float ff_w_steady_state = (float)0.05;
+float ff_w_transient = (float)0.1;
 
 /********************************************************************************
  * Function definitions
@@ -249,6 +258,11 @@ void get_path_params(void)
     vxy_cmd_max_allowed_jerk = follow_control.get_float_param("Follow_Params", "CMD_vxy_max_allowed_jerk");
     x_error_dot_filt_coef = follow_control.get_float_param("Follow_Params", "X_error_dot_filt");
     vxy_cmd_ff_brake_gain = follow_control.get_float_param("Follow_Params", "CMD_vxy_ff_brake_gain");
+    alpha_ff_x = follow_control.get_float_param("Follow_Params", "FF_Alpha_X");
+    beta_ff_x = follow_control.get_float_param("Follow_Params", "FF_Beta_X");
+    ff_w_transient = follow_control.get_float_param("Follow_Params", "FF_weight_transient");
+    ff_accel_thresh = follow_control.get_float_param("Follow_Params", "FF_accel_thresh");
+    ff_w_steady_state = follow_control.get_float_param("Follow_Params", "FF_weight_steady_state");
 }
 
 /********************************************************************************
@@ -457,9 +471,143 @@ void dtrmn_vel_cmd(void)
     g_vx_adjust = v_shaped.x;
     g_vy_adjust = v_shaped.y;
 
+    // -----------------------------------------------------------------------------
+    // Feed-forward acceleration and proportional braking (X-direction only)
+    // -----------------------------------------------------------------------------
+    const float v_des = g_vx_adjust;        // PID output (desired velocity)
+    const float v_des_prev = vx_adjust_prv; // previous desired velocity
+    const float v_act = g_veh_vx_est;       // measured/estimated velocity
+    const float dt = g_dt;
+
+    // Desired acceleration (finite difference)
+    const float vdot_des = (v_des - v_des_prev) / dt;
+
+    // Feed-forward input to required to achieve desired velocity
+    const float u_ff = (v_des + vdot_des * dt - alpha_ff_x * v_act) / beta_ff_x;
+
+    // Determine if braking should be applied
+    const bool braking_active = ((v_des * v_act > 0.0f) && (fabsf(v_des) < fabsf(v_act))) || (v_des * v_act < 0.0f);
+
+    // Select the FF weighting factor based on the current vehicle behavior
+    // If speeding up or braking then use more FF
+    const float ff_w = (fabsf(vdot_des) > ff_accel_thresh || braking_active) ? ff_w_transient : ff_w_steady_state;
+
+    // Blend PID setpoint with FF term
+    float vx_cmd = (1.0f - ff_w) * v_des + ff_w * u_ff;
+
+    // Apply proportional braking when slowing down or reversing
+    if (braking_active)
+    {
+        vx_cmd -= vxy_cmd_ff_brake_gain * v_act;
+    }
+
+    // Output
+    g_vx_cmd_ff = vx_cmd;
+    g_vx_dot_des = vdot_des;
+
     target_valid_last_cycle = g_target_valid;
-    vx_adjust_prv = g_vx_adjust;
+    vx_adjust_prv = v_des;
     x_error_prv = g_x_error;
+}
+
+struct FollowSimState
+{
+    float r;          // relative distance (target - drone)
+    float v_d;        // drone forward velocity
+    float v_des_prev; // previous desired velocity
+};
+
+void sim_follow_relative_step(
+    FollowSimState &state,
+    float dt,
+    float alpha_plant,
+    float beta_plant,
+    float u_cmd, // actual control input (PID + FF)
+    float v_rel, // ✅ rename to "v_rel" (EKF relative velocity)
+    float brake_gain)
+{
+    // --- Vehicle plant (for simulated drone velocity) ---
+    float v_d = state.v_d;
+    float v_d_next = alpha_plant * v_d + beta_plant * u_cmd;
+
+    // --- Optional braking clamp ---
+    if (((u_cmd * v_d) < 0.0f) && fabsf(v_d) > 0.1f)
+        v_d_next -= brake_gain * v_d * dt;
+
+    // --- ✅ Relative distance update ---
+    // Because EKF velocity is already relative-to-drone, we just integrate it.
+    float r_next = state.r + v_rel * dt;
+
+    // --- Store back ---
+    state.v_d = v_d_next;
+    state.r = r_next;
+}
+
+void simulation(void)
+{
+    static FollowSimState sim_state{.r = 0.0f, .v_d = 0.0f, .v_des_prev = 0.0f};
+    static bool sim_initialized = false;
+
+    // Only run once you actually have a valid target
+    if (!g_target_valid)
+    {
+        // sim_initialized = false; // reset until target is seen again
+        // g_target_sim_r = 0.0f;
+        // g_veh_sim_vd = 0.0f;
+        return;
+    }
+
+    // When target first appears — initialize distance
+    if (!sim_initialized)
+    {
+        sim_state.r = g_x_error;      // measured initial relative distance
+        sim_state.v_d = g_veh_vx_est; // current drone velocity
+        sim_state.v_des_prev = 0.0f;
+        sim_initialized = true;
+    }
+
+    // --- Continue with the normal sim update ---
+    const float v_des = g_vx_adjust; // PID output
+    const float v_des_prev = vx_adjust_prv;
+    const float v_act = g_veh_vx_est;
+    const float dt = g_dt;
+
+    const float vdot_des = (v_des - v_des_prev) / dt;
+    const float u_ff = (v_des + vdot_des * dt - alpha_ff_x * v_act) / beta_ff_x;
+    const bool braking_active = ((v_des * v_act > 0.0f) && (fabsf(v_des) < fabsf(v_act))) || (v_des * v_act < 0.0f);
+    const float ff_w = (fabsf(vdot_des) > ff_accel_thresh || braking_active) ? ff_w_transient : ff_w_steady_state;
+
+    float v_t = g_vx_target_ekf; // + g_veh_vx_est;
+
+    // void sim_follow_relative_step(
+    //     FollowSimState & state,
+    //     float dt,
+    //     float alpha,
+    //     float beta,
+    //     float v_des,
+    //     float e,
+    //     float u_cmd, // your PID + FF output, g_vx_cmd_ff
+    //     float v_t,   // target velocity (KF-estimated absolute)
+    //     float ff_weight,
+    //     float alpha_ff_x,
+    //     float beta_ff_x,
+    //     float brake_gain)
+
+    if (g_target_is_lost)
+    {
+    }
+
+    sim_follow_relative_step(
+        sim_state,
+        g_dt,
+        alpha_ff_x,
+        beta_ff_x,
+        g_vx_adjust, // actual command used in flight
+        v_t,         // target absolute velocity
+        vxy_cmd_ff_brake_gain);
+
+    g_target_sim_r = sim_state.r;
+    g_veh_sim_vd = sim_state.v_d;
 }
 
 /********************************************************************************
@@ -519,6 +667,7 @@ void PathPlanner::loop(void)
     calc_follow_error();
     calc_yaw_target_error();
     dtrmn_vel_cmd();
+    simulation();
 }
 
 /********************************************************************************

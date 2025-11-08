@@ -111,7 +111,12 @@
         "Desired_Y_pix_offset": 0.0,
         "CMD_vel_max_cmd": 10.0,
         "CMD_vxy_max_allowed_accel": 2.5,
-        "CMD_vxy_max_allowed_jerk": 5.0
+        "CMD_vxy_max_allowed_jerk": 5.0,
+        "FF_Alpha_X": 0.9387,
+        "FF_Beta_X": 0.039,
+        "FF_weight_steady_state": 0.1,
+        "FF_weight_transient": 0.2,
+        "FF_accel_thresh": 0.5
     },
     "Camera_Params": {
         "Sensor_Mode": 0,

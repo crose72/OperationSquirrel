@@ -27,6 +27,10 @@ extern float g_yaw_target_error;
 extern float g_veh_vx_est;
 extern float g_veh_vy_est;
 extern float g_x_error_dot;
+extern float g_vx_cmd_ff;
+extern float g_vx_dot_des;
+extern float g_target_sim_r; // predicted relative distance
+extern float g_veh_sim_vd;
 
 /********************************************************************************
  * Function prototypes
