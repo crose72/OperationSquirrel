@@ -534,22 +534,25 @@ void sim_follow_relative_step(
     if (((u_cmd * v_d) < 0.0f) && fabsf(v_d) > 0.1f)
         v_d_next -= brake_gain * v_d * dt;
 
-    // --- NEW: smarter relative distance integration ---
-    // Add small lead + correction to reduce lag and bias
+    // --- Relative distance integration ---
     static float vrel_prev = 0.0f;
     float dv_rel = (v_rel - vrel_prev) / std::max(1e-3f, dt);
     vrel_prev = v_rel;
 
     const float T_lead = 0.20f; // 200 ms lead compensator
-    const float k_corr = 0.15f; // bias correction (nudges sim_r toward real error)
-    const float gamma = 0.02f;  // 2% complementary correction
+    const float k_corr = 0.15f;
+    float gamma = 0.02f;
+
+    // 🔧 Stronger correction when near target (error small)
+    if (fabsf(g_x_error) < 2.0f)
+        gamma = 0.06f;
 
     float v_rel_lead = v_rel + T_lead * dv_rel + k_corr * (g_x_error - state.r);
 
     // integrate relative distance
     float r_pred = state.r + v_rel_lead * dt;
 
-    // blend toward measured x_error to prevent stagnation
+    // complementary blend toward measured x_error
     float r_next = (1.0f - gamma) * r_pred + gamma * g_x_error;
 
     // --- Store back ---
@@ -577,10 +580,10 @@ void simulation(void)
 
     // --- plant tuning ---
     const float alpha_plant = 0.94f;
-    const float beta_plant = 0.06f; // unity steady-state gain
+    const float beta_plant = 0.04f; // 🔧 was 0.06f — reduces gain toward real dynamics
 
     // --- EKF relative velocity ---
-    float v_rel = g_vx_target_ekf; // relative velocity wrt drone
+    float v_rel = g_vx_target_ekf;
 
     // --- Simulate one step ---
     sim_follow_relative_step(
