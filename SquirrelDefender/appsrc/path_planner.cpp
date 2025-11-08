@@ -539,20 +539,24 @@ void sim_follow_relative_step(
     float dv_rel = (v_rel - vrel_prev) / std::max(1e-3f, dt);
     vrel_prev = v_rel;
 
-    const float T_lead = 0.20f; // 200 ms lead compensator
+    const float T_lead = 0.20f;
     const float k_corr = 0.15f;
-    float gamma = 0.02f;
-
-    // 🔧 Stronger correction when near target (error small)
-    if (fabsf(g_x_error) < 2.0f)
-        gamma = 0.06f;
+    const float gamma = 0.02f;
 
     float v_rel_lead = v_rel + T_lead * dv_rel + k_corr * (g_x_error - state.r);
+
+    // --- NEW: bias-balancing term ---
+    // small corrective velocity that pushes r toward 0 when system is steady
+    if (fabsf(v_rel) < 0.3f && fabsf(g_x_error) < 3.0f)
+    {
+        const float k_balance = 0.2f;               // m/s per meter bias
+        v_rel_lead += k_balance * (0.0f - state.r); // sign-corrective push
+    }
 
     // integrate relative distance
     float r_pred = state.r + v_rel_lead * dt;
 
-    // complementary blend toward measured x_error
+    // complementary blend to measurement
     float r_next = (1.0f - gamma) * r_pred + gamma * g_x_error;
 
     // --- Store back ---
@@ -565,9 +569,26 @@ void simulation(void)
     static FollowSimState sim_state{.r = 0.0f, .v_d = 0.0f, .v_des_prev = 0.0f};
     static bool sim_initialized = false;
 
-    if (!g_target_valid)
-        return;
+    const float dt = g_dt;
 
+    // --- Handle "target missing" first: drive sim toward neutral ---
+    const bool target_missing = (g_target_is_lost) || (std::fabs(g_vx_target_ekf) < 0.005f);
+    if (target_missing)
+    {
+        // pink -> 0 with a short time constant
+        const float tau_r = 0.6f; // seconds (tune 0.4–1.0)
+        sim_state.r += (-sim_state.r) * (dt / tau_r);
+
+        // red -> 0 gently so it doesn’t spike (optional)
+        const float tau_v = 0.8f;
+        sim_state.v_d += (-sim_state.v_d) * (dt / tau_v);
+
+        g_target_sim_r = sim_state.r;
+        g_veh_sim_vd = sim_state.v_d;
+        return; // skip normal step while target is missing
+    }
+
+    // --- Normal path below (target present) ---
     if (!sim_initialized)
     {
         sim_state.r = g_x_error;
@@ -576,16 +597,13 @@ void simulation(void)
         sim_initialized = true;
     }
 
-    const float dt = g_dt;
-
-    // --- plant tuning ---
+    // plant (use your ID’d values or the ones you prefer)
     const float alpha_plant = 0.94f;
-    const float beta_plant = 0.04f; // 🔧 was 0.06f — reduces gain toward real dynamics
+    const float beta_plant = 0.04f; // lowers red toward green; use 0.039f if you want exact ID
 
-    // --- EKF relative velocity ---
+    // EKF relative velocity (target wrt drone)
     float v_rel = g_vx_target_ekf;
 
-    // --- Simulate one step ---
     sim_follow_relative_step(
         sim_state,
         dt,
@@ -595,7 +613,6 @@ void simulation(void)
         v_rel,
         vxy_cmd_ff_brake_gain);
 
-    // --- Outputs ---
     g_target_sim_r = sim_state.r;
     g_veh_sim_vd = sim_state.v_d;
 }
