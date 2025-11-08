@@ -523,7 +523,7 @@ void sim_follow_relative_step(
     float alpha_plant,
     float beta_plant,
     float u_cmd, // actual control input (PID + FF)
-    float v_rel, // ✅ rename to "v_rel" (EKF relative velocity)
+    float v_rel, // EKF relative velocity
     float brake_gain)
 {
     // --- Vehicle plant (for simulated drone velocity) ---
@@ -534,9 +534,23 @@ void sim_follow_relative_step(
     if (((u_cmd * v_d) < 0.0f) && fabsf(v_d) > 0.1f)
         v_d_next -= brake_gain * v_d * dt;
 
-    // --- ✅ Relative distance update ---
-    // Because EKF velocity is already relative-to-drone, we just integrate it.
-    float r_next = state.r + v_rel * dt;
+    // --- NEW: smarter relative distance integration ---
+    // Add small lead + correction to reduce lag and bias
+    static float vrel_prev = 0.0f;
+    float dv_rel = (v_rel - vrel_prev) / std::max(1e-3f, dt);
+    vrel_prev = v_rel;
+
+    const float T_lead = 0.20f; // 200 ms lead compensator
+    const float k_corr = 0.15f; // bias correction (nudges sim_r toward real error)
+    const float gamma = 0.02f;  // 2% complementary correction
+
+    float v_rel_lead = v_rel + T_lead * dv_rel + k_corr * (g_x_error - state.r);
+
+    // integrate relative distance
+    float r_pred = state.r + v_rel_lead * dt;
+
+    // blend toward measured x_error to prevent stagnation
+    float r_next = (1.0f - gamma) * r_pred + gamma * g_x_error;
 
     // --- Store back ---
     state.v_d = v_d_next;
@@ -548,64 +562,37 @@ void simulation(void)
     static FollowSimState sim_state{.r = 0.0f, .v_d = 0.0f, .v_des_prev = 0.0f};
     static bool sim_initialized = false;
 
-    // Only run once you actually have a valid target
     if (!g_target_valid)
-    {
-        // sim_initialized = false; // reset until target is seen again
-        // g_target_sim_r = 0.0f;
-        // g_veh_sim_vd = 0.0f;
         return;
-    }
 
-    // When target first appears — initialize distance
     if (!sim_initialized)
     {
-        sim_state.r = g_x_error;      // measured initial relative distance
-        sim_state.v_d = g_veh_vx_est; // current drone velocity
+        sim_state.r = g_x_error;
+        sim_state.v_d = g_veh_vx_est;
         sim_state.v_des_prev = 0.0f;
         sim_initialized = true;
     }
 
-    // --- Continue with the normal sim update ---
-    const float v_des = g_vx_adjust; // PID output
-    const float v_des_prev = vx_adjust_prv;
-    const float v_act = g_veh_vx_est;
     const float dt = g_dt;
 
-    const float vdot_des = (v_des - v_des_prev) / dt;
-    const float u_ff = (v_des + vdot_des * dt - alpha_ff_x * v_act) / beta_ff_x;
-    const bool braking_active = ((v_des * v_act > 0.0f) && (fabsf(v_des) < fabsf(v_act))) || (v_des * v_act < 0.0f);
-    const float ff_w = (fabsf(vdot_des) > ff_accel_thresh || braking_active) ? ff_w_transient : ff_w_steady_state;
+    // --- plant tuning ---
+    const float alpha_plant = 0.94f;
+    const float beta_plant = 0.06f; // unity steady-state gain
 
-    float v_t = g_vx_target_ekf; // + g_veh_vx_est;
+    // --- EKF relative velocity ---
+    float v_rel = g_vx_target_ekf; // relative velocity wrt drone
 
-    // void sim_follow_relative_step(
-    //     FollowSimState & state,
-    //     float dt,
-    //     float alpha,
-    //     float beta,
-    //     float v_des,
-    //     float e,
-    //     float u_cmd, // your PID + FF output, g_vx_cmd_ff
-    //     float v_t,   // target velocity (KF-estimated absolute)
-    //     float ff_weight,
-    //     float alpha_ff_x,
-    //     float beta_ff_x,
-    //     float brake_gain)
-
-    if (g_target_is_lost)
-    {
-    }
-
+    // --- Simulate one step ---
     sim_follow_relative_step(
         sim_state,
-        g_dt,
-        alpha_ff_x,
-        beta_ff_x,
-        g_vx_adjust, // actual command used in flight
-        v_t,         // target absolute velocity
+        dt,
+        alpha_plant,
+        beta_plant,
+        g_vx_adjust,
+        v_rel,
         vxy_cmd_ff_brake_gain);
 
+    // --- Outputs ---
     g_target_sim_r = sim_state.r;
     g_veh_sim_vd = sim_state.v_d;
 }
