@@ -1,10 +1,14 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
-/.vscode
+﻿/.vscode
 /.vs
-/SquirrelDefender/data
-/SquirrelDefender/test_data
 SquirrelDefender/modules/SecretSquirrel
+SquirrelDefender/test_suite/test_data
 **/build*/
+*_pb2.py
+**/__pycache__
+scripts/mcap-test/
+*.tar.gz
+*.deb
+**.mp4
+**.csv
+**/misc
+**/data

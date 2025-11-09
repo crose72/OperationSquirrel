@@ -66,7 +66,8 @@ fi
 # --- Run your converter ---
 echo "🚀 Running MCAP to CSV conversion..."
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
-python3 "$SCRIPT_DIR/gen_test_csv_from_mcap.py" "${ARGS[@]}"
+export PROTO_DIR="$PROTO_DIR"
+python3 "$SCRIPT_DIR/helpers/gen_test_csv_from_mcap.py" "${ARGS[@]}"
 
 
 echo "✅ Conversion complete."
