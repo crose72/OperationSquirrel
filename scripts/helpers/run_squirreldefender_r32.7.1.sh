@@ -61,4 +61,4 @@ sudo docker run --rm --runtime nvidia --network host \
   --volume /run:/run \
   -v "$LOG_DIR":/workspace/OperationSquirrel/SquirrelDefender/data/ \
   --name $CONTAINER_NAME \
-  crose72/jetson-inference-r32.7.1:squirreldefender
+  crose72/os-release:squirreldefender-jetson-inference-32.7.1-latest
