@@ -63,25 +63,24 @@ DOCKER_VOLUMES=(
 docker pull "$IMAGE_NAME"
 
 # --------------------------------------------------------------
-# Launch logic
+# 🔁 Universal attach/restart logic
+# --------------------------------------------------------------
+if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
+  if [ "$(docker ps -q -f name=^${CONTAINER_NAME}$)" ]; then
+    echo "📦 Container '${CONTAINER_NAME}' is already running — attaching..."
+    docker exec -it ${CONTAINER_NAME} bash
+  else
+    echo "▶️  Restarting existing container '${CONTAINER_NAME}'..."
+    docker start -ai ${CONTAINER_NAME}
+  fi
+  exit 0
+fi
+
+# --------------------------------------------------------------
+# 🚀 Launch a new container
 # --------------------------------------------------------------
 if [[ "$MODE" == "osremote" ]]; then
   echo "📱 Launching persistent container for OSRemote (Flutter app)..."
-
-  # Check if container already exists
-  if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
-    if [ "$(docker ps -q -f name=^${CONTAINER_NAME}$)" ]; then
-      echo "📦 Container '${CONTAINER_NAME}' already running → attaching"
-      docker exec -it ${CONTAINER_NAME} bash
-    else
-      echo "▶️ Restarting stopped container '${CONTAINER_NAME}'..."
-      docker start -ai ${CONTAINER_NAME}
-    fi
-    exit 0
-  fi
-
-  # Otherwise, run new persistent background container
-  echo "🚀 Starting new persistent OSRemote container..."
   nohup docker run --runtime nvidia -dit --network host \
     --privileged --ipc=host \
     --env DISPLAY=$DISPLAY \
@@ -90,10 +89,9 @@ if [[ "$MODE" == "osremote" ]]; then
     --name ${CONTAINER_NAME} \
     ${IMAGE_NAME} \
     tail -f /dev/null > /tmp/squirreldefender.log 2>&1 &
-  echo "✅ Container launched in background for Flutter remote access."
-
+  echo "✅ Persistent OSRemote container started in background."
 else
-  echo "💻 Launching normal dev container (interactive)..."
+  echo "💻 Launching new interactive dev container..."
   docker run --runtime nvidia -it --rm --network host \
     --privileged --ipc=host \
     --env DISPLAY=$DISPLAY \
