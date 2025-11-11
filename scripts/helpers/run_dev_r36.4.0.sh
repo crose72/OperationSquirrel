@@ -1,6 +1,30 @@
+#!/usr/bin/env bash
 # Ensure ${OS_WS} is defined
-docker pull crose72/os-dev:jetpack-r36.4.0-latest
-sudo docker run --runtime nvidia -it --rm --network host \
+set -e
+
+CONTAINER_NAME="squirreldefender-dev"
+IMAGE_NAME="crose72/os-dev:jetpack-r36.4.0-latest"
+
+# Pull latest image (optional but safe)
+docker pull "$IMAGE_NAME"
+
+# If container exists (either running or stopped)
+if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
+  # If it's running, just attach
+  if [ "$(docker ps -q -f name=^${CONTAINER_NAME}$)" ]; then
+    echo "📦 Container '${CONTAINER_NAME}' is already running. Attaching..."
+    docker exec -it ${CONTAINER_NAME} bash
+  else
+    echo "▶️  Restarting existing container '${CONTAINER_NAME}'..."
+    docker start -ai ${CONTAINER_NAME}
+  fi
+  exit 0
+fi
+
+# Otherwise, run a new container
+echo "🚀 Starting a new container '${CONTAINER_NAME}'..."
+
+docker run --runtime nvidia -dit --network host \
   --privileged --ipc=host \
   --env DISPLAY=$DISPLAY \
   --device /dev/video0 \
@@ -30,8 +54,6 @@ sudo docker run --runtime nvidia -it --rm --network host \
   --volume /tmp/argus_socket:/tmp/argus_socket \
   --volume /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra \
   --volume ${OS_WS}/OperationSquirrel/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender \
-  --volume ${OS_WS}/YOLOv8-TensorRT-CPP:/workspace/YOLOv8-TensorRT-CPP \
-  --name squirreldefender-dev \
-  crose72/os-dev:jetpack-r36.4.0-latest \
-  bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build \
-    && exec bash"
+  --name ${CONTAINER_NAME} \
+  ${IMAGE_NAME} \
+  bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build && tail -f /dev/null"
