@@ -1,6 +1,12 @@
 {
-"PID_vx_forward": {
-        "Kp": 0.4,
+    "Flight_Params": {
+        "CMD_Takeoff_Alt": 7.0,
+        "Min_Mission_Alt_CM": 550,
+        "Min_Mission_Alt_MM": 5500,
+        "Min_Mission_Start_Debounce": 500
+    },
+    "PID_vx_forward": {
+        "Kp": 0.6,
         "Ki": 0.0,
         "Kd": 0.1,
         "w1": 1.0,
@@ -24,7 +30,7 @@
         "w3": 0.0
     },
     "PID_vx_reverse": {
-        "Kp": 0.4,
+        "Kp": 0.6,
         "Ki": 0.009,
         "Kd": 0.1,
         "w1": 1.0,
