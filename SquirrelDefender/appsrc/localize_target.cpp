@@ -376,7 +376,15 @@ void dtrmn_target_loc_img(void)
         g_target_lost_dbc_sec += g_dt;
     }
 
+#if defined(BLD_WSL)
+
+    g_target_is_lost = g_target_lost_dbc_sec > 1.0;
+
+#else
+
     g_target_is_lost = g_target_lost_dbc > target_lost_dbc_reset;
+
+#endif
 
     if (!g_target_is_lost)
     {
