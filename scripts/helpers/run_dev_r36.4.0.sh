@@ -68,9 +68,9 @@ docker pull "$IMAGE_NAME"
 if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
   if [ "$(docker ps -q -f name=^${CONTAINER_NAME}$)" ]; then
     echo "📦 Container '${CONTAINER_NAME}' is already running — attaching..."
-    docker exec -it ${CONTAINER_NAME} bash
+    docker exec -it ${CONTAINER_NAME} bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build && exec bash"
   else
-    echo "▶️  Restarting existing container '${CONTAINER_NAME}'..."
+    echo "▶️  Restarting stopped container '${CONTAINER_NAME}'..."
     docker start -ai ${CONTAINER_NAME}
   fi
   exit 0
