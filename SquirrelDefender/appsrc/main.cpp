@@ -58,6 +58,10 @@ void attach_sig_handler(void)
     {
         spdlog::error("can't catch SIGINT");
     }
+    if (signal(SIGTERM, sig_handler) == SIG_ERR)
+    {
+    	spdlog::error("Can't catch SIGTERM");
+    }
 }
 
 /********************************************************************************
@@ -89,6 +93,7 @@ int main(int argc, char **argv)
     }
 
     Scheduler::shutdown();
+    ::sync();
 
     return 0;
 }

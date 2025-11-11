@@ -1,15 +1,6 @@
 #!/usr/bin/env bash
 # Ensure ${OS_WS} is defined
-OS_WS=${OS_WS:-/home/$USER/workspaces/os-dev}
-
 set +e
-
-if [ -z "$DISPLAY" ]; then
-  # default jeston display
-  export DISPLAY=:0
-fi
-
-xhost +local:root >/dev/null 2>&1 || true
 
 CONTAINER_NAME="squirreldefender-dev"
 IMAGE_NAME="crose72/os-dev:jetpack-r36.4.0-latest"
