@@ -16,6 +16,7 @@
 #include "mav_utils.h"
 #include "path_planner.h"
 #include "system_controller.h"
+#include "param_reader.h"
 
 /********************************************************************************
  * Typedefs
@@ -31,10 +32,13 @@
 bool takeoff_dbc;
 bool start_follow_mode;
 uint16_t takeoff_dbc_cnt;
+float desired_veh_alt;
 
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
+uint16_t min_mission_alt_cm = (uint16_t)550;
+int32_t min_mission_alt_mm = (int32_t)5500;
 
 /********************************************************************************
  * Function definitions
@@ -80,7 +84,7 @@ void dtrmn_veh_control_action(void)
     }
     else if (g_system_state == SystemState::STANDBY)
     {
-        MavCmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, (float)7.0);
+        MavCmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, desired_veh_alt);
     }
     else if (g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
@@ -96,7 +100,7 @@ void dtrmn_veh_control_action(void)
             takeoff_dbc = true;
         }
 
-        if (takeoff_dbc && g_mav_veh_rngfdr_current_distance > 550 || g_mav_veh_rel_alt > 5500)
+        if (takeoff_dbc && g_mav_veh_rngfdr_current_distance > min_mission_alt_cm || g_mav_veh_rel_alt > min_mission_alt_mm)
         {
             start_follow_mode = true;
         }
@@ -126,9 +130,14 @@ VehicleController::~VehicleController(void) {}
  ********************************************************************************/
 bool VehicleController::init(void)
 {
+    ParamReader flight_params("../params.json");
+
     takeoff_dbc = false;
     start_follow_mode = false;
-    takeoff_dbc_cnt = 500;
+    takeoff_dbc_cnt = flight_params.get_float_param("Flight_Params", "Min_Mission_Start_Debounce");
+    min_mission_alt_cm = flight_params.get_float_param("Flight_Params", "Min_Mission_Alt_CM");
+    min_mission_alt_mm = flight_params.get_float_param("Flight_Params", "Min_Mission_Alt_MM");
+    desired_veh_alt = flight_params.get_float_param("Flight_Params", "CMD_Takeoff_Alt");
 
     return true;
 }
@@ -148,5 +157,6 @@ void VehicleController::loop(void)
  ********************************************************************************/
 void VehicleController::shutdown(void)
 {
-    MavCmd::set_mode_land(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+    // When operating with OSRemote we don't want it to land every time
+    // MavCmd::set_mode_land(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
 }

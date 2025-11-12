@@ -3,6 +3,7 @@ set -e
 
 CONTAINER="${1}"      # dev or squirreldefender
 PLATFORM="${2}"            # orin, b01, ubuntu-22.04_sm86
+OSREMOTE="${3:-}"         # optional: osremote (for Flutter)
 
 SCRIPT_DIR="$(dirname "$0")"
 HELPER_DIR="$SCRIPT_DIR/helpers"
@@ -38,6 +39,14 @@ esac
 # Construct the helper name dynamically
 HELPER_SCRIPT="$HELPER_DIR/run_${CONTAINER}_${RUN_TAG}.sh"
 
+# Check if running from flutter app
+if [[ "$OSREMOTE" == "osremote" ]]; then
+    echo "📱 Detected OSRemote (Flutter) mode"
+else
+    echo "💻 Standard development mode"
+fi
+
+# Verify the script for the desired device exists
 if [[ ! -f "$HELPER_SCRIPT" ]]; then
     echo "❌ Missing helper: $HELPER_SCRIPT"
     echo "Expected at: $HELPER_SCRIPT"
@@ -46,4 +55,4 @@ fi
 
 echo "📦 Using version tag: $RUN_TAG"
 shift 2
-bash "$HELPER_SCRIPT" "$@"
+bash "$HELPER_SCRIPT" "$OSREMOTE" "$@"
