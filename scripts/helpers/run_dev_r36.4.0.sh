@@ -58,9 +58,14 @@ DOCKER_VOLUMES=(
 )
 
 # --------------------------------------------------------------
-# Optional image pull
+# Optional image pull (only if online)
 # --------------------------------------------------------------
-docker pull "$IMAGE_NAME"
+if ping -c1 -W1 8.8.8.8 &>/dev/null; then
+  echo "🌐 Internet detected — pulling latest image..."
+  docker pull "$IMAGE_NAME"
+else
+  echo "📡 Offline mode — skipping docker pull."
+fi
 
 # --------------------------------------------------------------
 # 🔁 Universal attach/restart logic
