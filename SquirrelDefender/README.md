@@ -68,7 +68,7 @@ sudo usermod -aG docker $USER && newgrp docker
 
 # Go to and execute the setup script
 cd OperationSquirrel/scripts
-./setup_squirreldefender.sh --jetson=orin # for the Orin nano, --jetson=b01 for the B01 nano
+../setup.sh squirreldefender --jetson=orin # for the Orin nano, --jetson=b01 for the B01 nano
 
 # This setup script will execute a python script that will allow you to configure your csi camera.
 # It will prompt you to reboot the jetson for the changes to take effect.  Choose to exit without
@@ -109,7 +109,7 @@ cd OperationSquirrel/scripts
 ./run.sh dev b01
 ```
 
-A terminal inside the container should open up.  If `SquirrelDefender/build` doesn't exist on your jetson then you need to create it since the dev container opens to that path (the `setup_squirreldefender.sh` should take care of this).  You can now make changes to the code outside of the container (the code is mounted into the container), and compile and run the executable inside the container.  Inside the container do the following:
+A terminal inside the container should open up.  If `SquirrelDefender/build` doesn't exist on your jetson then you need to create it since the dev container opens to that path (the `setup.sh` should take care of this).  You can now make changes to the code outside of the container (the code is mounted into the container), and compile and run the executable inside the container.  Inside the container do the following:
 
 ```bash
 # Build
@@ -125,7 +125,7 @@ make -j$(nproc)
 
 ### Release container:
 
-If you don't need to change the code and just want to run the precompiled program then you can just do the setup and run `./run_squirreldefender_orin.sh` or `./run_squirreldefender_b01.sh` to run the program for your Jetson.  The purpose of this container is to be deployed onto your drone or other autonomous vehicle since the only thing that it does is run the pre-compiled binary that you created using the dev container from the previous step.
+If you don't need to change the code and just want to run the precompiled program then you can just do the setup and run `./run.sh squirreldefender orin` or `./run.sh squirreldefender b01` to run the program for your Jetson.  The purpose of this container is to be deployed onto your drone or other autonomous vehicle since the only thing that it does is run the pre-compiled binary that you created using the dev container from the previous step.
 
 If you want to have the program run as soon as you power on the jetson (for example when your jetson is mounted on your drone and you plug in the battery to your jetson) then you need to do the setup, and then enable the `squirreldefender.service` by doing
 
@@ -183,7 +183,7 @@ Let's say you're at the park with your jetson and your drone, and you want to tr
 
 When the Jetson has no internet connection the system time defaults to 1969.  Since you're probably working in the present (2025 and beyond), any files you've touched will likey have a timestamp in the present.  This timestamp is after 1969 by a lot.  So if you go to compile the squirreldefender program the compiler will notice that the files have a timestamp millions of seconds in the future, resulting in a clock skew when recompiling.  To solve this issue, create a systemd service to automatically move the system time to a few seconds after the latest timestamp in the OperationSquirrel repo.
 
-The `setup_squirreldefender.sh` should take care of this, but here is the manual setup for your benefit.
+The `setup.sh` should take care of this, but here is the manual setup for your benefit.
 
 Create a systemd service
 

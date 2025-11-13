@@ -11,8 +11,9 @@ This folder contains scripts used to **build, run, and configure** the Operation
 |--------|----------|
 | **`run.sh`** | Runs either the **development** or **SquirrelDefender** container for a specified target (e.g. Orin, B01, Ubuntu). |
 | **`build.sh`** | Builds the **SquirrelDefender** container for a specified target (e.g. Orin, B01). |
-| **`setup_squirreldefender.sh`** | Configures a Jetson to automatically start SquirrelDefender on power-up. |
+| **`setup.sh`** | Configures a Jetson to automatically start SquirrelDefender on power-up. Also configures OSRemote. |
 | **`gen_test_csv_from_mcap.sh`** | Converts `.mcap` logs into test-harness compatible CSVs. |
+| **`toggle_osremote.sh`** | Toggle jetson between hotspot mode and it's usual wifi connection. |
 
 ## 🚀 Example: `run.sh`
 
@@ -51,15 +52,26 @@ cd OperationSquirrel/scripts
 ./build.sh squirreldefender b01
 ```
 
-## ⚙️ Example: `setup_squirreldefender.sh`
+## ⚙️ Example: `setup.sh`
 
 ```bash
 # After starting up the jetson
 cd OperationSquirrel/scripts
 # Don't run as sudo - will cause the squirreldefender.service to look for the run script in the /home/root/ path, you want /home/$USER/
-./setup_squirreldefender.sh
+./setup.sh squirreldefender --jetson=[orin|b01] # sets up the jetson to run the release container when the jetson powers on
+
+./setup.sh osremote # sets up the jetson to be ready to be controlled from the osremote app
 
 # This should setup the necessary components to enable the squirreldefender program to start as soon as the jetson is powered (useful when putting the jetson on a vehicle).
+```
+
+## 🚀 Example: `toggle_osremote.sh`
+
+```bash
+cd OperationSquirrel/scripts
+sudo ./toggle_osremote.sh
+
+# If connected to wifi, running this script will save your wifi credentials and put the jetson in access point mode (hotspot).  You can then connect your phone to this "hotspot" and use the OSRemote app to improve your dev experience in the field.  If the jetson is in hotspot mode and you are back in range of your wifi, running this script should connect the jetson back to the wifi network it was on before.
 ```
 
 ## 🧩 Example: `gen_test_csv_from_mcap.sh`

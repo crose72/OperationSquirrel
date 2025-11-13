@@ -101,7 +101,6 @@ struct MotionProfiler2D
  ********************************************************************************/
 PID pid_forwd;
 PID pid_rev;
-PID pid_yaw;
 MotionProfiler2D g_vel_shaper; // shapes (g_vx_adjust, g_vy_adjust)
 bool g_target_too_close;
 bool yaw_initial_latched;
@@ -136,45 +135,27 @@ float x_error_dot_prv;
 float Kp_x = (float)0.5;
 float Ki_x = (float)0.009;
 float Kd_x = (float)0.1;
-float w1_x = (float)1.0;
-float w2_x = (float)0.0;
-float w3_x = (float)0.0;
 
 /* y forward */
 float Kp_y = (float)0.03;
 float Ki_y = (float)0.00;
 float Kd_y = (float)0.001;
-float w1_y = (float)1.0;
-float w2_y = (float)0.0;
-float w3_y = (float)0.0;
 
 /* z forward */
-float w1_z = (float)0.0;
-float w2_z = (float)0.0;
-float w3_z = (float)0.0;
 
 /* x reverse */
 float Kp_x_rev = (float)0.0;
 float Ki_x_rev = (float)0.0;
 float Kd_x_rev = (float)0.0;
-float w1_x_rev = (float)1.0;
-float w2_x_rev = (float)0.0;
-float w3_x_rev = (float)0.0;
 
 /* y reverse */
 float Kp_y_rev = (float)0.005;
 float Ki_y_rev = (float)0.0;
 float Kd_y_rev = (float)0.0;
-float w1_y_rev = (float)1.0;
-float w2_y_rev = (float)0.0;
-float w3_y_rev = (float)0.0;
 
 float Kp_yaw = (float)0.08;
 float Ki_yaw = (float)0.0;
 float Kd_yaw = (float)0.00005;
-float w1_yaw = (float)1.0;
-float w2_yaw = (float)0.0;
-float w3_yaw = (float)0.0;
 
 float x_desired = (float)4.0;
 float y_desired = (float)0.0;
@@ -205,41 +186,26 @@ void get_path_params(void)
     Kp_x = follow_control.get_float_param("PID_vx_forward", "Kp");
     Ki_x = follow_control.get_float_param("PID_vx_forward", "Ki");
     Kd_x = follow_control.get_float_param("PID_vx_forward", "Kd");
-    w1_x = follow_control.get_float_param("PID_vx_forward", "w1");
-    w2_x = follow_control.get_float_param("PID_vx_forward", "w2");
-    w3_x = follow_control.get_float_param("PID_vx_forward", "w3");
 
     // Accessing Vel_PID_y parameters
     Kp_y = follow_control.get_float_param("PID_vy_forward", "Kp");
     Ki_y = follow_control.get_float_param("PID_vy_forward", "Ki");
     Kd_y = follow_control.get_float_param("PID_vy_forward", "Kd");
-    w1_y = follow_control.get_float_param("PID_vy_forward", "w1");
-    w2_y = follow_control.get_float_param("PID_vy_forward", "w2");
-    w3_y = follow_control.get_float_param("PID_vy_forward", "w3");
 
     // Accessing Vel_PID_x parameters for reverse movement
     Kp_x_rev = follow_control.get_float_param("PID_vx_reverse", "Kp");
     Ki_x_rev = follow_control.get_float_param("PID_vx_reverse", "Ki");
     Kd_x_rev = follow_control.get_float_param("PID_vx_reverse", "Kd");
-    w1_x_rev = follow_control.get_float_param("PID_vx_reverse", "w1");
-    w2_x_rev = follow_control.get_float_param("PID_vx_reverse", "w2");
-    w3_x_rev = follow_control.get_float_param("PID_vx_reverse", "w3");
 
     // Accessing Vel_PID_y parameters for reverse movment
     Kp_y_rev = follow_control.get_float_param("PID_vy_reverse", "Kp");
     Ki_y_rev = follow_control.get_float_param("PID_vy_reverse", "Ki");
     Kd_y_rev = follow_control.get_float_param("PID_vy_reverse", "Kd");
-    w1_y_rev = follow_control.get_float_param("PID_vy_reverse", "w1");
-    w2_y_rev = follow_control.get_float_param("PID_vy_reverse", "w2");
-    w3_y_rev = follow_control.get_float_param("PID_vy_reverse", "w3");
 
     // Accessing Yaw PID parameters
     Kp_yaw = follow_control.get_float_param("PID_yaw", "Kp");
     Ki_yaw = follow_control.get_float_param("PID_yaw", "Ki");
     Kd_yaw = follow_control.get_float_param("PID_yaw", "Kd");
-    w1_yaw = follow_control.get_float_param("PID_yaw", "w1");
-    w2_yaw = follow_control.get_float_param("PID_yaw", "w2");
-    w3_yaw = follow_control.get_float_param("PID_yaw", "w3");
 
     // Follow params
     x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_offset");
@@ -412,31 +378,25 @@ void dtrmn_vel_cmd(void)
     // PID control outputs - these are the control setpoints (vx, vy, etc)
     if (g_target_valid && g_target_too_close)
     {
-        g_vx_adjust = pid_rev.pid3(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                   g_x_error, 0.0f, 0.0f,
-                                   w1_x_rev, 0.0f, 0.0f, ControlDim::X, g_dt);
+        g_vx_adjust = pid_rev.pid(Kp_x_rev, Ki_x_rev, Kd_x_rev,
+                                  g_x_error, ControlDim::X, g_dt);
 
-        g_vy_adjust = pid_rev.pid3(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                   g_y_error, 0.0f, 0.0f,
-                                   w1_y_rev, 0.0f, 0.0f, ControlDim::Y, g_dt);
+        g_vy_adjust = pid_rev.pid(Kp_y_rev, Ki_y_rev, Kd_y_rev,
+                                  g_y_error, ControlDim::Y, g_dt);
 
-        g_yaw_adjust = pid_yaw.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
-                                    g_yaw_target_error, 0.0f, 0.0f,
-                                    w1_yaw, 0.0f, 0.0f, ControlDim::YAW, g_dt);
+        g_yaw_adjust = pid_rev.pid(Kp_yaw, Ki_yaw, Kd_yaw,
+                                   g_yaw_target_error, ControlDim::YAW, g_dt);
     }
     else if (g_target_valid && !g_target_too_close)
     {
-        g_vx_adjust = pid_forwd.pid3(Kp_x, Ki_x, Kd_x,
-                                     g_x_error, 0.0f, 0.0f,
-                                     w1_x, 0.0f, 0.0f, ControlDim::X, g_dt);
+        g_vx_adjust = pid_forwd.pid(Kp_x, Ki_x, Kd_x,
+                                    g_x_error, ControlDim::X, g_dt);
 
-        g_vy_adjust = pid_forwd.pid3(Kp_y, Ki_y, Kd_y,
-                                     g_y_error, 0.0f, 0.0f,
-                                     w1_y, 0.0f, 0.0f, ControlDim::Y, g_dt);
+        g_vy_adjust = pid_forwd.pid(Kp_y, Ki_y, Kd_y,
+                                    g_y_error, ControlDim::Y, g_dt);
 
-        g_yaw_adjust = pid_yaw.pid3(Kp_yaw, Ki_yaw, Kd_yaw,
-                                    g_yaw_target_error, 0.0f, 0.0f,
-                                    w1_yaw, 0.0f, 0.0f, ControlDim::YAW, g_dt);
+        g_yaw_adjust = pid_forwd.pid(Kp_yaw, Ki_yaw, Kd_yaw,
+                                     g_yaw_target_error, ControlDim::YAW, g_dt);
     }
     else
     {

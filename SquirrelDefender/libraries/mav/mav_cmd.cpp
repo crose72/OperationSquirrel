@@ -87,7 +87,7 @@ void MavCmd::disarm_vehicle(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8
 void MavCmd::set_mode_land(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
 {
     set_flight_mode(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
-                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::LAND, 0);
+                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)ArduPilotMode::LAND, 0);
 }
 
 /********************************************************************************
@@ -97,7 +97,7 @@ void MavCmd::set_mode_land(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_
 void MavCmd::set_mode_guided(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
 {
     set_flight_mode(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
-                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::GUIDED, 0);
+                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)ArduPilotMode::GUIDED, 0);
 }
 
 /********************************************************************************
@@ -107,7 +107,7 @@ void MavCmd::set_mode_guided(uint8_t sender_sys_id, uint8_t sender_comp_id, uint
 void MavCmd::set_mode_guided_nogps(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
 {
     set_flight_mode(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
-                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::GUIDED_NOGPS, 0);
+                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)ArduPilotMode::GUIDED_NOGPS, 0);
 }
 
 /********************************************************************************
@@ -117,7 +117,7 @@ void MavCmd::set_mode_guided_nogps(uint8_t sender_sys_id, uint8_t sender_comp_id
 void MavCmd::set_mode_rtl(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id)
 {
     set_flight_mode(sender_sys_id, sender_comp_id, target_sys_id, target_comp_id,
-                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)FlightMode::RTL, 0);
+                    0, MAV_MODE_FLAG_CUSTOM_MODE_ENABLED, (float)ArduPilotMode::RTL, 0);
 }
 
 /********************************************************************************
@@ -195,5 +195,42 @@ void MavCmd::send_cmd_long(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_
     command_long.param7 = cmd_long_param7;
 
     mavlink_msg_command_long_encode(sender_sys_id, sender_comp_id, &msg, &command_long);
+    send_mav_cmd(msg);
+}
+
+/********************************************************************************
+ * Function: read_param
+ * Description: This function sends mavlink message to read a flight controller
+ *              internal parameter.
+ ********************************************************************************/
+void MavCmd::read_param(uint8_t sender_sys_id,
+                        uint8_t sender_comp_id,
+                        uint8_t target_sys_id,
+                        uint8_t target_comp_id,
+                        const char *param_id,
+                        int16_t param_index)
+{
+    mavlink_message_t msg;
+    mavlink_param_request_read_t req;
+
+    req.target_system = target_sys_id;
+    req.target_component = target_comp_id;
+
+    // Choose between name or index
+    if (param_id && param_id[0] != '\0')
+    {
+        // Use name
+        strncpy(req.param_id, param_id, sizeof(req.param_id));
+        req.param_index = -1; // tells FCU to use param_id
+    }
+    else
+    {
+        // Use index
+        req.param_index = param_index;
+        req.param_id[0] = '\0'; // name ignored
+    }
+
+    // Encode and send
+    mavlink_msg_param_request_read_encode(sender_sys_id, sender_comp_id, &msg, &req);
     send_mav_cmd(msg);
 }
