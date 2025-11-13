@@ -57,7 +57,7 @@ option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
-option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" OFF)
+option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" ON)
 option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" OFF)
 option(ENABLE_SECRET_SQUIRREL "Compile custom code with the open source Operation Squirrel" ON)
 
@@ -472,7 +472,7 @@ endif()
 #=============================================================================
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/test_flights)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/test_suite/test_flights)
 
 # squirreldefender and source file paths
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/appsrc)

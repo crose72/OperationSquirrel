@@ -56,6 +56,7 @@ void write_headers(void);
 void log_data(void);
 void save_to_csv(const std::string &filename, const std::vector<std::vector<std::string>> &data);
 std::string generate_unique_filename(const std::string &filename);
+void save_params(const std::string &filename);
 
 /********************************************************************************
  * Function: generate_unique_filename
@@ -76,6 +77,55 @@ std::string generate_unique_filename(const std::string &filename, const std::str
     }
 
     return new_file_name;
+}
+
+/********************************************************************************
+ * Function: save_params
+ * Description: Copy params.json (one level above data folder)
+ *              into the data folder with matching index suffix.
+ ********************************************************************************/
+void save_params(const std::string &mcap_filename)
+{
+    // Derive suffix (e.g., "_3" from "data_3.mcap")
+    std::string number_suffix;
+    const size_t underscore_pos = mcap_filename.find_last_of('_');
+    const size_t dot_pos = mcap_filename.find_last_of('.');
+    if (underscore_pos != std::string::npos &&
+        dot_pos != std::string::npos &&
+        dot_pos > underscore_pos)
+    {
+        number_suffix = mcap_filename.substr(underscore_pos, dot_pos - underscore_pos);
+    }
+
+    // --- Use the known path instead of parsing ---
+    // data_file_path points to "../data/"
+    // params.json is one level up from that ("../params.json")
+    const std::string src_path = data_file_path.substr(0, data_file_path.find_last_of('/', data_file_path.length() - 2)) + "/params.json";
+    const std::string dst_path = data_file_path + "params" + number_suffix + ".json";
+
+    std::ifstream src(src_path);
+    if (!src.is_open())
+    {
+        std::cout << "⚠️  Could not open " << src_path << " for reading.\n";
+        return;
+    }
+
+    std::ofstream dst(dst_path);
+    if (!dst.is_open())
+    {
+        std::cout << "⚠️  Could not create " << dst_path << " for writing.\n";
+        src.close();
+        return;
+    }
+
+    std::string line;
+    while (std::getline(src, line))
+        dst << line << '\n';
+
+    src.close();
+    dst.close();
+
+    std::cout << "✅ Saved params copy: " << dst_path << std::endl;
 }
 
 /********************************************************************************
@@ -643,8 +693,8 @@ bool DataLogger::init(void)
 
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-    const std::string path = generate_unique_filename(data_file_name, ".mcap");
-    mMCAPLogger = std::make_unique<MCAPLogger>(path, "profile");
+    const std::string unique_file_name = generate_unique_filename(data_file_name, ".mcap");
+    mMCAPLogger = std::make_unique<MCAPLogger>(unique_file_name, "profile");
 
     // Register channels (schema names must match package.Message)
     mMCAPLogger->addChannel("/system/state", "os.logger.SystemStateMsg", "protobuf");
@@ -667,6 +717,8 @@ bool DataLogger::init(void)
     write_headers();
 
 #endif
+
+    save_params(unique_file_name);
 
     return true;
 }

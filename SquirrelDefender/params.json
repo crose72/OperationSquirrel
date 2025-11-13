@@ -1,179 +1,184 @@
 {
-"PID_vx_forward": {
-        "Kp": 0.4,
-        "Ki": 0.0,
-        "Kd": 0.1,
-        "w1": 1.0,
-        "w2": 0.0,
-        "w3": 0.0
+  "Flight_Params": {
+    "CMD_Takeoff_Alt": 7.3,
+    "Min_Mission_Alt_CM": 550,
+    "Min_Mission_Alt_MM": 5500,
+    "Min_Mission_Start_Debounce": 500
+  },
+  "PID_vx_forward": {
+    "Kp": 0.6,
+    "Ki": 0.0,
+    "Kd": 0.1,
+    "w1": 1.0,
+    "w2": 0.0,
+    "w3": 0.0
+  },
+  "PID_vy_forward": {
+    "Kp": 0.04,
+    "Ki": 0.0,
+    "Kd": 0.001,
+    "w1": 1.0,
+    "w2": 0.0,
+    "w3": 0.0
+  },
+  "PID_vz_forward": {
+    "Kp": 0.0,
+    "Ki": 0.0,
+    "Kd": 0.0,
+    "w1": 0.0,
+    "w2": 0.0,
+    "w3": 0.0
+  },
+  "PID_vx_reverse": {
+    "Kp": 0.6,
+    "Ki": 0.009,
+    "Kd": 0.1,
+    "w1": 1.0,
+    "w2": 0.0,
+    "w3": 0.0
+  },
+  "PID_vy_reverse": {
+    "Kp": 0.03,
+    "Ki": 0.0,
+    "Kd": 0.001,
+    "w1": 1.0,
+    "w2": 0.0,
+    "w3": 0.0
+  },
+  "PID_vz_reverse": {
+    "Kp": 0.0,
+    "Ki": 0.0,
+    "Kd": 0.0,
+    "w1": 0.0,
+    "w2": 0.0,
+    "w3": 0.0
+  },
+  "PID_yaw": {
+    "Kp": 0.024,
+    "Ki": 0.0,
+    "Kd": 0.015,
+    "w1": 1.0,
+    "w2": 0.0,
+    "w3": 0.0
+  },
+  "Detection_Params": {
+    "Max_Batch_Size": 4,
+    "Precision": 0,
+    "Device": 0,
+    "Allow_gpu_fallback": false,
+    "Min_Frames": 25,
+    "Drop_Frames": 10,
+    "Overlap_Threshold": 0.1
+  },
+  "Tracking_Params": {
+    "BBox_Filt_coeff": 0.75,
+    "Detect_Thresh": 0.65,
+    "Detect_Class_Orin": 0,
+    "Detect_Class_B01": 1,
+    "Track_max_reid_batch": 32,
+    "Track_similarity_thresh": 0.55
+  },
+  "Localization_Params": {
+    "H_loc_00": 1.0,
+    "H_loc_11": 1.0,
+    "Q_loc_00": 0.0001,
+    "Q_loc_11": 0.0001,
+    "Q_loc_22": 0.00001,
+    "Q_loc_33": 0.00001,
+    "Q_loc_44": 0.00001,
+    "Q_loc_55": 0.00001,
+    "R_loc_00": 0.01,
+    "R_loc_11": 0.001,
+    "P_loc_00": 0.1,
+    "P_loc_11": 0.1,
+    "P_loc_22": 0.1,
+    "P_loc_33": 0.1,
+    "P_loc_44": 0.1,
+    "P_loc_55": 0.1,
+    "X_pix_mov_avg_window_size": 10,
+    "Y_pix_mov_avg_window_size": 125,
+    "Loc_Eq_Height_x_coef": 1680.557,
+    "Loc_Eq_Height_x_pow": -0.863,
+    "Loc_Eq_Width_x_coef": 540.456,
+    "Loc_Eq_Width_x_pow": -0.758,
+    "Loc_Known_Obj_Height_All_Dist": 1.778,
+    "Min_Target_Bbox_Area": 1500.0,
+    "Edge_of_Frame_Loc_Buffer": 50.0,
+    "Target_Lost_Debounce_Reset": 1000
+  },
+  "Follow_Params": {
+    "Desired_Height": 640.0,
+    "Desired_Width": 150.0,
+    "Desired_X_offset": 10.0,
+    "Desired_Y_offset": 0.0,
+    "Desired_Z_offset": 0.0,
+    "Desired_X_pix_offset": 0.0,
+    "Desired_Y_pix_offset": 0.0,
+    "CMD_vel_max_cmd": 10.0,
+    "CMD_vxy_max_allowed_accel": 2.5,
+    "CMD_vxy_max_allowed_jerk": 5.0
+  },
+  "Camera_Params": {
+    "Sensor_Mode": 0,
+    "WBMode": 1,
+    "AEAntiBanding": 2,
+    "TNR_Mode": 0,
+    "EE_Mode": 0,
+    "Exposure_Min": 8000000,
+    "Exposure_Max": 33333333,
+    "Gain_Min": 1.0,
+    "Gain_Max": 10.0,
+    "ISP_DGain_Min": 1.0,
+    "ISP_DGain_Max": 1.5,
+    "Input_Format": "NV12",
+    "Capture_Width": 3280,
+    "Capture_Height": 2464,
+    "Input_Framerate": "21/1",
+    "Output_Format": "BGR",
+    "Output_Width": 1640,
+    "Output_Height": 1232
+  },
+  "Encoder_Params": {
+    "Bitrate": 16000,
+    "Speed_Preset": "veryfast",
+    "Tune": "zerolatency",
+    "KeyIntMax": 21,
+    "Threads": 0,
+    "Mux_FastStart": true
+  },
+  "Camera_Control_Params": {
+    "Input_Width": 1640.0,
+    "Input_Height": 1232.0,
+    "Output_Framerate": 21.0,
+    "CAM0_FOV": 105.0,
+    "CAM0_Tilt_Down_Angle": 28.017636
+  },
+  "PID_alt": {
+      "Kp": 0.6,
+      "Ki": 0.05,
+      "Kd": 0.15,
+      "w1": 1.0,
+      "Tau": 0.15,
+      "Decay": 0.98,
+      "MaxIntegral": 10.0
     },
-    "PID_vy_forward": {
-        "Kp": 0.03,
-        "Ki": 0.0,
-        "Kd": 0.001,
-        "w1": 1.0,
-        "w2": 0.0,
-        "w3": 0.0
+    "PID_vel": {
+      "Kp": 0.4,
+      "Ki": 0.1,
+      "Kd": 0.05,
+      "w1": 1.0,
+      "Tau": 0.10,
+      "Decay": 0.98,
+      "MaxIntegral": 10.0
     },
-    "PID_vz_forward": {
-        "Kp": 0.0,
-        "Ki": 0.0,
-        "Kd": 0.0,
-        "w1": 0.0,
-        "w2": 0.0,
-        "w3": 0.0
+    "Takeoff": {
+      "ThrottleMax": 0.9,
+      "ThrottleSlewTime": 2.0,
+      "AltTolerance": 0.3,
+      "ClimbDetectVz": 0.1,
+      "ClimbDetectAlt": 0.3
     },
-    "PID_vx_reverse": {
-        "Kp": 0.5,
-        "Ki": 0.009,
-        "Kd": 0.1,
-        "w1": 1.0,
-        "w2": 0.0,
-        "w3": 0.0
-    },
-    "PID_vy_reverse": {
-        "Kp": 0.03,
-        "Ki": 0.0,
-        "Kd": 0.001,
-        "w1": 1.0,
-        "w2": 0.0,
-        "w3": 0.0
-    },
-    "PID_vz_reverse": {
-        "Kp": 0.0,
-        "Ki": 0.0,
-        "Kd": 0.0,
-        "w1": 0.0,
-        "w2": 0.0,
-        "w3": 0.0
-    },
-    "PID_yaw": {
-        "Kp": 0.06,
-        "Ki": 0.0,
-        "Kd": 0.009,
-        "w1": 1.0,
-        "w2": 0.0,
-        "w3": 0.0
-    },
-    "Detection_Params": {
-        "Max_Batch_Size": 4,
-        "Precision": 0,
-        "Device": 0,
-        "Allow_gpu_fallback": false,
-        "Min_Frames": 25,
-        "Drop_Frames": 10,
-        "Overlap_Threshold": 0.1
-    },
-    "Tracking_Params": {
-        "BBox_Filt_coeff": 0.75,
-        "Detect_Thresh": 0.25,
-        "Detect_Class_Orin": 0,
-        "Detect_Class_B01": 1,
-        "Track_max_reid_batch": 32,
-        "Track_similarity_thresh": 0.55
-    },
-    "Localization_Params": {
-        "H_loc_00": 1.0,
-        "H_loc_11": 1.0,
-        "Q_loc_00": 0.0001,
-        "Q_loc_11": 0.0001,
-        "Q_loc_22": 0.00001,
-        "Q_loc_33": 0.00001,
-        "Q_loc_44": 0.00001,
-        "Q_loc_55": 0.00001,
-        "R_loc_00": 10.0,
-        "R_loc_11": 0.001,
-        "P_loc_00": 0.1,
-        "P_loc_11": 0.1,
-        "P_loc_22": 0.1,
-        "P_loc_33": 0.1,
-        "P_loc_44": 0.1,
-        "P_loc_55": 0.1,
-        "X_pix_mov_avg_window_size": 10,
-        "Y_pix_mov_avg_window_size": 125,
-        "Loc_Eq_Height_x_coef": 1680.557,
-        "Loc_Eq_Height_x_pow": -0.863,
-        "Loc_Eq_Width_x_coef": 540.456,
-        "Loc_Eq_Width_x_pow": -0.758,
-        "Loc_Known_Obj_Height_All_Dist": 1.778,
-        "Min_Target_Bbox_Area": 3500.0,
-        "Edge_of_Frame_Loc_Buffer": 50.0,
-        "Target_Lost_Debounce_Reset": 1000
-        
-    },
-    "Follow_Params": {
-        "Desired_Height": 640.0,
-        "Desired_Width": 150.0,
-        "Desired_X_offset": 10.0,
-        "Desired_Y_offset": 0.0,
-        "Desired_Z_offset": 0.0,
-        "Desired_X_pix_offset": 0.0,
-        "Desired_Y_pix_offset": 0.0,
-        "CMD_vel_max_cmd": 10.0,
-        "CMD_vxy_max_allowed_accel": 2.5,
-        "CMD_vxy_max_allowed_jerk": 5.0
-    },
-    "Camera_Params": {
-        "Sensor_Mode": 0,
-        "WBMode": 1,
-        "AEAntiBanding": 2,
-        "TNR_Mode": 0,
-        "EE_Mode": 0,
-        "Exposure_Min": 8000000,
-        "Exposure_Max": 33333333,
-        "Gain_Min": 1.0,
-        "Gain_Max": 10.0,
-        "ISP_DGain_Min": 1.0,
-        "ISP_DGain_Max": 1.5,
-        "Input_Format": "NV12",
-        "Capture_Width": 3280,
-        "Capture_Height": 2464,
-        "Input_Framerate": "21/1",
-        "Output_Format": "BGR",
-        "Output_Width": 1640,
-        "Output_Height": 1232
-    },
-    "Encoder_Params": {
-        "Bitrate": 16000,
-        "Speed_Preset": "veryfast",
-        "Tune": "zerolatency",
-        "KeyIntMax": 21,
-        "Threads": 0,
-        "Mux_FastStart": true
-    },
-    "Camera_Control_Params": {
-        "Input_Width": 1640.0,
-        "Input_Height": 1232.0,
-        "Output_Framerate": 21.0,
-        "CAM0_FOV": 105.0,
-        "CAM0_Tilt_Down_Angle": 28.017636
-    },
-    "PID_alt": {
-        "Kp": 0.6,
-        "Ki": 0.05,
-        "Kd": 0.15,
-        "w1": 1.0,
-        "Tau": 0.15,
-        "Decay": 0.98,
-        "MaxIntegral": 10.0
-      },
-      "PID_vel": {
-        "Kp": 0.4,
-        "Ki": 0.1,
-        "Kd": 0.05,
-        "w1": 1.0,
-        "Tau": 0.10,
-        "Decay": 0.98,
-        "MaxIntegral": 10.0
-      },
-      "Takeoff": {
-        "ThrottleMax": 0.9,
-        "ThrottleSlewTime": 2.0,
-        "AltTolerance": 0.3,
-        "ClimbDetectVz": 0.1,
-        "ClimbDetectAlt": 0.3
-      },
-      "Target": {
-        "Altitude": 20.0
-      }
+    "Target": {
+      "Altitude": 20.0
+    }
 }

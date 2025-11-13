@@ -279,6 +279,10 @@ bool create_video_io_streams(void)
     spdlog::info("Recording to: " + full_path);
     file_stream_created = true;
 
+    // Calculate new center if video playback has a different size
+    g_cam0_video_width_center = g_cam0_video_width * (float)0.5;
+    g_cam0_video_height_center = g_cam0_video_height * (float)0.5;
+
     return true;
 }
 
@@ -344,6 +348,12 @@ void overlay_text(
  ********************************************************************************/
 void video_mods(void)
 {
+    // Leave original timestamps
+    if (g_use_video_playback)
+    {
+        return;
+    }
+
     overlay_text(
         g_cam0_image,
         "t",
@@ -452,10 +462,6 @@ bool VideoCV::init(void)
     {
         return false;
     }
-
-    // Calculate new center if video playback has a different size
-    g_cam0_video_width_center = g_cam0_video_width * (float)0.5;
-    g_cam0_video_height_center = g_cam0_video_height * (float)0.5;
 
     return true;
 }

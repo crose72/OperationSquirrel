@@ -2,29 +2,16 @@ FROM crose72/jetson-inference:r32.7.1
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+# We are cool - we use an awesome CMake version
 RUN wget https://cmake.org/files/v3.28/cmake-3.28.0-linux-aarch64.sh && \
     chmod +x cmake-3.28.0-linux-aarch64.sh && \
     ./cmake-3.28.0-linux-aarch64.sh --prefix=/usr/local --exclude-subdir && \
     rm cmake-3.28.0-linux-aarch64.sh 
 
-RUN apt-get update && apt install -y \
-    libspdlog-dev \
-    libfmt-dev \
-    libjsoncpp-dev \
-    libarmadillo-dev \
-    liblapack-dev \
-    libblas-dev && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
-
-RUN git clone https://github.com/pjueon/JetsonGPIO.git && \
-    cd JetsonGPIO && \
-    mkdir build && cd build && \
-    cmake .. && \
-    make && \
-    make install && \
-    cd ../.. && rm -rf JetsonGPIO
-
-# Copy fake model file so OpenCV build script knows which Jetson to compile for
+# Copy fake model file so OpenCV build script knows which Jetson to compile for the OpenCV install script
+# Create the docker/fake-proc/device-tree/model folder inside this folder
+# Now copy the proc file
+# sudo cp /proc/device-tree/model <path-to-OperationSquirrel-repo>/docker/fake-proc/device-tree/model
 COPY docker/fake-proc/device-tree/model /opt/device-tree/model
 
 RUN apt-get update && apt install -y libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-good1.0-dev && \
@@ -39,3 +26,37 @@ RUN apt-get update && apt install -y libgstreamer1.0-dev libgstreamer-plugins-ba
     apt-get update && \
     ./OpenCV-4-10-0-tracking.sh && \
     cd .. && rm -rf Install-OpenCV-Jetson-Nano
+
+# KF module dependencies
+RUN apt-get update && apt install -y \
+    libspdlog-dev \
+    libfmt-dev \
+    libjsoncpp-dev \
+    libarmadillo-dev \
+    liblapack-dev \
+    libblas-dev && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# MCAP dependencies
+RUN apt-get update && \
+     apt-get install -y liblz4-dev libzstd-dev pkg-config
+
+# Install all essential GStreamer components - for video input/output using gstreamer pipelines
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        gstreamer1.0-tools \
+        gstreamer1.0-plugins-base \
+        gstreamer1.0-plugins-good \
+        gstreamer1.0-plugins-bad \
+        gstreamer1.0-plugins-ugly \
+        gstreamer1.0-libav && \
+    rm -rf /var/lib/apt/lists/*
+    
+# For LED and other HWIO functionality
+RUN git clone https://github.com/pjueon/JetsonGPIO.git && \
+    cd JetsonGPIO && \
+    mkdir build && cd build && \
+    cmake .. && \
+    make && \
+    make install && \
+    cd ../.. && rm -rf JetsonGPIO
