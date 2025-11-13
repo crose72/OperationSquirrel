@@ -17,7 +17,7 @@
  * Typedefs / Enums / Structs
  ********************************************************************************/
 // Auto Pilot Modes enumeration - same as in ArduPilot firmware
-enum class FlightMode : uint8_t
+enum class ArduPilotMode : uint8_t
 {
     STABILIZE = 0,     // manual airframe angle with manual throttle
     ACRO = 1,          // manual body-frame angular rate with manual throttle
@@ -77,6 +77,12 @@ public:
                               float cmd_long_param1, float cmd_long_param2, float cmd_long_param3, float cmd_long_param4,
                               float cmd_long_param5, float cmd_long_param6, float cmd_long_param7); // command, confirmation, param1 - param7
     static void send_cmd_int(uint8_t sender_sys_id, uint8_t sender_comp_id, const mavlink_command_int_t &command_int);
+    static void read_param(uint8_t sender_sys_id,
+                           uint8_t sender_comp_id,
+                           uint8_t target_sys_id,
+                           uint8_t target_comp_id,
+                           const char *param_id,
+                           int16_t param_index);
 
 private:
     static void send_mav_cmd(mavlink_message_t &msg) { MavSerial::write_mav_msg(msg); };

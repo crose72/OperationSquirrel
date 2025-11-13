@@ -152,5 +152,33 @@
     "Output_Framerate": 21.0,
     "CAM0_FOV": 105.0,
     "CAM0_Tilt_Down_Angle": 28.017636
-  }
+  },
+  "PID_alt": {
+      "Kp": 0.6,
+      "Ki": 0.05,
+      "Kd": 0.15,
+      "w1": 1.0,
+      "Tau": 0.15,
+      "Decay": 0.98,
+      "MaxIntegral": 10.0
+    },
+    "PID_vel": {
+      "Kp": 0.4,
+      "Ki": 0.1,
+      "Kd": 0.05,
+      "w1": 1.0,
+      "Tau": 0.10,
+      "Decay": 0.98,
+      "MaxIntegral": 10.0
+    },
+    "Takeoff": {
+      "ThrottleMax": 0.9,
+      "ThrottleSlewTime": 2.0,
+      "AltTolerance": 0.3,
+      "ClimbDetectVz": 0.1,
+      "ClimbDetectAlt": 0.3
+    },
+    "Target": {
+      "Altitude": 20.0
+    }
 }
