@@ -56,13 +56,13 @@ void follow_mode(void)
 {
     float target_velocity[3] = {0.0, 0.0, 0.0};
 
-    target_velocity[0] = g_vx_adjust;
-    target_velocity[1] = g_vy_adjust;
-    target_velocity[2] = g_vz_adjust;
+    target_velocity[0] = g_ctrl_vel_x_cmd;
+    target_velocity[1] = g_ctrl_vel_y_cmd;
+    target_velocity[2] = g_ctrl_vel_z_cmd;
 
-    if (g_target_valid)
+    if (g_tgt_meas_valid)
     {
-        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity, g_yaw_adjust);
+        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity, g_ctrl_yaw_cmd);
     }
 }
 
@@ -100,7 +100,7 @@ void dtrmn_veh_control_action(void)
             takeoff_dbc = true;
         }
 
-        if (takeoff_dbc && g_mav_veh_rngfdr_current_distance > min_mission_alt_cm || g_mav_veh_rel_alt > min_mission_alt_mm)
+        if (takeoff_dbc && g_mav_rng_dist_m > min_mission_alt_cm || g_mav_gps_alt_rel > min_mission_alt_mm)
         {
             start_follow_mode = true;
         }

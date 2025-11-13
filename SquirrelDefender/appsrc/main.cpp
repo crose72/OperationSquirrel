@@ -43,7 +43,7 @@ void sig_handler(int signo)
 {
     if (signo == SIGINT)
     {
-        g_stop_program = true;
+        g_app_stop = true;
         spdlog::info("received SIGINT\n");
     }
 }
@@ -70,14 +70,14 @@ void attach_sig_handler(void)
  ********************************************************************************/
 int main(int argc, char **argv)
 {
-    g_input_video_path = "";
-    g_use_video_playback = false;
-    g_stop_program = false;
+    g_app_video_input_path = "";
+    g_app_use_video_playback = false;
+    g_app_stop = false;
 
     if (argc > 1)
     {
-        g_input_video_path = argv[1];
-        g_use_video_playback = true;
+        g_app_video_input_path = argv[1];
+        g_app_use_video_playback = true;
     }
 
     attach_sig_handler();
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
         return Scheduler::init();
     }
 
-    while (!g_stop_program)
+    while (!g_app_stop)
     {
         Scheduler::loop();
     }

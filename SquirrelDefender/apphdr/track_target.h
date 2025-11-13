@@ -15,24 +15,24 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool g_target_valid;
-extern int g_target_detection_id;
-extern int g_target_track_id;
-extern float g_target_cntr_offset_x;
-extern float g_target_cntr_offset_y;
-extern float g_target_height;
-extern float g_target_width;
-extern float g_target_aspect;
-extern float g_target_left;
-extern float g_target_right;
-extern float g_target_top;
-extern float g_target_bottom;
-extern float g_target_center_x;
-extern float g_target_center_y;
-extern float g_detection_class;
-extern float g_target_detection_conf;
-extern float g_target_cntr_offset_x_filt;
-extern float g_target_cntr_offset_y_filt;
+extern bool g_tgt_meas_valid;
+extern int g_tgt_detect_id;
+extern int g_tgt_track_id;
+extern float g_tgt_cntr_offset_x_pix;
+extern float g_tgt_cntr_offset_y_pix;
+extern float g_tgt_height_pix;
+extern float g_tgt_width_pix;
+extern float g_tgt_aspect_ratio;
+extern float g_tgt_left_px;
+extern float g_tgt_right_px;
+extern float g_tgt_top_px;
+extern float g_tgt_bottom_px;
+extern float g_tgt_center_x_px;
+extern float g_tgt_center_y_px;
+extern float g_tgt_class_id;
+extern float g_tgt_conf;
+extern float g_tgt_cntr_offset_x_filt;
+extern float g_tgt_cntr_offset_y_filt;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

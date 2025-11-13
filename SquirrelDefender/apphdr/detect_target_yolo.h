@@ -20,13 +20,13 @@
  ********************************************************************************/
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-extern std::vector<Object> g_yolo_detections;
-extern int g_yolo_detection_count;
+extern std::vector<Object> g_det_yolo_list;
+extern int g_det_yolo_count;
 
 #elif defined(BLD_WIN)
 
-extern std::vector<YoloNet::detection> g_yolo_detections;
-extern int g_yolo_detection_count;
+extern std::vector<YoloNet::detection> g_det_yolo_list;
+extern int g_det_yolo_count;
 
 #else
 

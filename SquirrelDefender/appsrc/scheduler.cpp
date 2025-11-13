@@ -47,7 +47,7 @@
  * Object definitions
  ********************************************************************************/
 std::mutex scheduler_mutex;
-bool g_controller_initialiazed;
+bool g_ctrl_initialized;
 Timer main_loop(std::chrono::milliseconds(25));
 Timer timer1;
 
@@ -106,7 +106,7 @@ int Scheduler::init(void)
         return 1;
     }
 
-    g_controller_initialiazed = true;
+    g_ctrl_initialized = true;
 
     return 0;
 }

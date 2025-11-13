@@ -34,16 +34,16 @@
  * Object definitions
  ********************************************************************************/
 std::string base_path = "../data/";
-cv::Mat g_cam0_image;
-cv::cuda::GpuMat g_cam0_image_gpu;
+cv::Mat g_cam0_img_cpu;
+cv::cuda::GpuMat g_cam0_img_gpu;
 cv::VideoCapture cam0_capture;
-bool g_cam0_valid_image_rcvd;
+bool g_cam0_img_valid;
 uint32_t g_cam0_frame_id;
-float g_cam0_video_width_center;
-float g_cam0_video_height_center;
+float g_cam0_img_width_cx;
+float g_cam0_img_height_cy;
 float g_cam0_fov_rad;
 float g_cam0_fov_rad_half;
-bool g_end_of_video;
+bool g_video_end;
 float cam0_video_out_fps_actual;
 bool file_stream_created;
 cv::VideoWriter video_writer;
@@ -52,12 +52,12 @@ cv::Mat image_overlay;
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-float g_cam0_video_width = (float)1640.0;
-float g_cam0_video_height = (float)1232.0;
-float g_camera_fov = (float)105.0; // 1.832595 rad for 105 fov // 1.4486 rad for 83 fov
+float g_cam0_img_width_px = (float)1640.0;
+float g_cam0_img_height_px = (float)1232.0;
+float g_cam0_fov_deg = (float)105.0; // 1.832595 rad for 105 fov // 1.4486 rad for 83 fov
 float cam0_video_out_fps = (float)21.0;
-float g_cam0_tilt_down_angle = (float)0.0;
-float g_cam0_tilt_down_angle_rad = (float)0.0;
+float g_cam0_tilt_deg = (float)0.0;
+float g_cam0_tilt_rad = (float)0.0;
 
 /********************************************************************************
  * Function definitions
@@ -118,13 +118,13 @@ void get_video_io_params(void)
 {
     ParamReader cfg("../params.json");
 
-    g_cam0_video_width = cfg.get_float_param("Camera_Control_Params", "Input_Width");
-    g_cam0_video_height = cfg.get_float_param("Camera_Control_Params", "Input_Height");
+    g_cam0_img_width_px = cfg.get_float_param("Camera_Control_Params", "Input_Width");
+    g_cam0_img_height_px = cfg.get_float_param("Camera_Control_Params", "Input_Height");
     cam0_video_out_fps = cfg.get_float_param("Camera_Control_Params", "Output_Framerate");
-    g_camera_fov = cfg.get_float_param("Camera_Control_Params", "Output_Framerate");
-    g_cam0_tilt_down_angle = cfg.get_float_param("Camera_Control_Params", "CAM0_Tilt_Down_Angle");
-    g_cam0_tilt_down_angle_rad = g_cam0_tilt_down_angle * M_PI / (float)180.0;
-    g_cam0_fov_rad = g_camera_fov * M_PI / (float)180.0;
+    g_cam0_fov_deg = cfg.get_float_param("Camera_Control_Params", "Output_Framerate");
+    g_cam0_tilt_deg = cfg.get_float_param("Camera_Control_Params", "CAM0_Tilt_Down_Angle");
+    g_cam0_tilt_rad = g_cam0_tilt_deg * M_PI / (float)180.0;
+    g_cam0_fov_rad = g_cam0_fov_deg * M_PI / (float)180.0;
     g_cam0_fov_rad_half = g_cam0_fov_rad * (float)0.5;
 }
 
@@ -234,7 +234,7 @@ bool create_video_io_streams(void)
     create_gstreamer_pipelines(video_cap_pipeline, video_out_pipeline, full_path);
 
     // Use live camera feed or use prerecorded video
-    if (!g_use_video_playback)
+    if (!g_app_use_video_playback)
     {
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
@@ -243,8 +243,8 @@ bool create_video_io_streams(void)
 #elif defined(BLD_WIN)
 
         cam0_capture.open(0, cv::CAP_DSHOW); // Open default webcam
-        cam0_capture.set(cv::CAP_PROP_FRAME_WIDTH, g_cam0_video_width);
-        cam0_capture.set(cv::CAP_PROP_FRAME_HEIGHT, g_cam0_video_height);
+        cam0_capture.set(cv::CAP_PROP_FRAME_WIDTH, g_cam0_img_width_px);
+        cam0_capture.set(cv::CAP_PROP_FRAME_HEIGHT, g_cam0_img_height_px);
 
 #else
 
@@ -255,9 +255,9 @@ bool create_video_io_streams(void)
     else
     {
         // Use video playback - get input video's parameters
-        cam0_capture.open(g_input_video_path);
-        g_cam0_video_width = cam0_capture.get(cv::CAP_PROP_FRAME_WIDTH);
-        g_cam0_video_height = cam0_capture.get(cv::CAP_PROP_FRAME_HEIGHT);
+        cam0_capture.open(g_app_video_input_path);
+        g_cam0_img_width_px = cam0_capture.get(cv::CAP_PROP_FRAME_WIDTH);
+        g_cam0_img_height_px = cam0_capture.get(cv::CAP_PROP_FRAME_HEIGHT);
         cam0_video_out_fps = cam0_capture.get(cv::CAP_PROP_FPS);
     }
 
@@ -269,7 +269,7 @@ bool create_video_io_streams(void)
     }
 
     // 21 is max fps for mode 0 (full resolution)
-    if (!video_writer.open(video_out_pipeline, cv::CAP_GSTREAMER, 0, cam0_video_out_fps, cv::Size(g_cam0_video_width, g_cam0_video_height), true))
+    if (!video_writer.open(video_out_pipeline, cv::CAP_GSTREAMER, 0, cam0_video_out_fps, cv::Size(g_cam0_img_width_px, g_cam0_img_height_px), true))
     {
         spdlog::error("video_io_opencv: failed to open GStreamer VideoWriter\n");
         file_stream_created = false;
@@ -280,8 +280,8 @@ bool create_video_io_streams(void)
     file_stream_created = true;
 
     // Calculate new center if video playback has a different size
-    g_cam0_video_width_center = g_cam0_video_width * (float)0.5;
-    g_cam0_video_height_center = g_cam0_video_height * (float)0.5;
+    g_cam0_img_width_cx = g_cam0_img_width_px * (float)0.5;
+    g_cam0_img_height_cy = g_cam0_img_height_px * (float)0.5;
 
     return true;
 }
@@ -292,16 +292,16 @@ bool create_video_io_streams(void)
  ********************************************************************************/
 bool capture_image(void)
 {
-    cam0_capture >> g_cam0_image; // Capture g_cam0_image from the camera
+    cam0_capture >> g_cam0_img_cpu; // Capture g_cam0_img_cpu from the camera
 
-    if (g_cam0_image.empty())
+    if (g_cam0_img_cpu.empty())
     {
-        g_cam0_valid_image_rcvd = false;
+        g_cam0_img_valid = false;
 
-        if (g_use_video_playback)
+        if (g_app_use_video_playback)
         {
             spdlog::info("End of video playback");
-            g_end_of_video = true;
+            g_video_end = true;
             return false;
         }
 
@@ -309,10 +309,10 @@ bool capture_image(void)
         return false;
     }
 
-    g_cam0_valid_image_rcvd = true;
-    cam0_video_out_fps_actual = ((g_dt > (float)0.000001) ? (1 / g_dt) : (float)0.0);
+    g_cam0_img_valid = true;
+    cam0_video_out_fps_actual = ((g_ctrl_dt > (float)0.000001) ? (1 / g_ctrl_dt) : (float)0.0);
 
-    g_cam0_image_gpu.upload(g_cam0_image);
+    g_cam0_img_gpu.upload(g_cam0_img_cpu);
     ++g_cam0_frame_id;
 
     return true;
@@ -349,32 +349,32 @@ void overlay_text(
 void video_mods(void)
 {
     // Leave original timestamps
-    if (g_use_video_playback)
+    if (g_app_use_video_playback)
     {
         return;
     }
 
     overlay_text(
-        g_cam0_image,
+        g_cam0_img_cpu,
         "t",
-        std::to_string(g_app_elapsed_time),
-        cv::Point(10, g_cam0_image.rows - 10), // bottom-left
+        std::to_string(g_app_time_s),
+        cv::Point(10, g_cam0_img_cpu.rows - 10), // bottom-left
         0.5,                                   // font scale
         cv::Scalar(255, 255, 255),             // white
         1);
     overlay_text(
-        g_cam0_image,
+        g_cam0_img_cpu,
         "fps",
         std::to_string(cam0_video_out_fps_actual),
-        cv::Point(10, g_cam0_image.rows - 30), // bottom-left
+        cv::Point(10, g_cam0_img_cpu.rows - 30), // bottom-left
         0.5,                                   // font scale
         cv::Scalar(255, 255, 255),             // white
         1);
     overlay_text(
-        g_cam0_image,
+        g_cam0_img_cpu,
         "f",
         std::to_string(g_cam0_frame_id),
-        cv::Point(10, g_cam0_image.rows - 50), // bottom-left
+        cv::Point(10, g_cam0_img_cpu.rows - 50), // bottom-left
         0.5,                                   // font scale
         cv::Scalar(255, 255, 255),             // white
         1);
@@ -387,9 +387,9 @@ void video_mods(void)
 bool save_video(void)
 {
     // write video file
-    if (video_writer.isOpened() && g_cam0_valid_image_rcvd && file_stream_created)
+    if (video_writer.isOpened() && g_cam0_img_valid && file_stream_created)
     {
-        video_writer.write(g_cam0_image);
+        video_writer.write(g_cam0_img_cpu);
         return true;
     }
 
@@ -402,9 +402,9 @@ bool save_video(void)
  ********************************************************************************/
 bool display_video(void)
 {
-    if (g_cam0_valid_image_rcvd)
+    if (g_cam0_img_valid)
     {
-        cv::imshow("Image", g_cam0_image);
+        cv::imshow("Image", g_cam0_img_cpu);
         cv::waitKey(1);
 
         return true;
@@ -452,9 +452,9 @@ bool VideoCV::init(void)
 {
     get_video_io_params();
 
-    g_cam0_valid_image_rcvd = false;
-    g_cam0_image = NULL;
-    g_end_of_video = false;
+    g_cam0_img_valid = false;
+    g_cam0_img_cpu = NULL;
+    g_video_end = false;
     cam0_video_out_fps_actual = (float)16.67;
     g_cam0_frame_id = (uint32_t)0;
 
@@ -484,7 +484,7 @@ void VideoCV::out_loop(void)
     video_mods();
     save_video();
 
-    if (g_use_video_playback)
+    if (g_app_use_video_playback)
     {
         display_video();
     }

@@ -33,9 +33,9 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-detectNet *g_net;
-detectNet::Detection *g_detections;
-int g_detection_count;
+detectNet *g_det_nv_net;
+detectNet::Detection *g_det_nv_list;
+int g_det_nv_count;
 
 /********************************************************************************
  * Calibration definitions
@@ -84,12 +84,12 @@ bool create_detection_network(void)
     Dims3 inputDims(3, 720, 1280);
     const char *output_count = "NMS_1";
 
-    // g_net = detectNet::Create("SSD_Inception_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
-    // g_net = detectNet::Create("SSD_Mobilenet_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
-    g_net = detectNet::Create(model, class_labels, thresh, input_blob, inputDims, output_blob, output_count); // load model from specific path
-    g_net->SetTracker(objectTrackerIOU::Create(min_frames, drop_frames, overlap_thresh));
+    // g_det_nv_net = detectNet::Create("SSD_Inception_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
+    // g_det_nv_net = detectNet::Create("SSD_Mobilenet_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
+    g_det_nv_net = detectNet::Create(model, class_labels, thresh, input_blob, inputDims, output_blob, output_count); // load model from specific path
+    g_det_nv_net->SetTracker(objectTrackerIOU::Create(min_frames, drop_frames, overlap_thresh));
 
-    if (!g_net)
+    if (!g_det_nv_net)
     {
         LogError("detectnet:  failed to load detectNet model\n");
         return false;
@@ -109,13 +109,13 @@ void detect_targets(void)
 
     overlay_flags = overlay_flags | detectNet::OVERLAY_LABEL | detectNet::OVERLAY_CONFIDENCE | detectNet::OVERLAY_TRACKING | detectNet::OVERLAY_LINES;
 
-    if (overlay_flags > 0 && g_cam0_image != NULL)
+    if (overlay_flags > 0 && g_cam0_img_cpu != NULL)
     {
-        g_detection_count = g_net->Detect(g_cam0_image, g_input->GetWidth(), g_input->GetHeight(), &g_detections, overlay_flags);
+        g_det_nv_count = g_det_nv_net->Detect(g_cam0_img_cpu, g_input->GetWidth(), g_input->GetHeight(), &g_det_nv_list, overlay_flags);
     }
-    else if (g_cam0_image != NULL)
+    else if (g_cam0_img_cpu != NULL)
     {
-        g_detection_count = g_net->Detect(g_cam0_image, g_input->GetWidth(), g_input->GetHeight(), &g_detections);
+        g_det_nv_count = g_det_nv_net->Detect(g_cam0_img_cpu, g_input->GetWidth(), g_input->GetHeight(), &g_det_nv_list);
     }
     else
     {
@@ -141,9 +141,9 @@ SSD::~SSD(void) {};
  ********************************************************************************/
 bool SSD::init(void)
 {
-    g_net = NULL;
-    g_detections = NULL;
-    g_detection_count = 0;
+    g_det_nv_net = NULL;
+    g_det_nv_list = NULL;
+    g_det_nv_count = 0;
 
     if (!create_detection_network())
     {
@@ -170,7 +170,7 @@ void SSD::loop(void)
 void SSD::shutdown(void)
 {
     LogVerbose("detectnet:  shutting down...\n");
-    SAFE_DELETE(g_net);
+    SAFE_DELETE(g_det_nv_net);
     LogVerbose("detectnet:  shutdown complete.\n");
 }
 

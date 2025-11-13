@@ -17,7 +17,7 @@
  * Exported objects
  ********************************************************************************/
 extern SystemState g_system_state;
-extern bool g_manual_override_land;
+extern bool g_ctrl_land_override;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
