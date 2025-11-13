@@ -339,7 +339,7 @@ void DataLogger::log_data(void)
         os::logger::TargetDetection m;
         DataLogger::logTime(m.mutable_t(), g_app_epoch_ns);
         m.set_frame_id(g_cam0_frame_id);
-        m.set_target_valid(g_tgt_meas_valid);
+        m.set_target_valid(g_tgt_valid);
         m.set_target_detection_id(static_cast<int32_t>(g_tgt_detect_id));
         m.set_target_track_id(static_cast<int32_t>(g_tgt_track_id));
         m.set_detection_class(g_tgt_class_id);
@@ -449,7 +449,7 @@ void write_headers(void)
     datalog_record.push_back({"g_app_time_s",
                               "g_system_state",
                               "g_tgt_too_close",
-                              "g_tgt_meas_valid",
+                              "g_tgt_valid",
                               "g_tgt_detect_id",
                               "g_tgt_track_id",
                               "g_tgt_class_id",
@@ -557,7 +557,7 @@ void log_data(void)
     datalog_record.push_back({{std::to_string(g_app_time_s),
                                std::to_string(g_system_state),
                                std::to_string(g_tgt_too_close),
-                               std::to_string(g_tgt_meas_valid),
+                               std::to_string(g_tgt_valid),
                                std::to_string(g_tgt_detect_id),
                                std::to_string(g_tgt_track_id),
                                std::to_string(g_tgt_class_id),

@@ -15,7 +15,7 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool g_tgt_meas_valid;
+extern bool g_tgt_valid;
 extern int g_tgt_detect_id;
 extern int g_tgt_track_id;
 extern float g_tgt_cntr_offset_x_pix;

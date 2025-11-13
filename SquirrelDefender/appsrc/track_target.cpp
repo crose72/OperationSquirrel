@@ -52,7 +52,7 @@ bool initialized_tracker;
 float target_detection_thresh;
 float target_class;
 bool target_valid_prv;
-bool g_tgt_meas_valid;
+bool g_tgt_valid;
 int g_tgt_detect_id;
 int g_tgt_track_id;
 float g_tgt_cntr_offset_x_pix;
@@ -376,14 +376,14 @@ void validate_target(void)
     implimented. */
     if (g_tgt_detect_id >= 0 && g_tgt_track_id >= 0 && g_tgt_height_pix > 1 && g_tgt_width_pix > 1)
     {
-        g_tgt_meas_valid = true;
+        g_tgt_valid = true;
     }
     else
     {
-        g_tgt_meas_valid = false;
+        g_tgt_valid = false;
     }
 
-    target_valid_prv = g_tgt_meas_valid;
+    target_valid_prv = g_tgt_valid;
 }
 
 /********************************************************************************
@@ -427,7 +427,7 @@ bool Tracking::init(void)
 {
     get_tracking_params();
 
-    g_tgt_meas_valid = false;
+    g_tgt_valid = false;
     target_valid_prv = false;
     g_tgt_cntr_offset_x_pix = (float)0.0;
     g_tgt_cntr_offset_y_pix = (float)0.0;

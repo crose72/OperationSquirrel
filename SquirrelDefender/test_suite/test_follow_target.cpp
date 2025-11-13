@@ -40,89 +40,89 @@ TestHarness g_h;
 // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
 // Input variables
 #define INPUT_VARS(X)          \
-    X(g_app_time_s)      \
-    X(g_tgt_meas_valid)          \
-    X(g_tgt_detect_id)   \
-    X(g_tgt_track_id)       \
-    X(g_tgt_class_id)       \
-    X(g_tgt_conf) \
-    X(g_tgt_cntr_offset_x_pix)  \
-    X(g_tgt_cntr_offset_y_pix)  \
-    X(g_tgt_height_pix)         \
-    X(g_tgt_width_pix)          \
-    X(g_tgt_aspect_ratio)         \
+    X(g_app_time_s)            \
+    X(g_tgt_valid)             \
+    X(g_tgt_detect_id)         \
+    X(g_tgt_track_id)          \
+    X(g_tgt_class_id)          \
+    X(g_tgt_conf)              \
+    X(g_tgt_cntr_offset_x_pix) \
+    X(g_tgt_cntr_offset_y_pix) \
+    X(g_tgt_height_pix)        \
+    X(g_tgt_width_pix)         \
+    X(g_tgt_aspect_ratio)      \
     X(g_tgt_left_px)           \
     X(g_tgt_right_px)          \
     X(g_tgt_top_px)            \
     X(g_tgt_bottom_px)         \
-    X(g_mav_veh_vel_ned_x)  \
-    X(g_mav_veh_vel_ned_y)  \
-    X(g_mav_imu_accel_x)        \
-    X(g_mav_imu_accel_y)        \
-    X(g_mav_imu_accel_z)        \
-    X(g_mav_veh_yaw_deg)           \
-    X(g_mav_veh_pitch_deg)         \
+    X(g_mav_veh_vel_ned_x)     \
+    X(g_mav_veh_vel_ned_y)     \
+    X(g_mav_imu_accel_x)       \
+    X(g_mav_imu_accel_y)       \
+    X(g_mav_imu_accel_z)       \
+    X(g_mav_veh_yaw_deg)       \
+    X(g_mav_veh_pitch_deg)     \
     X(g_mav_veh_pos_ned_z)
 
 // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
 // Computed-only outputs (written only; if you also want an input recorded,
 // you can list it here too—dedup is automatic in the header/row)
 #define OUTPUT_VARS(X)                                                     \
-    X(g_tgt_height_meas)                                                        \
-    X(g_tgt_width_meas)                                                        \
-    X(g_tgt_pos_x_meas)                                                          \
-    X(g_tgt_pos_y_meas)                                                          \
-    X(g_tgt_pos_z_meas)                                                          \
-    X(g_tgt_dist_meas)                                                          \
-    X(g_cam_delta_angle_deg)                                                       \
-    X(g_cam_tilt_deg)                                                 \
-    X(g_dist_delta_x)                                                         \
-    X(g_dist_delta_z)                                                         \
-    X(g_cam_comp_angle_deg)                                                 \
-    X(g_tgt_too_close)                                                  \
-    X(g_cam_fov_height)                                                        \
-    X(g_tgt_pos_x_est)                                                      \
-    X(g_tgt_pos_y_est)                                                      \
+    X(g_tgt_height_meas)                                                   \
+    X(g_tgt_width_meas)                                                    \
+    X(g_tgt_pos_x_meas)                                                    \
+    X(g_tgt_pos_y_meas)                                                    \
+    X(g_tgt_pos_z_meas)                                                    \
+    X(g_tgt_dist_meas)                                                     \
+    X(g_cam_delta_angle_deg)                                               \
+    X(g_cam_tilt_deg)                                                      \
+    X(g_dist_delta_x)                                                      \
+    X(g_dist_delta_z)                                                      \
+    X(g_cam_comp_angle_deg)                                                \
+    X(g_tgt_too_close)                                                     \
+    X(g_cam_fov_height)                                                    \
+    X(g_tgt_pos_x_est)                                                     \
+    X(g_tgt_pos_y_est)                                                     \
     X(g_tgt_vel_x_est)                                                     \
     X(g_tgt_vel_y_est)                                                     \
     X(g_tgt_acc_x_est)                                                     \
     X(g_tgt_acc_y_est)                                                     \
-    X(g_tgt_cntr_offset_x_m)                                            \
-    X(g_m_per_pix)                                                     \
-    X(g_tgt_cntr_offset_x_filt)                                      \
-    X(g_tgt_cntr_offset_y_filt)                                      \
-    X(g_tgt_meas_valid)                                                \
-    X(g_los_m)                                                     \
+    X(g_tgt_cntr_offset_x_m)                                               \
+    X(g_m_per_pix)                                                         \
+    X(g_tgt_cntr_offset_x_filt)                                            \
+    X(g_tgt_cntr_offset_y_filt)                                            \
+    X(g_tgt_meas_valid)                                                    \
+    X(g_los_m)                                                             \
     /* Vehicle Controls */                                                 \
-    X(g_pos_err_x)                                                           \
-    X(g_pos_err_y)                                                           \
-    X(g_ctrl_vel_x_cmd)                                                         \
-    X(g_ctrl_vel_y_cmd)                                                         \
-    X(g_ctrl_vel_z_cmd)                                                         \
-    X(g_ctrl_yaw_tgt)                                                        \
+    X(g_pos_err_x)                                                         \
+    X(g_pos_err_y)                                                         \
+    X(g_ctrl_vel_x_cmd)                                                    \
+    X(g_ctrl_vel_y_cmd)                                                    \
+    X(g_ctrl_vel_z_cmd)                                                    \
+    X(g_ctrl_yaw_tgt)                                                      \
     /* Optionally repeat inputs you also want in output CSV (dedup OK): */ \
-    X(g_app_time_s)                                                  \
-    X(g_tgt_detect_id)                                               \
-    X(g_tgt_track_id)                                                   \
-    X(g_tgt_class_id)                                                   \
-    X(g_tgt_conf)                                             \
-    X(g_tgt_meas_valid)                                                      \
-    X(g_tgt_cntr_offset_x_pix)                                              \
-    X(g_tgt_cntr_offset_y_pix)                                              \
-    X(g_tgt_height_pix)                                                     \
-    X(g_tgt_width_pix)                                                      \
-    X(g_tgt_aspect_ratio)                                                     \
+    X(g_app_time_s)                                                        \
+    X(g_tgt_detect_id)                                                     \
+    X(g_tgt_track_id)                                                      \
+    X(g_tgt_class_id)                                                      \
+    X(g_tgt_conf)                                                          \
+    X(g_tgt_valid)                                                         \
+    X(g_tgt_cntr_offset_x_pix)                                             \
+    X(g_tgt_cntr_offset_y_pix)                                             \
+    X(g_tgt_height_pix)                                                    \
+    X(g_tgt_width_pix)                                                     \
+    X(g_tgt_aspect_ratio)                                                  \
     X(g_tgt_left_px)                                                       \
     X(g_tgt_right_px)                                                      \
     X(g_tgt_top_px)                                                        \
     X(g_tgt_bottom_px)                                                     \
-    X(g_mav_veh_vel_ned_x)                                              \
-    X(g_mav_veh_vel_ned_y)                                              \
-    X(g_mav_imu_accel_x)                                                    \
-    X(g_mav_imu_accel_y)                                                    \
-    X(g_mav_imu_accel_z)                                                    \
-    X(g_mav_veh_yaw_deg)                                                       \
-    X(g_mav_veh_pitch_deg)                                                     \
+    X(g_mav_veh_vel_ned_x)                                                 \
+    X(g_mav_veh_vel_ned_y)                                                 \
+    X(g_mav_imu_accel_x)                                                   \
+    X(g_mav_imu_accel_y)                                                   \
+    X(g_mav_imu_accel_z)                                                   \
+    X(g_mav_veh_yaw_deg)                                                   \
+    X(g_mav_veh_pitch_deg)                                                 \
     X(g_mav_veh_pos_ned_z)
 
 /********************************************************************************

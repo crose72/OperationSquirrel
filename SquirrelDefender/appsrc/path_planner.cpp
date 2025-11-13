@@ -237,8 +237,8 @@ void calc_follow_error(void)
     g_pos_err_y = y_desired;
 
     // Error derivative
-    if (!target_valid_last_cycle && g_tgt_meas_valid ||
-        !g_tgt_meas_valid && target_valid_last_cycle)
+    if (!target_valid_last_cycle && g_tgt_valid ||
+        !g_tgt_valid && target_valid_last_cycle)
     {
         g_pos_err_x_dot = (float)0.0;
     }
@@ -376,27 +376,27 @@ void dtrmn_vel_cmd(void)
     g_tgt_too_close = (g_pos_err_x < 0.0f);
 
     // PID control outputs - these are the control setpoints (vx, vy, etc)
-    if (g_tgt_meas_valid && g_tgt_too_close)
+    if (g_tgt_valid && g_tgt_too_close)
     {
         g_ctrl_vel_x_cmd = pid_rev.pid(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                  g_pos_err_x, ControlDim::X, g_ctrl_dt);
+                                       g_pos_err_x, ControlDim::X, g_ctrl_dt);
 
         g_ctrl_vel_y_cmd = pid_rev.pid(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                  g_pos_err_y, ControlDim::Y, g_ctrl_dt);
+                                       g_pos_err_y, ControlDim::Y, g_ctrl_dt);
 
         g_ctrl_yaw_cmd = pid_rev.pid(Kp_yaw, Ki_yaw, Kd_yaw,
-                                   g_yaw_err, ControlDim::YAW, g_ctrl_dt);
+                                     g_yaw_err, ControlDim::YAW, g_ctrl_dt);
     }
-    else if (g_tgt_meas_valid && !g_tgt_too_close)
+    else if (g_tgt_valid && !g_tgt_too_close)
     {
         g_ctrl_vel_x_cmd = pid_forwd.pid(Kp_x, Ki_x, Kd_x,
-                                    g_pos_err_x, ControlDim::X, g_ctrl_dt);
+                                         g_pos_err_x, ControlDim::X, g_ctrl_dt);
 
         g_ctrl_vel_y_cmd = pid_forwd.pid(Kp_y, Ki_y, Kd_y,
-                                    g_pos_err_y, ControlDim::Y, g_ctrl_dt);
+                                         g_pos_err_y, ControlDim::Y, g_ctrl_dt);
 
         g_ctrl_yaw_cmd = pid_forwd.pid(Kp_yaw, Ki_yaw, Kd_yaw,
-                                     g_yaw_err, ControlDim::YAW, g_ctrl_dt);
+                                       g_yaw_err, ControlDim::YAW, g_ctrl_dt);
     }
     else
     {
@@ -417,7 +417,7 @@ void dtrmn_vel_cmd(void)
     g_ctrl_vel_x_cmd = v_shaped.x;
     g_ctrl_vel_y_cmd = v_shaped.y;
 
-    target_valid_last_cycle = g_tgt_meas_valid;
+    target_valid_last_cycle = g_tgt_valid;
     vx_adjust_prv = g_ctrl_vel_x_cmd;
     x_error_prv = g_pos_err_x;
 }

@@ -60,7 +60,7 @@ void follow_mode(void)
     target_velocity[1] = g_ctrl_vel_y_cmd;
     target_velocity[2] = g_ctrl_vel_z_cmd;
 
-    if (g_tgt_meas_valid)
+    if (g_tgt_valid)
     {
         MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity, g_ctrl_yaw_cmd);
     }
