@@ -478,11 +478,10 @@ void VideoCV::out_loop(void)
     video_mods();
     save_video();
 
-#if defined(BLD_WSL)
-
-    // display_video();
-
-#endif
+    if (g_use_video_playback)
+    {
+        display_video();
+    }
 }
 
 /********************************************************************************
