@@ -128,45 +128,27 @@ bool target_valid_last_cycle;
 float Kp_x = (float)0.5;
 float Ki_x = (float)0.009;
 float Kd_x = (float)0.1;
-float w1_x = (float)1.0;
-float w2_x = (float)0.0;
-float w3_x = (float)0.0;
 
 /* y forward */
 float Kp_y = (float)0.03;
 float Ki_y = (float)0.00;
 float Kd_y = (float)0.001;
-float w1_y = (float)1.0;
-float w2_y = (float)0.0;
-float w3_y = (float)0.0;
 
 /* z forward */
-float w1_z = (float)0.0;
-float w2_z = (float)0.0;
-float w3_z = (float)0.0;
 
 /* x reverse */
 float Kp_x_rev = (float)0.0;
 float Ki_x_rev = (float)0.0;
 float Kd_x_rev = (float)0.0;
-float w1_x_rev = (float)1.0;
-float w2_x_rev = (float)0.0;
-float w3_x_rev = (float)0.0;
 
 /* y reverse */
 float Kp_y_rev = (float)0.005;
 float Ki_y_rev = (float)0.0;
 float Kd_y_rev = (float)0.0;
-float w1_y_rev = (float)1.0;
-float w2_y_rev = (float)0.0;
-float w3_y_rev = (float)0.0;
 
 float Kp_yaw = (float)0.08;
 float Ki_yaw = (float)0.0;
 float Kd_yaw = (float)0.00005;
-float w1_yaw = (float)1.0;
-float w2_yaw = (float)0.0;
-float w3_yaw = (float)0.0;
 
 float x_desired = (float)4.0;
 float y_desired = (float)0.0;
@@ -194,41 +176,26 @@ void get_path_params(void)
     Kp_x = follow_control.get_float_param("PID_vx_forward", "Kp");
     Ki_x = follow_control.get_float_param("PID_vx_forward", "Ki");
     Kd_x = follow_control.get_float_param("PID_vx_forward", "Kd");
-    w1_x = follow_control.get_float_param("PID_vx_forward", "w1");
-    w2_x = follow_control.get_float_param("PID_vx_forward", "w2");
-    w3_x = follow_control.get_float_param("PID_vx_forward", "w3");
 
     // Accessing Vel_PID_y parameters
     Kp_y = follow_control.get_float_param("PID_vy_forward", "Kp");
     Ki_y = follow_control.get_float_param("PID_vy_forward", "Ki");
     Kd_y = follow_control.get_float_param("PID_vy_forward", "Kd");
-    w1_y = follow_control.get_float_param("PID_vy_forward", "w1");
-    w2_y = follow_control.get_float_param("PID_vy_forward", "w2");
-    w3_y = follow_control.get_float_param("PID_vy_forward", "w3");
 
     // Accessing Vel_PID_x parameters for reverse movement
     Kp_x_rev = follow_control.get_float_param("PID_vx_reverse", "Kp");
     Ki_x_rev = follow_control.get_float_param("PID_vx_reverse", "Ki");
     Kd_x_rev = follow_control.get_float_param("PID_vx_reverse", "Kd");
-    w1_x_rev = follow_control.get_float_param("PID_vx_reverse", "w1");
-    w2_x_rev = follow_control.get_float_param("PID_vx_reverse", "w2");
-    w3_x_rev = follow_control.get_float_param("PID_vx_reverse", "w3");
 
     // Accessing Vel_PID_y parameters for reverse movment
     Kp_y_rev = follow_control.get_float_param("PID_vy_reverse", "Kp");
     Ki_y_rev = follow_control.get_float_param("PID_vy_reverse", "Ki");
     Kd_y_rev = follow_control.get_float_param("PID_vy_reverse", "Kd");
-    w1_y_rev = follow_control.get_float_param("PID_vy_reverse", "w1");
-    w2_y_rev = follow_control.get_float_param("PID_vy_reverse", "w2");
-    w3_y_rev = follow_control.get_float_param("PID_vy_reverse", "w3");
 
     // Accessing Yaw PID parameters
     Kp_yaw = follow_control.get_float_param("PID_yaw", "Kp");
     Ki_yaw = follow_control.get_float_param("PID_yaw", "Ki");
     Kd_yaw = follow_control.get_float_param("PID_yaw", "Kd");
-    w1_yaw = follow_control.get_float_param("PID_yaw", "w1");
-    w2_yaw = follow_control.get_float_param("PID_yaw", "w2");
-    w3_yaw = follow_control.get_float_param("PID_yaw", "w3");
 
     // Follow params
     x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_offset");
