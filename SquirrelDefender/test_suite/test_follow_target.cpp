@@ -46,8 +46,8 @@ TestHarness g_h;
     X(g_tgt_track_id)          \
     X(g_tgt_class_id)          \
     X(g_tgt_conf)              \
-    X(g_tgt_cntr_offset_x_pix) \
     X(g_tgt_cntr_offset_y_pix) \
+    X(g_tgt_cntr_offset_x_pix) \
     X(g_tgt_height_pix)        \
     X(g_tgt_width_pix)         \
     X(g_tgt_aspect_ratio)      \
@@ -107,8 +107,8 @@ TestHarness g_h;
     X(g_tgt_class_id)                                                      \
     X(g_tgt_conf)                                                          \
     X(g_tgt_valid)                                                         \
-    X(g_tgt_cntr_offset_x_pix)                                             \
     X(g_tgt_cntr_offset_y_pix)                                             \
+    X(g_tgt_cntr_offset_x_pix)                                             \
     X(g_tgt_height_pix)                                                    \
     X(g_tgt_width_pix)                                                     \
     X(g_tgt_aspect_ratio)                                                  \
@@ -180,12 +180,12 @@ void get_test_inputs(size_t data_index)
     // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
     // Manual calculations as needed
     // Manual calculate dt since it's not logged
-    g_ctrl_dt = g_app_time_s - time_prv;
+    g_app_dt = g_app_time_s - time_prv;
     time_prv = g_app_time_s;
 
     // Calculate target bbox center manually - not logged originally
-    g_tgt_center_y_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
-    g_tgt_center_x_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
+    g_tgt_center_x_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
+    g_tgt_center_y_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
 }
 
 void write_test_outputs(void)

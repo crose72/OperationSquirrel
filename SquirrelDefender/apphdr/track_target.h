@@ -18,8 +18,8 @@
 extern bool g_tgt_valid;
 extern int g_tgt_detect_id;
 extern int g_tgt_track_id;
-extern float g_tgt_cntr_offset_x_pix;
 extern float g_tgt_cntr_offset_y_pix;
+extern float g_tgt_cntr_offset_x_pix;
 extern float g_tgt_height_pix;
 extern float g_tgt_width_pix;
 extern float g_tgt_aspect_ratio;
@@ -27,12 +27,10 @@ extern float g_tgt_left_px;
 extern float g_tgt_right_px;
 extern float g_tgt_top_px;
 extern float g_tgt_bottom_px;
-extern float g_tgt_center_x_px;
 extern float g_tgt_center_y_px;
+extern float g_tgt_center_x_px;
 extern float g_tgt_class_id;
 extern float g_tgt_conf;
-extern float g_tgt_cntr_offset_x_filt;
-extern float g_tgt_cntr_offset_y_filt;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

@@ -374,8 +374,8 @@ void DataLogger::log_data(void)
         m.set_class_id(g_tgt_class_id);
         m.set_confidence(g_tgt_conf);
 
-        m.set_bbox_offset_x_px(g_tgt_cntr_offset_x_pix);
-        m.set_bbox_offset_y_px(g_tgt_cntr_offset_y_pix);
+        m.set_bbox_offset_x_px(g_tgt_cntr_offset_y_pix);
+        m.set_bbox_offset_y_px(g_tgt_cntr_offset_x_pix);
 
         m.set_bbox_height_px(g_tgt_height_pix);
         m.set_bbox_width_px(g_tgt_width_pix);
@@ -482,8 +482,8 @@ void write_headers(void)
                               "g_tgt_track_id",
                               "g_tgt_class_id",
                               "g_tgt_conf",
-                              "g_tgt_cntr_offset_x_pix",
                               "g_tgt_cntr_offset_y_pix",
+                              "g_tgt_cntr_offset_x_pix",
                               "g_tgt_cntr_offset_x_filt,"
                               "g_tgt_cntr_offset_y_filt,"
                               "g_tgt_height_pix",
@@ -590,8 +590,8 @@ void log_data(void)
                                std::to_string(g_tgt_track_id),
                                std::to_string(g_tgt_class_id),
                                std::to_string(g_tgt_conf),
-                               std::to_string(g_tgt_cntr_offset_x_pix),
                                std::to_string(g_tgt_cntr_offset_y_pix),
+                               std::to_string(g_tgt_cntr_offset_x_pix),
                                std::to_string(g_tgt_cntr_offset_x_filt),
                                std::to_string(g_tgt_cntr_offset_y_filt),
                                std::to_string(g_tgt_height_pix),

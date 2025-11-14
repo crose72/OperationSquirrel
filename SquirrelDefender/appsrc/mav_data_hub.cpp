@@ -143,13 +143,13 @@ float g_mav_veh_vel_ned_z; /*< [m/s] Z Speed*/
 
 // Parameter read
 
-float g_param_value;    /*<  Onboard parameter value*/
-uint16_t g_param_count; /*<  Total number of onboard parameters*/
-uint16_t g_param_index; /*<  Index of this onboard parameter*/
-char g_param_id[17];    /*<  Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string*/
-uint8_t g_param_type;   /*<  Onboard parameter type.*/
-std::string param_name;
-bool g_param_read;
+float g_mav_param_val;      /*<  Onboard parameter value*/
+uint16_t g_mav_param_count; /*<  Total number of onboard parameters*/
+uint16_t g_mav_param_index; /*<  Index of this onboard parameter*/
+char g_mav_param_id[17];    /*<  Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string*/
+uint8_t g_mav_param_type;   /*<  Onboard parameter type.*/
+std::string g_mav_param_name;
+bool g_mav_param_read;
 
 /********************************************************************************
  * Calibration definitions
@@ -330,18 +330,18 @@ void proc_mav_statustext_msg(const mavlink_message_t *msg)
 void proc_mav_param_value_msg(const mavlink_message_t *msg)
 {
     mavlink_param_value_t param;
-    mavlink_msg_param_value_decode(msg, &param);
+    mavlink_msg_mav_param_val_decode(msg, &param);
 
     // Copy param_id safely for internal use
-    memcpy(g_param_id, param.param_id, 16);
-    g_param_id[16] = '\0';
+    memcpy(g_mav_param_id, param.param_id, 16);
+    g_mav_param_id[16] = '\0';
 
-    g_param_value = param.param_value;
-    g_param_count = param.param_count;
-    g_param_index = param.param_index;
-    g_param_type = param.param_type;
-    param_name = g_param_id;
-    g_param_read = true;
+    g_mav_param_val = param.param_value;
+    g_mav_param_count = param.param_count;
+    g_mav_param_index = param.param_index;
+    g_mav_param_type = param.param_type;
+    g_mav_param_name = g_mav_param_id;
+    g_mav_param_read = true;
 
     // // --- Debug: print all raw MAVLink values ---
     // char name_buf[17];
@@ -690,7 +690,7 @@ void parse_mav_msgs(void)
     uint8_t byte;
 
     // reset param read status
-    g_param_read = false;
+    g_mav_param_read = false;
 
     int n = MavSerial::bytes_available();
 

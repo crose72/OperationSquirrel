@@ -366,10 +366,10 @@ void dtrmn_target_loc_img(void)
     // Only consider targets whose bounding boxes are not smashed against the
     // video frame, and at least a certain size (to prevent bad estimation)
     g_tgt_meas_valid = (g_tgt_valid &&
-                        (!(g_tgt_center_x_px < target_det_edge_of_frame_buffer ||
-                           g_tgt_center_x_px > (g_cam0_img_height_px - target_det_edge_of_frame_buffer)) &&
-                         !(g_tgt_center_y_px < target_det_edge_of_frame_buffer ||
-                           g_tgt_center_y_px > (g_cam0_img_width_px - target_det_edge_of_frame_buffer)) &&
+                        (!(g_tgt_center_y_px < target_det_edge_of_frame_buffer ||
+                           g_tgt_center_y_px > (g_cam0_img_height_px - target_det_edge_of_frame_buffer)) &&
+                         !(g_tgt_center_x_px < target_det_edge_of_frame_buffer ||
+                           g_tgt_center_x_px > (g_cam0_img_width_px - target_det_edge_of_frame_buffer)) &&
                          !((g_tgt_width_pix * g_tgt_height_pix) < min_target_bbox_area)));
 
     if (g_tgt_meas_valid)
@@ -385,7 +385,7 @@ void dtrmn_target_loc_img(void)
     {
 #if defined(BLD_WSL)
 
-        g_target_lost_dbc += std::chrono::milliseconds((int)(g_ctrl_dt * 1000));
+        g_target_lost_dbc += std::chrono::milliseconds((int)(g_app_dt * 1000));
 
 #else
 
@@ -393,7 +393,7 @@ void dtrmn_target_loc_img(void)
 
 #endif
 
-        g_tgt_lost_dbc_sec += g_ctrl_dt;
+        g_tgt_lost_dbc_sec += g_app_dt;
     }
 
 #if defined(BLD_WSL)
@@ -409,8 +409,8 @@ void dtrmn_target_loc_img(void)
     if (!g_tgt_lost)
     {
         // Moving average for more smoothing - modifies the history vector
-        g_tgt_cntr_offset_x_filt = moving_average(target_x_pix_hist4avg, g_tgt_cntr_offset_x_pix, x_buffer_idx4avg, x_sum);
-        g_tgt_cntr_offset_y_filt = moving_average(target_y_pix_hist4avg, g_tgt_cntr_offset_y_pix, y_buffer_idx4avg, y_sum);
+        g_tgt_cntr_offset_x_filt = moving_average(target_x_pix_hist4avg, g_tgt_cntr_offset_y_pix, x_buffer_idx4avg, x_sum);
+        g_tgt_cntr_offset_y_filt = moving_average(target_y_pix_hist4avg, g_tgt_cntr_offset_x_pix, y_buffer_idx4avg, y_sum);
 
         // Convert the offset to meters
         g_tgt_cntr_offset_x_m = g_tgt_cntr_offset_x_filt * g_cam0_m_per_pix;
@@ -487,14 +487,14 @@ void dtrmn_target_loc_real(void)
         if (g_cam0_delta_angle_deg > 0.0f && g_cam0_delta_angle_deg < g_cam0_tilt_rad)
         {
             delta_idx_d = get_float_index(g_tgt_los_dist_meas, &delta_offset_d[0], MAX_IDX_DELTA_D_OFFSET, true);
-            delta_idx_pix = get_float_index(std::fabs(g_tgt_cntr_offset_x_pix), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
+            delta_idx_pix = get_float_index(std::fabs(g_tgt_cntr_offset_y_pix), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
             delta_d = get_2d_interpolated_value(&delta_offset[0][0], MAX_IDX_DELTA_PIXEL_OFFSET, MAX_IDX_DELTA_D_OFFSET, delta_idx_pix, delta_idx_d);
 
             g_tgt_pos_x_delta = delta_d * cosf(g_cam0_delta_angle_deg);
             g_tgt_pos_z_delta = delta_d * sinf(g_cam0_delta_angle_deg);
 
             /* If object center is below the center of the frame */
-            if (g_tgt_cntr_offset_x_pix > g_cam0_img_height_cy)
+            if (g_tgt_cntr_offset_y_pix > g_cam0_img_height_cy)
             {
                 g_tgt_pos_x_delta = -g_tgt_pos_x_delta;
                 g_tgt_pos_z_delta = -g_tgt_pos_z_delta;
@@ -507,9 +507,9 @@ void dtrmn_target_loc_real(void)
 
         /* Calculate target y offset from the center line of view of the camera based on calibrated forward distance and the
         offset of the center of the target to the side of the center of the video frame in pixels */
-        g_tgt_pos_y_meas = g_cam0_m_per_pix * g_tgt_cntr_offset_y_pix;
+        g_tgt_pos_y_meas = g_cam0_m_per_pix * g_tgt_cntr_offset_x_pix;
 
-        if (g_tgt_cntr_offset_y_pix < 0.0f)
+        if (g_tgt_cntr_offset_x_pix < 0.0f)
         {
             g_tgt_pos_y_meas = -g_tgt_pos_y_meas;
         }
@@ -557,7 +557,7 @@ void update_target_loc_real(void)
 
         // Define the system transition matrix A_loc (discretized)
         // TODO: update the state transition matrix A_loc
-        // Ensure g_ctrl_dt is valid (std::isnan(g_ctrl_dt) || std::isinf(g_ctrl_dt) || g_ctrl_dt <= 0)
+        // Ensure g_app_dt is valid (std::isnan(g_app_dt) || std::isinf(g_app_dt) || g_app_dt <= 0)
 
         // No external control input for now
         colvec u(1, fill::zeros);

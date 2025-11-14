@@ -91,7 +91,7 @@ void dtrmn_program_stop_cond(void)
 int system_state_machine(void)
 {
     // Initialize system status on startup
-    if (g_ctrl_first_loop)
+    if (g_app_first_loop)
     {
         g_system_state = SystemState::DEFAULT;
     }
@@ -115,7 +115,7 @@ int system_state_machine(void)
         {
         // Default state is the first state, nothing is initialialized, no systems are active
         case SystemState::DEFAULT:
-            if (g_ctrl_initialized)
+            if (g_system_init)
             {
                 g_system_state = SystemState::INIT;
             }
@@ -196,7 +196,7 @@ SystemController::~SystemController(void) {}
  ********************************************************************************/
 bool SystemController::init(void)
 {
-    g_ctrl_initialized = false;
+    g_system_init = false;
     g_mav_veh_custom_mode_prv = 0;
 
 #ifdef BLD_JETSON_B01

@@ -15,8 +15,8 @@
  ********************************************************************************/
 extern float g_app_time_s;
 extern uint64_t g_app_time_ns;
-extern float g_ctrl_dt;
-extern bool g_ctrl_first_loop;
+extern float g_app_dt;
+extern bool g_app_first_loop;
 extern uint64_t g_app_epoch_ns;
 
 /********************************************************************************

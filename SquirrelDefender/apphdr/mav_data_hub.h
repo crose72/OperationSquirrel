@@ -118,13 +118,13 @@ extern float g_mav_veh_vel_ned_x;
 extern float g_mav_veh_vel_ned_y;
 extern float g_mav_veh_vel_ned_z;
 
-extern float g_param_value;
-extern uint16_t g_param_count;
-extern uint16_t g_param_index;
-extern char g_param_id[17];
-extern uint8_t g_param_type;
-extern std::string param_name;
-extern bool g_param_read;
+extern float g_mav_param_val;
+extern uint16_t g_mav_param_count;
+extern uint16_t g_mav_param_index;
+extern char g_mav_param_id[17];
+extern uint8_t g_mav_param_type;
+extern std::string g_mav_param_name;
+extern bool g_mav_param_read;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

@@ -310,7 +310,7 @@ bool capture_image(void)
     }
 
     g_cam0_img_valid = true;
-    cam0_video_out_fps_actual = ((g_ctrl_dt > (float)0.000001) ? (1 / g_ctrl_dt) : (float)0.0);
+    cam0_video_out_fps_actual = ((g_app_dt > (float)0.000001) ? (1 / g_app_dt) : (float)0.0);
 
     g_cam0_img_gpu.upload(g_cam0_img_cpu);
     ++g_cam0_frame_id;
@@ -359,24 +359,24 @@ void video_mods(void)
         "t",
         std::to_string(g_app_time_s),
         cv::Point(10, g_cam0_img_cpu.rows - 10), // bottom-left
-        0.5,                                   // font scale
-        cv::Scalar(255, 255, 255),             // white
+        0.5,                                     // font scale
+        cv::Scalar(255, 255, 255),               // white
         1);
     overlay_text(
         g_cam0_img_cpu,
         "fps",
         std::to_string(cam0_video_out_fps_actual),
         cv::Point(10, g_cam0_img_cpu.rows - 30), // bottom-left
-        0.5,                                   // font scale
-        cv::Scalar(255, 255, 255),             // white
+        0.5,                                     // font scale
+        cv::Scalar(255, 255, 255),               // white
         1);
     overlay_text(
         g_cam0_img_cpu,
         "f",
         std::to_string(g_cam0_frame_id),
         cv::Point(10, g_cam0_img_cpu.rows - 50), // bottom-left
-        0.5,                                   // font scale
-        cv::Scalar(255, 255, 255),             // white
+        0.5,                                     // font scale
+        cv::Scalar(255, 255, 255),               // white
         1);
 }
 

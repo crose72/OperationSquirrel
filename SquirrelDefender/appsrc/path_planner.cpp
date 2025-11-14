@@ -245,7 +245,7 @@ void calc_follow_error(void)
     else
     {
 
-        g_pos_err_x_dot = div((g_pos_err_x - x_error_prv), g_ctrl_dt);
+        g_pos_err_x_dot = div((g_pos_err_x - x_error_prv), g_app_dt);
         g_pos_err_x_dot = low_pass_filter(g_pos_err_x_dot, x_error_dot_prv, x_error_dot_filt_coef);
     }
 
@@ -267,7 +267,7 @@ void calc_yaw_target_error(void)
 {
     // is g_app_use_video_playback and yaw_initial_latched needed here?
     // TODO: or is it fine for using camera to with drone turning all the time?
-    if (!g_ctrl_first_loop && g_app_use_video_playback && !yaw_initial_latched)
+    if (!g_app_first_loop && g_app_use_video_playback && !yaw_initial_latched)
     {
         yaw_initial = g_mav_veh_yaw_deg;
         yaw_initial_latched = true;
@@ -303,13 +303,13 @@ void calc_yaw_target_error(void)
 
     // If the target is to the right of the center of the video then yaw right
     // If the target is to the left of the center of the video then yaw left
-    if (g_tgt_cntr_offset_y_pix > 50.0)
+    if (g_tgt_cntr_offset_x_pix > 50.0)
     {
-        g_ctrl_yaw_tgt = (0.0011 * g_tgt_cntr_offset_y_pix);
+        g_ctrl_yaw_tgt = (0.0011 * g_tgt_cntr_offset_x_pix);
     }
-    else if (g_tgt_cntr_offset_y_pix < -50.0)
+    else if (g_tgt_cntr_offset_x_pix < -50.0)
     {
-        g_ctrl_yaw_tgt = -(0.0011 * std::abs(g_tgt_cntr_offset_y_pix));
+        g_ctrl_yaw_tgt = -(0.0011 * std::abs(g_tgt_cntr_offset_x_pix));
     }
     else
     {
@@ -321,9 +321,9 @@ void calc_yaw_target_error(void)
     const float deadband_px = (float)50.0;
 
     // Yaw in radians using pinhole model
-    if (std::abs(g_tgt_cntr_offset_y_pix) > deadband_px)
+    if (std::abs(g_tgt_cntr_offset_x_pix) > deadband_px)
     {
-        g_ctrl_yaw_tgt = g_tgt_cntr_offset_y_pix * angle;
+        g_ctrl_yaw_tgt = g_tgt_cntr_offset_x_pix * angle;
     }
     else
     {
@@ -379,24 +379,24 @@ void dtrmn_vel_cmd(void)
     if (g_tgt_valid && g_tgt_too_close)
     {
         g_ctrl_vel_x_cmd = pid_rev.pid(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                       g_pos_err_x, ControlDim::X, g_ctrl_dt);
+                                       g_pos_err_x, ControlDim::X, g_app_dt);
 
         g_ctrl_vel_y_cmd = pid_rev.pid(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                       g_pos_err_y, ControlDim::Y, g_ctrl_dt);
+                                       g_pos_err_y, ControlDim::Y, g_app_dt);
 
         g_ctrl_yaw_cmd = pid_rev.pid(Kp_yaw, Ki_yaw, Kd_yaw,
-                                     g_yaw_err, ControlDim::YAW, g_ctrl_dt);
+                                     g_yaw_err, ControlDim::YAW, g_app_dt);
     }
     else if (g_tgt_valid && !g_tgt_too_close)
     {
         g_ctrl_vel_x_cmd = pid_forwd.pid(Kp_x, Ki_x, Kd_x,
-                                         g_pos_err_x, ControlDim::X, g_ctrl_dt);
+                                         g_pos_err_x, ControlDim::X, g_app_dt);
 
         g_ctrl_vel_y_cmd = pid_forwd.pid(Kp_y, Ki_y, Kd_y,
-                                         g_pos_err_y, ControlDim::Y, g_ctrl_dt);
+                                         g_pos_err_y, ControlDim::Y, g_app_dt);
 
         g_ctrl_yaw_cmd = pid_forwd.pid(Kp_yaw, Ki_yaw, Kd_yaw,
-                                       g_yaw_err, ControlDim::YAW, g_ctrl_dt);
+                                       g_yaw_err, ControlDim::YAW, g_app_dt);
     }
     else
     {
@@ -410,7 +410,7 @@ void dtrmn_vel_cmd(void)
     // Map your max-ramp-rate knob to the accel cap; jerk is separate.
     // This ensures any update (including update-to-zero) is turned into a smooth S-curve.
     // It does so by limiting the velocity command
-    g_vel_shaper.update(Vector2f{g_ctrl_vel_x_cmd, g_ctrl_vel_y_cmd}, g_ctrl_dt);
+    g_vel_shaper.update(Vector2f{g_ctrl_vel_x_cmd, g_ctrl_vel_y_cmd}, g_app_dt);
     const Vector2f v_shaped = g_vel_shaper.value();
 
     // Updated control setpoints with smoothing

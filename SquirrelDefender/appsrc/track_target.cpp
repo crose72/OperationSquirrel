@@ -55,10 +55,10 @@ bool target_valid_prv;
 bool g_tgt_valid;
 int g_tgt_detect_id;
 int g_tgt_track_id;
-float g_tgt_cntr_offset_x_pix;
 float g_tgt_cntr_offset_y_pix;
-float g_tgt_center_y_px;
+float g_tgt_cntr_offset_x_pix;
 float g_tgt_center_x_px;
+float g_tgt_center_y_px;
 float g_tgt_height_pix;
 float g_tgt_width_pix;
 float g_tgt_aspect_ratio;
@@ -359,10 +359,10 @@ void get_target_info(void)
 #endif
 
     g_tgt_bottom_px = g_tgt_top_px + g_tgt_height_pix;
-    g_tgt_center_y_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
-    g_tgt_center_x_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
-    g_tgt_cntr_offset_y_pix = g_tgt_center_y_px - g_cam0_img_width_cx;
-    g_tgt_cntr_offset_x_pix = g_tgt_center_x_px - g_cam0_img_height_cy;
+    g_tgt_center_x_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
+    g_tgt_center_y_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
+    g_tgt_cntr_offset_x_pix = g_tgt_center_x_px - g_cam0_img_width_cx;
+    g_tgt_cntr_offset_y_pix = g_tgt_center_y_px - g_cam0_img_height_cy;
     g_tgt_aspect_ratio = g_tgt_width_pix / g_tgt_height_pix;
 }
 
@@ -399,10 +399,10 @@ void update_target_info(void)
     g_tgt_right_px = g_tgt_left_px + g_tgt_width_pix;
     g_tgt_top_px = target_bounding_box.y;
     g_tgt_bottom_px = g_tgt_top_px + g_tgt_height_pix;
-    g_tgt_center_y_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
-    g_tgt_center_x_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
-    g_tgt_cntr_offset_y_pix = g_tgt_center_y_px - g_cam0_img_width_cx;
-    g_tgt_cntr_offset_x_pix = g_tgt_center_x_px - g_cam0_img_height_cy;
+    g_tgt_center_x_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
+    g_tgt_center_y_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
+    g_tgt_cntr_offset_x_pix = g_tgt_center_x_px - g_cam0_img_width_cx;
+    g_tgt_cntr_offset_y_pix = g_tgt_center_y_px - g_cam0_img_height_cy;
     g_tgt_aspect_ratio = (g_tgt_height_pix >= 0.0000001 ? g_tgt_width_pix / g_tgt_height_pix : (float)0.0);
 }
 
@@ -429,8 +429,8 @@ bool Tracking::init(void)
 
     g_tgt_valid = false;
     target_valid_prv = false;
-    g_tgt_cntr_offset_x_pix = (float)0.0;
     g_tgt_cntr_offset_y_pix = (float)0.0;
+    g_tgt_cntr_offset_x_pix = (float)0.0;
     g_tgt_height_pix = (float)0.0;
     g_tgt_width_pix = (float)0.0;
     g_tgt_aspect_ratio = (float)0.0;
