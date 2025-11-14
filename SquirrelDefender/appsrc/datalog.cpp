@@ -24,6 +24,7 @@
 #include "time_calc.h"
 #include "system_controller.h"
 #include "video_io.h"
+#include <spdlog/spdlog.h>
 
 /********************************************************************************
  * Typedefs
@@ -106,14 +107,14 @@ void save_params(const std::string &mcap_filename)
     std::ifstream src(src_path);
     if (!src.is_open())
     {
-        std::cout << "⚠️  Could not open " << src_path << " for reading.\n";
+        spdlog::error("⚠️  Could not open {} for reading.", src_path);
         return;
     }
 
     std::ofstream dst(dst_path);
     if (!dst.is_open())
     {
-        std::cout << "⚠️  Could not create " << dst_path << " for writing.\n";
+        spdlog::error("⚠️  Could not create {} for writing.", dst_path);
         src.close();
         return;
     }
@@ -124,8 +125,6 @@ void save_params(const std::string &mcap_filename)
 
     src.close();
     dst.close();
-
-    std::cout << "✅ Saved params copy: " << dst_path << std::endl;
 }
 
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)

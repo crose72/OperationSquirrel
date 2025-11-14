@@ -330,7 +330,7 @@ void proc_mav_statustext_msg(const mavlink_message_t *msg)
 void proc_mav_param_value_msg(const mavlink_message_t *msg)
 {
     mavlink_param_value_t param;
-    mavlink_msg_mav_param_val_decode(msg, &param);
+    mavlink_msg_param_value_decode(msg, &param);
 
     // Copy param_id safely for internal use
     memcpy(g_mav_param_id, param.param_id, 16);
