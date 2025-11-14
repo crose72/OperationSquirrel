@@ -10,6 +10,8 @@
  * Includes
  ********************************************************************************/
 #include <vector>
+#include <cmath>
+#include <algorithm>
 
 /********************************************************************************
  * Typedefs / Enums / Structs
@@ -24,5 +26,15 @@ float moving_average(std::vector<float> &buffer, float sample, int &index, float
 std::vector<float> unwrap_buffer(const std::vector<float> &buffer, int index);
 float first_derivative(float current, float previous, float dt);
 float second_derivative(float current, float prev, float prev2, float dt);
+
+template <typename T>
+inline T div(T num, T denom, T eps = (T)1e-6)
+{
+    if (std::fabs(denom) < eps)
+    {
+        denom = (denom >= 0 ? eps : -eps);
+    }
+    return num / denom;
+}
 
 #endif // SIGNAL_PROCESSING_H

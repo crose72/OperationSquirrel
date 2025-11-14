@@ -14,6 +14,9 @@
 #include <spdlog/spdlog.h>
 #include <mutex>
 #include <signal.h>
+#include <fenv.h>
+
+#pragma STDC FENV_ACCESS ON
 
 /********************************************************************************
  * Typedefs
@@ -60,7 +63,7 @@ void attach_sig_handler(void)
     }
     if (signal(SIGTERM, sig_handler) == SIG_ERR)
     {
-    	spdlog::error("Can't catch SIGTERM");
+        spdlog::error("Can't catch SIGTERM");
     }
 }
 
@@ -70,6 +73,8 @@ void attach_sig_handler(void)
  ********************************************************************************/
 int main(int argc, char **argv)
 {
+    feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
+
     g_app_video_input_path = "";
     g_app_use_video_playback = false;
     g_app_stop = false;

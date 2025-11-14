@@ -326,15 +326,35 @@ void calc_fov(void)
     // The object isn't there, this is an intermediate calculation to determine
     // how many pixels correspond to a meter at the current drone height.
 
+    float ghost_object_height = (float)0.0;
+
     // Height of a known object at given distance
-    float ghost_object_height = pix_height_x_coef * powf(g_los_m, pix_height_x_pow);
+    if (g_los_m > (float)0.0)
+    {
+        float ghost_object_height = pix_height_x_coef * powf(g_los_m, pix_height_x_pow);
+    }
     // How many meters a single pixel represents at the line of sight distance
     // TODO: When to use actual vs ghost object height?
     // Uses "ghost object" height - the height of the known object at the LOS distance
     // g_m_per_pix = known_obj_heigh_all_dist / ghost_object_height;
     // Currently gonna use the target actual height
-    g_m_per_pix = known_obj_heigh_all_dist / g_tgt_height_pix;
-    g_cam_fov_height = g_m_per_pix * g_cam0_img_height_px;
+    // Only compute m_per_pixel if we have a valid bbox height
+    if (g_tgt_height_pix > (float)0.0f)
+    {
+        g_m_per_pix = known_obj_heigh_all_dist / g_tgt_height_pix;
+        g_cam_fov_height = g_m_per_pix * g_cam0_img_height_px;
+    }
+    else
+    {
+        // No detection yet – use last-known or default
+        // Avoid NaN and preserve stability
+        g_m_per_pix = g_m_per_pix; // or keep previous
+        // OR safer: use a sane default from params
+        // g_m_per_pix = default_m_per_pix;
+
+        // Same for FOV height – maintain previous stable value
+        // g_cam_fov_height = default_fov_m;
+    }
 }
 
 /********************************************************************************
@@ -603,7 +623,7 @@ bool Localize::init(void)
     g_tgt_meas_valid = false;
     camera_comp_angle_abs = (float)0.0;
     g_cam_fov_height = (float)0.0;
-    g_m_per_pix = (float)0.0;
+    g_m_per_pix = (float)0.00001;
     g_tgt_cntr_offset_x_m = (float)0.0;
     target_y_pix_hist4avg.assign(y_pix_window, (float)0.0);
     target_x_pix_hist4avg.assign(x_pix_window, (float)0.0);

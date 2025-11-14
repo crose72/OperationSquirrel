@@ -245,7 +245,7 @@ void calc_follow_error(void)
     else
     {
 
-        g_pos_err_x_dot = (g_pos_err_x - x_error_prv) / g_ctrl_dt;
+        g_pos_err_x_dot = div((g_pos_err_x - x_error_prv), g_ctrl_dt);
         g_pos_err_x_dot = low_pass_filter(g_pos_err_x_dot, x_error_dot_prv, x_error_dot_filt_coef);
     }
 
