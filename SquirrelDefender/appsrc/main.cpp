@@ -73,7 +73,8 @@ void attach_sig_handler(void)
  ********************************************************************************/
 int main(int argc, char **argv)
 {
-    feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
+    // Enable to catch NaN, Inf, and other errors
+    // feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
 
     g_app_video_input_path = "";
     g_app_use_video_playback = false;

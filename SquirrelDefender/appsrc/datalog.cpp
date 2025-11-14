@@ -206,7 +206,7 @@ void DataLogger::publishAnnotations(uint64_t ts_ns, const os::logger::Objects &o
         txt->mutable_background_color()->CopyFrom(mkColor(0, 0, 0, 0.6));
     }
 
-    publish("/detection/annotations", anno, ts_ns);
+    // publish("/detection/annotations", anno, ts_ns);
 }
 
 /********************************************************************************
@@ -728,7 +728,6 @@ bool DataLogger::init(void)
     mMCAPLogger->addChannel("/system/state", "os.logger.SystemStateMsg", "protobuf");
     mMCAPLogger->addChannel("/target/detection", "os.logger.TargetDetection", "protobuf");
     mMCAPLogger->addChannel("/control/output", "os.logger.ControlOutput", "protobuf");
-    mMCAPLogger->addChannel("/target/location", "os.logger.TargetLocation", "protobuf");
 
     mMCAPLogger->addChannel("/mav/system", "os.logger.MavSystem", "protobuf");
     mMCAPLogger->addChannel("/mav/kinematics", "os.logger.MavKinematics", "protobuf");
@@ -737,7 +736,7 @@ bool DataLogger::init(void)
     mMCAPLogger->addChannel("/mav/flow", "os.logger.MavOpticalFlow", "protobuf");
 
     mMCAPLogger->addChannel("/detection/objects", "os.logger.Objects", "protobuf");
-    mMCAPLogger->addChannel("/detection/annotations", "os.logger.ImageAnnotations", "protobuf");
+    // mMCAPLogger->addChannel("/detection/annotations", "os.logger.ImageAnnotations", "protobuf");
 
 #else
 
