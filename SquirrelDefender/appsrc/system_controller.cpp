@@ -140,7 +140,7 @@ int system_state_machine(void)
             break;
         // Standby means we are ready to takeoff
         case SystemState::STANDBY:
-            if ((g_mav_gps_alt_rel > 1000 || g_mav_rng_dist_m > 100) && g_mav_state == MAV_STATE_ACTIVE)
+            if ((g_mav_gps_alt_rel > 1000 || g_mav_rngfndr_dist_m > 100) && g_mav_state == MAV_STATE_ACTIVE)
             {
                 g_system_state = SystemState::IN_FLIGHT_GOOD;
             }

@@ -58,7 +58,7 @@ option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
 option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" OFF)
-option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" OFF)
+option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" ON)
 option(ENABLE_SECRET_SQUIRREL "Compile custom code with the open source Operation Squirrel" ON)
 
 # Option to use environment variables for library paths

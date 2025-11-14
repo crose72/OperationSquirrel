@@ -151,7 +151,7 @@ void test_flight(void)
     const float dt = 0.05f; // 20 Hz loop
     static float throttle = 0.0f;
 
-    float current_alt = g_mav_rng_dist_m * 0.01f;
+    float current_alt = g_mav_rngfndr_dist_m * 0.01f;
     float alt_error = takeoff_target_alt - current_alt;
     float vz_up = -g_mav_veh_vel_ned_z; // +up
 

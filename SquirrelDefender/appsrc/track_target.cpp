@@ -153,10 +153,10 @@ void filter_detections(void)
     target_candidate_imgs.clear();
     target_candidate_bboxs.clear();
 
-    target_candidate_imgs.reserve(g_det_yolo_count);
-    target_candidate_bboxs.reserve(g_det_yolo_count);
+    target_candidate_imgs.reserve(g_det_count);
+    target_candidate_bboxs.reserve(g_det_count);
 
-    for (int n = 0; n < g_det_yolo_count; ++n)
+    for (int n = 0; n < g_det_count; ++n)
     {
         /* A detected object, classified as a person with some confidence level */
         if (g_det_yolo_list[n].label == target_class &&
@@ -271,7 +271,7 @@ void select_target(void)
 
 #elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-    for (int n = 0; n < g_det_yolo_count; ++n)
+    for (int n = 0; n < g_det_count; ++n)
     {
         /* A tracked object, classified as a person with some confidence level */
         if (g_det_yolo_list[n].label == target_class &&
@@ -286,7 +286,7 @@ void select_target(void)
 
 #elif defined(BLD_WIN)
 
-    for (int n = 0; n < g_det_yolo_count; ++n)
+    for (int n = 0; n < g_det_count; ++n)
     {
         /* A tracked object, classified as a person with some confidence level */
         if (g_det_yolo_list[n].ClassID == target_class &&

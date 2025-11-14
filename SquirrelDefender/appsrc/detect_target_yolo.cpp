@@ -32,13 +32,13 @@
 
 YOLOv8 *yolov8_detector;
 std::vector<Object> g_det_yolo_list;
-int g_det_yolo_count;
+int g_det_count;
 
 #elif defined(BLD_WIN)
 
 cv::dnn::Net g_det_nv_net;
 std::vector<YoloNet::detection> g_det_yolo_list;
-int g_det_yolo_count;
+int g_det_count;
 
 #else
 
@@ -67,7 +67,7 @@ void detect_targets(void)
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
         g_det_yolo_list = yolov8_detector->detectObjects(g_cam0_img_cpu);
-        g_det_yolo_count = g_det_yolo_list.size();
+        g_det_count = g_det_yolo_list.size();
 
         if (g_app_use_video_playback)
         {
@@ -77,7 +77,7 @@ void detect_targets(void)
 #elif defined(BLD_WIN)
 
         YoloNet::detect(g_cam0_img_cpu, g_det_nv_net, g_det_yolo_list);
-        g_det_yolo_count = g_det_yolo_list.size();
+        g_det_count = g_det_yolo_list.size();
 
 #else
 

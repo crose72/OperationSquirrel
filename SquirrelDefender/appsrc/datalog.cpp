@@ -312,8 +312,8 @@ void DataLogger::log_data(void)
         logTime(m.mutable_t(), g_app_epoch_ns);
         m.set_frame_id(g_cam0_frame_id);
 
-        m.set_current_distance(g_mav_rng_dist_m);
-        m.set_signal_quality(g_mav_rng_quality);
+        m.set_current_distance(g_mav_rngfndr_dist_m);
+        m.set_signal_quality(g_mav_rngfndr_quality);
 
         publish("/mav/rangefinder", m, g_app_epoch_ns);
     }
@@ -324,8 +324,8 @@ void DataLogger::log_data(void)
         logTime(m.mutable_t(), g_app_epoch_ns);
         m.set_frame_id(g_cam0_frame_id);
 
-        m.set_flow_comp_m_x(g_mav_flow_vel_m_x);
-        m.set_flow_comp_m_y(g_mav_flow_vel_m_y);
+        m.set_flow_comp_m_x(g_mav_flow_vel_x);
+        m.set_flow_comp_m_y(g_mav_flow_vel_y);
 
         m.set_flow_x(g_mav_flow_px_x);
         m.set_flow_y(g_mav_flow_px_y);
@@ -389,11 +389,11 @@ void DataLogger::log_data(void)
         m.set_bbox_center_x_px(g_tgt_cntr_offset_x_filt);
         m.set_bbox_center_y_px(g_tgt_cntr_offset_y_filt);
 
-        m.set_delta_angle_deg(g_cam_delta_angle_deg);
+        m.set_delta_angle_deg(g_cam0_delta_angle_deg);
         m.set_camera_tilt_deg(g_cam_tilt_deg);
 
-        m.set_delta_distance_x_m(g_dist_delta_x);
-        m.set_delta_distance_z_m(g_dist_delta_z);
+        m.set_delta_distance_x_m(g_tgt_pos_x_delta);
+        m.set_delta_distance_z_m(g_tgt_pos_z_delta);
 
         m.set_target_pos_x_est(g_tgt_pos_x_est);
         m.set_target_pos_y_est(g_tgt_pos_y_est);
@@ -493,8 +493,8 @@ void write_headers(void)
                               "g_tgt_right_px",
                               "g_tgt_top_px",
                               "g_tgt_bottom_px",
-                              "g_tgt_height_meas",
-                              "g_tgt_width_meas",
+                              "g_tgt_los_dist_from_pix_height",
+                              "g_tgt_los_dist_from_pix_width",
                               "g_tgt_pos_x_meas",
                               "g_tgt_pos_y_meas",
                               "g_tgt_pos_z_meas",
@@ -505,13 +505,13 @@ void write_headers(void)
                               "g_tgt_acc_x_est",
                               "g_tgt_acc_y_est",
                               "g_tgt_meas_valid",
-                              "g_tgt_dist_meas",
+                              "g_tgt_los_dist_meas",
                               "g_pos_err_x",
                               "g_pos_err_y",
-                              "g_cam_delta_angle_deg",
+                              "g_cam0_delta_angle_deg",
                               "g_cam_tilt_deg",
-                              "g_dist_delta_x",
-                              "g_dist_delta_z",
+                              "g_tgt_pos_x_delta",
+                              "g_tgt_pos_z_delta",
                               "g_ctrl_vel_x_cmd",
                               "g_ctrl_vel_y_cmd",
                               "g_ctrl_vel_z_cmd",
@@ -538,10 +538,10 @@ void write_headers(void)
                               "g_mav_imu_gyro_x",
                               "g_mav_imu_gyro_y",
                               "g_mav_imu_gyro_z",
-                              "g_mav_rng_dist_m",
-                              "g_mav_rng_quality",
-                              "g_mav_flow_vel_m_x",
-                              "g_mav_flow_vel_m_y",
+                              "g_mav_rngfndr_dist_m",
+                              "g_mav_rngfndr_quality",
+                              "g_mav_flow_vel_x",
+                              "g_mav_flow_vel_y",
                               "g_mav_flow_px_x",
                               "g_mav_flow_px_y",
                               "g_mav_flow_quality",
@@ -601,8 +601,8 @@ void log_data(void)
                                std::to_string(g_tgt_right_px),
                                std::to_string(g_tgt_top_px),
                                std::to_string(g_tgt_bottom_px),
-                               std::to_string(g_tgt_height_meas),
-                               std::to_string(g_tgt_width_meas),
+                               std::to_string(g_tgt_los_dist_from_pix_height),
+                               std::to_string(g_tgt_los_dist_from_pix_width),
                                std::to_string(g_tgt_pos_x_meas),
                                std::to_string(g_tgt_pos_y_meas),
                                std::to_string(g_tgt_pos_z_meas),
@@ -613,13 +613,13 @@ void log_data(void)
                                std::to_string(g_tgt_acc_x_est),
                                std::to_string(g_tgt_acc_y_est),
                                std::to_string(g_tgt_meas_valid),
-                               std::to_string(g_tgt_dist_meas),
+                               std::to_string(g_tgt_los_dist_meas),
                                std::to_string(g_pos_err_x),
                                std::to_string(g_pos_err_y),
-                               std::to_string(g_cam_delta_angle_deg),
+                               std::to_string(g_cam0_delta_angle_deg),
                                std::to_string(g_cam_tilt_deg),
-                               std::to_string(g_dist_delta_x),
-                               std::to_string(g_dist_delta_z),
+                               std::to_string(g_tgt_pos_x_delta),
+                               std::to_string(g_tgt_pos_z_delta),
                                std::to_string(g_ctrl_vel_x_cmd),
                                std::to_string(g_ctrl_vel_y_cmd),
                                std::to_string(g_ctrl_vel_z_cmd),
@@ -646,10 +646,10 @@ void log_data(void)
                                std::to_string(g_mav_imu_gyro_x),
                                std::to_string(g_mav_imu_gyro_y),
                                std::to_string(g_mav_imu_gyro_z),
-                               std::to_string(g_mav_rng_dist_m),
-                               std::to_string(g_mav_rng_quality),
-                               std::to_string(g_mav_flow_vel_m_x),
-                               std::to_string(g_mav_flow_vel_m_y),
+                               std::to_string(g_mav_rngfndr_dist_m),
+                               std::to_string(g_mav_rngfndr_quality),
+                               std::to_string(g_mav_flow_vel_x),
+                               std::to_string(g_mav_flow_vel_y),
                                std::to_string(g_mav_flow_px_x),
                                std::to_string(g_mav_flow_px_y),
                                std::to_string(g_mav_flow_quality),

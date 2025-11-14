@@ -74,10 +74,10 @@ TestHarness g_h;
     X(g_tgt_pos_y_meas)                                                    \
     X(g_tgt_pos_z_meas)                                                    \
     X(g_tgt_dist_meas)                                                     \
-    X(g_cam_delta_angle_deg)                                               \
+    X(g_cam0_delta_angle_deg)                                              \
     X(g_cam_tilt_deg)                                                      \
-    X(g_dist_delta_x)                                                      \
-    X(g_dist_delta_z)                                                      \
+    X(g_tgt_pos_x_delta)                                                   \
+    X(g_tgt_pos_z_delta)                                                   \
     X(g_cam_comp_angle_deg)                                                \
     X(g_tgt_too_close)                                                     \
     X(g_cam_fov_height)                                                    \
