@@ -24,7 +24,7 @@ import sys
 
 # File extensions to process
 EXTS = {
-    ".h", ".cpp", ".csv"
+    ".csv"
 }
 
 # --------------------------------------------------------------------------
@@ -53,14 +53,12 @@ RENAME_MAP = {
     "g_z_target":                   "g_tgt_pos_z_meas",
     "g_d_target":                   "g_tgt_dist_meas",
 
-    "g_x_error":                    "g_pos_err_x",
-    "g_y_error":                    "g_pos_err_y",
-
-    "g_delta_angle":                "g_cam_delta_angle_deg",
+    # Mismatch-fixed → use (A) = real header names
+    "g_delta_angle":                "g_cam0_delta_angle_deg",
     "g_camera_tilt_angle":          "g_cam_tilt_deg",
-    "g_delta_d_x":                  "g_dist_delta_x",
-    "g_delta_d_z":                  "g_dist_delta_z",
-    "g_camera_comp_angle":          "g_cam_comp_angle_deg",
+    "g_delta_d_x":                  "g_tgt_pos_x_delta",
+    "g_delta_d_z":                  "g_tgt_pos_z_delta",
+    "g_camera_comp_angle":          "g_cam0_comp_angle_deg",
 
     "g_x_target_ekf":               "g_tgt_pos_x_est",
     "g_y_target_ekf":               "g_tgt_pos_y_est",
@@ -70,17 +68,28 @@ RENAME_MAP = {
     "g_ay_target_ekf":              "g_tgt_acc_y_est",
 
     "g_target_data_useful":         "g_tgt_meas_valid",
-    "g_fov_height":                 "g_cam_fov_height",
-    "g_meter_per_pix":              "g_m_per_pix",
+
+    # Mismatch-fixed
+    "g_fov_height":                 "g_cam0_fov_height",
+    "g_meter_per_pix":              "g_cam0_m_per_pix",
+
     "g_target_cntr_offset_x_m":     "g_tgt_cntr_offset_x_m",
     "g_target_cntr_offset_x_mov_avg": "g_tgt_cntr_offset_x_filt",
     "g_target_cntr_offset_y_mov_avg": "g_tgt_cntr_offset_y_filt",
-    "g_line_of_sight":              "g_los_m",
+
+    # Mismatch-fixed
+    "g_line_of_sight":              "g_cam0_los_m",
+
     "g_target_is_lost":             "g_tgt_lost",
     "g_target_lost_dbc_sec":        "g_tgt_lost_dbc_sec",
 
     # -------------------- PATH PLANNER / CONTROL -----------------
     "g_target_too_close":           "g_tgt_too_close",
+
+    # These were kept because they match your new headers:
+    "g_x_error":                    "g_pos_err_x",
+    "g_y_error":                    "g_pos_err_y",
+
     "g_vx_adjust":                  "g_ctrl_vel_x_cmd",
     "g_vy_adjust":                  "g_ctrl_vel_y_cmd",
     "g_vz_adjust":                  "g_ctrl_vel_z_cmd",
@@ -93,13 +102,13 @@ RENAME_MAP = {
     "g_x_error_dot":                "g_pos_err_x_dot",
 
     # -------------------- SCHEDULER / SYSTEM / TIME --------------
-    "g_controller_initialiazed":    "g_ctrl_initialized",
+    "g_controller_initialiazed":    "g_system_init",
     "g_manual_override_land":       "g_ctrl_land_override",
 
     "g_app_elapsed_time":           "g_app_time_s",
     "g_app_elapsed_time_ns":        "g_app_time_ns",
-    "g_dt":                         "g_ctrl_dt",
-    "g_first_loop_after_start":     "g_ctrl_first_loop",
+    "g_dt":                         "g_app_dt",
+    "g_first_loop_after_start":     "g_app_first_loop",
     "g_epoch_ns":                   "g_app_epoch_ns",
 
     # -------------------- TRACK TARGET ---------------------------
@@ -118,8 +127,8 @@ RENAME_MAP = {
     "g_target_right":               "g_tgt_right_px",
     "g_target_top":                 "g_tgt_top_px",
     "g_target_bottom":              "g_tgt_bottom_px",
-    "g_target_center_x":            "g_tgt_center_x_px",
-    "g_target_center_y":            "g_tgt_center_y_px",
+    "g_target_center_x":            "g_tgt_center_x_pix",
+    "g_target_center_y":            "g_tgt_center_y_pix",
 
     "g_detection_class":            "g_tgt_class_id",
     "g_target_detection_conf":      "g_tgt_conf",
@@ -131,15 +140,20 @@ RENAME_MAP = {
     "g_cam0_valid_image_rcvd":      "g_cam0_img_valid",
     "g_cam0_image":                 "g_cam0_img_cpu",
     "g_cam0_image_gpu":             "g_cam0_img_gpu",
+
     "g_cam0_video_width":           "g_cam0_img_width_px",
     "g_cam0_video_height":          "g_cam0_img_height_px",
+
     "g_camera_fov":                 "g_cam0_fov_deg",
+
     "g_cam0_video_width_center":    "g_cam0_img_width_cx",
     "g_cam0_video_height_center":   "g_cam0_img_height_cy",
+
     "g_cam0_fov_rad":               "g_cam0_fov_rad",
     "g_cam0_fov_rad_half":          "g_cam0_fov_rad_half",
     "g_cam0_tilt_down_angle":       "g_cam0_tilt_deg",
     "g_cam0_tilt_down_angle_rad":   "g_cam0_tilt_rad",
+
     "g_end_of_video":               "g_video_end",
     "g_cam0_frame_id":              "g_cam0_frame_id",
 
@@ -233,21 +247,21 @@ RENAME_MAP = {
     "g_mav_veh_repr_offset_q":     "g_mav_att_repr_offset_q",
 
     # --- Rangefinder ---
-    "g_mav_veh_rngfdr_min_distance":       "g_mav_rng_min_m",
-    "g_mav_veh_rngfdr_max_distance":       "g_mav_rng_max_m",
-    "g_mav_veh_rngfdr_current_distance":   "g_mav_rng_dist_m",
-    "g_mav_veh_rngfdr_type":               "g_mav_rng_type",
-    "g_mav_veh_rngfdr_id":                 "g_mav_rng_id",
-    "g_mav_veh_rngfdr_orientation":        "g_mav_rng_orient",
-    "g_mav_veh_rngfdr_covariance":         "g_mav_rng_cov",
-    "g_mav_veh_rngfdr_horizontal_fov":     "g_mav_rng_fov_horiz_deg",
-    "g_mav_veh_rngfdr_vertical_fov":       "g_mav_rng_fov_vert_deg",
-    "g_mav_veh_rngfdr_quaternion":         "g_mav_rng_quat",
-    "g_mav_veh_rngfdr_signal_quality":     "g_mav_rng_quality",
+    "g_mav_veh_rngfdr_min_distance":       "g_mav_rngfndr_min_cm",
+    "g_mav_veh_rngfdr_max_distance":       "g_mav_rngfndr_max_cm",
+    "g_mav_veh_rngfdr_current_distance":   "g_mav_rngfndr_dist_m",
+    "g_mav_veh_rngfdr_type":               "g_mav_rngfndr_type",
+    "g_mav_veh_rngfdr_id":                 "g_mav_rngfndr_id",
+    "g_mav_veh_rngfdr_orientation":        "g_mav_rngfndr_orient",
+    "g_mav_veh_rngfdr_covariance":         "g_mav_rngfndr_cov",
+    "g_mav_veh_rngfdr_horizontal_fov":     "g_mav_rngfndr_fov_horiz_deg",
+    "g_mav_veh_rngfdr_vertical_fov":       "g_mav_rngfndr_fov_vert_deg",
+    "g_mav_veh_rngfdr_quaternion":         "g_mav_rngfndr_quat",
+    "g_mav_veh_rngfdr_signal_quality":     "g_mav_rngfndr_quality",
 
     # --- Optical Flow ---
-    "g_mav_veh_flow_comp_m_x":   "g_mav_flow_vel_m_x",
-    "g_mav_veh_flow_comp_m_y":   "g_mav_flow_vel_m_y",
+    "g_mav_veh_flow_comp_m_x":   "g_mav_flow_vel_x",
+    "g_mav_veh_flow_comp_m_y":   "g_mav_flow_vel_y",
     "g_mav_veh_ground_distance": "g_mav_flow_ground_dist_m",
     "g_mav_veh_flow_x":          "g_mav_flow_px_x",
     "g_mav_veh_flow_y":          "g_mav_flow_px_y",
@@ -286,19 +300,12 @@ import sys
 # ALLOWLIST: only these paths will be scanned
 # --------------------------------------------------------------------------
 ALLOW_DIRS = [
-    "SquirrelDefender/apphdr",
-    "SquirrelDefender/appsrc",
-    "SquirrelDefender/libraries",
-    "SquirrelDefender/test_suite",
-    "SquirrelDefender/modules/SecretSquirrel/",
-    "scripts",
+    "scripts/mcap_data",
 ]
 
 # BLOCKLIST: explicitly exclude mavlink-related code
 EXCLUDE_DIRS = [
-    "SquirrelDefender/libraries/mav/mavlink",
-    "SquirrelDefender/test_suite/test_data/decision_to_throw",
-    "SquirrelDefender/test_suite/test_data/follow",
+    "SquirrelDefender/",
 ]
 
 # --------------------------------------------------------------------------
