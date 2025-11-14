@@ -8,5 +8,5 @@ message SystemStateMsg {
   uint32 frame_id  = 2;
   
   int32 system_state     = 10; // cast from your SystemState enum
-  float app_elapsed_time = 11; // g_app_elapsed_time (float)
+  float app_elapsed_time_sec = 11; // g_app_elapsed_time (float)
 }
