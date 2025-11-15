@@ -67,18 +67,18 @@ uint8_t g_mav_mode_base;      /*<  System mode bitmap.*/
 uint8_t g_mav_state;          /*<  System status flag.*/
 uint8_t g_mav_version;        /*<  MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version*/
 
-int32_t g_mav_gps_lat;          /*< [degE7] Latitude, expressed*/
-int32_t g_mav_gps_lon;          /*< [degE7] Longitude, expressed*/
-int32_t g_mav_gps_alt_msl;      /*< [mm] Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.*/
-int32_t g_mav_gps_alt_rel;      /*< [mm] Altitude above ground*/
-int16_t g_mav_gps_vel_x;        /*< [cm/s] Ground X Speed (Latitude, positive north)*/
-int16_t g_mav_gps_vel_y;        /*< [cm/s] Ground Y Speed (Longitude, positive east)*/
-int16_t g_mav_gps_vel_z;        /*< [cm/s] Ground Z Speed (Altitude, positive down)*/
-uint16_t g_mav_gps_heading_deg; /*< [cdeg] Vehicle heading (yaw angle), 0.0..359.99 degrees. If unknown, set to: UINT16_MAX*/
+int32_t g_mav_gps_lat;           /*< [degE7] Latitude, expressed*/
+int32_t g_mav_gps_lon;           /*< [degE7] Longitude, expressed*/
+int32_t g_mav_gps_alt_msl;       /*< [mm] Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.*/
+int32_t g_mav_gps_alt_rel;       /*< [mm] Altitude above ground*/
+int16_t g_mav_gps_vel_x;         /*< [cm/s] Ground X Speed (Latitude, positive north)*/
+int16_t g_mav_gps_vel_y;         /*< [cm/s] Ground Y Speed (Longitude, positive east)*/
+int16_t g_mav_gps_vel_z;         /*< [cm/s] Ground Z Speed (Altitude, positive down)*/
+uint16_t g_mav_gps_heading_cdeg; /*< [cdeg] Vehicle heading (yaw angle), 0.0..359.99 degrees. If unknown, set to: UINT16_MAX*/
 
-float g_mav_veh_roll_deg;   /*< [rad] Roll angle (-pi..+pi)*/
-float g_mav_veh_pitch_deg;  /*< [rad] Pitch angle (-pi..+pi)*/
-float g_mav_veh_yaw_deg;    /*< [rad] Yaw angle (-pi..+pi)*/
+float g_mav_veh_roll_rad;   /*< [rad] Roll angle (-pi..+pi)*/
+float g_mav_veh_pitch_rad;  /*< [rad] Pitch angle (-pi..+pi)*/
+float g_mav_veh_yaw_rad;    /*< [rad] Yaw angle (-pi..+pi)*/
 float g_mav_veh_roll_rate;  /*< [rad/s] Roll angular speed*/
 float g_mav_veh_pitch_rate; /*< [rad/s] Pitch angular speed*/
 float g_mav_veh_yaw_rate;   /*< [rad/s] Yaw angular speed*/
@@ -119,8 +119,8 @@ uint8_t g_mav_rngfndr_type;        /*<  Type of distance sensor.*/
 uint8_t g_mav_rngfndr_id;          /*<  Onboard ID of the sensor*/
 uint8_t g_mav_rngfndr_orient;      /*<  Direction the sensor faces. downward-facing: ROTATION_PITCH_270, upward-facing: ROTATION_PITCH_90, backward-facing: ROTATION_PITCH_180, forward-facing: ROTATION_NONE, left-facing: ROTATION_YAW_90, right-facing: ROTATION_YAW_270*/
 uint8_t g_mav_rngfndr_cov;         /*< [cm^2] Measurement variance. Max standard deviation is 6cm. UINT8_MAX if unknown.*/
-float g_mav_rngfndr_fov_horiz_deg; /*< [rad] Horizontal Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.*/
-float g_mav_rngfndr_fov_vert_deg;  /*< [rad] Vertical Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.*/
+float g_mav_rngfndr_fov_horiz_rad; /*< [rad] Horizontal Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.*/
+float g_mav_rngfndr_fov_vert_rad;  /*< [rad] Vertical Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.*/
 float g_mav_rngfndr_quat[4];       /*<  Quaternion of the sensor orientation in vehicle body frame (w, x, y, z order, zero-rotation is 1, 0, 0, 0). Zero-rotation is along the vehicle body x-axis. This field is required if the orientation is set to MAV_SENSOR_ROTATION_CUSTOM. Set it to 0 if invalid."*/
 uint8_t g_mav_rngfndr_quality;     /*< [%] Signal quality of the sensor. Specific to each sensor type, representing the relation of the signal strength with the target reflectivity, distance, size or aspect, but normalised as a percentage. 0 = unknown/unset signal quality, 1 = invalid signal, 100 = perfect signal.*/
 
@@ -245,7 +245,7 @@ void proc_mav_gps_int_msg(const mavlink_message_t *msg)
     g_mav_gps_vel_x = global_pos_int.vx;
     g_mav_gps_vel_y = global_pos_int.vy;
     g_mav_gps_vel_z = global_pos_int.vz;
-    g_mav_gps_heading_deg = global_pos_int.hdg;
+    g_mav_gps_heading_cdeg = global_pos_int.hdg;
 
 #ifdef DEBUG_BUILD
 
@@ -486,9 +486,9 @@ void proc_mav_attitude_msg(const mavlink_message_t *msg)
     mavlink_attitude_t attitude;
     mavlink_msg_attitude_decode(msg, &attitude);
 
-    g_mav_veh_roll_deg = attitude.roll;
-    g_mav_veh_pitch_deg = attitude.pitch;
-    g_mav_veh_yaw_deg = attitude.yaw;
+    g_mav_veh_roll_rad = attitude.roll;
+    g_mav_veh_pitch_rad = attitude.pitch;
+    g_mav_veh_yaw_rad = attitude.yaw;
     g_mav_veh_roll_rate = attitude.rollspeed;
     g_mav_veh_pitch_rate = attitude.pitchspeed;
     g_mav_veh_yaw_rate = attitude.yawspeed;
@@ -627,8 +627,8 @@ void proc_mav_distance_sensor_msg(const mavlink_message_t *msg)
     g_mav_rngfndr_id = distance_sensor.id;
     g_mav_rngfndr_orient = distance_sensor.orientation;
     g_mav_rngfndr_cov = distance_sensor.covariance;
-    g_mav_rngfndr_fov_horiz_deg = distance_sensor.horizontal_fov;
-    g_mav_rngfndr_fov_vert_deg = distance_sensor.vertical_fov;
+    g_mav_rngfndr_fov_horiz_rad = distance_sensor.horizontal_fov;
+    g_mav_rngfndr_fov_vert_rad = distance_sensor.vertical_fov;
     g_mav_rngfndr_quat[4] = distance_sensor.quaternion[4];
     g_mav_rngfndr_quality = distance_sensor.signal_quality;
 
@@ -819,11 +819,11 @@ bool MavMsg::init(void)
     g_mav_gps_vel_x = 0;
     g_mav_gps_vel_y = 0;
     g_mav_gps_vel_z = 0;
-    g_mav_gps_heading_deg = 0;
+    g_mav_gps_heading_cdeg = 0;
 
-    g_mav_veh_roll_deg = 0.0;
-    g_mav_veh_pitch_deg = 0.0;
-    g_mav_veh_yaw_deg = 0.0;
+    g_mav_veh_roll_rad = 0.0;
+    g_mav_veh_pitch_rad = 0.0;
+    g_mav_veh_yaw_rad = 0.0;
     g_mav_veh_roll_rate = 0.0;
     g_mav_veh_pitch_rate = 0.0;
     g_mav_veh_yaw_rate = 0.0;
@@ -867,8 +867,8 @@ bool MavMsg::init(void)
     g_mav_rngfndr_id = 0;
     g_mav_rngfndr_orient = 0;
     g_mav_rngfndr_cov = 0;
-    g_mav_rngfndr_fov_horiz_deg = 0.0;
-    g_mav_rngfndr_fov_vert_deg = 0.0;
+    g_mav_rngfndr_fov_horiz_rad = 0.0;
+    g_mav_rngfndr_fov_vert_rad = 0.0;
     g_mav_rngfndr_quat[0] = 0.0;
     g_mav_rngfndr_quat[1] = 0.0;
     g_mav_rngfndr_quat[2] = 0.0;

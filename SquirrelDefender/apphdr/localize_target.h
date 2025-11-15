@@ -18,17 +18,17 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern float g_tgt_height_meas;
-extern float g_tgt_width_meas;
+extern float g_tgt_los_dist_from_pix_height;
+extern float g_tgt_los_dist_from_pix_width;
 extern float g_tgt_pos_x_meas;
 extern float g_tgt_pos_y_meas;
 extern float g_tgt_pos_z_meas;
-extern float g_tgt_dist_meas;
-extern float g_cam0_delta_angle_deg;
-extern float g_cam_tilt_deg;
+extern float g_tgt_los_dist_meas;
+extern float g_cam0_delta_angle_rad;
+extern float g_cam0_angle_rad;
 extern float g_tgt_pos_x_delta;
 extern float g_tgt_pos_z_delta;
-extern float g_cam0_comp_angle_deg;
+extern float g_cam0_comp_angle_rad;
 extern float g_tgt_pos_x_est;
 extern float g_tgt_pos_y_est;
 extern float g_tgt_vel_x_est;
@@ -39,8 +39,8 @@ extern bool g_tgt_meas_valid;
 extern float g_cam0_fov_height;
 extern float g_cam0_m_per_pix;
 extern float g_tgt_cntr_offset_x_m;
-extern float g_tgt_cntr_offset_x_filt;
-extern float g_tgt_cntr_offset_y_filt;
+extern float g_tgt_cntr_offset_x_pix_filt;
+extern float g_tgt_cntr_offset_y_pix_filt;
 extern float g_cam0_los_m;
 extern bool g_tgt_lost;
 extern float g_tgt_lost_dbc_sec;

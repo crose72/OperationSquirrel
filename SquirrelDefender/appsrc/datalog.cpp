@@ -258,11 +258,11 @@ void DataLogger::log_data(void)
         m.set_gps_vx(g_mav_gps_vel_x);
         m.set_gps_vy(g_mav_gps_vel_y);
         m.set_gps_vz(g_mav_gps_vel_z);
-        m.set_gps_hdg(g_mav_gps_heading_deg);
+        m.set_gps_hdg(g_mav_gps_heading_cdeg);
 
-        m.set_roll(g_mav_veh_roll_deg);
-        m.set_pitch(g_mav_veh_pitch_deg);
-        m.set_yaw(g_mav_veh_yaw_deg);
+        m.set_roll(g_mav_veh_roll_rad);
+        m.set_pitch(g_mav_veh_pitch_rad);
+        m.set_yaw(g_mav_veh_yaw_rad);
         m.set_rollspeed(g_mav_veh_roll_rate);
         m.set_pitchspeed(g_mav_veh_pitch_rate);
         m.set_yawspeed(g_mav_veh_yaw_rate);
@@ -373,8 +373,8 @@ void DataLogger::log_data(void)
         m.set_class_id(g_tgt_class_id);
         m.set_confidence(g_tgt_conf);
 
-        m.set_bbox_offset_x_px(g_tgt_cntr_offset_y_pix);
-        m.set_bbox_offset_y_px(g_tgt_cntr_offset_x_pix);
+        m.set_bbox_offset_x_px(g_tgt_cntr_offset_x_pix);
+        m.set_bbox_offset_y_px(g_tgt_cntr_offset_y_pix);
 
         m.set_bbox_height_px(g_tgt_height_pix);
         m.set_bbox_width_px(g_tgt_width_pix);
@@ -385,11 +385,11 @@ void DataLogger::log_data(void)
         m.set_bbox_top_px(g_tgt_top_px);
         m.set_bbox_bottom_px(g_tgt_bottom_px);
 
-        m.set_bbox_center_x_px(g_tgt_cntr_offset_x_filt);
-        m.set_bbox_center_y_px(g_tgt_cntr_offset_y_filt);
+        m.set_bbox_center_x_px(g_tgt_cntr_offset_x_pix_filt);
+        m.set_bbox_center_y_px(g_tgt_cntr_offset_y_pix_filt);
 
-        m.set_delta_angle_deg(g_cam0_delta_angle_deg);
-        m.set_camera_tilt_deg(g_cam_tilt_deg);
+        m.set_delta_angle_deg((g_cam0_delta_angle_rad * (float)180.0 / M_PI));
+        m.set_camera_tilt_deg((g_cam0_angle_rad * (float)180.0 / M_PI));
 
         m.set_delta_distance_x_m(g_tgt_pos_x_delta);
         m.set_delta_distance_z_m(g_tgt_pos_z_delta);
@@ -483,8 +483,8 @@ void write_headers(void)
                               "g_tgt_conf",
                               "g_tgt_cntr_offset_y_pix",
                               "g_tgt_cntr_offset_x_pix",
-                              "g_tgt_cntr_offset_x_filt,"
-                              "g_tgt_cntr_offset_y_filt,"
+                              "g_tgt_cntr_offset_x_pix_filt,"
+                              "g_tgt_cntr_offset_y_pix_filt,"
                               "g_tgt_height_pix",
                               "g_tgt_width_pix",
                               "g_tgt_aspect_ratio",
@@ -507,8 +507,8 @@ void write_headers(void)
                               "g_tgt_los_dist_meas",
                               "g_pos_err_x",
                               "g_pos_err_y",
-                              "g_cam0_delta_angle_deg",
-                              "g_cam_tilt_deg",
+                              "g_cam0_delta_angle_rad",
+                              "g_cam0_angle_rad",
                               "g_tgt_pos_x_delta",
                               "g_tgt_pos_z_delta",
                               "g_ctrl_vel_x_cmd",
@@ -524,10 +524,10 @@ void write_headers(void)
                               "g_mav_gps_vel_x",
                               "g_mav_gps_vel_y",
                               "g_mav_gps_vel_z",
-                              "g_mav_gps_heading_deg",
-                              "g_mav_veh_roll_deg",
-                              "g_mav_veh_pitch_deg",
-                              "g_mav_veh_yaw_deg",
+                              "g_mav_gps_heading_cdeg",
+                              "g_mav_veh_roll_rad",
+                              "g_mav_veh_pitch_rad",
+                              "g_mav_veh_yaw_rad",
                               "g_mav_veh_roll_rate",
                               "g_mav_veh_pitch_rate",
                               "g_mav_veh_yaw_rate",
@@ -591,8 +591,8 @@ void log_data(void)
                                std::to_string(g_tgt_conf),
                                std::to_string(g_tgt_cntr_offset_y_pix),
                                std::to_string(g_tgt_cntr_offset_x_pix),
-                               std::to_string(g_tgt_cntr_offset_x_filt),
-                               std::to_string(g_tgt_cntr_offset_y_filt),
+                               std::to_string(g_tgt_cntr_offset_x_pix_filt),
+                               std::to_string(g_tgt_cntr_offset_y_pix_filt),
                                std::to_string(g_tgt_height_pix),
                                std::to_string(g_tgt_width_pix),
                                std::to_string(g_tgt_aspect_ratio),
@@ -615,8 +615,8 @@ void log_data(void)
                                std::to_string(g_tgt_los_dist_meas),
                                std::to_string(g_pos_err_x),
                                std::to_string(g_pos_err_y),
-                               std::to_string(g_cam0_delta_angle_deg),
-                               std::to_string(g_cam_tilt_deg),
+                               std::to_string(g_cam0_delta_angle_rad),
+                               std::to_string(g_cam0_angle_rad),
                                std::to_string(g_tgt_pos_x_delta),
                                std::to_string(g_tgt_pos_z_delta),
                                std::to_string(g_ctrl_vel_x_cmd),
@@ -632,10 +632,10 @@ void log_data(void)
                                std::to_string(g_mav_gps_vel_x),
                                std::to_string(g_mav_gps_vel_y),
                                std::to_string(g_mav_gps_vel_z),
-                               std::to_string(g_mav_gps_heading_deg),
-                               std::to_string(g_mav_veh_roll_deg),
-                               std::to_string(g_mav_veh_pitch_deg),
-                               std::to_string(g_mav_veh_yaw_deg),
+                               std::to_string(g_mav_gps_heading_cdeg),
+                               std::to_string(g_mav_veh_roll_rad),
+                               std::to_string(g_mav_veh_pitch_rad),
+                               std::to_string(g_mav_veh_yaw_rad),
                                std::to_string(g_mav_veh_roll_rate),
                                std::to_string(g_mav_veh_pitch_rate),
                                std::to_string(g_mav_veh_yaw_rate),
