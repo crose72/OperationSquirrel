@@ -57,31 +57,31 @@ void dtrmn_program_stop_cond(void);
  ********************************************************************************/
 void dtrmn_program_stop_cond(void)
 {
-    if (g_mav_veh_custom_mode == (uint32_t)9 && g_mav_veh_custom_mode_prv != (uint32_t)9)
+    if (g_mav_mode_custom == (uint32_t)9 && g_mav_veh_custom_mode_prv != (uint32_t)9)
     {
-        g_manual_override_land = true;
+        g_ctrl_land_override = true;
     }
     else
     {
-        g_manual_override_land = false;
+        g_ctrl_land_override = false;
     }
 
-    if (g_system_state == SystemState::IN_FLIGHT_GOOD && g_manual_override_land)
+    if (g_system_state == SystemState::IN_FLIGHT_GOOD && g_ctrl_land_override)
     {
-        g_stop_program = true;
+        g_app_stop = true;
     }
 
-    if (!g_cam0_valid_image_rcvd && g_use_video_playback && g_system_state == SystemState::IN_FLIGHT_GOOD)
+    if (!g_cam0_img_valid && g_app_use_video_playback && g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
-        g_stop_program = true;
+        g_app_stop = true;
     }
 
-    if (g_end_of_video)
+    if (g_video_end)
     {
-        g_stop_program = true;
+        g_app_stop = true;
     }
 
-    g_mav_veh_custom_mode_prv = g_mav_veh_custom_mode;
+    g_mav_veh_custom_mode_prv = g_mav_mode_custom;
 }
 
 /********************************************************************************
@@ -91,22 +91,22 @@ void dtrmn_program_stop_cond(void)
 int system_state_machine(void)
 {
     // Initialize system status on startup
-    if (g_first_loop_after_start)
+    if (g_app_first_loop)
     {
         g_system_state = SystemState::DEFAULT;
     }
     else
     {
-        bool mav_type_is_quad = (g_mav_veh_type == MAV_TYPE_QUADROTOR && g_mav_veh_autopilot_type == MAV_AUTOPILOT_ARDUPILOTMEGA);
+        bool mav_type_is_quad = (g_mav_type == MAV_TYPE_QUADROTOR && g_mav_autopilot_type == MAV_AUTOPILOT_ARDUPILOTMEGA);
         bool prearm_checks = false;
 
 #ifdef ENABLE_CV
 
-        prearm_checks = ((g_mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && g_cam0_valid_image_rcvd);
+        prearm_checks = ((g_mav_sys_sensors_present & MAV_SYS_STATUS_PREARM_CHECK) != 0 && g_cam0_img_valid);
 
 #else
 
-        prearm_checks = ((g_mav_veh_sys_stat_onbrd_cntrl_snsrs_present & MAV_SYS_STATUS_PREARM_CHECK) != 0);
+        prearm_checks = ((g_mav_sys_sensors_present & MAV_SYS_STATUS_PREARM_CHECK) != 0);
 
 #endif // ENABLE_CV
 
@@ -115,7 +115,7 @@ int system_state_machine(void)
         {
         // Default state is the first state, nothing is initialialized, no systems are active
         case SystemState::DEFAULT:
-            if (g_controller_initialiazed)
+            if (g_system_init)
             {
                 g_system_state = SystemState::INIT;
             }
@@ -129,18 +129,18 @@ int system_state_machine(void)
             break;
         // Pre arm good means that the data is from a drone and pre arm checks are good
         case SystemState::PRE_ARM_GOOD:
-            if (mav_type_is_quad && g_mav_veh_state == MAV_STATE_STANDBY)
+            if (mav_type_is_quad && g_mav_state == MAV_STATE_STANDBY)
             {
                 g_system_state = SystemState::STANDBY;
             }
-            else if (g_mav_veh_rel_alt > 1000 && mav_type_is_quad && g_mav_veh_state == MAV_STATE_ACTIVE)
+            else if (g_mav_gps_alt_rel > 1000 && mav_type_is_quad && g_mav_state == MAV_STATE_ACTIVE)
             {
                 g_system_state = SystemState::IN_FLIGHT_GOOD;
             }
             break;
         // Standby means we are ready to takeoff
         case SystemState::STANDBY:
-            if ((g_mav_veh_rel_alt > 1000 || g_mav_veh_rngfdr_current_distance > 100) && g_mav_veh_state == MAV_STATE_ACTIVE)
+            if ((g_mav_gps_alt_rel > 1000 || g_mav_rngfndr_dist_m > 100) && g_mav_state == MAV_STATE_ACTIVE)
             {
                 g_system_state = SystemState::IN_FLIGHT_GOOD;
             }
@@ -196,7 +196,7 @@ SystemController::~SystemController(void) {}
  ********************************************************************************/
 bool SystemController::init(void)
 {
-    g_controller_initialiazed = false;
+    g_system_init = false;
     g_mav_veh_custom_mode_prv = 0;
 
 #ifdef BLD_JETSON_B01

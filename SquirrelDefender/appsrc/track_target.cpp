@@ -52,24 +52,22 @@ bool initialized_tracker;
 float target_detection_thresh;
 float target_class;
 bool target_valid_prv;
-bool g_target_valid;
-int g_target_detection_id;
-int g_target_track_id;
-float g_target_cntr_offset_x;
-float g_target_cntr_offset_y;
-float g_target_center_y;
-float g_target_center_x;
-float g_target_height;
-float g_target_width;
-float g_target_aspect;
-float g_target_left;
-float g_target_right;
-float g_target_top;
-float g_target_bottom;
-float g_detection_class;
-float g_target_detection_conf;
-float g_target_cntr_offset_x_filt;
-float g_target_cntr_offset_y_filt;
+bool g_tgt_valid;
+int g_tgt_detect_id;
+int g_tgt_track_id;
+float g_tgt_cntr_offset_y_pix;
+float g_tgt_cntr_offset_x_pix;
+float g_tgt_center_x_px;
+float g_tgt_center_y_px;
+float g_tgt_height_pix;
+float g_tgt_width_pix;
+float g_tgt_aspect_ratio;
+float g_tgt_left_px;
+float g_tgt_right_px;
+float g_tgt_top_px;
+float g_tgt_bottom_px;
+float g_tgt_class_id;
+float g_tgt_conf;
 float target_cntr_offset_x_prv;
 float target_cntr_offset_y_prv;
 cv::Rect target_bounding_box;
@@ -155,17 +153,17 @@ void filter_detections(void)
     target_candidate_imgs.clear();
     target_candidate_bboxs.clear();
 
-    target_candidate_imgs.reserve(g_yolo_detection_count);
-    target_candidate_bboxs.reserve(g_yolo_detection_count);
+    target_candidate_imgs.reserve(g_det_count);
+    target_candidate_bboxs.reserve(g_det_count);
 
-    for (int n = 0; n < g_yolo_detection_count; ++n)
+    for (int n = 0; n < g_det_count; ++n)
     {
         /* A detected object, classified as a person with some confidence level */
-        if (g_yolo_detections[n].label == target_class &&
-            g_yolo_detections[n].probability > target_detection_thresh)
+        if (g_det_yolo_list[n].label == target_class &&
+            g_det_yolo_list[n].probability > target_detection_thresh)
         {
-            cv::Rect bbox = g_yolo_detections[n].rect; // Rect2f -> Rect (int)
-            bbox &= cv::Rect(0, 0, g_cam0_image_gpu.cols, g_cam0_image_gpu.rows);
+            cv::Rect bbox = g_det_yolo_list[n].rect; // Rect2f -> Rect (int)
+            bbox &= cv::Rect(0, 0, g_cam0_img_gpu.cols, g_cam0_img_gpu.rows);
 
             if (bbox.width <= 0 || bbox.height <= 0)
             {
@@ -174,7 +172,7 @@ void filter_detections(void)
 
             target_candidates.emplace_back(n);
             target_candidate_bboxs.push_back(bbox);
-            target_candidate_imgs.emplace_back(g_cam0_image_gpu(bbox));
+            target_candidate_imgs.emplace_back(g_cam0_img_gpu(bbox));
         }
     }
 
@@ -237,10 +235,10 @@ void track_objects(void)
 
         // Draw on CPU image
         // const cv::Rect &r = target_candidate_bboxs[i];
-        // cv::rectangle(g_cam0_image, r, cv::Scalar(0, 255, 0), 2);
+        // cv::rectangle(g_cam0_img_cpu, r, cv::Scalar(0, 255, 0), 2);
         // char txt[128];
         // std::snprintf(txt, sizeof(txt), "id=%d s=%.2f", best_idx, best_s);
-        // cv::putText(g_cam0_image, txt, {r.x, std::max(0, r.y - 5)},
+        // cv::putText(g_cam0_img_cpu, txt, {r.x, std::max(0, r.y - 5)},
         //             cv::FONT_HERSHEY_SIMPLEX, 0.5, {255, 255, 255}, 1);
     }
 
@@ -253,50 +251,50 @@ void track_objects(void)
  ********************************************************************************/
 void select_target(void)
 {
-    g_target_detection_id = -1;
+    g_tgt_detect_id = -1;
 
 #if defined(BLD_JETSON_B01)
 
-    for (int n = 0; n < g_detection_count; ++n)
+    for (int n = 0; n < g_det_nv_count; ++n)
     {
         /* A tracked object, classified as a person with some confidence level */
-        if (g_detections[n].TrackID >= 0 &&
-            g_detections[n].ClassID == target_class &&
-            g_detections[n].Confidence > target_detection_thresh)
+        if (g_det_nv_list[n].TrackID >= 0 &&
+            g_det_nv_list[n].ClassID == target_class &&
+            g_det_nv_list[n].Confidence > target_detection_thresh)
         {
-            g_detection_class = g_detections[n].ClassID;
-            g_target_detection_conf = g_detections[n].Confidence;
-            g_target_detection_id = n;
+            g_tgt_class_id = g_det_nv_list[n].ClassID;
+            g_tgt_conf = g_det_nv_list[n].Confidence;
+            g_tgt_detect_id = n;
             return;
         }
     }
 
 #elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-    for (int n = 0; n < g_yolo_detection_count; ++n)
+    for (int n = 0; n < g_det_count; ++n)
     {
         /* A tracked object, classified as a person with some confidence level */
-        if (g_yolo_detections[n].label == target_class &&
-            g_yolo_detections[n].probability > target_detection_thresh)
+        if (g_det_yolo_list[n].label == target_class &&
+            g_det_yolo_list[n].probability > target_detection_thresh)
         {
-            g_detection_class = g_yolo_detections[n].label;
-            g_target_detection_conf = g_yolo_detections[n].probability;
-            g_target_detection_id = n;
+            g_tgt_class_id = g_det_yolo_list[n].label;
+            g_tgt_conf = g_det_yolo_list[n].probability;
+            g_tgt_detect_id = n;
             return;
         }
     }
 
 #elif defined(BLD_WIN)
 
-    for (int n = 0; n < g_yolo_detection_count; ++n)
+    for (int n = 0; n < g_det_count; ++n)
     {
         /* A tracked object, classified as a person with some confidence level */
-        if (g_yolo_detections[n].ClassID == target_class &&
-            g_yolo_detections[n].Confidence > target_detection_thresh)
+        if (g_det_yolo_list[n].ClassID == target_class &&
+            g_det_yolo_list[n].Confidence > target_detection_thresh)
         {
-            g_detection_class = g_yolo_detections[n].ClassID;
-            g_target_detection_conf = g_yolo_detections[n].Confidence;
-            g_target_detection_id = n;
+            g_tgt_class_id = g_det_yolo_list[n].ClassID;
+            g_tgt_conf = g_det_yolo_list[n].Confidence;
+            g_tgt_detect_id = n;
             return;
         }
     }
@@ -315,43 +313,43 @@ void select_target(void)
  ********************************************************************************/
 void get_target_info(void)
 {
-    g_target_track_id = (int)-1;
+    g_tgt_track_id = (int)-1;
 
 #if defined(BLD_JETSON_B01)
 
-    if (g_target_detection_id >= 0)
+    if (g_tgt_detect_id >= 0)
     {
-        g_target_height = g_detections[g_target_detection_id].Height();
-        g_target_width = g_detections[g_target_detection_id].Width();
-        g_target_track_id = g_detections[g_target_detection_id].TrackID;
-        g_target_left = g_detections[g_target_detection_id].Left;
-        g_target_right = g_detections[g_target_detection_id].Right;
-        g_target_top = g_detections[g_target_detection_id].Top;
-        g_target_bottom = g_detections[g_target_detection_id].Bottom;
+        g_tgt_height_pix = g_det_nv_list[g_tgt_detect_id].Height();
+        g_tgt_width_pix = g_det_nv_list[g_tgt_detect_id].Width();
+        g_tgt_track_id = g_det_nv_list[g_tgt_detect_id].TrackID;
+        g_tgt_left_px = g_det_nv_list[g_tgt_detect_id].Left;
+        g_tgt_right_px = g_det_nv_list[g_tgt_detect_id].Right;
+        g_tgt_top_px = g_det_nv_list[g_tgt_detect_id].Top;
+        g_tgt_bottom_px = g_det_nv_list[g_tgt_detect_id].Bottom;
     }
 
 #elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-    if (g_target_detection_id >= 0)
+    if (g_tgt_detect_id >= 0)
     {
-        g_target_height = g_yolo_detections[g_target_detection_id].rect.height;
-        g_target_width = g_yolo_detections[g_target_detection_id].rect.width;
-        g_target_track_id = 0;
-        g_target_left = g_yolo_detections[g_target_detection_id].rect.x;
-        g_target_right = g_target_left + g_target_width;
-        g_target_top = g_yolo_detections[g_target_detection_id].rect.y;
+        g_tgt_height_pix = g_det_yolo_list[g_tgt_detect_id].rect.height;
+        g_tgt_width_pix = g_det_yolo_list[g_tgt_detect_id].rect.width;
+        g_tgt_track_id = 0;
+        g_tgt_left_px = g_det_yolo_list[g_tgt_detect_id].rect.x;
+        g_tgt_right_px = g_tgt_left_px + g_tgt_width_pix;
+        g_tgt_top_px = g_det_yolo_list[g_tgt_detect_id].rect.y;
     }
 
 #elif defined(BLD_WIN)
 
-    if (g_target_detection_id >= 0)
+    if (g_tgt_detect_id >= 0)
     {
-        g_target_height = g_yolo_detections[g_target_detection_id].rect.height;
-        g_target_width = g_yolo_detections[g_target_detection_id].rect.width;
-        g_target_track_id = 0;
-        g_target_left = g_yolo_detections[g_target_detection_id].rect.x;
-        g_target_right = g_target_left + g_target_width;
-        g_target_top = g_yolo_detections[g_target_detection_id].rect.y;
+        g_tgt_height_pix = g_det_yolo_list[g_tgt_detect_id].rect.height;
+        g_tgt_width_pix = g_det_yolo_list[g_tgt_detect_id].rect.width;
+        g_tgt_track_id = 0;
+        g_tgt_left_px = g_det_yolo_list[g_tgt_detect_id].rect.x;
+        g_tgt_right_px = g_tgt_left_px + g_tgt_width_pix;
+        g_tgt_top_px = g_det_yolo_list[g_tgt_detect_id].rect.y;
     }
 
 #else
@@ -360,15 +358,12 @@ void get_target_info(void)
 
 #endif
 
-    g_target_bottom = g_target_top + g_target_height;
-    g_target_center_y = (g_target_left + g_target_right) / 2.0f;
-    g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-    g_target_cntr_offset_y = g_target_center_y - g_cam0_video_width_center;
-    g_target_cntr_offset_x = g_target_center_x - g_cam0_video_height_center;
-    g_target_aspect = g_target_width / g_target_height;
-
-    g_target_cntr_offset_x_filt = low_pass_filter(g_target_cntr_offset_x, target_cntr_offset_x_prv, target_bbox_center_filt_coeff);
-    g_target_cntr_offset_y_filt = low_pass_filter(g_target_cntr_offset_y, target_cntr_offset_y_prv, target_bbox_center_filt_coeff);
+    g_tgt_bottom_px = g_tgt_top_px + g_tgt_height_pix;
+    g_tgt_center_x_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
+    g_tgt_center_y_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
+    g_tgt_cntr_offset_x_pix = g_tgt_center_x_px - g_cam0_img_width_cx;
+    g_tgt_cntr_offset_y_pix = g_tgt_center_y_px - g_cam0_img_height_cy;
+    g_tgt_aspect_ratio = g_tgt_width_pix / g_tgt_height_pix;
 }
 
 /********************************************************************************
@@ -379,16 +374,16 @@ void validate_target(void)
 {
     /* Target detected, tracked, and has a size greater than 0.  Controls based on the target may be
     implimented. */
-    if (g_target_detection_id >= 0 && g_target_track_id >= 0 && g_target_height > 1 && g_target_width > 1)
+    if (g_tgt_detect_id >= 0 && g_tgt_track_id >= 0 && g_tgt_height_pix > 1 && g_tgt_width_pix > 1)
     {
-        g_target_valid = true;
+        g_tgt_valid = true;
     }
     else
     {
-        g_target_valid = false;
+        g_tgt_valid = false;
     }
 
-    target_valid_prv = g_target_valid;
+    target_valid_prv = g_tgt_valid;
 }
 
 /********************************************************************************
@@ -398,17 +393,17 @@ void validate_target(void)
  ********************************************************************************/
 void update_target_info(void)
 {
-    g_target_height = target_bounding_box.height;
-    g_target_width = target_bounding_box.width;
-    g_target_left = target_bounding_box.x;
-    g_target_right = g_target_left + g_target_width;
-    g_target_top = target_bounding_box.y;
-    g_target_bottom = g_target_top + g_target_height;
-    g_target_center_y = (g_target_left + g_target_right) / 2.0f;
-    g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
-    g_target_cntr_offset_y = g_target_center_y - g_cam0_video_width_center;
-    g_target_cntr_offset_x = g_target_center_x - g_cam0_video_height_center;
-    g_target_aspect = (g_target_height >= 0.0000001 ? g_target_width / g_target_height : (float)0.0);
+    g_tgt_height_pix = target_bounding_box.height;
+    g_tgt_width_pix = target_bounding_box.width;
+    g_tgt_left_px = target_bounding_box.x;
+    g_tgt_right_px = g_tgt_left_px + g_tgt_width_pix;
+    g_tgt_top_px = target_bounding_box.y;
+    g_tgt_bottom_px = g_tgt_top_px + g_tgt_height_pix;
+    g_tgt_center_x_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
+    g_tgt_center_y_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
+    g_tgt_cntr_offset_x_pix = g_tgt_center_x_px - g_cam0_img_width_cx;
+    g_tgt_cntr_offset_y_pix = g_tgt_center_y_px - g_cam0_img_height_cy;
+    g_tgt_aspect_ratio = (g_tgt_height_pix >= 0.0000001 ? g_tgt_width_pix / g_tgt_height_pix : (float)0.0);
 }
 
 /********************************************************************************
@@ -432,23 +427,21 @@ bool Tracking::init(void)
 {
     get_tracking_params();
 
-    g_target_valid = false;
+    g_tgt_valid = false;
     target_valid_prv = false;
-    g_target_cntr_offset_x = (float)0.0;
-    g_target_cntr_offset_y = (float)0.0;
-    g_target_height = (float)0.0;
-    g_target_width = (float)0.0;
-    g_target_aspect = (float)0.0;
-    g_target_left = (float)0.0;
-    g_target_right = (float)0.0;
-    g_target_top = (float)0.0;
-    g_target_bottom = (float)0.0;
-    g_target_detection_id = -1;
-    g_detection_class = (float)0.0;
-    g_target_detection_conf = (float)0.0;
+    g_tgt_cntr_offset_y_pix = (float)0.0;
+    g_tgt_cntr_offset_x_pix = (float)0.0;
+    g_tgt_height_pix = (float)0.0;
+    g_tgt_width_pix = (float)0.0;
+    g_tgt_aspect_ratio = (float)0.0;
+    g_tgt_left_px = (float)0.0;
+    g_tgt_right_px = (float)0.0;
+    g_tgt_top_px = (float)0.0;
+    g_tgt_bottom_px = (float)0.0;
+    g_tgt_detect_id = -1;
+    g_tgt_class_id = (float)0.0;
+    g_tgt_conf = (float)0.0;
 
-    g_target_cntr_offset_x_filt = (float)0.0;
-    g_target_cntr_offset_y_filt = (float)0.0;
     target_cntr_offset_x_prv = (float)0.0;
     target_cntr_offset_y_prv = (float)0.0;
 

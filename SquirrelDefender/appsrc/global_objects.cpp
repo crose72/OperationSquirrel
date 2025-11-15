@@ -13,6 +13,6 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool g_stop_program = false;
-bool g_use_video_playback = false;
-std::string g_input_video_path = "";
+bool g_app_stop = false;
+bool g_app_use_video_playback = false;
+std::string g_app_video_input_path = "";

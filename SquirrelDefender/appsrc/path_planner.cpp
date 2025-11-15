@@ -101,31 +101,31 @@ struct MotionProfiler2D
  ********************************************************************************/
 PID pid_forwd;
 PID pid_rev;
-MotionProfiler2D g_vel_shaper; // shapes (g_vx_adjust, g_vy_adjust)
-bool g_target_too_close;
+MotionProfiler2D g_vel_shaper; // shapes (g_ctrl_vel_x_cmd, g_ctrl_vel_y_cmd)
+bool g_tgt_too_close;
 bool yaw_initial_latched;
-float g_x_error;
-float g_y_error;
-float g_vx_adjust;
-float g_vy_adjust;
-float g_vz_adjust;
-float g_yaw_target;
+float g_pos_err_x;
+float g_pos_err_y;
+float g_ctrl_vel_x_cmd;
+float g_ctrl_vel_y_cmd;
+float g_ctrl_vel_z_cmd;
+float g_ctrl_yaw_tgt;
 float yaw_initial;
 float min_yaw;
 float max_yaw;
-float g_yaw_adjust;
+float g_ctrl_yaw_cmd;
 float g_mav_veh_yaw_prv;
-float g_yaw_target_error;
-float g_mav_veh_yaw_adjusted_for_playback;
+float g_yaw_err;
+float g_veh_yaw_playback_adj;
 float x_error_prv;
 float vx_adjust_prv;
 float vx_decel_prof_idx;
 bool decel_profile_active;
 int profile_sign;
 bool target_valid_last_cycle;
-float g_veh_vx_est;
-float g_veh_vy_est;
-float g_x_error_dot;
+float g_veh_vel_x_est;
+float g_veh_vel_y_est;
+float g_pos_err_x_dot;
 float x_error_dot_prv;
 
 /********************************************************************************
@@ -224,38 +224,38 @@ void get_path_params(void)
  ********************************************************************************/
 void calc_follow_error(void)
 {
-    if (g_x_target_ekf < 0.001f)
+    if (g_tgt_pos_x_est < 0.001f)
     {
-        g_x_error = (float)0.0;
+        g_pos_err_x = (float)0.0;
     }
     else
     {
-        g_x_error = (g_x_target_ekf - x_desired);
+        g_pos_err_x = (g_tgt_pos_x_est - x_desired);
     }
 
     // Currently set to 0 - not sending a y component velocity vector
-    g_y_error = y_desired;
+    g_pos_err_y = y_desired;
 
     // Error derivative
-    if (!target_valid_last_cycle && g_target_valid ||
-        !g_target_valid && target_valid_last_cycle)
+    if (!target_valid_last_cycle && g_tgt_valid ||
+        !g_tgt_valid && target_valid_last_cycle)
     {
-        g_x_error_dot = (float)0.0;
+        g_pos_err_x_dot = (float)0.0;
     }
     else
     {
 
-        g_x_error_dot = (g_x_error - x_error_prv) / g_dt;
-        g_x_error_dot = low_pass_filter(g_x_error_dot, x_error_dot_prv, x_error_dot_filt_coef);
+        g_pos_err_x_dot = div((g_pos_err_x - x_error_prv), g_app_dt);
+        g_pos_err_x_dot = low_pass_filter(g_pos_err_x_dot, x_error_dot_prv, x_error_dot_filt_coef);
     }
 
-    x_error_dot_prv = g_x_error_dot;
+    x_error_dot_prv = g_pos_err_x_dot;
 }
 
 void calc_veh_speed(void)
 {
-    g_veh_vx_est = cosf(g_mav_veh_yaw) * g_mav_veh_local_ned_vx + sinf(g_mav_veh_yaw) * g_mav_veh_local_ned_vy;
-    g_veh_vy_est = cosf(g_mav_veh_yaw) * g_mav_veh_local_ned_vy - sinf(g_mav_veh_yaw) * g_mav_veh_local_ned_vx;
+    g_veh_vel_x_est = cosf(g_mav_veh_yaw_deg) * g_mav_veh_vel_ned_x + sinf(g_mav_veh_yaw_deg) * g_mav_veh_vel_ned_y;
+    g_veh_vel_y_est = cosf(g_mav_veh_yaw_deg) * g_mav_veh_vel_ned_y - sinf(g_mav_veh_yaw_deg) * g_mav_veh_vel_ned_x;
 }
 
 /********************************************************************************
@@ -265,11 +265,11 @@ void calc_veh_speed(void)
  ********************************************************************************/
 void calc_yaw_target_error(void)
 {
-    // is g_use_video_playback and yaw_initial_latched needed here?
+    // is g_app_use_video_playback and yaw_initial_latched needed here?
     // TODO: or is it fine for using camera to with drone turning all the time?
-    if (!g_first_loop_after_start && g_use_video_playback && !yaw_initial_latched)
+    if (!g_app_first_loop && g_app_use_video_playback && !yaw_initial_latched)
     {
-        yaw_initial = g_mav_veh_yaw;
+        yaw_initial = g_mav_veh_yaw_deg;
         yaw_initial_latched = true;
         // Yaw has a max value of M_PI and a min value of - M_PI.
         // If the sum of the yaw target and the initial latched yaw state of the
@@ -299,47 +299,47 @@ void calc_yaw_target_error(void)
         }
     }
 
-    g_mav_veh_yaw_adjusted_for_playback = g_mav_veh_yaw - yaw_initial;
+    g_veh_yaw_playback_adj = g_mav_veh_yaw_deg - yaw_initial;
 
     // If the target is to the right of the center of the video then yaw right
     // If the target is to the left of the center of the video then yaw left
-    if (g_target_cntr_offset_y > 50.0)
+    if (g_tgt_cntr_offset_x_pix > 50.0)
     {
-        g_yaw_target = (0.0011 * g_target_cntr_offset_y);
+        g_ctrl_yaw_tgt = (0.0011 * g_tgt_cntr_offset_x_pix);
     }
-    else if (g_target_cntr_offset_y < -50.0)
+    else if (g_tgt_cntr_offset_x_pix < -50.0)
     {
-        g_yaw_target = -(0.0011 * std::abs(g_target_cntr_offset_y));
+        g_ctrl_yaw_tgt = -(0.0011 * std::abs(g_tgt_cntr_offset_x_pix));
     }
     else
     {
-        g_yaw_target = 0.0;
+        g_ctrl_yaw_tgt = 0.0;
     }
 
-    const float angle = 2 * std::tan(g_camera_fov * 0.5) / g_cam0_video_width;
+    const float angle = 2 * std::tan(g_cam0_fov_deg * 0.5) / g_cam0_img_width_px;
 
     const float deadband_px = (float)50.0;
 
     // Yaw in radians using pinhole model
-    if (std::abs(g_target_cntr_offset_y) > deadband_px)
+    if (std::abs(g_tgt_cntr_offset_x_pix) > deadband_px)
     {
-        g_yaw_target = g_target_cntr_offset_y * angle;
+        g_ctrl_yaw_tgt = g_tgt_cntr_offset_x_pix * angle;
     }
     else
     {
-        g_yaw_target = 0.0;
+        g_ctrl_yaw_tgt = 0.0;
     }
 
     // Corrections for when yaw changes signs
     float abs_yaw_target = 0.0;
 
-    if ((g_yaw_target + g_mav_veh_yaw) < -M_PI)
+    if ((g_ctrl_yaw_tgt + g_mav_veh_yaw_deg) < -M_PI)
     {
-        abs_yaw_target = M_PI - (std::abs(g_yaw_target) - M_PI);
+        abs_yaw_target = M_PI - (std::abs(g_ctrl_yaw_tgt) - M_PI);
     }
-    else if ((g_yaw_target + g_mav_veh_yaw) > M_PI)
+    else if ((g_ctrl_yaw_tgt + g_mav_veh_yaw_deg) > M_PI)
     {
-        abs_yaw_target = -(M_PI - (std::abs(g_yaw_target) - M_PI));
+        abs_yaw_target = -(M_PI - (std::abs(g_ctrl_yaw_tgt) - M_PI));
     }
 
     float abs_max_yaw_temp = yaw_initial + g_cam0_fov_rad;
@@ -356,13 +356,13 @@ void calc_yaw_target_error(void)
     // If using video playback then subtract the initial yaw to track
     // the yaw error over time.  Otherwise, the error is just the yaw target
     // because the goal is for the target to be in the center of the frame.
-    if (g_use_video_playback)
+    if (g_app_use_video_playback)
     {
-        g_yaw_target_error = g_yaw_target - g_mav_veh_yaw_adjusted_for_playback;
+        g_yaw_err = g_ctrl_yaw_tgt - g_veh_yaw_playback_adj;
     }
     else
     {
-        g_yaw_target_error = g_yaw_target;
+        g_yaw_err = g_ctrl_yaw_tgt;
     }
 }
 
@@ -373,53 +373,53 @@ void calc_yaw_target_error(void)
  ********************************************************************************/
 void dtrmn_vel_cmd(void)
 {
-    g_target_too_close = (g_x_error < 0.0f);
+    g_tgt_too_close = (g_pos_err_x < 0.0f);
 
     // PID control outputs - these are the control setpoints (vx, vy, etc)
-    if (g_target_valid && g_target_too_close)
+    if (g_tgt_valid && g_tgt_too_close)
     {
-        g_vx_adjust = pid_rev.pid(Kp_x_rev, Ki_x_rev, Kd_x_rev,
-                                  g_x_error, ControlDim::X, g_dt);
+        g_ctrl_vel_x_cmd = pid_rev.pid(Kp_x_rev, Ki_x_rev, Kd_x_rev,
+                                       g_pos_err_x, ControlDim::X, g_app_dt);
 
-        g_vy_adjust = pid_rev.pid(Kp_y_rev, Ki_y_rev, Kd_y_rev,
-                                  g_y_error, ControlDim::Y, g_dt);
+        g_ctrl_vel_y_cmd = pid_rev.pid(Kp_y_rev, Ki_y_rev, Kd_y_rev,
+                                       g_pos_err_y, ControlDim::Y, g_app_dt);
 
-        g_yaw_adjust = pid_rev.pid(Kp_yaw, Ki_yaw, Kd_yaw,
-                                   g_yaw_target_error, ControlDim::YAW, g_dt);
+        g_ctrl_yaw_cmd = pid_rev.pid(Kp_yaw, Ki_yaw, Kd_yaw,
+                                     g_yaw_err, ControlDim::YAW, g_app_dt);
     }
-    else if (g_target_valid && !g_target_too_close)
+    else if (g_tgt_valid && !g_tgt_too_close)
     {
-        g_vx_adjust = pid_forwd.pid(Kp_x, Ki_x, Kd_x,
-                                    g_x_error, ControlDim::X, g_dt);
+        g_ctrl_vel_x_cmd = pid_forwd.pid(Kp_x, Ki_x, Kd_x,
+                                         g_pos_err_x, ControlDim::X, g_app_dt);
 
-        g_vy_adjust = pid_forwd.pid(Kp_y, Ki_y, Kd_y,
-                                    g_y_error, ControlDim::Y, g_dt);
+        g_ctrl_vel_y_cmd = pid_forwd.pid(Kp_y, Ki_y, Kd_y,
+                                         g_pos_err_y, ControlDim::Y, g_app_dt);
 
-        g_yaw_adjust = pid_forwd.pid(Kp_yaw, Ki_yaw, Kd_yaw,
-                                     g_yaw_target_error, ControlDim::YAW, g_dt);
+        g_ctrl_yaw_cmd = pid_forwd.pid(Kp_yaw, Ki_yaw, Kd_yaw,
+                                       g_yaw_err, ControlDim::YAW, g_app_dt);
     }
     else
     {
         // Raw commands go to zero when target invalid
-        g_vx_adjust = 0.0f;
-        g_vy_adjust = 0.0f;
-        g_yaw_adjust = 0.0f;
+        g_ctrl_vel_x_cmd = 0.0f;
+        g_ctrl_vel_y_cmd = 0.0f;
+        g_ctrl_yaw_cmd = 0.0f;
     }
 
     // PID provides the raw command to reach the target
     // Map your max-ramp-rate knob to the accel cap; jerk is separate.
     // This ensures any update (including update-to-zero) is turned into a smooth S-curve.
     // It does so by limiting the velocity command
-    g_vel_shaper.update(Vector2f{g_vx_adjust, g_vy_adjust}, g_dt);
+    g_vel_shaper.update(Vector2f{g_ctrl_vel_x_cmd, g_ctrl_vel_y_cmd}, g_app_dt);
     const Vector2f v_shaped = g_vel_shaper.value();
 
     // Updated control setpoints with smoothing
-    g_vx_adjust = v_shaped.x;
-    g_vy_adjust = v_shaped.y;
+    g_ctrl_vel_x_cmd = v_shaped.x;
+    g_ctrl_vel_y_cmd = v_shaped.y;
 
-    target_valid_last_cycle = g_target_valid;
-    vx_adjust_prv = g_vx_adjust;
-    x_error_prv = g_x_error;
+    target_valid_last_cycle = g_tgt_valid;
+    vx_adjust_prv = g_ctrl_vel_x_cmd;
+    x_error_prv = g_pos_err_x;
 }
 
 /********************************************************************************
@@ -443,21 +443,21 @@ bool PathPlanner::init(void)
 {
     get_path_params();
 
-    g_target_too_close = false;
-    g_x_error = (float)0.0;
-    g_y_error = (float)0.0;
-    g_vx_adjust = (float)0.0;
-    g_vy_adjust = (float)0.0;
-    g_vz_adjust = (float)0.0;
-    g_yaw_target = (float)0.0;
+    g_tgt_too_close = false;
+    g_pos_err_x = (float)0.0;
+    g_pos_err_y = (float)0.0;
+    g_ctrl_vel_x_cmd = (float)0.0;
+    g_ctrl_vel_y_cmd = (float)0.0;
+    g_ctrl_vel_z_cmd = (float)0.0;
+    g_ctrl_yaw_tgt = (float)0.0;
     yaw_initial = (float)0.0;
     yaw_initial_latched = false;
     max_yaw = (float)0.0;
     min_yaw = (float)0.0;
-    g_yaw_adjust = (float)0.0;
+    g_ctrl_yaw_cmd = (float)0.0;
     g_mav_veh_yaw_prv = (float)0.0;
-    g_yaw_target_error = (float)0.0;
-    g_mav_veh_yaw_adjusted_for_playback = (float)0.0;
+    g_yaw_err = (float)0.0;
+    g_veh_yaw_playback_adj = (float)0.0;
     x_error_prv = (float)0.0;
     vx_adjust_prv = (float)0.0;
     target_valid_last_cycle = false;

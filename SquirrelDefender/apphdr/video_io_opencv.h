@@ -17,20 +17,20 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool g_cam0_valid_image_rcvd;
-extern cv::Mat g_cam0_image;
-extern float g_cam0_video_width;
-extern float g_cam0_video_height;
-extern bool g_end_of_video;
+extern bool g_cam0_img_valid;
+extern cv::Mat g_cam0_img_cpu;
+extern float g_cam0_img_width_px;
+extern float g_cam0_img_height_px;
+extern bool g_video_end;
 extern uint32_t g_cam0_frame_id;
-extern cv::cuda::GpuMat g_cam0_image_gpu;
-extern float g_camera_fov;
-extern float g_cam0_video_width_center;
-extern float g_cam0_video_height_center;
+extern cv::cuda::GpuMat g_cam0_img_gpu;
+extern float g_cam0_fov_deg;
+extern float g_cam0_img_width_cx;
+extern float g_cam0_img_height_cy;
 extern float g_cam0_fov_rad;
 extern float g_cam0_fov_rad_half;
-extern float g_cam0_tilt_down_angle;
-extern float g_cam0_tilt_down_angle_rad;
+extern float g_cam0_tilt_deg;
+extern float g_cam0_tilt_rad;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

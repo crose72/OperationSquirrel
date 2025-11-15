@@ -19,7 +19,7 @@
 #include "Mavlink.pb.h"
 #include "System.pb.h"
 #include "Detection.pb.h"
-#include "Path.pb.h"
+#include "Control.pb.h"
 #include "ImageAnnotations.pb.h"
 
 #endif // logger options

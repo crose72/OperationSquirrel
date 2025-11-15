@@ -17,9 +17,9 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern detectNet *g_net;
-extern detectNet::Detection *g_detections;
-extern int g_detection_count;
+extern detectNet *g_det_nv_net;
+extern detectNet::Detection *g_det_nv_list;
+extern int g_det_nv_count;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

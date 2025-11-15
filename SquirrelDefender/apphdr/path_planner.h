@@ -14,19 +14,19 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool g_target_too_close;
-extern float g_x_error;
-extern float g_y_error;
-extern float g_vx_adjust;
-extern float g_vy_adjust;
-extern float g_vz_adjust;
-extern float g_yaw_target;
-extern float g_yaw_adjust;
-extern float g_mav_veh_yaw_adjusted_for_playback;
-extern float g_yaw_target_error;
-extern float g_veh_vx_est;
-extern float g_veh_vy_est;
-extern float g_x_error_dot;
+extern bool g_tgt_too_close;
+extern float g_pos_err_x;
+extern float g_pos_err_y;
+extern float g_ctrl_vel_x_cmd;
+extern float g_ctrl_vel_y_cmd;
+extern float g_ctrl_vel_z_cmd;
+extern float g_ctrl_yaw_tgt;
+extern float g_ctrl_yaw_cmd;
+extern float g_veh_yaw_playback_adj;
+extern float g_yaw_err;
+extern float g_veh_vel_x_est;
+extern float g_veh_vel_y_est;
+extern float g_pos_err_x_dot;
 
 /********************************************************************************
  * Function prototypes

@@ -33,20 +33,20 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool g_cam0_valid_image_rcvd;
+bool g_cam0_img_valid;
 std::string base_path = "../data/";
 bool display_stream_created;
 bool file_stream_created;
 videoSource *g_input;
 videoOutput *output_vid_file;
 videoOutput *output_vid_disp;
-uchar3 *g_cam0_image;
+uchar3 *g_cam0_img_cpu;
 
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-const float g_cam0_video_width = 1280.0;
-const float g_cam0_video_height = 720.0;
+const float g_cam0_img_width_px = 1280.0;
+const float g_cam0_img_height_px = 720.0;
 const float g_input_video_fps = 30;
 
 /********************************************************************************
@@ -206,7 +206,7 @@ bool capture_image(void)
 {
     int status = 0;
 
-    if (!g_input->Capture(&g_cam0_image, &status))
+    if (!g_input->Capture(&g_cam0_img_cpu, &status))
     {
         if (status != videoSource::TIMEOUT)
         {
@@ -214,14 +214,14 @@ bool capture_image(void)
         }
     }
 
-    // Checking for valid g_cam0_image, Capture may return true while g_cam0_image may still be NULL
-    if (g_cam0_image == NULL)
+    // Checking for valid g_cam0_img_cpu, Capture may return true while g_cam0_img_cpu may still be NULL
+    if (g_cam0_img_cpu == NULL)
     {
-        g_cam0_valid_image_rcvd = false;
-        return false; // Return false if the g_cam0_image is not valid
+        g_cam0_img_valid = false;
+        return false; // Return false if the g_cam0_img_cpu is not valid
     }
 
-    g_cam0_valid_image_rcvd = true;
+    g_cam0_img_valid = true;
 
     return true;
 }
@@ -235,7 +235,7 @@ bool save_video(void)
     // render output_vid_disp to the display
     if (output_vid_file != NULL)
     {
-        output_vid_file->Render(g_cam0_image, g_input->GetWidth(), g_input->GetHeight());
+        output_vid_file->Render(g_cam0_img_cpu, g_input->GetWidth(), g_input->GetHeight());
 
         // check if the user quit
         if (!output_vid_file->IsStreaming())
@@ -249,20 +249,20 @@ bool save_video(void)
 
 /********************************************************************************
  * Function: display_video
- * Description: Display the g_cam0_image on the screen.
+ * Description: Display the g_cam0_img_cpu on the screen.
  ********************************************************************************/
 bool display_video(void)
 {
     // render output_vid_disp to the display
     if (output_vid_disp != NULL)
     {
-        output_vid_disp->Render(g_cam0_image, g_input->GetWidth(), g_input->GetHeight());
+        output_vid_disp->Render(g_cam0_img_cpu, g_input->GetWidth(), g_input->GetHeight());
 
 #ifdef DEBUG_BUILD
 
         // update the status bar
         char str[256];
-        sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(g_net->GetPrecision()), g_net->GetNetworkFPS());
+        sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(g_det_nv_net->GetPrecision()), g_det_nv_net->GetNetworkFPS());
         output_vid_disp->SetStatus(str);
 
 #endif // DEBUG_BUILD
@@ -340,8 +340,8 @@ VideoNV::~VideoNV(void) {}
 bool VideoNV::init(void)
 {
 
-    g_cam0_valid_image_rcvd = false;
-    g_cam0_image = NULL;
+    g_cam0_img_valid = false;
+    g_cam0_img_cpu = NULL;
 
     if (!create_input_video_stream() ||
         !create_output_vid_stream())

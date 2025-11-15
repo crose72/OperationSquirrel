@@ -5,51 +5,42 @@ import "Common.proto";
 
 message TargetDetection {
   Time   t = 1;
-  uint32 frame_id  = 2;
-  
-  bool   target_valid              = 10;
-  int32  target_detection_id       = 11; // int -> int32
-  int32  target_track_id           = 12; // int -> int32
-  int32  detection_class           = 13; // you declared float
-  float  target_detection_conf     = 14;
+  uint32 frame_id = 2;
 
-  float  target_cntr_offset_x      = 20;
-  float  target_cntr_offset_y      = 21;
-  float  target_cntr_offset_x_filt = 22;
-  float  target_cntr_offset_y_filt = 23;
+  // --- Detection validity and IDs ---
+  bool   is_target_detected = 10;     // was: target_valid
+  int32  detection_id       = 11;     // was: target_detection_id
+  int32  track_id           = 12;     // was: target_track_id
+  int32  class_id           = 13;     // was: detection_class
+  float  confidence         = 14;     // was: target_detection_conf
 
-  float  target_height             = 30;
-  float  target_width              = 31;
-  float  target_aspect             = 32;
-  float  target_left               = 33;
-  float  target_right              = 34;
-  float  target_top                = 35;
-  float  target_bottom             = 36;
-}
+  // --- Bounding box geometry (pixel units) ---
+  float bbox_offset_x_px     = 20;    // was: target_cntr_offset_x
+  float bbox_offset_y_px     = 21;    // was: target_cntr_offset_y
+  float bbox_height_px       = 22;    // was: target_height
+  float bbox_width_px        = 23;    // was: target_width
+  float bbox_aspect_ratio    = 24;    // was: target_aspect
+  float bbox_left_px         = 25;    // was: target_left
+  float bbox_right_px        = 26;    // was: target_right
+  float bbox_top_px          = 27;    // was: target_top
+  float bbox_bottom_px       = 28;    // was: target_bottom
+  float bbox_center_x_px     = 29;    // was: target_center_x
+  float bbox_center_y_px     = 30;    // was: target_center_y
 
-message TargetLocation {
-  Time  t = 1;
-  uint32 frame_id  = 2;
-  
-  float d_target_h   = 10;
-  float d_target_w   = 11;
-  float d_target     = 12;
+  // --- Camera and angular geometry ---
+  float delta_angle_deg       = 31;   // was: delta_angle
+  float camera_tilt_deg       = 32;   // was: camera_tilt_angle
+  float delta_distance_x_m    = 33;   // was: delta_d_x
+  float delta_distance_z_m    = 34;   // was: delta_d_z
 
-  float x_target     = 20;
-  float y_target     = 21;
-  float z_target     = 22;
+  // --- EKF-estimated target state ---
+  float target_pos_x_est      = 40;   // was: x_target_ekf
+  float target_pos_y_est      = 41;   // was: y_target_ekf
+  float target_vel_x_est      = 42;   // was: vx_target_ekf
+  float target_vel_y_est      = 43;   // was: vy_target_ekf
+  float target_acc_x_est      = 44;   // was: ax_target_ekf
+  float target_acc_y_est      = 45;   // was: ay_target_ekf
 
-  float delta_angle        = 30;
-  float camera_tilt_angle  = 31;
-  float delta_d_x          = 32;
-  float delta_d_z          = 33;
-
-  float x_target_ekf = 40;
-  float y_target_ekf = 41;
-  float vx_target_ekf= 42;
-  float vy_target_ekf= 43;
-  float ax_target_ekf= 44;
-  float ay_target_ekf= 45;
-
-  bool  target_data_useful = 50;
+  // --- Post-filter measurement usability ---
+  bool  is_measurement_valid  = 50;   // was: target_data_useful
 }
