@@ -60,6 +60,29 @@ TOPICS = {
 }
 
 # --------------------------------------------------------------------------
+# ⚙️ Signals to be converted from deg -> rad
+# --------------------------------------------------------------------------
+RAD_PER_DEG = math.pi / 180.0
+
+# Convert selected degree fields → radians
+DEGREE_FIELDS_TO_CONVERT = {
+    # TargetDetection
+    "delta_angle_deg",
+    "camera_tilt_deg",
+
+    # MavKinematics
+    "roll",
+    "pitch",
+    "yaw",
+    "rollspeed",
+    "pitchspeed",
+    "yawspeed",
+    "roll_rate_actual",
+    "pitch_rate_actual",
+    "yaw_rate_actual",
+}
+
+# --------------------------------------------------------------------------
 # ⚙️ CONFIGURATION — per-topic field mappings
 # --------------------------------------------------------------------------
 # This maps from MCAP topic → {CSV column: protobuf field name}.
@@ -77,6 +100,8 @@ TOPIC_CONFIG = {
         "g_tgt_track_id": "track_id",
         "g_tgt_class_id": "class_id",
         "g_tgt_conf": "confidence",
+
+        # Bounding box geometry
         "g_tgt_cntr_offset_x_pix": "bbox_offset_x_px",
         "g_tgt_cntr_offset_y_pix": "bbox_offset_y_px",
         "g_tgt_height_pix": "bbox_height_px",
@@ -86,22 +111,30 @@ TOPIC_CONFIG = {
         "g_tgt_right_px": "bbox_right_px",
         "g_tgt_top_px": "bbox_top_px",
         "g_tgt_bottom_px": "bbox_bottom_px",
+
+        # Center (filtered)
+        "g_tgt_cntr_offset_x_pix_filt": "bbox_center_x_px",
+        "g_tgt_cntr_offset_y_pix_filt": "bbox_center_y_px",
+
+        # EKF / deltas
+        "g_cam0_delta_angle_deg": "delta_angle_deg",
+        "g_cam0_tilt_deg": "camera_tilt_deg",
+        "g_tgt_pos_x_delta": "delta_distance_x_m",
+        "g_tgt_pos_z_delta": "delta_distance_z_m",
+
+        # EKF-estimated state (positions / velocities / accelerations)
+        "g_tgt_pos_x_est": "target_pos_x_est",
+        "g_tgt_pos_y_est": "target_pos_y_est",
+        "g_tgt_vel_x_est": "target_vel_x_est",
+        "g_tgt_vel_y_est": "target_vel_y_est",
+        "g_tgt_acc_x_est": "target_acc_x_est",
+        "g_tgt_acc_y_est": "target_acc_y_est",
+
+        # Data validity
+        "g_tgt_meas_valid": "is_measurement_valid",
     },
 
-    "/target/location": {
-        "g_tgt_height_meas": "d_target_h",
-        "g_tgt_width_meas": "d_target_w",
-        "d_target": "d_target",
-        "g_tgt_pos_x_meas": "x_target",
-        "g_tgt_pos_y_meas": "y_target",
-        "g_tgt_pos_z_meas": "z_target",
-        "g_cam0_delta_angle_deg": "delta_angle",
-        "g_cam_tilt_deg": "camera_tilt_angle",
-        "g_tgt_pos_x_delta": "delta_d_x",
-        "g_tgt_pos_z_delta": "delta_d_z",
-    },
-
-    "/path/control": {
+    "/control/output": {
         "g_tgt_too_close": "target_too_close",
         "g_pos_err_x": "x_error",
         "g_pos_err_y": "y_error",
@@ -133,9 +166,9 @@ TOPIC_CONFIG = {
         "g_mav_gps_heading_deg": "gps_hdg",
 
         # Orientation (Euler)
-        "g_mav_veh_roll_deg": "roll",
-        "g_mav_veh_pitch_deg": "pitch",
-        "g_mav_veh_yaw_deg": "yaw",
+        "g_mav_veh_roll_rad": "roll",
+        "g_mav_veh_pitch_rad": "pitch",
+        "g_mav_veh_yaw_rad": "yaw",
 
         # Angular rates
         "g_mav_veh_roll_rate": "rollspeed",
@@ -242,6 +275,17 @@ def process_mcap(input_mcap: str):
             msg.ParseFromString(message.data)
             # Flatten into a dict of {field_name: value}
             data = flatten(msg)
+
+            # Convert degrees → radians for known angular fields
+            for key in list(data.keys()):
+                field_name = key.split(".")[-1]  # handle nested fields like x.y.z
+                if field_name in DEGREE_FIELDS_TO_CONVERT:
+                    try:
+                        data[key] = float(data[key]) * RAD_PER_DEG
+                    except:
+                        pass
+
+
             # Record the timestamp (ns since epoch) and topic.
             data["timestamp_ns"] = message.log_time
             data["topic"] = topic
