@@ -1,19 +1,19 @@
 #ifdef ENABLE_CV
 
 /********************************************************************************
- * @file    localize_target.cpp
+ * @file    target_localization.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Localize the x, y, z offset of the target relative to the vehicle.
+ * @brief   TargetLocalization the x, y, z offset of the target relative to the vehicle.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "localize_target.h"
+#include "target_localization.h"
 #include "mav_data_hub.h"
-#include "track_target.h"
+#include "target_tracking.h"
 #include "video_io.h"
 #include "param_reader.h"
 #include "interpolate.h"
@@ -589,17 +589,17 @@ void update_target_loc_real(void)
 };
 
 /********************************************************************************
- * Function: ~Localize
- * Description: Localize class destructor.
+ * Function: ~TargetLocalization
+ * Description: TargetLocalization class destructor.
  ********************************************************************************/
-Localize::~Localize(void) {};
+TargetLocalization::~TargetLocalization(void) {};
 
 /********************************************************************************
  * Function: init
- * Description: Initialize all Localize target variables.  Run once at the start
+ * Description: Initialize all TargetLocalization target variables.  Run once at the start
  *              of the program.
  ********************************************************************************/
-bool Localize::init(void)
+bool TargetLocalization::init(void)
 {
     get_localization_params();
     init_kf_loc();
@@ -643,10 +643,10 @@ bool Localize::init(void)
 
 /********************************************************************************
  * Function: loop
- * Description: Return control parameters for the vehicle to Localize a designated
+ * Description: Return control parameters for the vehicle to TargetLocalization a designated
  *              target at a distance.
  ********************************************************************************/
-void Localize::loop(void)
+void TargetLocalization::loop(void)
 {
     calc_fov();
     dtrmn_target_loc_img();
@@ -658,7 +658,7 @@ void Localize::loop(void)
  * Function: shutdown
  * Description: Clean up code to run before program exits.
  ********************************************************************************/
-void Localize::shutdown(void)
+void TargetLocalization::shutdown(void)
 {
     // place clean up code here
 }

@@ -11,13 +11,13 @@
 #include "mav_data_hub.h"
 #include "mav_utils.h"
 #include "vehicle_controller.h"
-#include "detect_target.h"
-#include "track_target.h"
-#include "localize_target.h"
-#include "path_planner.h"
+#include "target_detection.h"
+#include "target_tracking.h"
+#include "target_localization.h"
+#include "velocity_controller.h"
 #include "time_calc.h"
 #include "timer.h"
-#include "path_planner.h"
+#include "velocity_controller.h"
 
 /********************************************************************************
  * Globals
@@ -203,15 +203,15 @@ void init_software_components(void)
 {
     // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
     // Initialize all inputs to the software component
-    Localize::init();
-    PathPlanner::init();
+    TargetLocalization::init();
+    VelocityController::init();
 }
 
 void run_loops(void)
 {
     // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
-    Localize::loop();
-    PathPlanner::loop();
+    TargetLocalization::loop();
+    VelocityController::loop();
 }
 
 void setup(void)

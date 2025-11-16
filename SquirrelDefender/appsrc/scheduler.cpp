@@ -17,13 +17,13 @@
 #include "mav_data_hub.h"
 #include "mav_utils.h"
 #include "vehicle_controller.h"
-#include "detect_target.h"
-#include "track_target.h"
-#include "localize_target.h"
-#include "path_planner.h"
+#include "target_detection.h"
+#include "target_tracking.h"
+#include "target_localization.h"
+#include "velocity_controller.h"
 #include "time_calc.h"
 #include "timer.h"
-#include "path_planner.h"
+#include "velocity_controller.h"
 #include <mutex>
 #include <signal.h>
 #include <chrono>
@@ -87,10 +87,10 @@ int Scheduler::init(void)
 #ifdef ENABLE_CV
 
     if (!Video::init() ||
-        !Detection::init() ||
-        !Tracking::init() ||
-        !Localize::init() ||
-        !PathPlanner::init())
+        !TargetDetection::init() ||
+        !TargetTracking::init() ||
+        !TargetLocalization::init() ||
+        !VelocityController::init())
     {
         return 1;
     }
@@ -125,10 +125,10 @@ void Scheduler::loop(void)
 #ifdef ENABLE_CV
 
     Video::in_loop();
-    Detection::loop();
-    Tracking::loop();
-    Localize::loop();
-    PathPlanner::loop();
+    TargetDetection::loop();
+    TargetTracking::loop();
+    TargetLocalization::loop();
+    VelocityController::loop();
     Video::out_loop();
 
 #endif // ENABLE_CV
@@ -154,12 +154,12 @@ void Scheduler::shutdown(void)
 
 #ifdef ENABLE_CV
 
-    Tracking::shutdown();
-    Localize::shutdown();
-    PathPlanner::shutdown();
-    PathPlanner::shutdown();
+    TargetTracking::shutdown();
+    TargetLocalization::shutdown();
+    VelocityController::shutdown();
+    VelocityController::shutdown();
     Video::shutdown();
-    Detection::shutdown();
+    TargetDetection::shutdown();
 
 #endif // ENABLE_CV
 }

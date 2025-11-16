@@ -1,11 +1,11 @@
 /********************************************************************************
- * @file    path_planner
+ * @file    velocity_controller
  * @author  Cameron Rose
  * @date    3/12/2025
  ********************************************************************************/
 
-#ifndef PATH_PLANNER_H
-#define PATH_PLANNER_H
+#ifndef VELOCITY_CONTROLLER_H
+#define VELOCITY_CONTROLLER_H
 
 /********************************************************************************
  * Includes
@@ -31,11 +31,11 @@ extern float g_pos_err_x_dot;
 /********************************************************************************
  * Function prototypes
  ********************************************************************************/
-class PathPlanner
+class VelocityController
 {
 public:
-    PathPlanner();
-    ~PathPlanner();
+    VelocityController();
+    ~VelocityController();
 
     static bool init(void);
     static void loop(void);
@@ -44,4 +44,4 @@ public:
 private:
 };
 
-#endif // PATH_PLANNER_H
+#endif // VELOCITY_CONTROLLER_H

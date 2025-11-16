@@ -1,5 +1,5 @@
 /********************************************************************************
- * @file    path_planner.cpp
+ * @file    velocity_controller.cpp
  * @author  Cameron Rose
  * @date    3/12/2025
  * @brief   The path planner contains the MPC setup and solving for the optimal
@@ -11,15 +11,15 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "path_planner.h"
+#include "velocity_controller.h"
 #include "video_io.h"
 #include "param_reader.h"
 #include "pid.h"
-#include "localize_target.h"
+#include "target_localization.h"
 #include "time_calc.h"
-#include "track_target.h"
+#include "target_tracking.h"
 #include "mav_data_hub.h"
-#include "path_planner.h"
+#include "velocity_controller.h"
 #include "signal_processing.h"
 #include <spdlog/spdlog.h>
 
@@ -422,24 +422,29 @@ void dtrmn_vel_cmd(void)
     x_error_prv = g_pos_err_x;
 }
 
-/********************************************************************************
- * Function: PathPlanner
- * Description: PathPlanner class constructor.
- ********************************************************************************/
-PathPlanner::PathPlanner(void) {}
+void dtrmn_vel_ff_cmd(void)
+{
+    //
+}
 
 /********************************************************************************
- * Function: ~PathPlanner
- * Description: PathPlanner class destructor.
+ * Function: VelocityController
+ * Description: VelocityController class constructor.
  ********************************************************************************/
-PathPlanner::~PathPlanner(void) {}
+VelocityController::VelocityController(void) {}
+
+/********************************************************************************
+ * Function: ~VelocityController
+ * Description: VelocityController class destructor.
+ ********************************************************************************/
+VelocityController::~VelocityController(void) {}
 
 /********************************************************************************
  * Function: init
  * Description: Initialize all planner variables.  Run once at the start
  *              of the program.
  ********************************************************************************/
-bool PathPlanner::init(void)
+bool VelocityController::init(void)
 {
     get_path_params();
 
@@ -473,19 +478,20 @@ bool PathPlanner::init(void)
  * Function: loop
  * Description: Function to run every loop.
  ********************************************************************************/
-void PathPlanner::loop(void)
+void VelocityController::loop(void)
 {
     calc_veh_speed();
     calc_follow_error();
     calc_yaw_target_error();
     dtrmn_vel_cmd();
+    dtrmn_vel_ff_cmd();
 }
 
 /********************************************************************************
  * Function: shutdown
  * Description: Function to clean up planner at the end of the program.
  ********************************************************************************/
-void PathPlanner::shutdown(void)
+void VelocityController::shutdown(void)
 {
     // place clean up code here
 }

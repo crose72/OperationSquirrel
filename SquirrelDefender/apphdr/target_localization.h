@@ -1,7 +1,7 @@
 #pragma once
 
 /********************************************************************************
- * @file    localize_target.h
+ * @file    target_localization.h
  * @author  Cameron Rose
  * @date    1/22/2025
  ********************************************************************************/
@@ -48,11 +48,11 @@ extern float g_tgt_lost_dbc_sec;
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-class Localize
+class TargetLocalization
 {
 public:
-    Localize();
-    ~Localize();
+    TargetLocalization();
+    ~TargetLocalization();
 
     static bool init(void);
     static void loop(void);

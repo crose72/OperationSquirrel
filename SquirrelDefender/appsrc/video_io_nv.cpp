@@ -13,7 +13,7 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "video_io_nv.h"
-#include "detect_target.h"
+#include "target_detection.h"
 #include <string>
 #include <fstream>
 #include "jetson-utils/videoSource.h"
