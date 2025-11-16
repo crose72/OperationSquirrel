@@ -53,11 +53,11 @@ extern int32_t g_mav_gps_alt_rel;
 extern int16_t g_mav_gps_vel_x;
 extern int16_t g_mav_gps_vel_y;
 extern int16_t g_mav_gps_vel_z;
-extern uint16_t g_mav_gps_heading_deg;
+extern uint16_t g_mav_gps_heading_cdeg;
 
-extern float g_mav_veh_roll_deg;
-extern float g_mav_veh_pitch_deg;
-extern float g_mav_veh_yaw_deg;
+extern float g_mav_veh_roll_rad;
+extern float g_mav_veh_pitch_rad;
+extern float g_mav_veh_yaw_rad;
 extern float g_mav_veh_roll_rate;
 extern float g_mav_veh_pitch_rate;
 extern float g_mav_veh_yaw_rate;
@@ -96,8 +96,8 @@ extern uint8_t g_mav_rngfndr_type;
 extern uint8_t g_mav_rngfndr_id;
 extern uint8_t g_mav_rngfndr_orient;
 extern uint8_t g_mav_rngfndr_cov;
-extern float g_mav_rngfndr_fov_horiz_deg;
-extern float g_mav_rngfndr_fov_vert_deg;
+extern float g_mav_rngfndr_fov_horiz_rad;
+extern float g_mav_rngfndr_fov_vert_rad;
 extern float g_mav_rngfndr_quat[4];
 extern uint8_t g_mav_rngfndr_quality;
 

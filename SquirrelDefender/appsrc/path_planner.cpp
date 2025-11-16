@@ -254,8 +254,8 @@ void calc_follow_error(void)
 
 void calc_veh_speed(void)
 {
-    g_veh_vel_x_est = cosf(g_mav_veh_yaw_deg) * g_mav_veh_vel_ned_x + sinf(g_mav_veh_yaw_deg) * g_mav_veh_vel_ned_y;
-    g_veh_vel_y_est = cosf(g_mav_veh_yaw_deg) * g_mav_veh_vel_ned_y - sinf(g_mav_veh_yaw_deg) * g_mav_veh_vel_ned_x;
+    g_veh_vel_x_est = cosf(g_mav_veh_yaw_rad) * g_mav_veh_vel_ned_x + sinf(g_mav_veh_yaw_rad) * g_mav_veh_vel_ned_y;
+    g_veh_vel_y_est = cosf(g_mav_veh_yaw_rad) * g_mav_veh_vel_ned_y - sinf(g_mav_veh_yaw_rad) * g_mav_veh_vel_ned_x;
 }
 
 /********************************************************************************
@@ -269,7 +269,7 @@ void calc_yaw_target_error(void)
     // TODO: or is it fine for using camera to with drone turning all the time?
     if (!g_app_first_loop && g_app_use_video_playback && !yaw_initial_latched)
     {
-        yaw_initial = g_mav_veh_yaw_deg;
+        yaw_initial = g_mav_veh_yaw_rad;
         yaw_initial_latched = true;
         // Yaw has a max value of M_PI and a min value of - M_PI.
         // If the sum of the yaw target and the initial latched yaw state of the
@@ -299,7 +299,7 @@ void calc_yaw_target_error(void)
         }
     }
 
-    g_veh_yaw_playback_adj = g_mav_veh_yaw_deg - yaw_initial;
+    g_veh_yaw_playback_adj = g_mav_veh_yaw_rad - yaw_initial;
 
     // If the target is to the right of the center of the video then yaw right
     // If the target is to the left of the center of the video then yaw left
@@ -333,11 +333,11 @@ void calc_yaw_target_error(void)
     // Corrections for when yaw changes signs
     float abs_yaw_target = 0.0;
 
-    if ((g_ctrl_yaw_tgt + g_mav_veh_yaw_deg) < -M_PI)
+    if ((g_ctrl_yaw_tgt + g_mav_veh_yaw_rad) < -M_PI)
     {
         abs_yaw_target = M_PI - (std::abs(g_ctrl_yaw_tgt) - M_PI);
     }
-    else if ((g_ctrl_yaw_tgt + g_mav_veh_yaw_deg) > M_PI)
+    else if ((g_ctrl_yaw_tgt + g_mav_veh_yaw_rad) > M_PI)
     {
         abs_yaw_target = -(M_PI - (std::abs(g_ctrl_yaw_tgt) - M_PI));
     }

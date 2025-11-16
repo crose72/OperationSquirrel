@@ -258,30 +258,30 @@ void DataLogger::log_data(void)
         m.set_gps_vx(g_mav_gps_vel_x);
         m.set_gps_vy(g_mav_gps_vel_y);
         m.set_gps_vz(g_mav_gps_vel_z);
-        m.set_gps_hdg(g_mav_gps_heading_deg);
+        m.set_gps_hdg(g_mav_gps_heading_cdeg);
 
-        m.set_roll(g_mav_veh_roll_deg);
-        m.set_pitch(g_mav_veh_pitch_deg);
-        m.set_yaw(g_mav_veh_yaw_deg);
+        m.set_roll(g_mav_veh_roll_rad);
+        m.set_pitch(g_mav_veh_pitch_rad);
+        m.set_yaw(g_mav_veh_yaw_rad);
         m.set_rollspeed(g_mav_veh_roll_rate);
         m.set_pitchspeed(g_mav_veh_pitch_rate);
         m.set_yawspeed(g_mav_veh_yaw_rate);
 
-        m.set_local_ned_x(g_mav_veh_pos_ned_x);
-        m.set_local_ned_y(g_mav_veh_pos_ned_y);
-        m.set_local_ned_z(g_mav_veh_pos_ned_z);
-        m.set_local_ned_vx(g_mav_veh_vel_ned_x);
-        m.set_local_ned_vy(g_mav_veh_vel_ned_y);
-        m.set_local_ned_vz(g_mav_veh_vel_ned_z);
+        m.set_local_ned_x(g_mav_veh_pos_ned_x * (float)180.0 / M_PI);
+        m.set_local_ned_y(g_mav_veh_pos_ned_y * (float)180.0 / M_PI);
+        m.set_local_ned_z(g_mav_veh_pos_ned_z * (float)180.0 / M_PI);
+        m.set_local_ned_vx(g_mav_veh_vel_ned_x * (float)180.0 / M_PI);
+        m.set_local_ned_vy(g_mav_veh_vel_ned_y * (float)180.0 / M_PI);
+        m.set_local_ned_vz(g_mav_veh_vel_ned_z * (float)180.0 / M_PI);
 
         m.set_q1_actual(g_mav_att_actual_q1);
         m.set_q2_actual(g_mav_att_actual_q2);
         m.set_q3_actual(g_mav_att_actual_q3);
         m.set_q4_actual(g_mav_att_actual_q4);
 
-        m.set_roll_rate_actual(g_mav_att_actual_roll_rate);
-        m.set_pitch_rate_actual(g_mav_att_actual_pitch_rate);
-        m.set_yaw_rate_actual(g_mav_att_actual_yaw_rate);
+        m.set_roll_rate_actual(g_mav_att_actual_roll_rate * (float)180.0 / M_PI);
+        m.set_pitch_rate_actual(g_mav_att_actual_pitch_rate * (float)180.0 / M_PI);
+        m.set_yaw_rate_actual(g_mav_att_actual_yaw_rate * (float)180.0 / M_PI);
 
         for (int i = 0; i < 4; ++i)
             m.add_repr_offset_q(g_mav_att_repr_offset_q[i]);
@@ -361,20 +361,22 @@ void DataLogger::log_data(void)
         publish("/detection/objects", m, g_app_epoch_ns);
     }
 
-    // Target detections/tracks
+    // Target detections
     {
         os::logger::TargetDetection m;
         logTime(m.mutable_t(), g_app_epoch_ns);
         m.set_frame_id(g_cam0_frame_id);
 
+        // Detection validity + IDs
         m.set_is_target_detected(g_tgt_valid);
         m.set_detection_id(g_tgt_detect_id);
         m.set_track_id(g_tgt_track_id);
         m.set_class_id(g_tgt_class_id);
         m.set_confidence(g_tgt_conf);
 
-        m.set_bbox_offset_x_px(g_tgt_cntr_offset_y_pix);
-        m.set_bbox_offset_y_px(g_tgt_cntr_offset_x_pix);
+        // Raw bbox geometry in pixels
+        m.set_bbox_center_offset_x_px_raw(g_tgt_cntr_offset_x_pix);
+        m.set_bbox_center_offset_y_px_raw(g_tgt_cntr_offset_y_pix);
 
         m.set_bbox_height_px(g_tgt_height_pix);
         m.set_bbox_width_px(g_tgt_width_pix);
@@ -385,25 +387,37 @@ void DataLogger::log_data(void)
         m.set_bbox_top_px(g_tgt_top_px);
         m.set_bbox_bottom_px(g_tgt_bottom_px);
 
-        m.set_bbox_center_x_px(g_tgt_cntr_offset_x_filt);
-        m.set_bbox_center_y_px(g_tgt_cntr_offset_y_filt);
+        // Filtered pixel center offsets
+        m.set_bbox_center_offset_x_px_filt(g_tgt_cntr_offset_x_pix_filt);
+        m.set_bbox_center_offset_y_px_filt(g_tgt_cntr_offset_y_pix_filt);
 
-        m.set_delta_angle_deg(g_cam0_delta_angle_deg);
-        m.set_camera_tilt_deg(g_cam_tilt_deg);
+        publish("/target/detection", m, g_app_epoch_ns);
+    }
+
+    // Target state
+    {
+        os::logger::TargetState m;
+        logTime(m.mutable_t(), g_app_epoch_ns);
+        m.set_frame_id(g_cam0_frame_id);
+
+        // Camera and angular geometry (converted to degrees where appropriate)
+        m.set_delta_angle(g_cam0_delta_angle_rad * (float)180.0f / M_PI);
+        m.set_camera_tilt_angle(g_cam0_angle_rad * (float)180.0f / M_PI);
 
         m.set_delta_distance_x_m(g_tgt_pos_x_delta);
         m.set_delta_distance_z_m(g_tgt_pos_z_delta);
 
-        m.set_target_pos_x_est(g_tgt_pos_x_est);
-        m.set_target_pos_y_est(g_tgt_pos_y_est);
-        m.set_target_vel_x_est(g_tgt_vel_x_est);
-        m.set_target_vel_y_est(g_tgt_vel_y_est);
-        m.set_target_acc_x_est(g_tgt_acc_x_est);
-        m.set_target_acc_y_est(g_tgt_acc_y_est);
+        // EKF estimated target state
+        m.set_pos_x_est(g_tgt_pos_x_est);
+        m.set_pos_y_est(g_tgt_pos_y_est);
+        m.set_vel_x_est(g_tgt_vel_x_est);
+        m.set_vel_y_est(g_tgt_vel_y_est);
+        m.set_acc_x_est(g_tgt_acc_x_est);
+        m.set_acc_y_est(g_tgt_acc_y_est);
 
+        // Post-filter measurement usability
         m.set_is_measurement_valid(g_tgt_meas_valid);
-
-        publish("/target/detection", m, g_app_epoch_ns);
+        publish("/target/state", m, g_app_epoch_ns);
     }
 
     // Control adjustments
@@ -416,9 +430,9 @@ void DataLogger::log_data(void)
 
         m.set_pos_error_x_m(g_pos_err_x);
         m.set_pos_error_y_m(g_pos_err_y);
-        m.set_yaw_error_rad(g_yaw_err);
-        m.set_yaw_playback_rad(g_veh_yaw_playback_adj);
-        m.set_yaw_target_rad(g_ctrl_yaw_tgt);
+        m.set_yaw_error(g_yaw_err);
+        m.set_yaw_playback(g_veh_yaw_playback_adj);
+        m.set_yaw_target(g_ctrl_yaw_tgt);
 
         m.set_cmd_vel_x_mps(g_ctrl_vel_x_cmd);
         m.set_cmd_vel_y_mps(g_ctrl_vel_y_cmd);
@@ -483,8 +497,8 @@ void write_headers(void)
                               "g_tgt_conf",
                               "g_tgt_cntr_offset_y_pix",
                               "g_tgt_cntr_offset_x_pix",
-                              "g_tgt_cntr_offset_x_filt,"
-                              "g_tgt_cntr_offset_y_filt,"
+                              "g_tgt_cntr_offset_x_pix_filt,"
+                              "g_tgt_cntr_offset_y_pix_filt,"
                               "g_tgt_height_pix",
                               "g_tgt_width_pix",
                               "g_tgt_aspect_ratio",
@@ -507,8 +521,8 @@ void write_headers(void)
                               "g_tgt_los_dist_meas",
                               "g_pos_err_x",
                               "g_pos_err_y",
-                              "g_cam0_delta_angle_deg",
-                              "g_cam_tilt_deg",
+                              "g_cam0_delta_angle_rad",
+                              "g_cam0_angle_rad",
                               "g_tgt_pos_x_delta",
                               "g_tgt_pos_z_delta",
                               "g_ctrl_vel_x_cmd",
@@ -524,10 +538,10 @@ void write_headers(void)
                               "g_mav_gps_vel_x",
                               "g_mav_gps_vel_y",
                               "g_mav_gps_vel_z",
-                              "g_mav_gps_heading_deg",
-                              "g_mav_veh_roll_deg",
-                              "g_mav_veh_pitch_deg",
-                              "g_mav_veh_yaw_deg",
+                              "g_mav_gps_heading_cdeg",
+                              "g_mav_veh_roll_rad",
+                              "g_mav_veh_pitch_rad",
+                              "g_mav_veh_yaw_rad",
                               "g_mav_veh_roll_rate",
                               "g_mav_veh_pitch_rate",
                               "g_mav_veh_yaw_rate",
@@ -591,8 +605,8 @@ void log_data(void)
                                std::to_string(g_tgt_conf),
                                std::to_string(g_tgt_cntr_offset_y_pix),
                                std::to_string(g_tgt_cntr_offset_x_pix),
-                               std::to_string(g_tgt_cntr_offset_x_filt),
-                               std::to_string(g_tgt_cntr_offset_y_filt),
+                               std::to_string(g_tgt_cntr_offset_x_pix_filt),
+                               std::to_string(g_tgt_cntr_offset_y_pix_filt),
                                std::to_string(g_tgt_height_pix),
                                std::to_string(g_tgt_width_pix),
                                std::to_string(g_tgt_aspect_ratio),
@@ -615,8 +629,8 @@ void log_data(void)
                                std::to_string(g_tgt_los_dist_meas),
                                std::to_string(g_pos_err_x),
                                std::to_string(g_pos_err_y),
-                               std::to_string(g_cam0_delta_angle_deg),
-                               std::to_string(g_cam_tilt_deg),
+                               std::to_string(g_cam0_delta_angle_rad),
+                               std::to_string(g_cam0_angle_rad),
                                std::to_string(g_tgt_pos_x_delta),
                                std::to_string(g_tgt_pos_z_delta),
                                std::to_string(g_ctrl_vel_x_cmd),
@@ -632,10 +646,10 @@ void log_data(void)
                                std::to_string(g_mav_gps_vel_x),
                                std::to_string(g_mav_gps_vel_y),
                                std::to_string(g_mav_gps_vel_z),
-                               std::to_string(g_mav_gps_heading_deg),
-                               std::to_string(g_mav_veh_roll_deg),
-                               std::to_string(g_mav_veh_pitch_deg),
-                               std::to_string(g_mav_veh_yaw_deg),
+                               std::to_string(g_mav_gps_heading_cdeg),
+                               std::to_string(g_mav_veh_roll_rad),
+                               std::to_string(g_mav_veh_pitch_rad),
+                               std::to_string(g_mav_veh_yaw_rad),
                                std::to_string(g_mav_veh_roll_rate),
                                std::to_string(g_mav_veh_pitch_rate),
                                std::to_string(g_mav_veh_yaw_rate),
@@ -726,6 +740,7 @@ bool DataLogger::init(void)
     // Register channels (schema names must match package.Message)
     mMCAPLogger->addChannel("/system/state", "os.logger.SystemStateMsg", "protobuf");
     mMCAPLogger->addChannel("/target/detection", "os.logger.TargetDetection", "protobuf");
+    mMCAPLogger->addChannel("/target/state", "os.logger.TargetDetection", "protobuf");
     mMCAPLogger->addChannel("/control/output", "os.logger.ControlOutput", "protobuf");
 
     mMCAPLogger->addChannel("/mav/system", "os.logger.MavSystem", "protobuf");

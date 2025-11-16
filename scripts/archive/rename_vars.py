@@ -24,7 +24,7 @@ import sys
 
 # File extensions to process
 EXTS = {
-    ".csv"
+    ".py"
 }
 
 # --------------------------------------------------------------------------
@@ -300,7 +300,7 @@ import sys
 # ALLOWLIST: only these paths will be scanned
 # --------------------------------------------------------------------------
 ALLOW_DIRS = [
-    "scripts/mcap_data",
+    "scripts/helpers",
 ]
 
 # BLOCKLIST: explicitly exclude mavlink-related code
