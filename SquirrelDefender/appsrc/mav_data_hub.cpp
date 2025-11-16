@@ -26,130 +26,130 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-uint16_t g_mav_veh_command_id;              /*<  Command ID (of acknowledged command).*/
-uint8_t g_mav_veh_command_result;           /*<  Result of command.*/
-uint8_t g_mav_veh_command_progress;         /*< [%] The progress percentage when result is MAV_RESULT_IN_PROGRESS. Values: [0-100],
-                                            or UINT8_MAX if the progress is unknown.*/
-int32_t g_mav_veh_command_result_param2;    /*<  Additional result information. Can be set with a command-specific enum containing
-                                           command-specific error reasons for why the command might be denied. If used, the associated
-                                           enum must be documented in the corresponding MAV_CMD (this enum should have a 0 value to indicate
-                                           "unused" or "unknown").*/
-uint8_t g_mav_veh_command_target_system;    /*<  System ID of the target recipient. This is the ID of the system that sent the command for
-                                               which this COMMAND_ACK is an acknowledgement.*/
-uint8_t g_mav_veh_command_target_component; /*<  Component ID of the target recipient. This is the ID of the system that sent the command for
-                                            which this COMMAND_ACK is an acknowledgement.*/
+uint16_t g_mav_cmd_id;           /*<  Command ID (of acknowledged command).*/
+uint8_t g_mav_cmd_result;        /*<  Result of command.*/
+uint8_t g_mav_cmd_progress;      /*< [%] The progress percentage when result is MAV_RESULT_IN_PROGRESS. Values: [0-100],
+                                         or UINT8_MAX if the progress is unknown.*/
+int32_t g_mav_cmd_result_param2; /*<  Additional result information. Can be set with a command-specific enum containing
+                                        command-specific error reasons for why the command might be denied. If used, the associated
+                                        enum must be documented in the corresponding MAV_CMD (this enum should have a 0 value to indicate
+                                        "unused" or "unknown").*/
+uint8_t g_mav_cmd_tgt_sys;       /*<  System ID of the target recipient. This is the ID of the system that sent the command for
+                                                  which this COMMAND_ACK is an acknowledgement.*/
+uint8_t g_mav_cmd_tgt_comp;      /*<  Component ID of the target recipient. This is the ID of the system that sent the command for
+                                                 which this COMMAND_ACK is an acknowledgement.*/
 
-uint32_t g_mav_veh_sys_stat_onbrd_cntrl_snsrs_present;      /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
-uint32_t g_mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled;      /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
-uint32_t g_mav_veh_sys_stat_onbrd_cntrl_snsrs_health;       /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error.
-                                                              Value of 1: healthy.*/
-uint16_t g_mav_veh_sys_stat_load;                           /*< [d%] Maximum usage in percent of the mainloop time. Values: [0-1000] - should always be below 1000*/
-uint16_t g_mav_veh_sys_stat_voltage_battery;                /*< [mV] Battery voltage, UINT16_MAX: Voltage not sent by autopilot*/
-int16_t g_mav_veh_sys_stat_current_battery;                 /*< [cA] Battery current, -1: Current not sent by autopilot*/
-uint16_t g_mav_veh_sys_stat_drop_rate_comm;                 /*< [c%] Communication drop rate, (UART, I2C, SPI, CAN), dropped packets on all links
-                                                            (packets that were corrupted on reception on the MAV)*/
-uint16_t g_mav_veh_sys_stat_errors_comm;                    /*<  Communication errors (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)*/
-uint16_t g_mav_veh_sys_stat_errors_count1;                  /*<  Autopilot-specific errors*/
-uint16_t g_mav_veh_sys_stat_errors_count2;                  /*<  Autopilot-specific errors*/
-uint16_t g_mav_veh_sys_stat_errors_count3;                  /*<  Autopilot-specific errors*/
-uint16_t g_mav_veh_sys_stat_errors_count4;                  /*<  Autopilot-specific errors*/
-int8_t g_mav_veh_sys_stat_battery_remaining;                /*< [%] Battery energy remaining, -1: Battery remaining energy not sent by autopilot*/
-uint32_t g_mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd;  /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
-uint32_t g_mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd;  /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
-uint32_t g_mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd; /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error.
-                                                            Value of 1: healthy.*/
-uint32_t g_mav_veh_custom_mode;                             /*<  A bitfield for use for autopilot-specific flags*/
-bool g_manual_override_land;
-uint8_t g_mav_veh_type;            /*<  Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the
-                                   component type (e.g. camera, gimbal, etc.). This should be used in preference to component id for identifying the component type.*/
-uint8_t g_mav_veh_autopilot_type;  /*<  Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.*/
-uint8_t g_mav_veh_base_mode;       /*<  System mode bitmap.*/
-uint8_t g_mav_veh_state;           /*<  System status flag.*/
-uint8_t g_mav_veh_mavlink_version; /*<  MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version*/
+uint32_t g_mav_sys_sensors_present;     /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
+uint32_t g_mav_sys_sensors_enabled;     /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
+uint32_t g_mav_sys_sensors_health;      /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error.
+                                                             Value of 1: healthy.*/
+uint16_t g_mav_sys_load;                /*< [d%] Maximum usage in percent of the mainloop time. Values: [0-1000] - should always be below 1000*/
+uint16_t g_mav_batt_voltage_mv;         /*< [mV] Battery voltage, UINT16_MAX: Voltage not sent by autopilot*/
+int16_t g_mav_batt_current_ma;          /*< [cA] Battery current, -1: Current not sent by autopilot*/
+uint16_t g_mav_comm_drop_rate;          /*< [c%] Communication drop rate, (UART, I2C, SPI, CAN), dropped packets on all links
+                                                     (packets that were corrupted on reception on the MAV)*/
+uint16_t g_mav_comm_errors;             /*<  Communication errors (UART, I2C, SPI, CAN), dropped packets on all links (packets that were corrupted on reception on the MAV)*/
+uint16_t g_mav_err_count1;              /*<  Autopilot-specific errors*/
+uint16_t g_mav_err_count2;              /*<  Autopilot-specific errors*/
+uint16_t g_mav_err_count3;              /*<  Autopilot-specific errors*/
+uint16_t g_mav_err_count4;              /*<  Autopilot-specific errors*/
+int8_t g_mav_batt_remaining_pct;        /*< [%] Battery energy remaining, -1: Battery remaining energy not sent by autopilot*/
+uint32_t g_mav_sys_sensors_present_ext; /*<  Bitmap showing which onboard controllers and sensors are present. Value of 0: not present. Value of 1: present.*/
+uint32_t g_mav_sys_sensors_enabled_ext; /*<  Bitmap showing which onboard controllers and sensors are enabled:  Value of 0: not enabled. Value of 1: enabled.*/
+uint32_t g_mav_sys_sensors_health_ext;  /*<  Bitmap showing which onboard controllers and sensors have an error (or are operational). Value of 0: error.
+                                                             Value of 1: healthy.*/
+uint32_t g_mav_mode_custom;             /*<  A bitfield for use for autopilot-specific flags*/
+bool g_ctrl_land_override;
+uint8_t g_mav_type;           /*<  Vehicle or component type. For a flight controller component the vehicle type (quadrotor, helicopter, etc.). For other components the
+                                  component type (e.g. camera, gimbal, etc.). This should be used in preference to component id for identifying the component type.*/
+uint8_t g_mav_autopilot_type; /*<  Autopilot type / class. Use MAV_AUTOPILOT_INVALID for components that are not flight controllers.*/
+uint8_t g_mav_mode_base;      /*<  System mode bitmap.*/
+uint8_t g_mav_state;          /*<  System status flag.*/
+uint8_t g_mav_version;        /*<  MAVLink version, not writable by user, gets added by protocol because of magic data type: uint8_t_mavlink_version*/
 
-int32_t g_mav_veh_lat;      /*< [degE7] Latitude, expressed*/
-int32_t g_mav_veh_lon;      /*< [degE7] Longitude, expressed*/
-int32_t g_mav_veh_alt;      /*< [mm] Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.*/
-int32_t g_mav_veh_rel_alt;  /*< [mm] Altitude above ground*/
-int16_t g_mav_veh_gps_vx;   /*< [cm/s] Ground X Speed (Latitude, positive north)*/
-int16_t g_mav_veh_gps_vy;   /*< [cm/s] Ground Y Speed (Longitude, positive east)*/
-int16_t g_mav_veh_gps_vz;   /*< [cm/s] Ground Z Speed (Altitude, positive down)*/
-uint16_t g_mav_veh_gps_hdg; /*< [cdeg] Vehicle heading (yaw angle), 0.0..359.99 degrees. If unknown, set to: UINT16_MAX*/
+int32_t g_mav_gps_lat;           /*< [degE7] Latitude, expressed*/
+int32_t g_mav_gps_lon;           /*< [degE7] Longitude, expressed*/
+int32_t g_mav_gps_alt_msl;       /*< [mm] Altitude (MSL). Note that virtually all GPS modules provide both WGS84 and MSL.*/
+int32_t g_mav_gps_alt_rel;       /*< [mm] Altitude above ground*/
+int16_t g_mav_gps_vel_x;         /*< [cm/s] Ground X Speed (Latitude, positive north)*/
+int16_t g_mav_gps_vel_y;         /*< [cm/s] Ground Y Speed (Longitude, positive east)*/
+int16_t g_mav_gps_vel_z;         /*< [cm/s] Ground Z Speed (Altitude, positive down)*/
+uint16_t g_mav_gps_heading_cdeg; /*< [cdeg] Vehicle heading (yaw angle), 0.0..359.99 degrees. If unknown, set to: UINT16_MAX*/
 
-float g_mav_veh_roll;       /*< [rad] Roll angle (-pi..+pi)*/
-float g_mav_veh_pitch;      /*< [rad] Pitch angle (-pi..+pi)*/
-float g_mav_veh_yaw;        /*< [rad] Yaw angle (-pi..+pi)*/
-float g_mav_veh_rollspeed;  /*< [rad/s] Roll angular speed*/
-float g_mav_veh_pitchspeed; /*< [rad/s] Pitch angular speed*/
-float g_mav_veh_yawspeed;   /*< [rad/s] Yaw angular speed*/
+float g_mav_veh_roll_rad;   /*< [rad] Roll angle (-pi..+pi)*/
+float g_mav_veh_pitch_rad;  /*< [rad] Pitch angle (-pi..+pi)*/
+float g_mav_veh_yaw_rad;    /*< [rad] Yaw angle (-pi..+pi)*/
+float g_mav_veh_roll_rate;  /*< [rad/s] Roll angular speed*/
+float g_mav_veh_pitch_rate; /*< [rad/s] Pitch angular speed*/
+float g_mav_veh_yaw_rate;   /*< [rad/s] Yaw angular speed*/
 
-int16_t g_mav_veh_imu_ax;    /*< [mG] X acceleration*/
-int16_t g_mav_veh_imu_ay;    /*< [mG] Y acceleration*/
-int16_t g_mav_veh_imu_az;    /*< [mG] Z acceleration*/
-int16_t g_mav_veh_imu_xgyro; /*< [mrad/s] Angular speed around X axis*/
-int16_t g_mav_veh_imu_ygyro; /*< [mrad/s] Angular speed around Y axis*/
-int16_t g_mav_veh_imu_zgyro; /*< [mrad/s] Angular speed around Z axis*/
-int16_t g_mav_veh_imu_xmag;  /*< [mgauss] X Magnetic field*/
-int16_t g_mav_veh_imu_ymag;  /*< [mgauss] Y Magnetic field*/
-int16_t g_mav_veh_imu_zmag;  /*< [mgauss] Z Magnetic field*/
+int16_t g_mav_imu_accel_x; /*< [mG] X acceleration*/
+int16_t g_mav_imu_accel_y; /*< [mG] Y acceleration*/
+int16_t g_mav_imu_accel_z; /*< [mG] Z acceleration*/
+int16_t g_mav_imu_gyro_x;  /*< [mrad/s] Angular speed around X axis*/
+int16_t g_mav_imu_gyro_y;  /*< [mrad/s] Angular speed around Y axis*/
+int16_t g_mav_imu_gyro_z;  /*< [mrad/s] Angular speed around Z axis*/
+int16_t g_mav_imu_mag_x;   /*< [mgauss] X Magnetic field*/
+int16_t g_mav_imu_mag_y;   /*< [mgauss] Y Magnetic field*/
+int16_t g_mav_imu_mag_z;   /*< [mgauss] Z Magnetic field*/
 
-float g_mav_veh_q1_target;         /*<  Quaternion component 1, w (1 in null-rotation)*/
-float g_mav_veh_q2_target;         /*<  Quaternion component 2, x (0 in null-rotation)*/
-float g_mav_veh_q3_target;         /*<  Quaternion component 3, y (0 in null-rotation)*/
-float g_mav_veh_q4_target;         /*<  Quaternion component 4, z (0 in null-rotation)*/
-float g_mav_veh_roll_rate_target;  /*< [rad/s] Roll angular speed*/
-float g_mav_veh_pitch_rate_target; /*< [rad/s] Pitch angular speed*/
-float g_mav_veh_yaw_rate_target;   /*< [rad/s] Yaw angular speed*/
-float g_mav_veh_thrust_target;     /*<  Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)*/
+float g_mav_att_target_q1;         /*<  Quaternion component 1, w (1 in null-rotation)*/
+float g_mav_att_target_q2;         /*<  Quaternion component 2, x (0 in null-rotation)*/
+float g_mav_att_target_q3;         /*<  Quaternion component 3, y (0 in null-rotation)*/
+float g_mav_att_target_q4;         /*<  Quaternion component 4, z (0 in null-rotation)*/
+float g_mav_att_target_roll_rate;  /*< [rad/s] Roll angular speed*/
+float g_mav_att_target_pitch_rate; /*< [rad/s] Pitch angular speed*/
+float g_mav_att_target_yaw_rate;   /*< [rad/s] Yaw angular speed*/
+float g_mav_att_target_thrust;     /*<  Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)*/
 uint8_t attitude_target_mask;      /*<  Bitmap to indicate which dimensions should be ignored by the vehicle.*/
 
-float g_mav_veh_q1_actual;         /*<  Quaternion component 1, w (1 in null-rotation)*/
-float g_mav_veh_q2_actual;         /*<  Quaternion component 2, x (0 in null-rotation)*/
-float g_mav_veh_q3_actual;         /*<  Quaternion component 3, y (0 in null-rotation)*/
-float g_mav_veh_q4_actual;         /*<  Quaternion component 4, z (0 in null-rotation)*/
-float g_mav_veh_roll_rate_actual;  /*< [rad/s] Roll angular speed*/
-float g_mav_veh_pitch_rate_actual; /*< [rad/s] Pitch angular speed*/
-float g_mav_veh_yaw_rate_actual;   /*< [rad/s] Yaw angular speed*/
-float g_mav_veh_repr_offset_q[4];  /*<  Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)*/
+float g_mav_att_actual_q1;         /*<  Quaternion component 1, w (1 in null-rotation)*/
+float g_mav_att_actual_q2;         /*<  Quaternion component 2, x (0 in null-rotation)*/
+float g_mav_att_actual_q3;         /*<  Quaternion component 3, y (0 in null-rotation)*/
+float g_mav_att_actual_q4;         /*<  Quaternion component 4, z (0 in null-rotation)*/
+float g_mav_att_actual_roll_rate;  /*< [rad/s] Roll angular speed*/
+float g_mav_att_actual_pitch_rate; /*< [rad/s] Pitch angular speed*/
+float g_mav_att_actual_yaw_rate;   /*< [rad/s] Yaw angular speed*/
+float g_mav_att_repr_offset_q[4];  /*<  Collective thrust, normalized to 0 .. 1 (-1 .. 1 for vehicles capable of reverse trust)*/
 
-uint16_t g_mav_veh_rngfdr_min_distance;     /*< [cm] Minimum distance the sensor can measure*/
-uint16_t g_mav_veh_rngfdr_max_distance;     /*< [cm] Maximum distance the sensor can measure*/
-uint16_t g_mav_veh_rngfdr_current_distance; /*< [cm] Current distance reading*/
-uint8_t g_mav_veh_rngfdr_type;              /*<  Type of distance sensor.*/
-uint8_t g_mav_veh_rngfdr_id;                /*<  Onboard ID of the sensor*/
-uint8_t g_mav_veh_rngfdr_orientation;       /*<  Direction the sensor faces. downward-facing: ROTATION_PITCH_270, upward-facing: ROTATION_PITCH_90, backward-facing: ROTATION_PITCH_180, forward-facing: ROTATION_NONE, left-facing: ROTATION_YAW_90, right-facing: ROTATION_YAW_270*/
-uint8_t g_mav_veh_rngfdr_covariance;        /*< [cm^2] Measurement variance. Max standard deviation is 6cm. UINT8_MAX if unknown.*/
-float g_mav_veh_rngfdr_horizontal_fov;      /*< [rad] Horizontal Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.*/
-float g_mav_veh_rngfdr_vertical_fov;        /*< [rad] Vertical Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.*/
-float g_mav_veh_rngfdr_quaternion[4];       /*<  Quaternion of the sensor orientation in vehicle body frame (w, x, y, z order, zero-rotation is 1, 0, 0, 0). Zero-rotation is along the vehicle body x-axis. This field is required if the orientation is set to MAV_SENSOR_ROTATION_CUSTOM. Set it to 0 if invalid."*/
-uint8_t g_mav_veh_rngfdr_signal_quality;    /*< [%] Signal quality of the sensor. Specific to each sensor type, representing the relation of the signal strength with the target reflectivity, distance, size or aspect, but normalised as a percentage. 0 = unknown/unset signal quality, 1 = invalid signal, 100 = perfect signal.*/
+uint16_t g_mav_rngfndr_min_cm;     /*< [cm] Minimum distance the sensor can measure*/
+uint16_t g_mav_rngfndr_max_cm;     /*< [cm] Maximum distance the sensor can measure*/
+uint16_t g_mav_rngfndr_dist_m;     /*< [cm] Current distance reading*/
+uint8_t g_mav_rngfndr_type;        /*<  Type of distance sensor.*/
+uint8_t g_mav_rngfndr_id;          /*<  Onboard ID of the sensor*/
+uint8_t g_mav_rngfndr_orient;      /*<  Direction the sensor faces. downward-facing: ROTATION_PITCH_270, upward-facing: ROTATION_PITCH_90, backward-facing: ROTATION_PITCH_180, forward-facing: ROTATION_NONE, left-facing: ROTATION_YAW_90, right-facing: ROTATION_YAW_270*/
+uint8_t g_mav_rngfndr_cov;         /*< [cm^2] Measurement variance. Max standard deviation is 6cm. UINT8_MAX if unknown.*/
+float g_mav_rngfndr_fov_horiz_rad; /*< [rad] Horizontal Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.*/
+float g_mav_rngfndr_fov_vert_rad;  /*< [rad] Vertical Field of View (angle) where the distance measurement is valid and the field of view is known. Otherwise this is set to 0.*/
+float g_mav_rngfndr_quat[4];       /*<  Quaternion of the sensor orientation in vehicle body frame (w, x, y, z order, zero-rotation is 1, 0, 0, 0). Zero-rotation is along the vehicle body x-axis. This field is required if the orientation is set to MAV_SENSOR_ROTATION_CUSTOM. Set it to 0 if invalid."*/
+uint8_t g_mav_rngfndr_quality;     /*< [%] Signal quality of the sensor. Specific to each sensor type, representing the relation of the signal strength with the target reflectivity, distance, size or aspect, but normalised as a percentage. 0 = unknown/unset signal quality, 1 = invalid signal, 100 = perfect signal.*/
 
-float g_mav_veh_flow_comp_m_x;   /*< [m/s] Flow in x-sensor direction, angular-speed compensated*/
-float g_mav_veh_flow_comp_m_y;   /*< [m/s] Flow in y-sensor direction, angular-speed compensated*/
-float g_mav_veh_ground_distance; /*< [m] Ground distance. Positive value: distance known. Negative value: Unknown distance*/
-int16_t g_mav_veh_flow_x;        /*< [dpix] Flow in x-sensor direction*/
-int16_t g_mav_veh_flow_y;        /*< [dpix] Flow in y-sensor direction*/
-uint8_t g_mav_veh_sensor_id;     /*<  Sensor ID*/
-uint8_t g_mav_veh_flow_quality;  /*<  Optical flow quality / confidence. 0: bad, 255: maximum quality*/
-float g_mav_veh_flow_rate_x;     /*< [rad/s] Flow rate about X axis*/
-float g_mav_veh_flow_rate_y;     /*< [rad/s] Flow rate about Y axis*/
+float g_mav_flow_vel_x;         /*< [m/s] Flow in x-sensor direction, angular-speed compensated*/
+float g_mav_flow_vel_y;         /*< [m/s] Flow in y-sensor direction, angular-speed compensated*/
+float g_mav_flow_ground_dist_m; /*< [m] Ground distance. Positive value: distance known. Negative value: Unknown distance*/
+int16_t g_mav_flow_px_x;        /*< [dpix] Flow in x-sensor direction*/
+int16_t g_mav_flow_px_y;        /*< [dpix] Flow in y-sensor direction*/
+uint8_t g_mav_flow_sensor_id;   /*<  Sensor ID*/
+uint8_t g_mav_flow_quality;     /*<  Optical flow quality / confidence. 0: bad, 255: maximum quality*/
+float g_mav_flow_rate_x;        /*< [rad/s] Flow rate about X axis*/
+float g_mav_flow_rate_y;        /*< [rad/s] Flow rate about Y axis*/
 
-float g_mav_veh_local_ned_x;  /*< [m] X Position*/
-float g_mav_veh_local_ned_y;  /*< [m] Y Position*/
-float g_mav_veh_local_ned_z;  /*< [m] Z Position*/
-float g_mav_veh_local_ned_vx; /*< [m/s] X Speed*/
-float g_mav_veh_local_ned_vy; /*< [m/s] Y Speed*/
-float g_mav_veh_local_ned_vz; /*< [m/s] Z Speed*/
+float g_mav_veh_pos_ned_x; /*< [m] X Position*/
+float g_mav_veh_pos_ned_y; /*< [m] Y Position*/
+float g_mav_veh_pos_ned_z; /*< [m] Z Position*/
+float g_mav_veh_vel_ned_x; /*< [m/s] X Speed*/
+float g_mav_veh_vel_ned_y; /*< [m/s] Y Speed*/
+float g_mav_veh_vel_ned_z; /*< [m/s] Z Speed*/
 
 // Parameter read
 
-float g_param_value;    /*<  Onboard parameter value*/
-uint16_t g_param_count; /*<  Total number of onboard parameters*/
-uint16_t g_param_index; /*<  Index of this onboard parameter*/
-char g_param_id[17];    /*<  Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string*/
-uint8_t g_param_type;   /*<  Onboard parameter type.*/
-std::string param_name;
-bool g_param_read;
+float g_mav_param_val;      /*<  Onboard parameter value*/
+uint16_t g_mav_param_count; /*<  Total number of onboard parameters*/
+uint16_t g_mav_param_index; /*<  Index of this onboard parameter*/
+char g_mav_param_id[17];    /*<  Onboard parameter id, terminated by NULL if the length is less than 16 human-readable chars and WITHOUT null termination (NULL) byte if the length is exactly 16 chars - applications have to provide 16+1 bytes storage if the ID is stored as string*/
+uint8_t g_mav_param_type;   /*<  Onboard parameter type.*/
+std::string g_mav_param_name;
+bool g_mav_param_read;
 
 /********************************************************************************
  * Calibration definitions
@@ -214,12 +214,12 @@ void proc_mav_heartbeat_msg(const mavlink_message_t *msg)
     /* Filter out non-quadrotor heartbeats - e.g. a GCS */
     if (heartbeat.type == 2)
     {
-        g_mav_veh_type = heartbeat.type;
-        g_mav_veh_autopilot_type = heartbeat.autopilot;
-        g_mav_veh_base_mode = heartbeat.base_mode;
-        g_mav_veh_custom_mode = heartbeat.custom_mode;
-        g_mav_veh_state = heartbeat.system_status;
-        g_mav_veh_mavlink_version = heartbeat.mavlink_version;
+        g_mav_type = heartbeat.type;
+        g_mav_autopilot_type = heartbeat.autopilot;
+        g_mav_mode_base = heartbeat.base_mode;
+        g_mav_mode_custom = heartbeat.custom_mode;
+        g_mav_state = heartbeat.system_status;
+        g_mav_version = heartbeat.mavlink_version;
     }
 
 #ifdef DEBUG_BUILD
@@ -238,14 +238,14 @@ void proc_mav_gps_int_msg(const mavlink_message_t *msg)
     mavlink_global_position_int_t global_pos_int;
     mavlink_msg_global_position_int_decode(msg, &global_pos_int);
 
-    g_mav_veh_lat = global_pos_int.lat;
-    g_mav_veh_lon = global_pos_int.lon;
-    g_mav_veh_alt = global_pos_int.alt;
-    g_mav_veh_rel_alt = global_pos_int.relative_alt;
-    g_mav_veh_gps_vx = global_pos_int.vx;
-    g_mav_veh_gps_vy = global_pos_int.vy;
-    g_mav_veh_gps_vz = global_pos_int.vz;
-    g_mav_veh_gps_hdg = global_pos_int.hdg;
+    g_mav_gps_lat = global_pos_int.lat;
+    g_mav_gps_lon = global_pos_int.lon;
+    g_mav_gps_alt_msl = global_pos_int.alt;
+    g_mav_gps_alt_rel = global_pos_int.relative_alt;
+    g_mav_gps_vel_x = global_pos_int.vx;
+    g_mav_gps_vel_y = global_pos_int.vy;
+    g_mav_gps_vel_z = global_pos_int.vz;
+    g_mav_gps_heading_cdeg = global_pos_int.hdg;
 
 #ifdef DEBUG_BUILD
 
@@ -281,22 +281,22 @@ void proc_mav_sys_status_msg(const mavlink_message_t *msg)
     mavlink_sys_status_t sys_status;
     mavlink_msg_sys_status_decode(msg, &sys_status);
 
-    g_mav_veh_sys_stat_onbrd_cntrl_snsrs_present = sys_status.onboard_control_sensors_present;
-    g_mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled = sys_status.onboard_control_sensors_enabled;
-    g_mav_veh_sys_stat_onbrd_cntrl_snsrs_health = sys_status.onboard_control_sensors_health;
-    g_mav_veh_sys_stat_load = sys_status.load;
-    g_mav_veh_sys_stat_voltage_battery = sys_status.voltage_battery;
-    g_mav_veh_sys_stat_current_battery = sys_status.current_battery;
-    g_mav_veh_sys_stat_drop_rate_comm = sys_status.drop_rate_comm;
-    g_mav_veh_sys_stat_errors_comm = sys_status.errors_comm;
-    g_mav_veh_sys_stat_errors_count1 = sys_status.errors_count1;
-    g_mav_veh_sys_stat_errors_count2 = sys_status.errors_count2;
-    g_mav_veh_sys_stat_errors_count3 = sys_status.errors_count3;
-    g_mav_veh_sys_stat_errors_count4 = sys_status.errors_count4;
-    g_mav_veh_sys_stat_battery_remaining = sys_status.battery_remaining;
-    g_mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd = sys_status.onboard_control_sensors_present_extended;
-    g_mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd = sys_status.onboard_control_sensors_enabled_extended;
-    g_mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd = sys_status.onboard_control_sensors_health_extended;
+    g_mav_sys_sensors_present = sys_status.onboard_control_sensors_present;
+    g_mav_sys_sensors_enabled = sys_status.onboard_control_sensors_enabled;
+    g_mav_sys_sensors_health = sys_status.onboard_control_sensors_health;
+    g_mav_sys_load = sys_status.load;
+    g_mav_batt_voltage_mv = sys_status.voltage_battery;
+    g_mav_batt_current_ma = sys_status.current_battery;
+    g_mav_comm_drop_rate = sys_status.drop_rate_comm;
+    g_mav_comm_errors = sys_status.errors_comm;
+    g_mav_err_count1 = sys_status.errors_count1;
+    g_mav_err_count2 = sys_status.errors_count2;
+    g_mav_err_count3 = sys_status.errors_count3;
+    g_mav_err_count4 = sys_status.errors_count4;
+    g_mav_batt_remaining_pct = sys_status.battery_remaining;
+    g_mav_sys_sensors_present_ext = sys_status.onboard_control_sensors_present_extended;
+    g_mav_sys_sensors_enabled_ext = sys_status.onboard_control_sensors_enabled_extended;
+    g_mav_sys_sensors_health_ext = sys_status.onboard_control_sensors_health_extended;
 
 #ifdef DEBUG_BUILD
 
@@ -333,15 +333,15 @@ void proc_mav_param_value_msg(const mavlink_message_t *msg)
     mavlink_msg_param_value_decode(msg, &param);
 
     // Copy param_id safely for internal use
-    memcpy(g_param_id, param.param_id, 16);
-    g_param_id[16] = '\0';
+    memcpy(g_mav_param_id, param.param_id, 16);
+    g_mav_param_id[16] = '\0';
 
-    g_param_value = param.param_value;
-    g_param_count = param.param_count;
-    g_param_index = param.param_index;
-    g_param_type = param.param_type;
-    param_name = g_param_id;
-    g_param_read = true;
+    g_mav_param_val = param.param_value;
+    g_mav_param_count = param.param_count;
+    g_mav_param_index = param.param_index;
+    g_mav_param_type = param.param_type;
+    g_mav_param_name = g_mav_param_id;
+    g_mav_param_read = true;
 
     // // --- Debug: print all raw MAVLink values ---
     // char name_buf[17];
@@ -382,15 +382,15 @@ void proc_mav_scaled_imu_msg(const mavlink_message_t *msg)
     mavlink_scaled_imu_t scaled_imu;
     mavlink_msg_scaled_imu_decode(msg, &scaled_imu);
 
-    g_mav_veh_imu_ax = scaled_imu.xacc;
-    g_mav_veh_imu_ay = scaled_imu.yacc;
-    g_mav_veh_imu_az = scaled_imu.zacc;
-    g_mav_veh_imu_xgyro = scaled_imu.xgyro;
-    g_mav_veh_imu_ygyro = scaled_imu.ygyro;
-    g_mav_veh_imu_zgyro = scaled_imu.zgyro;
-    g_mav_veh_imu_xmag = scaled_imu.xmag;
-    g_mav_veh_imu_ymag = scaled_imu.ymag;
-    g_mav_veh_imu_zmag = scaled_imu.zmag;
+    g_mav_imu_accel_x = scaled_imu.xacc;
+    g_mav_imu_accel_y = scaled_imu.yacc;
+    g_mav_imu_accel_z = scaled_imu.zacc;
+    g_mav_imu_gyro_x = scaled_imu.xgyro;
+    g_mav_imu_gyro_y = scaled_imu.ygyro;
+    g_mav_imu_gyro_z = scaled_imu.zgyro;
+    g_mav_imu_mag_x = scaled_imu.xmag;
+    g_mav_imu_mag_y = scaled_imu.ymag;
+    g_mav_imu_mag_z = scaled_imu.zmag;
 
 #ifdef DEBUG_BUILD
 
@@ -460,15 +460,15 @@ void proc_mav_position_local_ned_msg(const mavlink_message_t *msg)
     mavlink_local_position_ned_t position_local_ned;
     mavlink_msg_local_position_ned_decode(msg, &position_local_ned);
 
-    g_mav_veh_local_ned_x = position_local_ned.x;
-    g_mav_veh_local_ned_y = position_local_ned.y;
-    g_mav_veh_local_ned_z = position_local_ned.z;
+    g_mav_veh_pos_ned_x = position_local_ned.x;
+    g_mav_veh_pos_ned_y = position_local_ned.y;
+    g_mav_veh_pos_ned_z = position_local_ned.z;
     // TODO - figure out why
     // Data showed Forward and right were -vx & -vy
     // Forward and right should be +vx & +vy
-    g_mav_veh_local_ned_vx = position_local_ned.vx;
-    g_mav_veh_local_ned_vy = position_local_ned.vy;
-    g_mav_veh_local_ned_vz = position_local_ned.vz;
+    g_mav_veh_vel_ned_x = position_local_ned.vx;
+    g_mav_veh_vel_ned_y = position_local_ned.vy;
+    g_mav_veh_vel_ned_z = position_local_ned.vz;
 
 #ifdef DEBUG_BUILD
 
@@ -486,12 +486,12 @@ void proc_mav_attitude_msg(const mavlink_message_t *msg)
     mavlink_attitude_t attitude;
     mavlink_msg_attitude_decode(msg, &attitude);
 
-    g_mav_veh_roll = attitude.roll;
-    g_mav_veh_pitch = attitude.pitch;
-    g_mav_veh_yaw = attitude.yaw;
-    g_mav_veh_rollspeed = attitude.rollspeed;
-    g_mav_veh_pitchspeed = attitude.pitchspeed;
-    g_mav_veh_yawspeed = attitude.yawspeed;
+    g_mav_veh_roll_rad = attitude.roll;
+    g_mav_veh_pitch_rad = attitude.pitch;
+    g_mav_veh_yaw_rad = attitude.yaw;
+    g_mav_veh_roll_rate = attitude.rollspeed;
+    g_mav_veh_pitch_rate = attitude.pitchspeed;
+    g_mav_veh_yaw_rate = attitude.yawspeed;
 
 #ifdef DEBUG_BUILD
 
@@ -544,14 +544,14 @@ void proc_mav_attitude_quaternion_msg(const mavlink_message_t *msg)
     mavlink_attitude_quaternion_t attitude_quaternion;
     mavlink_msg_attitude_quaternion_decode(msg, &attitude_quaternion);
 
-    g_mav_veh_q1_actual = attitude_quaternion.q1;
-    g_mav_veh_q2_actual = attitude_quaternion.q2;
-    g_mav_veh_q3_actual = attitude_quaternion.q3;
-    g_mav_veh_q4_actual = attitude_quaternion.q4;
-    g_mav_veh_roll_rate_actual = attitude_quaternion.rollspeed;
-    g_mav_veh_pitch_rate_actual = attitude_quaternion.pitchspeed;
-    g_mav_veh_yaw_rate_actual = attitude_quaternion.yawspeed;
-    g_mav_veh_repr_offset_q[4] = attitude_quaternion.repr_offset_q[4];
+    g_mav_att_actual_q1 = attitude_quaternion.q1;
+    g_mav_att_actual_q2 = attitude_quaternion.q2;
+    g_mav_att_actual_q3 = attitude_quaternion.q3;
+    g_mav_att_actual_q4 = attitude_quaternion.q4;
+    g_mav_att_actual_roll_rate = attitude_quaternion.rollspeed;
+    g_mav_att_actual_pitch_rate = attitude_quaternion.pitchspeed;
+    g_mav_att_actual_yaw_rate = attitude_quaternion.yawspeed;
+    g_mav_att_repr_offset_q[4] = attitude_quaternion.repr_offset_q[4];
 
 #ifdef DEBUG_BUILD
 
@@ -570,12 +570,12 @@ void proc_mav_command_ack_msg(const mavlink_message_t *msg)
     mavlink_command_ack_t command_ack;
     mavlink_msg_command_ack_decode(msg, &command_ack);
 
-    g_mav_veh_command_id = command_ack.command;
-    g_mav_veh_command_result = command_ack.result;
-    g_mav_veh_command_progress = command_ack.progress;
-    g_mav_veh_command_result_param2 = command_ack.result_param2;
-    g_mav_veh_command_target_system = command_ack.target_system;
-    g_mav_veh_command_target_component = command_ack.target_component;
+    g_mav_cmd_id = command_ack.command;
+    g_mav_cmd_result = command_ack.result;
+    g_mav_cmd_progress = command_ack.progress;
+    g_mav_cmd_result_param2 = command_ack.result_param2;
+    g_mav_cmd_tgt_sys = command_ack.target_system;
+    g_mav_cmd_tgt_comp = command_ack.target_component;
 
 #ifdef DEBUG_BUILD
 
@@ -593,15 +593,15 @@ void proc_mav_optical_flow_msg(const mavlink_message_t *msg)
     mavlink_optical_flow_t optical_flow;
     mavlink_msg_optical_flow_decode(msg, &optical_flow);
 
-    g_mav_veh_flow_comp_m_x = optical_flow.flow_comp_m_x;
-    g_mav_veh_flow_comp_m_y = optical_flow.flow_comp_m_y;
-    g_mav_veh_ground_distance = optical_flow.ground_distance;
-    g_mav_veh_flow_x = optical_flow.flow_x;
-    g_mav_veh_flow_y = optical_flow.flow_y;
-    g_mav_veh_sensor_id = optical_flow.sensor_id;
-    g_mav_veh_flow_quality = optical_flow.quality;
-    g_mav_veh_flow_rate_x = optical_flow.flow_rate_x;
-    g_mav_veh_flow_rate_y = optical_flow.flow_rate_y;
+    g_mav_flow_vel_x = optical_flow.flow_comp_m_x;
+    g_mav_flow_vel_y = optical_flow.flow_comp_m_y;
+    g_mav_flow_ground_dist_m = optical_flow.ground_distance;
+    g_mav_flow_px_x = optical_flow.flow_x;
+    g_mav_flow_px_y = optical_flow.flow_y;
+    g_mav_flow_sensor_id = optical_flow.sensor_id;
+    g_mav_flow_quality = optical_flow.quality;
+    g_mav_flow_rate_x = optical_flow.flow_rate_x;
+    g_mav_flow_rate_y = optical_flow.flow_rate_y;
 
 #ifdef DEBUG_BUILD
 
@@ -620,17 +620,17 @@ void proc_mav_distance_sensor_msg(const mavlink_message_t *msg)
     mavlink_distance_sensor_t distance_sensor;
     mavlink_msg_distance_sensor_decode(msg, &distance_sensor);
 
-    g_mav_veh_rngfdr_min_distance = distance_sensor.min_distance;
-    g_mav_veh_rngfdr_max_distance = distance_sensor.max_distance;
-    g_mav_veh_rngfdr_current_distance = distance_sensor.current_distance;
-    g_mav_veh_rngfdr_type = distance_sensor.type;
-    g_mav_veh_rngfdr_id = distance_sensor.id;
-    g_mav_veh_rngfdr_orientation = distance_sensor.orientation;
-    g_mav_veh_rngfdr_covariance = distance_sensor.covariance;
-    g_mav_veh_rngfdr_horizontal_fov = distance_sensor.horizontal_fov;
-    g_mav_veh_rngfdr_vertical_fov = distance_sensor.vertical_fov;
-    g_mav_veh_rngfdr_quaternion[4] = distance_sensor.quaternion[4];
-    g_mav_veh_rngfdr_signal_quality = distance_sensor.signal_quality;
+    g_mav_rngfndr_min_cm = distance_sensor.min_distance;
+    g_mav_rngfndr_max_cm = distance_sensor.max_distance;
+    g_mav_rngfndr_dist_m = distance_sensor.current_distance;
+    g_mav_rngfndr_type = distance_sensor.type;
+    g_mav_rngfndr_id = distance_sensor.id;
+    g_mav_rngfndr_orient = distance_sensor.orientation;
+    g_mav_rngfndr_cov = distance_sensor.covariance;
+    g_mav_rngfndr_fov_horiz_rad = distance_sensor.horizontal_fov;
+    g_mav_rngfndr_fov_vert_rad = distance_sensor.vertical_fov;
+    g_mav_rngfndr_quat[4] = distance_sensor.quaternion[4];
+    g_mav_rngfndr_quality = distance_sensor.signal_quality;
 
 #ifdef DEBUG_BUILD
 
@@ -690,7 +690,7 @@ void parse_mav_msgs(void)
     uint8_t byte;
 
     // reset param read status
-    g_param_read = false;
+    g_mav_param_read = false;
 
     int n = MavSerial::bytes_available();
 
@@ -779,101 +779,101 @@ MavMsg::~MavMsg() {};
  ********************************************************************************/
 bool MavMsg::init(void)
 {
-    g_mav_veh_command_id = 0;
-    g_mav_veh_command_result = 0;
-    g_mav_veh_command_progress = 0;
-    g_mav_veh_command_result_param2 = 0;
-    g_mav_veh_command_target_system = 0;
-    g_mav_veh_command_target_component = 0;
-    g_mav_veh_sys_stat_onbrd_cntrl_snsrs_present = 0;
-    g_mav_veh_sys_stat_onbrd_cntrl_snsrs_enabled = 0;
-    g_mav_veh_sys_stat_onbrd_cntrl_snsrs_health = 0;
+    g_mav_cmd_id = 0;
+    g_mav_cmd_result = 0;
+    g_mav_cmd_progress = 0;
+    g_mav_cmd_result_param2 = 0;
+    g_mav_cmd_tgt_sys = 0;
+    g_mav_cmd_tgt_comp = 0;
+    g_mav_sys_sensors_present = 0;
+    g_mav_sys_sensors_enabled = 0;
+    g_mav_sys_sensors_health = 0;
 
-    g_mav_veh_sys_stat_load = 0;
-    g_mav_veh_sys_stat_voltage_battery = 0;
-    g_mav_veh_sys_stat_current_battery = 0;
-    g_mav_veh_sys_stat_drop_rate_comm = 0;
+    g_mav_sys_load = 0;
+    g_mav_batt_voltage_mv = 0;
+    g_mav_batt_current_ma = 0;
+    g_mav_comm_drop_rate = 0;
 
-    g_mav_veh_sys_stat_errors_comm = 0;
-    g_mav_veh_sys_stat_errors_count1 = 0;
-    g_mav_veh_sys_stat_errors_count2 = 0;
-    g_mav_veh_sys_stat_errors_count3 = 0;
-    g_mav_veh_sys_stat_errors_count4 = 0;
-    g_mav_veh_sys_stat_battery_remaining = 0;
-    g_mav_veh_sys_stat_onbrd_cntrl_snsrs_prsnt_extnd = 0;
-    g_mav_veh_sys_stat_onbrd_cntrl_snsrs_enbld_extnd = 0;
-    g_mav_veh_sys_stat_onbrd_cntrl_snsrs_health_extnd = 0;
+    g_mav_comm_errors = 0;
+    g_mav_err_count1 = 0;
+    g_mav_err_count2 = 0;
+    g_mav_err_count3 = 0;
+    g_mav_err_count4 = 0;
+    g_mav_batt_remaining_pct = 0;
+    g_mav_sys_sensors_present_ext = 0;
+    g_mav_sys_sensors_enabled_ext = 0;
+    g_mav_sys_sensors_health_ext = 0;
 
-    g_mav_veh_custom_mode = 0;
-    g_manual_override_land = false;
-    g_mav_veh_type = 0;
-    g_mav_veh_autopilot_type = 0;
-    g_mav_veh_base_mode = 0;
-    g_mav_veh_state = 0;
-    g_mav_veh_mavlink_version = 0;
+    g_mav_mode_custom = 0;
+    g_ctrl_land_override = false;
+    g_mav_type = 0;
+    g_mav_autopilot_type = 0;
+    g_mav_mode_base = 0;
+    g_mav_state = 0;
+    g_mav_version = 0;
 
-    g_mav_veh_lat = 0;
-    g_mav_veh_lon = 0;
-    g_mav_veh_alt = 0;
-    g_mav_veh_rel_alt = 0;
-    g_mav_veh_gps_vx = 0;
-    g_mav_veh_gps_vy = 0;
-    g_mav_veh_gps_vz = 0;
-    g_mav_veh_gps_hdg = 0;
+    g_mav_gps_lat = 0;
+    g_mav_gps_lon = 0;
+    g_mav_gps_alt_msl = 0;
+    g_mav_gps_alt_rel = 0;
+    g_mav_gps_vel_x = 0;
+    g_mav_gps_vel_y = 0;
+    g_mav_gps_vel_z = 0;
+    g_mav_gps_heading_cdeg = 0;
 
-    g_mav_veh_roll = 0.0;
-    g_mav_veh_pitch = 0.0;
-    g_mav_veh_yaw = 0.0;
-    g_mav_veh_rollspeed = 0.0;
-    g_mav_veh_pitchspeed = 0.0;
-    g_mav_veh_yawspeed = 0.0;
+    g_mav_veh_roll_rad = 0.0;
+    g_mav_veh_pitch_rad = 0.0;
+    g_mav_veh_yaw_rad = 0.0;
+    g_mav_veh_roll_rate = 0.0;
+    g_mav_veh_pitch_rate = 0.0;
+    g_mav_veh_yaw_rate = 0.0;
 
-    g_mav_veh_imu_ax = 0;
-    g_mav_veh_imu_ay = 0;
-    g_mav_veh_imu_az = 0;
-    g_mav_veh_imu_xgyro = 0;
-    g_mav_veh_imu_ygyro = 0;
-    g_mav_veh_imu_zgyro = 0;
-    g_mav_veh_imu_xmag = 0;
-    g_mav_veh_imu_ymag = 0;
-    g_mav_veh_imu_zmag = 0;
+    g_mav_imu_accel_x = 0;
+    g_mav_imu_accel_y = 0;
+    g_mav_imu_accel_z = 0;
+    g_mav_imu_gyro_x = 0;
+    g_mav_imu_gyro_y = 0;
+    g_mav_imu_gyro_z = 0;
+    g_mav_imu_mag_x = 0;
+    g_mav_imu_mag_y = 0;
+    g_mav_imu_mag_z = 0;
 
-    g_mav_veh_q1_target = 0.0;
-    g_mav_veh_q2_target = 0.0;
-    g_mav_veh_q3_target = 0.0;
-    g_mav_veh_q4_target = 0.0;
-    g_mav_veh_roll_rate_target = 0.0;
-    g_mav_veh_pitch_rate_target = 0.0;
-    g_mav_veh_yaw_rate_target = 0.0;
-    g_mav_veh_thrust_target = 0.0;
+    g_mav_att_target_q1 = 0.0;
+    g_mav_att_target_q2 = 0.0;
+    g_mav_att_target_q3 = 0.0;
+    g_mav_att_target_q4 = 0.0;
+    g_mav_att_target_roll_rate = 0.0;
+    g_mav_att_target_pitch_rate = 0.0;
+    g_mav_att_target_yaw_rate = 0.0;
+    g_mav_att_target_thrust = 0.0;
     attitude_target_mask = 0;
 
-    g_mav_veh_q1_actual = 0.0;
-    g_mav_veh_q2_actual = 0.0;
-    g_mav_veh_q3_actual = 0.0;
-    g_mav_veh_q4_actual = 0.0;
-    g_mav_veh_roll_rate_actual = 0.0;
-    g_mav_veh_pitch_rate_actual = 0.0;
-    g_mav_veh_yaw_rate_actual = 0.0;
-    g_mav_veh_repr_offset_q[0] = 0.0;
-    g_mav_veh_repr_offset_q[1] = 0.0;
-    g_mav_veh_repr_offset_q[2] = 0.0;
-    g_mav_veh_repr_offset_q[3] = 0.0;
+    g_mav_att_actual_q1 = 0.0;
+    g_mav_att_actual_q2 = 0.0;
+    g_mav_att_actual_q3 = 0.0;
+    g_mav_att_actual_q4 = 0.0;
+    g_mav_att_actual_roll_rate = 0.0;
+    g_mav_att_actual_pitch_rate = 0.0;
+    g_mav_att_actual_yaw_rate = 0.0;
+    g_mav_att_repr_offset_q[0] = 0.0;
+    g_mav_att_repr_offset_q[1] = 0.0;
+    g_mav_att_repr_offset_q[2] = 0.0;
+    g_mav_att_repr_offset_q[3] = 0.0;
 
-    g_mav_veh_rngfdr_min_distance = 0;
-    g_mav_veh_rngfdr_max_distance = 0;
-    g_mav_veh_rngfdr_current_distance = 0;
-    g_mav_veh_rngfdr_type = 0;
-    g_mav_veh_rngfdr_id = 0;
-    g_mav_veh_rngfdr_orientation = 0;
-    g_mav_veh_rngfdr_covariance = 0;
-    g_mav_veh_rngfdr_horizontal_fov = 0.0;
-    g_mav_veh_rngfdr_vertical_fov = 0.0;
-    g_mav_veh_rngfdr_quaternion[0] = 0.0;
-    g_mav_veh_rngfdr_quaternion[1] = 0.0;
-    g_mav_veh_rngfdr_quaternion[2] = 0.0;
-    g_mav_veh_rngfdr_quaternion[3] = 0.0;
-    g_mav_veh_rngfdr_signal_quality = 0;
+    g_mav_rngfndr_min_cm = 0;
+    g_mav_rngfndr_max_cm = 0;
+    g_mav_rngfndr_dist_m = 0;
+    g_mav_rngfndr_type = 0;
+    g_mav_rngfndr_id = 0;
+    g_mav_rngfndr_orient = 0;
+    g_mav_rngfndr_cov = 0;
+    g_mav_rngfndr_fov_horiz_rad = 0.0;
+    g_mav_rngfndr_fov_vert_rad = 0.0;
+    g_mav_rngfndr_quat[0] = 0.0;
+    g_mav_rngfndr_quat[1] = 0.0;
+    g_mav_rngfndr_quat[2] = 0.0;
+    g_mav_rngfndr_quat[3] = 0.0;
+    g_mav_rngfndr_quality = 0;
 
     if (!start_mav_comm() ||
         !start_message_subscriptions())

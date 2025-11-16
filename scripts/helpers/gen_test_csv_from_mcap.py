@@ -40,7 +40,7 @@ if not proto_dir or not os.path.isdir(proto_dir):
 sys.path.insert(0, os.path.abspath(proto_dir))
 print(f"📂 Using proto directory: {proto_dir}")
 
-import Common_pb2, Detection_pb2, Mavlink_pb2, Path_pb2, System_pb2, Target_pb2
+import Common_pb2, Detection_pb2, Mavlink_pb2, Control_pb2, System_pb2, Target_pb2
 
 # --------------------------------------------------------------------------
 # 📡 Topic → Proto Message Type
@@ -50,14 +50,36 @@ import Common_pb2, Detection_pb2, Mavlink_pb2, Path_pb2, System_pb2, Target_pb2
 TOPICS = {
     "/system/state": System_pb2.SystemStateMsg,
     "/target/detection": Target_pb2.TargetDetection,
-    "/target/location": Target_pb2.TargetLocation,
-    "/path/control": Path_pb2.ControlOutput,
+    "/control/output": Control_pb2.ControlOutput,
     "/mav/system": Mavlink_pb2.MavSystem,
     "/mav/kinematics": Mavlink_pb2.MavKinematics,
     "/mav/imu": Mavlink_pb2.MavImuRaw,
     "/mav/rangefinder": Mavlink_pb2.MavRangefinder,
     "/mav/flow": Mavlink_pb2.MavOpticalFlow,
     "/detection/objects": Detection_pb2.Objects,
+}
+
+# --------------------------------------------------------------------------
+# ⚙️ Signals to be converted from deg -> rad
+# --------------------------------------------------------------------------
+RAD_PER_DEG = math.pi / 180.0
+
+# Convert selected degree fields → radians
+DEGREE_FIELDS_TO_CONVERT = {
+    # TargetDetection
+    "delta_angle_deg",
+    "camera_tilt_deg",
+
+    # MavKinematics
+    "roll",
+    "pitch",
+    "yaw",
+    "rollspeed",
+    "pitchspeed",
+    "yawspeed",
+    "roll_rate_actual",
+    "pitch_rate_actual",
+    "yaw_rate_actual",
 }
 
 # --------------------------------------------------------------------------
@@ -68,136 +90,144 @@ TOPICS = {
 # You can easily add new mappings here without touching the rest of the script.
 TOPIC_CONFIG = {
     "/system/state": {
-        "g_app_elapsed_time": "app_elapsed_time",
+        "g_app_time_s": "app_elapsed_time_sec",
         "g_system_state": "system_state",
     },
 
     "/target/detection": {
-        "g_target_valid": "target_valid",
-        "g_target_detection_id": "target_detection_id",
-        "g_target_track_id": "target_track_id",
-        "g_detection_class": "detection_class",
-        "g_target_detection_conf": "target_detection_conf",
-        "g_target_cntr_offset_x": "target_cntr_offset_x",
-        "g_target_cntr_offset_y": "target_cntr_offset_y",
-        "g_target_cntr_offset_x_filt": "target_cntr_offset_x_filt",
-        "g_target_cntr_offset_y_filt": "target_cntr_offset_y_filt",
-        "g_target_height": "target_height",
-        "g_target_width": "target_width",
-        "g_target_aspect": "target_aspect",
-        "g_target_left": "target_left",
-        "g_target_right": "target_right",
-        "g_target_top": "target_top",
-        "g_target_bottom": "target_bottom",
+        "g_tgt_valid": "is_target_detected",
+        "g_tgt_detect_id": "detection_id",
+        "g_tgt_track_id": "track_id",
+        "g_tgt_class_id": "class_id",
+        "g_tgt_conf": "confidence",
+
+        # Bounding box geometry
+        "g_tgt_cntr_offset_x_pix": "bbox_offset_x_px",
+        "g_tgt_cntr_offset_y_pix": "bbox_offset_y_px",
+        "g_tgt_height_pix": "bbox_height_px",
+        "g_tgt_width_pix": "bbox_width_px",
+        "g_tgt_aspect_ratio": "bbox_aspect_ratio",
+        "g_tgt_left_px": "bbox_left_px",
+        "g_tgt_right_px": "bbox_right_px",
+        "g_tgt_top_px": "bbox_top_px",
+        "g_tgt_bottom_px": "bbox_bottom_px",
+
+        # Center (filtered)
+        "g_tgt_cntr_offset_x_pix_filt": "bbox_center_x_px",
+        "g_tgt_cntr_offset_y_pix_filt": "bbox_center_y_px",
+
+        # EKF / deltas
+        "g_cam0_delta_angle_deg": "delta_angle_deg",
+        "g_cam0_tilt_deg": "camera_tilt_deg",
+        "g_tgt_pos_x_delta": "delta_distance_x_m",
+        "g_tgt_pos_z_delta": "delta_distance_z_m",
+
+        # EKF-estimated state (positions / velocities / accelerations)
+        "g_tgt_pos_x_est": "target_pos_x_est",
+        "g_tgt_pos_y_est": "target_pos_y_est",
+        "g_tgt_vel_x_est": "target_vel_x_est",
+        "g_tgt_vel_y_est": "target_vel_y_est",
+        "g_tgt_acc_x_est": "target_acc_x_est",
+        "g_tgt_acc_y_est": "target_acc_y_est",
+
+        # Data validity
+        "g_tgt_meas_valid": "is_measurement_valid",
     },
 
-    "/target/location": {
-        "g_d_target_h": "d_target_h",
-        "g_d_target_w": "d_target_w",
-        "d_target": "d_target",
-        "g_x_target": "x_target",
-        "g_y_target": "y_target",
-        "g_z_target": "z_target",
-        "g_delta_angle": "delta_angle",
-        "g_camera_tilt_angle": "camera_tilt_angle",
-        "g_delta_d_x": "delta_d_x",
-        "g_delta_d_z": "delta_d_z",
-    },
-
-    "/path/control": {
-        "g_target_too_close": "target_too_close",
-        "g_x_error": "x_error",
-        "g_y_error": "y_error",
-        "g_vx_adjust": "vx_adjust",
-        "g_vy_adjust": "vy_adjust",
-        "g_vz_adjust": "vz_adjust",
+    "/control/output": {
+        "g_tgt_too_close": "target_too_close",
+        "g_pos_err_x": "x_error",
+        "g_pos_err_y": "y_error",
+        "g_ctrl_vel_x_cmd": "vx_adjust",
+        "g_ctrl_vel_y_cmd": "vy_adjust",
+        "g_ctrl_vel_z_cmd": "vz_adjust",
     },
 
     # MAVLink system/status
     "/mav/system": {
-        "g_mav_veh_sys_stat_voltage_battery": "sys_stat_voltage_battery",
-        "g_mav_veh_sys_stat_current_battery": "sys_stat_current_battery",
-        "g_mav_veh_sys_stat_battery_remaining": "sys_stat_battery_remaining",
-        "g_mav_veh_rel_alt": "rel_alt",
-        "g_mav_veh_type": "veh_type",
-        "g_mav_veh_autopilot_type": "autopilot_type",
-        "g_mav_veh_base_mode": "base_mode",
-        "g_mav_veh_custom_mode": "custom_mode",
-        "g_mav_veh_state": "state",
-        "g_mav_veh_mavlink_version": "mavlink_version",
+        "g_mav_batt_voltage_mv": "sys_stat_voltage_battery",
+        "g_mav_batt_current_ma": "sys_stat_current_battery",
+        "g_mav_batt_remaining_pct": "sys_stat_battery_remaining",
+        "g_mav_gps_alt_rel": "rel_alt",
+        "g_mav_type": "veh_type",
+        "g_mav_autopilot_type": "autopilot_type",
+        "g_mav_mode_base": "base_mode",
+        "g_mav_mode_custom": "custom_mode",
+        "g_mav_state": "state",
+        "g_mav_version": "mavlink_version",
     },
 
     # MAVLink kinematics (GPS / attitude / rates / local NED / quats)
     "/mav/kinematics": {
         # GPS velocities + heading
-        "g_mav_veh_gps_vx": "gps_vx",
-        "g_mav_veh_gps_vy": "gps_vy",
-        "g_mav_veh_gps_vz": "gps_vz",
-        "g_mav_veh_gps_hdg": "gps_hdg",
+        "g_mav_gps_vel_x": "gps_vx",
+        "g_mav_gps_vel_y": "gps_vy",
+        "g_mav_gps_vel_z": "gps_vz",
+        "g_mav_gps_heading_deg": "gps_hdg",
 
         # Orientation (Euler)
-        "g_mav_veh_roll": "roll",
-        "g_mav_veh_pitch": "pitch",
-        "g_mav_veh_yaw": "yaw",
+        "g_mav_veh_roll_rad": "roll",
+        "g_mav_veh_pitch_rad": "pitch",
+        "g_mav_veh_yaw_rad": "yaw",
 
         # Angular rates
-        "g_mav_veh_rollspeed": "rollspeed",
-        "g_mav_veh_pitchspeed": "pitchspeed",
-        "g_mav_veh_yawspeed": "yawspeed",
+        "g_mav_veh_roll_rate": "rollspeed",
+        "g_mav_veh_pitch_rate": "pitchspeed",
+        "g_mav_veh_yaw_rate": "yawspeed",
 
         # Local NED position
-        "g_mav_veh_local_ned_x": "local_ned_x",
-        "g_mav_veh_local_ned_y": "local_ned_y",
-        "g_mav_veh_local_ned_z": "local_ned_z",
+        "g_mav_veh_pos_ned_x": "local_ned_x",
+        "g_mav_veh_pos_ned_y": "local_ned_y",
+        "g_mav_veh_pos_ned_z": "local_ned_z",
 
         # Local NED velocities
-        "g_mav_veh_local_ned_vx": "local_ned_vx",
-        "g_mav_veh_local_ned_vy": "local_ned_vy",
-        "g_mav_veh_local_ned_vz": "local_ned_vz",
+        "g_mav_veh_vel_ned_x": "local_ned_vx",
+        "g_mav_veh_vel_ned_y": "local_ned_vy",
+        "g_mav_veh_vel_ned_z": "local_ned_vz",
 
         # Quaternions (attitude)
-        "g_mav_veh_q1_actual": "q1_actual",
-        "g_mav_veh_q2_actual": "q2_actual",
-        "g_mav_veh_q3_actual": "q3_actual",
-        "g_mav_veh_q4_actual": "q4_actual",
+        "g_mav_att_actual_q1": "q1_actual",
+        "g_mav_att_actual_q2": "q2_actual",
+        "g_mav_att_actual_q3": "q3_actual",
+        "g_mav_att_actual_q4": "q4_actual",
 
         # Rate setpoints / actual
-        "g_mav_veh_roll_rate_actual": "roll_rate_actual",
-        "g_mav_veh_pitch_rate_actual": "pitch_rate_actual",
-        "g_mav_veh_yaw_rate_actual": "yaw_rate_actual",
+        "g_mav_att_actual_roll_rate": "roll_rate_actual",
+        "g_mav_att_actual_pitch_rate": "pitch_rate_actual",
+        "g_mav_att_actual_yaw_rate": "yaw_rate_actual",
 
         # Repr offset quaternion (array fields as flattened keys)
-        "g_mav_veh_repr_offset_q[0]": "repr_offset_q[0]",
-        "g_mav_veh_repr_offset_q[1]": "repr_offset_q[1]",
-        "g_mav_veh_repr_offset_q[2]": "repr_offset_q[2]",
-        "g_mav_veh_repr_offset_q[3]": "repr_offset_q[3]",
+        "g_mav_att_repr_offset_q[0]": "repr_offset_q[0]",
+        "g_mav_att_repr_offset_q[1]": "repr_offset_q[1]",
+        "g_mav_att_repr_offset_q[2]": "repr_offset_q[2]",
+        "g_mav_att_repr_offset_q[3]": "repr_offset_q[3]",
     },
 
     # MAVLink IMU
     "/mav/imu": {
-        "g_mav_veh_imu_ax": "imu_ax",
-        "g_mav_veh_imu_ay": "imu_ay",
-        "g_mav_veh_imu_az": "imu_az",
-        "g_mav_veh_imu_xgyro": "imu_xgyro",
-        "g_mav_veh_imu_ygyro": "imu_ygyro",
-        "g_mav_veh_imu_zgyro": "imu_zgyro",
+        "g_mav_imu_accel_x": "imu_ax",
+        "g_mav_imu_accel_y": "imu_ay",
+        "g_mav_imu_accel_z": "imu_az",
+        "g_mav_imu_gyro_x": "imu_xgyro",
+        "g_mav_imu_gyro_y": "imu_ygyro",
+        "g_mav_imu_gyro_z": "imu_zgyro",
     },
 
     # MAVLink rangefinder
     "/mav/rangefinder": {
-        "g_mav_veh_rngfdr_current_distance": "current_distance",
-        "g_mav_veh_rngfdr_signal_quality": "signal_quality",
+        "g_mav_rngfndr_dist_m": "current_distance",
+        "g_mav_rngfndr_quality": "signal_quality",
     },
 
     # MAVLink optical flow
     "/mav/flow": {
-        "g_mav_veh_flow_comp_m_x": "flow_comp_m_x",
-        "g_mav_veh_flow_comp_m_y": "flow_comp_m_y",
-        "g_mav_veh_flow_x": "flow_x",
-        "g_mav_veh_flow_y": "flow_y",
-        "g_mav_veh_flow_quality": "flow_quality",
-        "g_mav_veh_flow_rate_x": "flow_rate_x",
-        "g_mav_veh_flow_rate_y": "flow_rate_y",
+        "g_mav_flow_vel_x": "flow_comp_m_x",
+        "g_mav_flow_vel_y": "flow_comp_m_y",
+        "g_mav_flow_px_x": "flow_x",
+        "g_mav_flow_px_y": "flow_y",
+        "g_mav_flow_quality": "flow_quality",
+        "g_mav_flow_rate_x": "flow_rate_x",
+        "g_mav_flow_rate_y": "flow_rate_y",
     },
 }
 
@@ -245,6 +275,17 @@ def process_mcap(input_mcap: str):
             msg.ParseFromString(message.data)
             # Flatten into a dict of {field_name: value}
             data = flatten(msg)
+
+            # Convert degrees → radians for known angular fields
+            for key in list(data.keys()):
+                field_name = key.split(".")[-1]  # handle nested fields like x.y.z
+                if field_name in DEGREE_FIELDS_TO_CONVERT:
+                    try:
+                        data[key] = float(data[key]) * RAD_PER_DEG
+                    except:
+                        pass
+
+
             # Record the timestamp (ns since epoch) and topic.
             data["timestamp_ns"] = message.log_time
             data["topic"] = topic

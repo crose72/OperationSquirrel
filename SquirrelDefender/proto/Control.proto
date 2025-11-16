@@ -1,0 +1,25 @@
+syntax = "proto3";
+package os.logger;
+
+import "Common.proto";
+
+message ControlOutput {
+  Time   t        = 1;
+  uint32 frame_id = 2;
+
+  // Target proximity flag
+  bool is_target_too_close = 10;
+
+  // Positional & yaw errors
+  float pos_error_x_m   = 20; // x position error (meters)
+  float pos_error_y_m   = 21; // y position error (meters)
+  float yaw_error   = 22; // yaw error (radians)
+  float yaw_playback = 23; // yaw value adjusted for playback
+  float yaw_target   = 24; // target yaw (radians)
+
+  // Control commands
+  float cmd_vel_x_mps   = 30; // commanded forward  velocity (m/s)
+  float cmd_vel_y_mps   = 31; // commanded lateral   velocity (m/s)
+  float cmd_vel_z_mps   = 32; // commanded vertical  velocity (m/s)
+  float cmd_yawrate_rps = 33; // commanded yaw rate  (rad/s)
+}

@@ -13,7 +13,7 @@ message PointsAnnotation {
   google.protobuf.Timestamp timestamp = 1;
   repeated Point2 points = 2;
   PointsAnnotationType type = 3;
-  Color outline_color = 4;
+  Color outline_colors = 4;
   double thickness = 5;
 }
 

@@ -51,14 +51,14 @@ project(SquirrelDefender)
 
 # Choose ONLY ONE platform for the build (BLD_JETSON_B01, BLD_WSL, BLD_WIN) 
 option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" OFF)
-option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" ON)
-option(BLD_WSL "Compiling for BLD_WSL" OFF)
+option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" OFF)
+option(BLD_WSL "Compiling for BLD_WSL" ON)
 option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
-option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" OFF)
-option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" OFF)
+option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" ON)
+option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" ON)
 option(ENABLE_SECRET_SQUIRREL "Compile custom code with the open source Operation Squirrel" ON)
 
 # Option to use environment variables for library paths

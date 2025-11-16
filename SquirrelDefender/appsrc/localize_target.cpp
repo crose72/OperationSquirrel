@@ -43,38 +43,38 @@
  * Object definitions
  ********************************************************************************/
 Timer target_data_useful_dbc;
-float g_d_target_h;
-float g_d_target_w;
-float g_x_target;
-float g_y_target;
-float g_z_target;
-float g_d_target;
-float g_delta_angle;       //
-float g_camera_tilt_angle; // Angle of the camera relative to the ground, compensating for pitch
-float g_delta_d_x;
-float g_delta_d_z;
-float g_camera_comp_angle;
+float g_tgt_los_dist_from_pix_height;
+float g_tgt_los_dist_from_pix_width;
+float g_tgt_pos_x_meas;
+float g_tgt_pos_y_meas;
+float g_tgt_pos_z_meas;
+float g_tgt_los_dist_meas;
+float g_cam0_delta_angle_rad; //
+float g_cam0_angle_rad;       // Angle of the camera relative to the ground, compensating for pitch
+float g_tgt_pos_x_delta;
+float g_tgt_pos_z_delta;
+float g_cam0_comp_angle_rad;
 float x_target_prv;
 float y_target_prv;
 bool y_target_hyst_actv;
 float y_target_latched;
 bool loc_target_valid_prv;
-bool g_target_data_useful;
+bool g_tgt_meas_valid;
 float loc_target_center_x_prv;
 float loc_target_center_y_prv;
-float g_x_target_ekf;
-float g_y_target_ekf;
-float g_vx_target_ekf;
-float g_vy_target_ekf;
-float g_ax_target_ekf;
-float g_ay_target_ekf;
+float g_tgt_pos_x_est;
+float g_tgt_pos_y_est;
+float g_tgt_vel_x_est;
+float g_tgt_vel_y_est;
+float g_tgt_acc_x_est;
+float g_tgt_acc_y_est;
 float x_target_ekf_prv;
 float y_target_ekf_prv;
 float camera_comp_angle_abs;
-float g_fov_height;
-float g_meter_per_pix;
-float g_target_cntr_offset_x_m;
-float g_line_of_sight;
+float g_cam0_fov_height;
+float g_cam0_m_per_pix;
+float g_tgt_cntr_offset_x_m;
+float g_cam0_los_m;
 static bool target_valid_prv;
 bool kf_loc_reset;
 bool target_data_useful_prv;
@@ -84,8 +84,8 @@ std::vector<float> target_y_pix_hist4avg;
 std::vector<float> target_x_pix_hist4avg;
 int x_pix_window;
 int y_pix_window;
-float g_target_cntr_offset_x_mov_avg;
-float g_target_cntr_offset_y_mov_avg;
+float g_tgt_cntr_offset_x_pix_filt;
+float g_tgt_cntr_offset_y_pix_filt;
 int y_buffer_idx4avg;
 int x_buffer_idx4avg;
 float y_sum;
@@ -103,9 +103,9 @@ arma::colvec u0_loc; // Observed initial measurements
 
 std::chrono::milliseconds g_target_lost_dbc;
 std::chrono::milliseconds target_lost_dbc_reset;
-bool g_target_is_lost;
+bool g_tgt_lost;
 bool target_is_lost_prv;
-float g_target_lost_dbc_sec;
+float g_tgt_lost_dbc_sec;
 
 /********************************************************************************
  * Calibration definitions
@@ -233,12 +233,12 @@ void init_kf_loc(void)
 {
     x_target_ekf_prv = 0.0;
     y_target_ekf_prv = 0.0;
-    g_x_target_ekf = 0.0;
-    g_y_target_ekf = 0.0;
-    g_vx_target_ekf = 0.0;
-    g_vy_target_ekf = 0.0;
-    g_ax_target_ekf = 0.0;
-    g_ay_target_ekf = 0.0;
+    g_tgt_pos_x_est = 0.0;
+    g_tgt_pos_y_est = 0.0;
+    g_tgt_vel_x_est = 0.0;
+    g_tgt_vel_y_est = 0.0;
+    g_tgt_acc_x_est = 0.0;
+    g_tgt_acc_y_est = 0.0;
 
     // Resize matrices and set to zero initially
     A_loc.set_size(n_states, n_states);
@@ -312,13 +312,13 @@ void init_kf_loc(void)
 void calc_fov(void)
 {
     // Calculate the line of sight distance of the camera
-    if ((g_camera_comp_angle + g_mav_veh_pitch) < (float)0.001)
+    if ((g_cam0_comp_angle_rad + g_mav_veh_pitch_rad) < (float)0.001)
     {
-        g_line_of_sight = (float)0.0;
+        g_cam0_los_m = (float)0.0;
     }
     else
     {
-        g_line_of_sight = std::fabs(g_mav_veh_local_ned_z) / cosf(g_camera_comp_angle + g_mav_veh_pitch);
+        g_cam0_los_m = std::fabs(g_mav_veh_pos_ned_z) / cosf(g_cam0_comp_angle_rad + g_mav_veh_pitch_rad);
     }
 
     // Calculate the pixel height of a known fixed object at given line of
@@ -326,15 +326,35 @@ void calc_fov(void)
     // The object isn't there, this is an intermediate calculation to determine
     // how many pixels correspond to a meter at the current drone height.
 
+    float ghost_object_height = (float)0.0;
+
     // Height of a known object at given distance
-    float ghost_object_height = pix_height_x_coef * powf(g_line_of_sight, pix_height_x_pow);
+    if (g_cam0_los_m > (float)0.0)
+    {
+        float ghost_object_height = pix_height_x_coef * powf(g_cam0_los_m, pix_height_x_pow);
+    }
     // How many meters a single pixel represents at the line of sight distance
     // TODO: When to use actual vs ghost object height?
     // Uses "ghost object" height - the height of the known object at the LOS distance
-    // g_meter_per_pix = known_obj_heigh_all_dist / ghost_object_height;
+    // g_cam0_m_per_pix = known_obj_heigh_all_dist / ghost_object_height;
     // Currently gonna use the target actual height
-    g_meter_per_pix = known_obj_heigh_all_dist / g_target_height;
-    g_fov_height = g_meter_per_pix * g_cam0_video_height;
+    // Only compute m_per_pixel if we have a valid bbox height
+    if (g_tgt_height_pix > (float)0.0f)
+    {
+        g_cam0_m_per_pix = known_obj_heigh_all_dist / g_tgt_height_pix;
+        g_cam0_fov_height = g_cam0_m_per_pix * g_cam0_img_height_px;
+    }
+    else
+    {
+        // No detection yet – use last-known or default
+        // Avoid NaN and preserve stability
+        g_cam0_m_per_pix = g_cam0_m_per_pix; // or keep previous
+        // OR safer: use a sane default from params
+        // g_cam0_m_per_pix = default_m_per_pix;
+
+        // Same for FOV height – maintain previous stable value
+        // g_cam0_fov_height = default_fov_m;
+    }
 }
 
 /********************************************************************************
@@ -345,19 +365,19 @@ void dtrmn_target_loc_img(void)
 {
     // Only consider targets whose bounding boxes are not smashed against the
     // video frame, and at least a certain size (to prevent bad estimation)
-    g_target_data_useful = (g_target_valid &&
-                            (!(g_target_center_x < target_det_edge_of_frame_buffer ||
-                               g_target_center_x > (g_cam0_video_height - target_det_edge_of_frame_buffer)) &&
-                             !(g_target_center_y < target_det_edge_of_frame_buffer ||
-                               g_target_center_y > (g_cam0_video_width - target_det_edge_of_frame_buffer)) &&
-                             !((g_target_width * g_target_height) < min_target_bbox_area)));
+    g_tgt_meas_valid = (g_tgt_valid &&
+                        (!(g_tgt_center_y_px < target_det_edge_of_frame_buffer ||
+                           g_tgt_center_y_px > (g_cam0_img_height_px - target_det_edge_of_frame_buffer)) &&
+                         !(g_tgt_center_x_px < target_det_edge_of_frame_buffer ||
+                           g_tgt_center_x_px > (g_cam0_img_width_px - target_det_edge_of_frame_buffer)) &&
+                         !((g_tgt_width_pix * g_tgt_height_pix) < min_target_bbox_area)));
 
-    if (g_target_data_useful)
+    if (g_tgt_meas_valid)
     {
         g_target_lost_dbc = (std::chrono::milliseconds)0;
-        g_target_lost_dbc_sec = (float)0.0;
+        g_tgt_lost_dbc_sec = (float)0.0;
     }
-    else if (target_data_useful_prv && !g_target_data_useful)
+    else if (target_data_useful_prv && !g_tgt_meas_valid)
     {
         target_data_useful_dbc.start(); // start timing the outage
     }
@@ -365,7 +385,7 @@ void dtrmn_target_loc_img(void)
     {
 #if defined(BLD_WSL)
 
-        g_target_lost_dbc += std::chrono::milliseconds((int)(g_dt * 1000));
+        g_target_lost_dbc += std::chrono::milliseconds((int)(g_app_dt * 1000));
 
 #else
 
@@ -373,36 +393,36 @@ void dtrmn_target_loc_img(void)
 
 #endif
 
-        g_target_lost_dbc_sec += g_dt;
+        g_tgt_lost_dbc_sec += g_app_dt;
     }
 
 #if defined(BLD_WSL)
 
-    g_target_is_lost = g_target_lost_dbc_sec > 1.0;
+    g_tgt_lost = g_tgt_lost_dbc_sec > 1.0;
 
 #else
 
-    g_target_is_lost = g_target_lost_dbc > target_lost_dbc_reset;
+    g_tgt_lost = g_target_lost_dbc > target_lost_dbc_reset;
 
 #endif
 
-    if (!g_target_is_lost)
+    if (!g_tgt_lost)
     {
         // Moving average for more smoothing - modifies the history vector
-        g_target_cntr_offset_x_mov_avg = moving_average(target_x_pix_hist4avg, g_target_cntr_offset_x, x_buffer_idx4avg, x_sum);
-        g_target_cntr_offset_y_mov_avg = moving_average(target_y_pix_hist4avg, g_target_cntr_offset_y, y_buffer_idx4avg, y_sum);
+        g_tgt_cntr_offset_x_pix_filt = moving_average(target_x_pix_hist4avg, g_tgt_cntr_offset_y_pix, x_buffer_idx4avg, x_sum);
+        g_tgt_cntr_offset_y_pix_filt = moving_average(target_y_pix_hist4avg, g_tgt_cntr_offset_x_pix, y_buffer_idx4avg, y_sum);
 
         // Convert the offset to meters
-        g_target_cntr_offset_x_m = g_target_cntr_offset_x_mov_avg * g_meter_per_pix;
+        g_tgt_cntr_offset_x_m = g_tgt_cntr_offset_x_pix_filt * g_cam0_m_per_pix;
     }
     else
     {
-        g_target_cntr_offset_x_mov_avg = (float)0.0;
-        g_target_cntr_offset_y_mov_avg = (float)0.0;
-        g_target_cntr_offset_x_m = (float)0.0;
+        g_tgt_cntr_offset_x_pix_filt = (float)0.0;
+        g_tgt_cntr_offset_y_pix_filt = (float)0.0;
+        g_tgt_cntr_offset_x_m = (float)0.0;
     }
 
-    target_data_useful_prv = g_target_data_useful;
+    target_data_useful_prv = g_tgt_meas_valid;
 }
 
 /********************************************************************************
@@ -422,38 +442,38 @@ void dtrmn_target_loc_real(void)
     float delta_d;
     float target_bounding_box_rate;
 
-    if (g_target_data_useful && !g_target_is_lost)
+    if (g_tgt_meas_valid && !g_tgt_lost)
     {
         /* Calculate distance from camera offset */
-        g_d_target_h = powf(g_target_height / pix_height_x_coef, (float)1.0 / pix_height_x_pow);
-        g_d_target_w = powf(g_target_width / pix_width_x, (float)1.0 / pix_width_x_pow);
+        g_tgt_los_dist_from_pix_height = powf(g_tgt_height_pix / pix_height_x_coef, (float)1.0 / pix_height_x_pow);
+        g_tgt_los_dist_from_pix_width = powf(g_tgt_width_pix / pix_width_x, (float)1.0 / pix_width_x_pow);
 
-        if (g_target_aspect > 0.4f)
+        if (g_tgt_aspect_ratio > 0.4f)
         {
-            g_d_target = g_d_target_w;
+            g_tgt_los_dist_meas = g_tgt_los_dist_from_pix_width;
         }
-        else if (g_d_target_h > 2.99f)
+        else if (g_tgt_los_dist_from_pix_height > 2.99f)
         {
-            g_d_target = g_d_target_h;
+            g_tgt_los_dist_meas = g_tgt_los_dist_from_pix_height;
         }
         else
         {
-            g_d_target = g_d_target_w;
+            g_tgt_los_dist_meas = g_tgt_los_dist_from_pix_width;
         }
 
         /* Calculate true camera angle relative to the ground, adjusting for pitch. */
-        g_camera_comp_angle = (M_PI / (float)2.0) - g_cam0_tilt_down_angle_rad;
-        g_camera_tilt_angle = g_mav_veh_pitch - g_cam0_tilt_down_angle_rad;
+        g_cam0_comp_angle_rad = (M_PI / (float)2.0) - g_cam0_tilt_rad;
+        g_cam0_angle_rad = g_mav_veh_pitch_rad - g_cam0_tilt_rad;
 
         /* Calculate the x and z distances of the target relative to the drone camera (positive z is down).*/
         // Always compute using a clamped tilt angle
         // requires: #include <algorithm> (for std::clamp)
-        // g_camera_comp_angle = (pi/2) - g_cam0_tilt_down_angle_rad (already computed)
-        float theta = std::clamp(g_camera_tilt_angle, -g_camera_comp_angle, 0.0f);
+        // g_cam0_comp_angle_rad = (pi/2) - g_cam0_tilt_rad (already computed)
+        float theta = std::clamp(g_cam0_angle_rad, -g_cam0_comp_angle_rad, 0.0f);
         float thabs = std::fabs(theta);
 
-        g_x_target = g_d_target * cosf(thabs);
-        g_z_target = g_d_target * sinf(thabs);
+        g_tgt_pos_x_meas = g_tgt_los_dist_meas * cosf(thabs);
+        g_tgt_pos_z_meas = g_tgt_los_dist_meas * sinf(thabs);
 
         /* Calculate shift in target location in the x and z directions based on camera tilt
         angle and drone pitch. When the drone pitch is equal to the camera tilt angle,
@@ -462,54 +482,54 @@ void dtrmn_target_loc_real(void)
         adjustment of the target position estimate in the z direction. Make adjustments when
         drone pitch is less than or equal to the camera tilt angle (brings the camera parallel
         to the ground) and greater than a calibratable value. */
-        g_delta_angle = g_camera_comp_angle + g_mav_veh_pitch;
+        g_cam0_delta_angle_rad = g_cam0_comp_angle_rad + g_mav_veh_pitch_rad;
 
-        if (g_delta_angle > 0.0f && g_delta_angle < g_cam0_tilt_down_angle_rad)
+        if (g_cam0_delta_angle_rad > 0.0f && g_cam0_delta_angle_rad < g_cam0_tilt_rad)
         {
-            delta_idx_d = get_float_index(g_d_target, &delta_offset_d[0], MAX_IDX_DELTA_D_OFFSET, true);
-            delta_idx_pix = get_float_index(std::fabs(g_target_cntr_offset_x), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
+            delta_idx_d = get_float_index(g_tgt_los_dist_meas, &delta_offset_d[0], MAX_IDX_DELTA_D_OFFSET, true);
+            delta_idx_pix = get_float_index(std::fabs(g_tgt_cntr_offset_y_pix), &delta_offset_pixels[0], MAX_IDX_DELTA_PIXEL_OFFSET, true);
             delta_d = get_2d_interpolated_value(&delta_offset[0][0], MAX_IDX_DELTA_PIXEL_OFFSET, MAX_IDX_DELTA_D_OFFSET, delta_idx_pix, delta_idx_d);
 
-            g_delta_d_x = delta_d * cosf(g_delta_angle);
-            g_delta_d_z = delta_d * sinf(g_delta_angle);
+            g_tgt_pos_x_delta = delta_d * cosf(g_cam0_delta_angle_rad);
+            g_tgt_pos_z_delta = delta_d * sinf(g_cam0_delta_angle_rad);
 
             /* If object center is below the center of the frame */
-            if (g_target_cntr_offset_x > g_cam0_video_height_center)
+            if (g_tgt_cntr_offset_y_pix > g_cam0_img_height_cy)
             {
-                g_delta_d_x = -g_delta_d_x;
-                g_delta_d_z = -g_delta_d_z;
+                g_tgt_pos_x_delta = -g_tgt_pos_x_delta;
+                g_tgt_pos_z_delta = -g_tgt_pos_z_delta;
             }
         }
 
         /* Adjust x and z distances based on camera tilt angle */
-        g_x_target = g_x_target + g_delta_d_x;
-        g_z_target = g_z_target + g_delta_d_z;
+        g_tgt_pos_x_meas = g_tgt_pos_x_meas + g_tgt_pos_x_delta;
+        g_tgt_pos_z_meas = g_tgt_pos_z_meas + g_tgt_pos_z_delta;
 
         /* Calculate target y offset from the center line of view of the camera based on calibrated forward distance and the
         offset of the center of the target to the side of the center of the video frame in pixels */
-        g_y_target = g_meter_per_pix * g_target_cntr_offset_y;
+        g_tgt_pos_y_meas = g_cam0_m_per_pix * g_tgt_cntr_offset_x_pix;
 
-        if (g_target_cntr_offset_y < 0.0f)
+        if (g_tgt_cntr_offset_x_pix < 0.0f)
         {
-            g_y_target = -g_y_target;
+            g_tgt_pos_y_meas = -g_tgt_pos_y_meas;
         }
 
-        x_target_prv = g_x_target;
-        y_target_prv = g_y_target;
+        x_target_prv = g_tgt_pos_x_meas;
+        y_target_prv = g_tgt_pos_y_meas;
     }
     else
     {
-        g_x_target = (float)0.0;
-        g_y_target = (float)0.0;
-        g_z_target = (float)0.0;
-        g_d_target = (float)0.0;
-        g_d_target_h = (float)0.0;
-        g_d_target_w = (float)0.0;
-        g_delta_d_x = (float)0.0;
-        g_delta_d_z = (float)0.0;
+        g_tgt_pos_x_meas = (float)0.0;
+        g_tgt_pos_y_meas = (float)0.0;
+        g_tgt_pos_z_meas = (float)0.0;
+        g_tgt_los_dist_meas = (float)0.0;
+        g_tgt_los_dist_from_pix_height = (float)0.0;
+        g_tgt_los_dist_from_pix_width = (float)0.0;
+        g_tgt_pos_x_delta = (float)0.0;
+        g_tgt_pos_z_delta = (float)0.0;
     }
 
-    loc_target_valid_prv = g_target_valid;
+    loc_target_valid_prv = g_tgt_valid;
 }
 
 /********************************************************************************
@@ -518,13 +538,13 @@ void dtrmn_target_loc_real(void)
  ********************************************************************************/
 void update_target_loc_real(void)
 {
-    if (g_target_data_useful && !g_target_is_lost)
+    if (g_tgt_meas_valid && !g_tgt_lost)
     {
         if (target_is_lost_prv)
         {
             arma::colvec x0(n_states, arma::fill::zeros);
-            x0(0) = g_x_target; // pos x
-            x0(1) = g_y_target; // pos y
+            x0(0) = g_tgt_pos_x_meas; // pos x
+            x0(1) = g_tgt_pos_y_meas; // pos y
             // vx, vy, ax, ay left at 0
 
             kf_loc.InitSystemState(x0);
@@ -533,11 +553,11 @@ void update_target_loc_real(void)
 
         // Measurement vector (observations)
         colvec z(2);
-        z << g_x_target << g_y_target;
+        z << g_tgt_pos_x_meas << g_tgt_pos_y_meas;
 
         // Define the system transition matrix A_loc (discretized)
         // TODO: update the state transition matrix A_loc
-        // Ensure g_dt is valid (std::isnan(g_dt) || std::isinf(g_dt) || g_dt <= 0)
+        // Ensure g_app_dt is valid (std::isnan(g_app_dt) || std::isinf(g_app_dt) || g_app_dt <= 0)
 
         // No external control input for now
         colvec u(1, fill::zeros);
@@ -547,25 +567,25 @@ void update_target_loc_real(void)
 
         // Retrieve the updated state
         colvec *state = kf_loc.GetCurrentEstimatedState();
-        g_x_target_ekf = state->at(0);
-        g_y_target_ekf = state->at(1);
-        g_vx_target_ekf = state->at(2);
-        g_vy_target_ekf = state->at(3);
-        g_ax_target_ekf = state->at(4);
-        g_ay_target_ekf = state->at(5);
+        g_tgt_pos_x_est = state->at(0);
+        g_tgt_pos_y_est = state->at(1);
+        g_tgt_vel_x_est = state->at(2);
+        g_tgt_vel_y_est = state->at(3);
+        g_tgt_acc_x_est = state->at(4);
+        g_tgt_acc_y_est = state->at(5);
     }
 
-    if (g_target_is_lost)
+    if (g_tgt_lost)
     {
-        g_x_target_ekf = (float)0.0;
-        g_y_target_ekf = (float)0.0;
-        g_vx_target_ekf = (float)0.0;
-        g_vy_target_ekf = (float)0.0;
-        g_ax_target_ekf = (float)0.0;
-        g_ay_target_ekf = (float)0.0;
+        g_tgt_pos_x_est = (float)0.0;
+        g_tgt_pos_y_est = (float)0.0;
+        g_tgt_vel_x_est = (float)0.0;
+        g_tgt_vel_y_est = (float)0.0;
+        g_tgt_acc_x_est = (float)0.0;
+        g_tgt_acc_y_est = (float)0.0;
     }
 
-    target_is_lost_prv = g_target_is_lost;
+    target_is_lost_prv = g_tgt_lost;
 };
 
 /********************************************************************************
@@ -584,39 +604,37 @@ bool Localize::init(void)
     get_localization_params();
     init_kf_loc();
 
-    g_d_target_h = (float)0.0;
-    g_d_target_w = (float)0.0;
-    g_x_target = (float)0.0;
-    g_y_target = (float)0.0;
-    g_z_target = (float)0.0;
-    g_d_target = (float)0.0;
-    g_x_error = (float)0.0;
-    g_y_error = (float)0.0;
-    g_delta_angle = (float)0.0;
-    g_camera_tilt_angle = (float)0.0;
-    g_delta_d_x = (float)0.0;
-    g_delta_d_z = (float)0.0;
-    g_camera_comp_angle = (float)0.0;
+    g_tgt_los_dist_from_pix_height = (float)0.0;
+    g_tgt_los_dist_from_pix_width = (float)0.0;
+    g_tgt_pos_x_meas = (float)0.0;
+    g_tgt_pos_y_meas = (float)0.0;
+    g_tgt_pos_z_meas = (float)0.0;
+    g_tgt_los_dist_meas = (float)0.0;
+    g_cam0_delta_angle_rad = (float)0.0;
+    g_cam0_angle_rad = (float)0.0;
+    g_tgt_pos_x_delta = (float)0.0;
+    g_tgt_pos_z_delta = (float)0.0;
+    g_cam0_comp_angle_rad = (float)0.0;
     x_target_prv = (float)0.0;
     y_target_prv = (float)0.0;
     loc_target_valid_prv = false;
-    g_target_data_useful = false;
+    g_tgt_meas_valid = false;
     camera_comp_angle_abs = (float)0.0;
-    g_fov_height = (float)0.0;
-    g_meter_per_pix = (float)0.0;
-    g_target_cntr_offset_x_m = (float)0.0;
+    g_cam0_fov_height = (float)0.0;
+    g_cam0_m_per_pix = (float)0.00001;
+    g_tgt_cntr_offset_x_m = (float)0.0;
     target_y_pix_hist4avg.assign(y_pix_window, (float)0.0);
     target_x_pix_hist4avg.assign(x_pix_window, (float)0.0);
-    g_target_cntr_offset_x_mov_avg = (float)0.0;
-    g_target_cntr_offset_y_mov_avg = (float)0.0;
+    g_tgt_cntr_offset_x_pix_filt = (float)0.0;
+    g_tgt_cntr_offset_y_pix_filt = (float)0.0;
     y_buffer_idx4avg = (int)0;
     y_sum = (float)0.0;
     x_buffer_idx4avg = (int)0;
     x_sum = (float)0.0;
-    g_line_of_sight = (float)0.0;
+    g_cam0_los_m = (float)0.0;
     target_valid_prv = false;
     kf_loc_reset = false;
-    g_target_is_lost = false;
+    g_tgt_lost = false;
     target_is_lost_prv = false;
     target_data_useful_prv = false;
 

@@ -3,36 +3,42 @@ package os.logger;
 
 import "Common.proto";
 
-// System status / metadata (low rate)
+// ---------------------------------------------------------------------------
+// SYSTEM STATUS (low rate)
+// ---------------------------------------------------------------------------
 message MavSystem {
-  Time  t = 1;
-  uint32 frame_id  = 2;
-  
-  uint32 sys_stat_voltage_battery   = 10; // uint16_t -> uint32
-  int32  sys_stat_current_battery   = 11; // int16_t  -> int32
-  int32  sys_stat_battery_remaining = 12; // int8_t   -> int32 (allows -1)
-  int32  rel_alt                    = 13; // int32_t
+  Time   t        = 1;
+  uint32 frame_id = 2;
 
-  uint32 veh_type            = 20; // uint8_t -> uint32
-  uint32 autopilot_type      = 21; // uint8_t -> uint32
-  uint32 base_mode           = 22; // uint8_t -> uint32
-  uint32 custom_mode         = 23; // uint32_t
-  uint32 state               = 24; // uint8_t -> uint32
-  uint32 mavlink_version     = 25; // uint8_t -> uint32
+  // Battery
+  uint32 sys_stat_voltage_battery   = 10;  // mv
+  int32  sys_stat_current_battery   = 11;  // ma
+  int32  sys_stat_battery_remaining = 12;  // percent, allows -1
+  int32  rel_alt                    = 13;  // mm (ArduPilot rel_alt)
+
+  // Mode / Type / State
+  uint32 veh_type        = 20;  
+  uint32 autopilot_type  = 21;
+  uint32 base_mode       = 22;
+  uint32 custom_mode     = 23;
+  uint32 state           = 24;
+  uint32 mavlink_version = 25;
 }
 
-// Kinematics / attitude (moderate rate)
+// ---------------------------------------------------------------------------
+// KINEMATICS + ATTITUDE (moderate rate)
+// ---------------------------------------------------------------------------
 message MavKinematics {
-  Time  t = 1;
-  uint32 frame_id  = 2;
-  
-  // GPS body-frame velocities & heading
-  int32  gps_vx  = 10; // int16_t -> int32
-  int32  gps_vy  = 11; // int16_t -> int32
-  int32  gps_vz  = 12; // int16_t -> int32
-  uint32 gps_hdg = 13; // uint16_t -> uint32
+  Time   t        = 1;
+  uint32 frame_id = 2;
 
-  // Attitude + rates
+  // GPS-derived velocities & heading
+  int32  gps_vx  = 10;
+  int32  gps_vy  = 11;
+  int32  gps_vz  = 12;
+  uint32 gps_hdg = 13;
+
+  // Attitude / Rates
   float roll       = 20;
   float pitch      = 21;
   float yaw        = 22;
@@ -48,50 +54,64 @@ message MavKinematics {
   float local_ned_vy = 34;
   float local_ned_vz = 35;
 
-  // Orientation quaternions & rates
+  // Quaternion + rate targets
   float q1_actual = 40;
   float q2_actual = 41;
   float q3_actual = 42;
   float q4_actual = 43;
-  float roll_rate_actual = 44;
-  float pitch_rate_actual= 45;
-  float yaw_rate_actual  = 46;
 
-  repeated float repr_offset_q = 50; // 4 elements
+  float roll_rate_actual  = 44;
+  float pitch_rate_actual = 45;
+  float yaw_rate_actual   = 46;
+
+  // Reprojection offset quaternion (length = 4)
+  repeated float repr_offset_q = 50;
 }
 
-// IMU raw (high rate)
+// ---------------------------------------------------------------------------
+// IMU RAW (high rate)
+// ---------------------------------------------------------------------------
 message MavImuRaw {
-  Time  t = 1;
-  uint32 frame_id  = 2;
-  
-  int32 imu_ax    = 10; // int16_t -> int32
-  int32 imu_ay    = 11; // int16_t -> int32
-  int32 imu_az    = 12; // int16_t -> int32
-  int32 imu_xgyro = 13; // int16_t -> int32
-  int32 imu_ygyro = 14; // int16_t -> int32
-  int32 imu_zgyro = 15; // int16_t -> int32
+  Time   t        = 1;
+  uint32 frame_id = 2;
+
+  int32 imu_ax    = 10;
+  int32 imu_ay    = 11;
+  int32 imu_az    = 12;
+  int32 imu_xgyro = 13;
+  int32 imu_ygyro = 14;
+  int32 imu_zgyro = 15;
 }
 
-// Rangefinder (low/moderate rate)
+// ---------------------------------------------------------------------------
+// RANGEFINDER
+// ---------------------------------------------------------------------------
 message MavRangefinder {
-  Time  t = 1;
-  uint32 frame_id  = 2;
-  
-  uint32 current_distance = 10; // uint16_t -> uint32
-  uint32 signal_quality   = 11; // uint8_t  -> uint32
+  Time   t        = 1;
+  uint32 frame_id = 2;
+
+  uint32 current_distance = 10;  // mm
+  uint32 signal_quality   = 11;  // [0..255]
 }
 
-// Optical flow (moderate/high rate)
+// ---------------------------------------------------------------------------
+// OPTICAL FLOW
+// ---------------------------------------------------------------------------
 message MavOpticalFlow {
-  Time  t = 1;
-  uint32 frame_id  = 2;
-  
+  Time   t        = 1;
+  uint32 frame_id = 2;
+
+  // Compensated motion (m/s)
   float  flow_comp_m_x = 10;
   float  flow_comp_m_y = 11;
-  int32  flow_x        = 12; // int16_t -> int32
-  int32  flow_y        = 13; // int16_t -> int32
-  uint32 flow_quality  = 14; // uint8_t -> uint32
+
+  // Raw flow pixels
+  int32  flow_x        = 12;
+  int32  flow_y        = 13;
+
+  uint32 flow_quality  = 14;
+
+  // Flow rates (rad/s)
   float  flow_rate_x   = 15;
   float  flow_rate_y   = 16;
 }

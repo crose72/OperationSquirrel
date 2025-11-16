@@ -14,8 +14,8 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern bool g_stop_program;
-extern bool g_use_video_playback;
-extern std::string g_input_video_path;
+extern bool g_app_stop;
+extern bool g_app_use_video_playback;
+extern std::string g_app_video_input_path;
 
 #endif // GLOBAL_OBJECTS_H

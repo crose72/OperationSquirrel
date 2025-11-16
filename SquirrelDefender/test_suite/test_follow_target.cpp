@@ -40,90 +40,90 @@ TestHarness g_h;
 // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
 // Input variables
 #define INPUT_VARS(X)          \
-    X(g_app_elapsed_time)      \
-    X(g_target_valid)          \
-    X(g_target_detection_id)   \
-    X(g_target_track_id)       \
-    X(g_detection_class)       \
-    X(g_target_detection_conf) \
-    X(g_target_cntr_offset_x)  \
-    X(g_target_cntr_offset_y)  \
-    X(g_target_height)         \
-    X(g_target_width)          \
-    X(g_target_aspect)         \
-    X(g_target_left)           \
-    X(g_target_right)          \
-    X(g_target_top)            \
-    X(g_target_bottom)         \
-    X(g_mav_veh_local_ned_vx)  \
-    X(g_mav_veh_local_ned_vy)  \
-    X(g_mav_veh_imu_ax)        \
-    X(g_mav_veh_imu_ay)        \
-    X(g_mav_veh_imu_az)        \
-    X(g_mav_veh_yaw)           \
-    X(g_mav_veh_pitch)         \
-    X(g_mav_veh_local_ned_z)
+    X(g_app_time_s)            \
+    X(g_tgt_valid)             \
+    X(g_tgt_detect_id)         \
+    X(g_tgt_track_id)          \
+    X(g_tgt_class_id)          \
+    X(g_tgt_conf)              \
+    X(g_tgt_cntr_offset_y_pix) \
+    X(g_tgt_cntr_offset_x_pix) \
+    X(g_tgt_height_pix)        \
+    X(g_tgt_width_pix)         \
+    X(g_tgt_aspect_ratio)      \
+    X(g_tgt_left_px)           \
+    X(g_tgt_right_px)          \
+    X(g_tgt_top_px)            \
+    X(g_tgt_bottom_px)         \
+    X(g_mav_veh_vel_ned_x)     \
+    X(g_mav_veh_vel_ned_y)     \
+    X(g_mav_imu_accel_x)       \
+    X(g_mav_imu_accel_y)       \
+    X(g_mav_imu_accel_z)       \
+    X(g_mav_veh_yaw_rad)       \
+    X(g_mav_veh_pitch_rad)     \
+    X(g_mav_veh_pos_ned_z)
 
 // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
 // Computed-only outputs (written only; if you also want an input recorded,
 // you can list it here too—dedup is automatic in the header/row)
 #define OUTPUT_VARS(X)                                                     \
-    X(g_d_target_h)                                                        \
-    X(g_d_target_w)                                                        \
-    X(g_x_target)                                                          \
-    X(g_y_target)                                                          \
-    X(g_z_target)                                                          \
-    X(g_d_target)                                                          \
-    X(g_delta_angle)                                                       \
-    X(g_camera_tilt_angle)                                                 \
-    X(g_delta_d_x)                                                         \
-    X(g_delta_d_z)                                                         \
-    X(g_camera_comp_angle)                                                 \
-    X(g_target_too_close)                                                  \
-    X(g_fov_height)                                                        \
-    X(g_x_target_ekf)                                                      \
-    X(g_y_target_ekf)                                                      \
-    X(g_vx_target_ekf)                                                     \
-    X(g_vy_target_ekf)                                                     \
-    X(g_ax_target_ekf)                                                     \
-    X(g_ay_target_ekf)                                                     \
-    X(g_target_cntr_offset_x_m)                                            \
-    X(g_meter_per_pix)                                                     \
-    X(g_target_cntr_offset_x_mov_avg)                                      \
-    X(g_target_cntr_offset_y_mov_avg)                                      \
-    X(g_target_data_useful)                                                \
-    X(g_line_of_sight)                                                     \
+    X(g_tgt_los_dist_from_pix_height)                                      \
+    X(g_tgt_los_dist_from_pix_width)                                       \
+    X(g_tgt_pos_x_meas)                                                    \
+    X(g_tgt_pos_y_meas)                                                    \
+    X(g_tgt_pos_z_meas)                                                    \
+    X(g_tgt_los_dist_meas)                                                 \
+    X(g_cam0_delta_angle_rad)                                              \
+    X(g_cam0_angle_rad)                                                    \
+    X(g_tgt_pos_x_delta)                                                   \
+    X(g_tgt_pos_z_delta)                                                   \
+    X(g_cam0_comp_angle_rad)                                               \
+    X(g_tgt_too_close)                                                     \
+    X(g_cam0_fov_height)                                                   \
+    X(g_tgt_pos_x_est)                                                     \
+    X(g_tgt_pos_y_est)                                                     \
+    X(g_tgt_vel_x_est)                                                     \
+    X(g_tgt_vel_y_est)                                                     \
+    X(g_tgt_acc_x_est)                                                     \
+    X(g_tgt_acc_y_est)                                                     \
+    X(g_tgt_cntr_offset_x_m)                                               \
+    X(g_cam0_m_per_pix)                                                    \
+    X(g_tgt_cntr_offset_x_pix_filt)                                        \
+    X(g_tgt_cntr_offset_y_pix_filt)                                        \
+    X(g_tgt_meas_valid)                                                    \
+    X(g_cam0_los_m)                                                        \
     /* Vehicle Controls */                                                 \
-    X(g_x_error)                                                           \
-    X(g_y_error)                                                           \
-    X(g_vx_adjust)                                                         \
-    X(g_vy_adjust)                                                         \
-    X(g_vz_adjust)                                                         \
-    X(g_yaw_target)                                                        \
+    X(g_pos_err_x)                                                         \
+    X(g_pos_err_y)                                                         \
+    X(g_ctrl_vel_x_cmd)                                                    \
+    X(g_ctrl_vel_y_cmd)                                                    \
+    X(g_ctrl_vel_z_cmd)                                                    \
+    X(g_ctrl_yaw_tgt)                                                      \
     /* Optionally repeat inputs you also want in output CSV (dedup OK): */ \
-    X(g_app_elapsed_time)                                                  \
-    X(g_target_detection_id)                                               \
-    X(g_target_track_id)                                                   \
-    X(g_detection_class)                                                   \
-    X(g_target_detection_conf)                                             \
-    X(g_target_valid)                                                      \
-    X(g_target_cntr_offset_x)                                              \
-    X(g_target_cntr_offset_y)                                              \
-    X(g_target_height)                                                     \
-    X(g_target_width)                                                      \
-    X(g_target_aspect)                                                     \
-    X(g_target_left)                                                       \
-    X(g_target_right)                                                      \
-    X(g_target_top)                                                        \
-    X(g_target_bottom)                                                     \
-    X(g_mav_veh_local_ned_vx)                                              \
-    X(g_mav_veh_local_ned_vy)                                              \
-    X(g_mav_veh_imu_ax)                                                    \
-    X(g_mav_veh_imu_ay)                                                    \
-    X(g_mav_veh_imu_az)                                                    \
-    X(g_mav_veh_yaw)                                                       \
-    X(g_mav_veh_pitch)                                                     \
-    X(g_mav_veh_local_ned_z)
+    X(g_app_time_s)                                                        \
+    X(g_tgt_detect_id)                                                     \
+    X(g_tgt_track_id)                                                      \
+    X(g_tgt_class_id)                                                      \
+    X(g_tgt_conf)                                                          \
+    X(g_tgt_valid)                                                         \
+    X(g_tgt_cntr_offset_y_pix)                                             \
+    X(g_tgt_cntr_offset_x_pix)                                             \
+    X(g_tgt_height_pix)                                                    \
+    X(g_tgt_width_pix)                                                     \
+    X(g_tgt_aspect_ratio)                                                  \
+    X(g_tgt_left_px)                                                       \
+    X(g_tgt_right_px)                                                      \
+    X(g_tgt_top_px)                                                        \
+    X(g_tgt_bottom_px)                                                     \
+    X(g_mav_veh_vel_ned_x)                                                 \
+    X(g_mav_veh_vel_ned_y)                                                 \
+    X(g_mav_imu_accel_x)                                                   \
+    X(g_mav_imu_accel_y)                                                   \
+    X(g_mav_imu_accel_z)                                                   \
+    X(g_mav_veh_yaw_rad)                                                   \
+    X(g_mav_veh_pitch_rad)                                                 \
+    X(g_mav_veh_pos_ned_z)
 
 /********************************************************************************
  * Load input/output lists and all data from the csv input file
@@ -180,12 +180,12 @@ void get_test_inputs(size_t data_index)
     // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
     // Manual calculations as needed
     // Manual calculate dt since it's not logged
-    g_dt = g_app_elapsed_time - time_prv;
-    time_prv = g_app_elapsed_time;
+    g_app_dt = g_app_time_s - time_prv;
+    time_prv = g_app_time_s;
 
     // Calculate target bbox center manually - not logged originally
-    g_target_center_y = (g_target_left + g_target_right) / 2.0f;
-    g_target_center_x = (g_target_bottom + g_target_top) / 2.0f;
+    g_tgt_center_x_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
+    g_tgt_center_y_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
 }
 
 void write_test_outputs(void)

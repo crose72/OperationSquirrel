@@ -56,8 +56,14 @@ float PID::pid(float Kp, float Ki, float Kd,
         err_sum[dim] = -max_integral;
     }
 
+    float derr = (float)0.0;
+
     // --- Derivative with low-pass filter ---
-    const float derr = (err - err_prv[dim]) / dt;
+    if (dt > (float)0.0)
+    {
+        derr = (err - err_prv[dim]) / dt;
+    }
+
     const float alpha = dt / (deriv_tau + dt);
     d_filt[dim] = d_filt[dim] + alpha * (derr - d_filt[dim]);
 
@@ -128,7 +134,13 @@ float PID3::pid3(float Kp, float Ki, float Kd,
     }
 
     // --- Derivative with 1st-order low-pass (to tame noise) ---
-    const float derr = (err - err_prv[dim]) / dt;
+    float derr = (float)0.0;
+
+    // --- Derivative with low-pass filter ---
+    if (dt > (float)0.0)
+    {
+        derr = (err - err_prv[dim]) / dt;
+    }
     const float alpha = dt / (deriv_tau + dt); // e.g., deriv_tau = 0.05..0.15 s
     d_filt[dim] = d_filt[dim] + alpha * (derr - d_filt[dim]);
 

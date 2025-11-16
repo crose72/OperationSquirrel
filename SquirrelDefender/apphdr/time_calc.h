@@ -13,11 +13,11 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-extern float g_app_elapsed_time;
-extern uint64_t g_app_elapsed_time_ns;
-extern float g_dt;
-extern bool g_first_loop_after_start;
-extern uint64_t g_epoch_ns;
+extern float g_app_time_s;
+extern uint64_t g_app_time_ns;
+extern float g_app_dt;
+extern bool g_app_first_loop;
+extern uint64_t g_app_epoch_ns;
 
 /********************************************************************************
  * Function prototypes and Class Definitions

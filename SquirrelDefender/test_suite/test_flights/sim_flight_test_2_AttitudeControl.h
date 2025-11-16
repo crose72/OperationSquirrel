@@ -151,9 +151,9 @@ void test_flight(void)
     const float dt = 0.05f; // 20 Hz loop
     static float throttle = 0.0f;
 
-    float current_alt = g_mav_veh_rngfdr_current_distance * 0.01f;
+    float current_alt = g_mav_rngfndr_dist_m * 0.01f;
     float alt_error = takeoff_target_alt - current_alt;
-    float vz_up = -g_mav_veh_local_ned_vz; // +up
+    float vz_up = -g_mav_veh_vel_ned_z; // +up
 
     // --- Outer loop: altitude PID -> climb rate target ---
     float vz_target = pid.pid(Kp_alt, Ki_alt, Kd_alt, alt_error, ControlDim::Z, dt);
