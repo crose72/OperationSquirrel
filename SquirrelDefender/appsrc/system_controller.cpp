@@ -19,11 +19,11 @@
 #include "video_io.h"
 #include "status_io.h"
 #include "vehicle_controller.h"
-#include "detect_target.h"
-#include "track_target.h"
-#include "localize_target.h"
-#include "path_planner.h"
-#include "path_planner.h"
+#include "target_detection.h"
+#include "target_tracking.h"
+#include "target_localization.h"
+#include "velocity_controller.h"
+#include "velocity_controller.h"
 #include "time_calc.h"
 
 /********************************************************************************

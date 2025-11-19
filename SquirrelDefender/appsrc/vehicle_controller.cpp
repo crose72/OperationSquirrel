@@ -11,10 +11,10 @@
  ********************************************************************************/
 #include "common_inc.h"
 #include "vehicle_controller.h"
-#include "track_target.h"
+#include "target_tracking.h"
 #include "mav_data_hub.h"
 #include "mav_utils.h"
-#include "path_planner.h"
+#include "velocity_controller.h"
 #include "system_controller.h"
 #include "param_reader.h"
 

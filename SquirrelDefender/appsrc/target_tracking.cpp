@@ -1,7 +1,7 @@
 #ifdef ENABLE_CV
 
 /********************************************************************************
- * @file    track_target.cpp
+ * @file    target_tracking.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
  * @brief   Maintain bounding box around a detected target, even when object
@@ -12,9 +12,9 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "track_target.h"
+#include "target_tracking.h"
 #include "video_io.h"
-#include "detect_target.h"
+#include "target_detection.h"
 #include "OSNet.h"
 #include "YOLOv8.h"
 #include "video_io.h"
@@ -407,23 +407,23 @@ void update_target_info(void)
 }
 
 /********************************************************************************
- * Function: Tracking
- * Description: Tracking class constructor.
+ * Function: TargetTracking
+ * Description: TargetTracking class constructor.
  ********************************************************************************/
-Tracking::Tracking(void) {};
+TargetTracking::TargetTracking(void) {};
 
 /********************************************************************************
- * Function: ~Tracking
- * Description: Tracking class destructor.
+ * Function: ~TargetTracking
+ * Description: TargetTracking class destructor.
  ********************************************************************************/
-Tracking::~Tracking(void) {};
+TargetTracking::~TargetTracking(void) {};
 
 /********************************************************************************
  * Function: init
  * Description: Initialize all track target variables.  Run once at the start
  *              of the program.
  ********************************************************************************/
-bool Tracking::init(void)
+bool TargetTracking::init(void)
 {
     get_tracking_params();
 
@@ -476,7 +476,7 @@ bool Tracking::init(void)
  * Description: Determine target to be tracked and maintain identity of target
  *              from loop to loop.
  ********************************************************************************/
-void Tracking::loop(void)
+void TargetTracking::loop(void)
 {
     filter_detections();
     track_objects();
@@ -489,7 +489,7 @@ void Tracking::loop(void)
  * Function: shutdown
  * Description: Cleanup code to run at the end of the program.
  ********************************************************************************/
-void Tracking::shutdown(void)
+void TargetTracking::shutdown(void)
 {
 }
 
