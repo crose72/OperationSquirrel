@@ -106,7 +106,7 @@
     "Edge_of_Frame_Loc_Buffer": 50.0,
     "Target_Lost_Debounce_Reset": 1000
   },
-  "Follow_Params": {
+  "Velocity_Control": {
     "Desired_Height": 640.0,
     "Desired_Width": 150.0,
     "Desired_X_offset": 10.0,
@@ -116,7 +116,9 @@
     "Desired_Y_pix_offset": 0.0,
     "CMD_vel_max_cmd": 10.0,
     "CMD_vxy_max_allowed_accel": 2.5,
-    "CMD_vxy_max_allowed_jerk": 5.0
+    "CMD_vxy_max_allowed_jerk": 5.0,
+    "X_error_dot_filt": 0.8,
+    "CMD_vxy_ff_brake_gain": -1.0
   },
   "Camera_Params": {
     "Sensor_Mode": 0,

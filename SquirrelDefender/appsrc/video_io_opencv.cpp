@@ -118,11 +118,11 @@ void get_video_io_params(void)
 {
     ParamReader cfg("../params.json");
 
-    g_cam0_img_width_px = cfg.get_float_param("Camera_Control_Params", "Input_Width");
-    g_cam0_img_height_px = cfg.get_float_param("Camera_Control_Params", "Input_Height");
-    cam0_video_out_fps = cfg.get_float_param("Camera_Control_Params", "Output_Framerate");
-    g_cam0_fov_deg = cfg.get_float_param("Camera_Control_Params", "Output_Framerate");
-    g_cam0_tilt_deg = cfg.get_float_param("Camera_Control_Params", "CAM0_Tilt_Down_Angle");
+    g_cam0_img_width_px = cfg.get_float_param("Camera_Control_Params.Input_Width");
+    g_cam0_img_height_px = cfg.get_float_param("Camera_Control_Params.Input_Height");
+    cam0_video_out_fps = cfg.get_float_param("Camera_Control_Params.Output_Framerate");
+    g_cam0_fov_deg = cfg.get_float_param("Camera_Control_Params.Output_Framerate");
+    g_cam0_tilt_deg = cfg.get_float_param("Camera_Control_Params.CAM0_Tilt_Down_Angle");
     g_cam0_tilt_rad = g_cam0_tilt_deg * M_PI / (float)180.0;
     g_cam0_fov_rad = g_cam0_fov_deg * M_PI / (float)180.0;
     g_cam0_fov_rad_half = g_cam0_fov_rad * (float)0.5;
@@ -139,34 +139,34 @@ void create_gstreamer_pipelines(std::string &capture_pipeline,
     ParamReader cfg("../params.json");
 
     /**************** CAMERA PARAMETERS ****************/
-    int sensor_mode = cfg.get_int_param("Camera_Params", "Sensor_Mode");
-    int wbmode = cfg.get_int_param("Camera_Params", "WBMode");
-    int aeantibanding = cfg.get_int_param("Camera_Params", "AEAntiBanding");
-    int tnr_mode = cfg.get_int_param("Camera_Params", "TNR_Mode");
-    int ee_mode = cfg.get_int_param("Camera_Params", "EE_Mode");
-    int exposure_min = cfg.get_int_param("Camera_Params", "Exposure_Min");
-    int exposure_max = cfg.get_int_param("Camera_Params", "Exposure_Max");
-    float gain_min = cfg.get_float_param("Camera_Params", "Gain_Min");
-    float gain_max = cfg.get_float_param("Camera_Params", "Gain_Max");
-    float isp_dgain_min = cfg.get_float_param("Camera_Params", "ISP_DGain_Min");
-    float isp_dgain_max = cfg.get_float_param("Camera_Params", "ISP_DGain_Max");
+    int sensor_mode = cfg.get_int_param("Camera_Params.Sensor_Mode");
+    int wbmode = cfg.get_int_param("Camera_Params.WBMode");
+    int aeantibanding = cfg.get_int_param("Camera_Params.AEAntiBanding");
+    int tnr_mode = cfg.get_int_param("Camera_Params.TNR_Mode");
+    int ee_mode = cfg.get_int_param("Camera_Params.EE_Mode");
+    int exposure_min = cfg.get_int_param("Camera_Params.Exposure_Min");
+    int exposure_max = cfg.get_int_param("Camera_Params.Exposure_Max");
+    float gain_min = cfg.get_float_param("Camera_Params.Gain_Min");
+    float gain_max = cfg.get_float_param("Camera_Params.Gain_Max");
+    float isp_dgain_min = cfg.get_float_param("Camera_Params.ISP_DGain_Min");
+    float isp_dgain_max = cfg.get_float_param("Camera_Params.ISP_DGain_Max");
 
-    int input_width = cfg.get_int_param("Camera_Params", "Capture_Width");
-    int input_height = cfg.get_int_param("Camera_Params", "Capture_Height");
-    std::string input_format = cfg.get_string_param("Camera_Params", "Input_Format");
-    std::string input_rate = cfg.get_string_param("Camera_Params", "Input_Framerate");
+    int input_width = cfg.get_int_param("Camera_Params.Capture_Width");
+    int input_height = cfg.get_int_param("Camera_Params.Capture_Height");
+    std::string input_format = cfg.get_string_param("Camera_Params.Input_Format");
+    std::string input_rate = cfg.get_string_param("Camera_Params.Input_Framerate");
 
-    int output_width = cfg.get_int_param("Camera_Params", "Output_Width");
-    int output_height = cfg.get_int_param("Camera_Params", "Output_Height");
-    std::string output_format = cfg.get_string_param("Camera_Params", "Output_Format");
+    int output_width = cfg.get_int_param("Camera_Params.Output_Width");
+    int output_height = cfg.get_int_param("Camera_Params.Output_Height");
+    std::string output_format = cfg.get_string_param("Camera_Params.Output_Format");
 
     /**************** ENCODER PARAMETERS ****************/
-    int bitrate = cfg.get_int_param("Encoder_Params", "Bitrate");
-    std::string speed_preset = cfg.get_string_param("Encoder_Params", "Speed_Preset");
-    std::string tune = cfg.get_string_param("Encoder_Params", "Tune");
-    int key_int_max = cfg.get_int_param("Encoder_Params", "KeyIntMax");
-    int threads = cfg.get_int_param("Encoder_Params", "Threads");
-    bool faststart = cfg.get_bool_param("Encoder_Params", "Mux_FastStart");
+    int bitrate = cfg.get_int_param("Encoder_Params.Bitrate");
+    std::string speed_preset = cfg.get_string_param("Encoder_Params.Speed_Preset");
+    std::string tune = cfg.get_string_param("Encoder_Params.Tune");
+    int key_int_max = cfg.get_int_param("Encoder_Params.KeyIntMax");
+    int threads = cfg.get_int_param("Encoder_Params.Threads");
+    bool faststart = cfg.get_bool_param("Encoder_Params.Mux_FastStart");
 
     /**************** BUILD CAPTURE PIPELINE ****************/
     std::ostringstream ss_cap;

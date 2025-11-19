@@ -132,8 +132,8 @@ TestHarness g_h;
 void init_test_inputs(void)
 {
     // Load the CSV input file
-    std::string test_input_file_path = test_params.get_string_param("Input_File", "File_Path");
-    std::string test_input_file_name = test_params.get_string_param("Input_File", "File_Name");
+    std::string test_input_file_path = test_params.get_string_param("Input_File.File_Path");
+    std::string test_input_file_name = test_params.get_string_param("Input_File.File_Name");
     test_inputs = test_input_file_path + test_input_file_name;
     g_csv = std::make_unique<CSVReader>(test_inputs, ',');
 
@@ -157,8 +157,8 @@ void init_test_inputs(void)
 
 void init_test_outputs(void)
 {
-    test_output_path = test_params.get_string_param("Output_File", "File_Path");
-    test_output_file_name = test_params.get_string_param("Output_File", "File_Name");
+    test_output_path = test_params.get_string_param("Output_File.File_Path");
+    test_output_file_name = test_params.get_string_param("Output_File.File_Name");
     test_unique_output_file_name = generate_unique_filename(test_output_path, test_output_file_name);
 
     test_output_file.open(test_unique_output_file_name);

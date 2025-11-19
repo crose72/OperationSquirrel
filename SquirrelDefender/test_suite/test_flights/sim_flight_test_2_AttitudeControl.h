@@ -97,23 +97,23 @@ void init_flight(void)
     ParamReader height_control("../params.json");
 
     // --- PID Parameters ---
-    Kp_alt = height_control.get_float_param("PID_alt", "Kp");
-    Ki_alt = height_control.get_float_param("PID_alt", "Ki");
-    Kd_alt = height_control.get_float_param("PID_alt", "Kd");
-    w1_alt = height_control.get_float_param("PID_alt", "w1");
+    Kp_alt = height_control.get_float_param("PID_alt.Kp");
+    Ki_alt = height_control.get_float_param("PID_alt.Ki");
+    Kd_alt = height_control.get_float_param("PID_alt.Kd");
+    w1_alt = height_control.get_float_param("PID_alt.w1");
 
-    Kp_vel = height_control.get_float_param("PID_vel", "Kp");
-    Ki_vel = height_control.get_float_param("PID_vel", "Ki");
-    Kd_vel = height_control.get_float_param("PID_vel", "Kd");
-    w1_vel = height_control.get_float_param("PID_vel", "w1");
+    Kp_vel = height_control.get_float_param("PID_vel.Kp");
+    Ki_vel = height_control.get_float_param("PID_vel.Ki");
+    Kd_vel = height_control.get_float_param("PID_vel.Kd");
+    w1_vel = height_control.get_float_param("PID_vel.w1");
 
     // Optional: filter & decay tuning
-    tau_alt = height_control.get_float_param("PID_alt", "Tau");
-    tau_vel = height_control.get_float_param("PID_vel", "Tau");
-    decay_alt = height_control.get_float_param("PID_alt", "Decay");
-    decay_vel = height_control.get_float_param("PID_vel", "Decay");
-    max_int_alt = height_control.get_float_param("PID_alt", "MaxIntegral");
-    max_int_vel = height_control.get_float_param("PID_vel", "MaxIntegral");
+    tau_alt = height_control.get_float_param("PID_alt.Tau");
+    tau_vel = height_control.get_float_param("PID_vel.Tau");
+    decay_alt = height_control.get_float_param("PID_alt.Decay");
+    decay_vel = height_control.get_float_param("PID_vel.Decay");
+    max_int_alt = height_control.get_float_param("PID_alt.MaxIntegral");
+    max_int_vel = height_control.get_float_param("PID_vel.MaxIntegral");
 
     // --- Apply tuning to PID instances ---
     pid.deriv_tau = tau_alt;
@@ -121,14 +121,14 @@ void init_flight(void)
     pid.max_integral = max_int_alt;
 
     // --- Takeoff Parameters ---
-    TAKEOFF_THR_MAX = height_control.get_float_param("Takeoff", "ThrottleMax");
-    TAKEOFF_THR_SLEW_TIME = height_control.get_float_param("Takeoff", "ThrottleSlewTime");
-    ALT_TOL = height_control.get_float_param("Takeoff", "AltTolerance");
-    CLIMB_DETECT_VZ = height_control.get_float_param("Takeoff", "ClimbDetectVz");
-    CLIMB_DETECT_ALT = height_control.get_float_param("Takeoff", "ClimbDetectAlt");
+    TAKEOFF_THR_MAX = height_control.get_float_param("Takeoff.ThrottleMax");
+    TAKEOFF_THR_SLEW_TIME = height_control.get_float_param("Takeoff.ThrottleSlewTime");
+    ALT_TOL = height_control.get_float_param("Takeoff.AltTolerance");
+    CLIMB_DETECT_VZ = height_control.get_float_param("Takeoff.ClimbDetectVz");
+    CLIMB_DETECT_ALT = height_control.get_float_param("Takeoff.ClimbDetectAlt");
 
     // --- Target Altitude ---
-    takeoff_target_alt = height_control.get_float_param("Target", "Altitude");
+    takeoff_target_alt = height_control.get_float_param("Target.Altitude");
 
     // --- MAVLink setup ---
     MavCmd::read_param(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID,

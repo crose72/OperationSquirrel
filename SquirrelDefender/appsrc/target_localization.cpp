@@ -187,41 +187,41 @@ void get_localization_params(void)
     ParamReader localization_params("../params.json");
 
     // H_loc (Observation matrix, 2x6)
-    H_loc_00 = localization_params.get_float_param("Localization_Params", "H_loc_00");
-    H_loc_11 = localization_params.get_float_param("Localization_Params", "H_loc_11");
+    H_loc_00 = localization_params.get_float_param("Localization_Params.H_loc_00");
+    H_loc_11 = localization_params.get_float_param("Localization_Params.H_loc_11");
 
     // Q_loc (Process noise covariance diagonals, 6x6)
-    Q_loc_00 = localization_params.get_float_param("Localization_Params", "Q_loc_00");
-    Q_loc_11 = localization_params.get_float_param("Localization_Params", "Q_loc_11");
-    Q_loc_22 = localization_params.get_float_param("Localization_Params", "Q_loc_22");
-    Q_loc_33 = localization_params.get_float_param("Localization_Params", "Q_loc_33");
-    Q_loc_44 = localization_params.get_float_param("Localization_Params", "Q_loc_44");
-    Q_loc_55 = localization_params.get_float_param("Localization_Params", "Q_loc_55");
+    Q_loc_00 = localization_params.get_float_param("Localization_Params.Q_loc_00");
+    Q_loc_11 = localization_params.get_float_param("Localization_Params.Q_loc_11");
+    Q_loc_22 = localization_params.get_float_param("Localization_Params.Q_loc_22");
+    Q_loc_33 = localization_params.get_float_param("Localization_Params.Q_loc_33");
+    Q_loc_44 = localization_params.get_float_param("Localization_Params.Q_loc_44");
+    Q_loc_55 = localization_params.get_float_param("Localization_Params.Q_loc_55");
 
     // R_loc (Measurement noise covariance diagonals, 2x2)
-    R_loc_00 = localization_params.get_float_param("Localization_Params", "R_loc_00");
-    R_loc_11 = localization_params.get_float_param("Localization_Params", "R_loc_11");
+    R_loc_00 = localization_params.get_float_param("Localization_Params.R_loc_00");
+    R_loc_11 = localization_params.get_float_param("Localization_Params.R_loc_11");
 
     // P_loc (Estimate covariance diagonals, 6x6)
-    P_loc_00 = localization_params.get_float_param("Localization_Params", "P_loc_00");
-    P_loc_11 = localization_params.get_float_param("Localization_Params", "P_loc_11");
-    P_loc_22 = localization_params.get_float_param("Localization_Params", "P_loc_22");
-    P_loc_33 = localization_params.get_float_param("Localization_Params", "P_loc_33");
-    P_loc_44 = localization_params.get_float_param("Localization_Params", "P_loc_44");
-    P_loc_55 = localization_params.get_float_param("Localization_Params", "P_loc_55");
+    P_loc_00 = localization_params.get_float_param("Localization_Params.P_loc_00");
+    P_loc_11 = localization_params.get_float_param("Localization_Params.P_loc_11");
+    P_loc_22 = localization_params.get_float_param("Localization_Params.P_loc_22");
+    P_loc_33 = localization_params.get_float_param("Localization_Params.P_loc_33");
+    P_loc_44 = localization_params.get_float_param("Localization_Params.P_loc_44");
+    P_loc_55 = localization_params.get_float_param("Localization_Params.P_loc_55");
 
     // Target centroid moving average and curve fit window sizes
-    x_pix_window = localization_params.get_int_param("Localization_Params", "X_pix_mov_avg_window_size");
-    y_pix_window = localization_params.get_int_param("Localization_Params", "Y_pix_mov_avg_window_size");
+    x_pix_window = localization_params.get_int_param("Localization_Params.X_pix_mov_avg_window_size");
+    y_pix_window = localization_params.get_int_param("Localization_Params.Y_pix_mov_avg_window_size");
 
-    pix_height_x_coef = localization_params.get_float_param("Localization_Params", "Loc_Eq_Height_x_coef");
-    pix_height_x_pow = localization_params.get_float_param("Localization_Params", "Loc_Eq_Height_x_pow");
-    pix_width_x = localization_params.get_float_param("Localization_Params", "Loc_Eq_Width_x_coef");
-    pix_width_x_pow = localization_params.get_float_param("Localization_Params", "Loc_Eq_Width_x_pow");
-    known_obj_heigh_all_dist = localization_params.get_float_param("Localization_Params", "Loc_Known_Obj_Height_All_Dist");
-    target_det_edge_of_frame_buffer = localization_params.get_float_param("Localization_Params", "Edge_of_Frame_Loc_Buffer");
-    min_target_bbox_area = localization_params.get_float_param("Localization_Params", "Min_Target_Bbox_Area");
-    int target_lost_dbc_reset_val = localization_params.get_float_param("Localization_Params", "Target_Lost_Debounce_Reset");
+    pix_height_x_coef = localization_params.get_float_param("Localization_Params.Loc_Eq_Height_x_coef");
+    pix_height_x_pow = localization_params.get_float_param("Localization_Params.Loc_Eq_Height_x_pow");
+    pix_width_x = localization_params.get_float_param("Localization_Params.Loc_Eq_Width_x_coef");
+    pix_width_x_pow = localization_params.get_float_param("Localization_Params.Loc_Eq_Width_x_pow");
+    known_obj_heigh_all_dist = localization_params.get_float_param("Localization_Params.Loc_Known_Obj_Height_All_Dist");
+    target_det_edge_of_frame_buffer = localization_params.get_float_param("Localization_Params.Edge_of_Frame_Loc_Buffer");
+    min_target_bbox_area = localization_params.get_float_param("Localization_Params.Min_Target_Bbox_Area");
+    int target_lost_dbc_reset_val = localization_params.get_float_param("Localization_Params.Target_Lost_Debounce_Reset");
     target_lost_dbc_reset = static_cast<std::chrono::milliseconds>(target_lost_dbc_reset_val);
 }
 

@@ -134,10 +134,10 @@ bool VehicleController::init(void)
 
     takeoff_dbc = false;
     start_follow_mode = false;
-    takeoff_dbc_cnt = flight_params.get_float_param("Flight_Params", "Min_Mission_Start_Debounce");
-    min_mission_alt_cm = flight_params.get_float_param("Flight_Params", "Min_Mission_Alt_CM");
-    min_mission_alt_mm = flight_params.get_float_param("Flight_Params", "Min_Mission_Alt_MM");
-    desired_veh_alt = flight_params.get_float_param("Flight_Params", "CMD_Takeoff_Alt");
+    takeoff_dbc_cnt = flight_params.get_float_param("Flight_Params.Min_Mission_Start_Debounce");
+    min_mission_alt_cm = flight_params.get_float_param("Flight_Params.Min_Mission_Alt_CM");
+    min_mission_alt_mm = flight_params.get_float_param("Flight_Params.Min_Mission_Alt_MM");
+    desired_veh_alt = flight_params.get_float_param("Flight_Params.CMD_Takeoff_Alt");
 
     return true;
 }

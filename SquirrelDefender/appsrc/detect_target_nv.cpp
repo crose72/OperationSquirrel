@@ -57,11 +57,11 @@ bool create_detection_network(void)
 
     detect_target_nv.h detection_params("../params.json");
 
-    float detection_thresh = detection_params.get_float_param("Detection_Params", "Detect_Thresh");
-    uint32_t max_batch_size = detection_params.get_uint32_param("Detection_Params", "Max_Batch_Size");
-    uint32_t min_frames = detection_params.get_uint32_param("Detection_Params", "Min_Frames");
-    uint32_t drop_frames = detection_params.get_uint32_param("Detection_Params", "Drop_Frames");
-    float overlap_thresh = detection_params.get_float_param("Detection_Params", "Overlap_Threshold");
+    float detection_thresh = detection_params.get_float_param("Detection_Params.Detect_Thresh");
+    uint32_t max_batch_size = detection_params.get_uint32_param("Detection_Params.Max_Batch_Size");
+    uint32_t min_frames = detection_params.get_uint32_param("Detection_Params.Min_Frames");
+    uint32_t drop_frames = detection_params.get_uint32_param("Detection_Params.Drop_Frames");
+    float overlap_thresh = detection_params.get_float_param("Detection_Params.Overlap_Threshold");
 
 #else
 

@@ -183,38 +183,38 @@ void get_path_params(void)
     ParamReader follow_control("../params.json");
 
     // Accessing Vel_PID_x parameters
-    Kp_x = follow_control.get_float_param("PID_vx_forward", "Kp");
-    Ki_x = follow_control.get_float_param("PID_vx_forward", "Ki");
-    Kd_x = follow_control.get_float_param("PID_vx_forward", "Kd");
+    Kp_x = follow_control.get_float_param("PID_vx_forward.Kp");
+    Ki_x = follow_control.get_float_param("PID_vx_forward.Ki");
+    Kd_x = follow_control.get_float_param("PID_vx_forward.Kd");
 
     // Accessing Vel_PID_y parameters
-    Kp_y = follow_control.get_float_param("PID_vy_forward", "Kp");
-    Ki_y = follow_control.get_float_param("PID_vy_forward", "Ki");
-    Kd_y = follow_control.get_float_param("PID_vy_forward", "Kd");
+    Kp_y = follow_control.get_float_param("PID_vy_forward.Kp");
+    Ki_y = follow_control.get_float_param("PID_vy_forward.Ki");
+    Kd_y = follow_control.get_float_param("PID_vy_forward.Kd");
 
     // Accessing Vel_PID_x parameters for reverse movement
-    Kp_x_rev = follow_control.get_float_param("PID_vx_reverse", "Kp");
-    Ki_x_rev = follow_control.get_float_param("PID_vx_reverse", "Ki");
-    Kd_x_rev = follow_control.get_float_param("PID_vx_reverse", "Kd");
+    Kp_x_rev = follow_control.get_float_param("PID_vx_reverse.Kp");
+    Ki_x_rev = follow_control.get_float_param("PID_vx_reverse.Ki");
+    Kd_x_rev = follow_control.get_float_param("PID_vx_reverse.Kd");
 
     // Accessing Vel_PID_y parameters for reverse movment
-    Kp_y_rev = follow_control.get_float_param("PID_vy_reverse", "Kp");
-    Ki_y_rev = follow_control.get_float_param("PID_vy_reverse", "Ki");
-    Kd_y_rev = follow_control.get_float_param("PID_vy_reverse", "Kd");
+    Kp_y_rev = follow_control.get_float_param("PID_vy_reverse.Kp");
+    Ki_y_rev = follow_control.get_float_param("PID_vy_reverse.Ki");
+    Kd_y_rev = follow_control.get_float_param("PID_vy_reverse.Kd");
 
     // Accessing Yaw PID parameters
-    Kp_yaw = follow_control.get_float_param("PID_yaw", "Kp");
-    Ki_yaw = follow_control.get_float_param("PID_yaw", "Ki");
-    Kd_yaw = follow_control.get_float_param("PID_yaw", "Kd");
+    Kp_yaw = follow_control.get_float_param("PID_yaw.Kp");
+    Ki_yaw = follow_control.get_float_param("PID_yaw.Ki");
+    Kd_yaw = follow_control.get_float_param("PID_yaw.Kd");
 
     // Follow params
-    x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_offset");
-    y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_offset");
+    x_desired = follow_control.get_float_param("Velocity_Control.Desired_X_offset");
+    y_desired = follow_control.get_float_param("Velocity_Control.Desired_Y_offset");
 
-    vxy_cmd_max_allowed_accel = follow_control.get_float_param("Follow_Params", "CMD_vxy_max_allowed_accel");
-    vxy_cmd_max_allowed_jerk = follow_control.get_float_param("Follow_Params", "CMD_vxy_max_allowed_jerk");
-    x_error_dot_filt_coef = follow_control.get_float_param("Follow_Params", "X_error_dot_filt");
-    vxy_cmd_ff_brake_gain = follow_control.get_float_param("Follow_Params", "CMD_vxy_ff_brake_gain");
+    vxy_cmd_max_allowed_accel = follow_control.get_float_param("Velocity_Control.CMD_vxy_max_allowed_accel");
+    vxy_cmd_max_allowed_jerk = follow_control.get_float_param("Velocity_Control.CMD_vxy_max_allowed_jerk");
+    x_error_dot_filt_coef = follow_control.get_float_param("Velocity_Control.X_error_dot_filt");
+    vxy_cmd_ff_brake_gain = follow_control.get_float_param("Velocity_Control.CMD_vxy_ff_brake_gain");
 }
 
 /********************************************************************************
