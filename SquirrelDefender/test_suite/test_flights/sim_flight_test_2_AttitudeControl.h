@@ -43,14 +43,14 @@ float max_int_vel = 10.0f;
 float hover_thrust = 0.35f;      // default if param read fails
 float takeoff_target_alt = 8.0f; // meters
 
-// --- Takeoff Parameters ---
+// --- gps_denied_control.thrust_control Parameters ---
 float TAKEOFF_THR_MAX = 0.9f;
 float TAKEOFF_THR_SLEW_TIME = 2.0f; // seconds
 float ALT_TOL = 0.3f;
 float CLIMB_DETECT_VZ = 0.1f;  // m/s threshold for "moving up"
 float CLIMB_DETECT_ALT = 0.3f; // m threshold for "already lifted"
 
-// --- Takeoff state machine ---
+// --- gps_denied_control.thrust_control state machine ---
 enum TakeoffState
 {
     TAKEOFF_SPOOLUP,
@@ -97,38 +97,38 @@ void init_flight(void)
     ParamReader height_control("../params.json");
 
     // --- PID Parameters ---
-    Kp_alt = height_control.get_float_param("PID_alt", "Kp");
-    Ki_alt = height_control.get_float_param("PID_alt", "Ki");
-    Kd_alt = height_control.get_float_param("PID_alt", "Kd");
-    w1_alt = height_control.get_float_param("PID_alt", "w1");
+    Kp_alt = height_control.get_float_param("gps_denied_control.alt_pid.Kp");
+    Ki_alt = height_control.get_float_param("gps_denied_control.alt_pid.Ki");
+    Kd_alt = height_control.get_float_param("gps_denied_control.alt_pid.Kd");
+    w1_alt = height_control.get_float_param("gps_denied_control.alt_pid.w1");
 
-    Kp_vel = height_control.get_float_param("PID_vel", "Kp");
-    Ki_vel = height_control.get_float_param("PID_vel", "Ki");
-    Kd_vel = height_control.get_float_param("PID_vel", "Kd");
-    w1_vel = height_control.get_float_param("PID_vel", "w1");
+    Kp_vel = height_control.get_float_param("gps_denied_control.vz_pid.Kp");
+    Ki_vel = height_control.get_float_param("gps_denied_control.vz_pid.Ki");
+    Kd_vel = height_control.get_float_param("gps_denied_control.vz_pid.Kd");
+    w1_vel = height_control.get_float_param("gps_denied_control.vz_pid.w1");
 
     // Optional: filter & decay tuning
-    tau_alt = height_control.get_float_param("PID_alt", "Tau");
-    tau_vel = height_control.get_float_param("PID_vel", "Tau");
-    decay_alt = height_control.get_float_param("PID_alt", "Decay");
-    decay_vel = height_control.get_float_param("PID_vel", "Decay");
-    max_int_alt = height_control.get_float_param("PID_alt", "MaxIntegral");
-    max_int_vel = height_control.get_float_param("PID_vel", "MaxIntegral");
+    tau_alt = height_control.get_float_param("gps_denied_control.alt_pid.Tau");
+    tau_vel = height_control.get_float_param("gps_denied_control.vz_pid.Tau");
+    decay_alt = height_control.get_float_param("gps_denied_control.alt_pid.Decay");
+    decay_vel = height_control.get_float_param("gps_denied_control.vz_pid.Decay");
+    max_int_alt = height_control.get_float_param("gps_denied_control.alt_pid.MaxIntegral");
+    max_int_vel = height_control.get_float_param("gps_denied_control.vz_pid.MaxIntegral");
 
     // --- Apply tuning to PID instances ---
     pid.deriv_tau = tau_alt;
     pid.integral_decay = decay_alt;
     pid.max_integral = max_int_alt;
 
-    // --- Takeoff Parameters ---
-    TAKEOFF_THR_MAX = height_control.get_float_param("Takeoff", "ThrottleMax");
-    TAKEOFF_THR_SLEW_TIME = height_control.get_float_param("Takeoff", "ThrottleSlewTime");
-    ALT_TOL = height_control.get_float_param("Takeoff", "AltTolerance");
-    CLIMB_DETECT_VZ = height_control.get_float_param("Takeoff", "ClimbDetectVz");
-    CLIMB_DETECT_ALT = height_control.get_float_param("Takeoff", "ClimbDetectAlt");
+    // --- gps_denied_control.thrust_control Parameters ---
+    TAKEOFF_THR_MAX = height_control.get_float_param("gps_denied_control.thrust_control.ThrottleMax");
+    TAKEOFF_THR_SLEW_TIME = height_control.get_float_param("gps_denied_control.thrust_control.ThrottleSlewTime");
+    ALT_TOL = height_control.get_float_param("gps_denied_control.thrust_control.AltTolerance");
+    CLIMB_DETECT_VZ = height_control.get_float_param("gps_denied_control.thrust_control.ClimbDetectVz");
+    CLIMB_DETECT_ALT = height_control.get_float_param("gps_denied_control.thrust_control.ClimbDetectAlt");
 
     // --- Target Altitude ---
-    takeoff_target_alt = height_control.get_float_param("Target", "Altitude");
+    takeoff_target_alt = height_control.get_float_param("Target.Altitude");
 
     // --- MAVLink setup ---
     MavCmd::read_param(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID,

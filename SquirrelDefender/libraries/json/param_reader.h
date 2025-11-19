@@ -25,14 +25,16 @@ public:
     ParamReader(const std::string &filename);
     ~ParamReader();
 
-    float get_float_param(const std::string &group, const std::string &key) const;
-    uint32_t get_uint32_param(const std::string &group, const std::string &key) const;
-    int get_int_param(const std::string &group, const std::string &key) const;
-    bool get_bool_param(const std::string &group, const std::string &key) const;
-    std::string get_string_param(const std::string &group, const std::string &key) const;
+    float get_float_param(const std::string &group) const;
+    uint32_t get_uint32_param(const std::string &group) const;
+    int get_int_param(const std::string &group) const;
+    bool get_bool_param(const std::string &group) const;
+    std::string get_string_param(const std::string &group) const;
 
 private:
     Json::Value root;
+
+    const Json::Value *resolve_path(const std::string &path) const;
 };
 
 #endif // JSON_UTILS_H
