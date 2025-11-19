@@ -117,22 +117,22 @@ void get_tracking_params(void)
 {
     ParamReader target_params("../params.json");
 
-    target_bbox_center_filt_coeff = target_params.get_float_param("Tracking_Params.BBox_Filt_coeff");
-    target_detection_thresh = target_params.get_float_param("Tracking_Params.Detect_Thresh");
+    target_bbox_center_filt_coeff = target_params.get_float_param("target_track_params.target_bbox_center_filt_coef");
+    target_detection_thresh = target_params.get_float_param("target_track_params.target_det_conf_thresh");
 
 #if defined(BLD_JETSON_B01)
 
-    target_class = target_params.get_int_param("Tracking_Params.Detect_Class_B01");
+    target_class = target_params.get_int_param("target_track_params.target_class_mobilenet_ssd_v2");
 
 #elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-    target_class = target_params.get_int_param("Tracking_Params.Detect_Class_Orin");
-    target_similarity_thresh = target_params.get_float_param("Tracking_Params.Track_similarity_thresh");
-    max_reid_batch = target_params.get_int_param("Tracking_Params.Track_max_reid_batch");
+    target_class = target_params.get_int_param("target_track_params.target_class_yolov8");
+    target_similarity_thresh = target_params.get_float_param("target_track_params.reid_sim_thresh");
+    max_reid_batch = target_params.get_int_param("target_track_params.reid_max_batch_size");
 
 #elif defined(BLD_WIN)
 
-    target_class = target_params.get_int_param("Tracking_Params.Detect_Class_Orin");
+    target_class = target_params.get_int_param("target_track_params.target_class_yolov8");
 
 #else
 
