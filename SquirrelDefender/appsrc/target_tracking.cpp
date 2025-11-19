@@ -1,7 +1,7 @@
 #ifdef ENABLE_CV
 
 /********************************************************************************
- * @file    track_target.cpp
+ * @file    target_tracking.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
  * @brief   Maintain bounding box around a detected target, even when object
@@ -12,9 +12,9 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "track_target.h"
+#include "target_tracking.h"
 #include "video_io.h"
-#include "detect_target.h"
+#include "target_detection.h"
 #include "OSNet.h"
 #include "YOLOv8.h"
 #include "video_io.h"
@@ -117,22 +117,22 @@ void get_tracking_params(void)
 {
     ParamReader target_params("../params.json");
 
-    target_bbox_center_filt_coeff = target_params.get_float_param("Tracking_Params", "BBox_Filt_coeff");
-    target_detection_thresh = target_params.get_float_param("Tracking_Params", "Detect_Thresh");
+    target_bbox_center_filt_coeff = target_params.get_float_param("target_track_params.target_bbox_center_filt_coef");
+    target_detection_thresh = target_params.get_float_param("target_track_params.target_det_conf_thresh");
 
 #if defined(BLD_JETSON_B01)
 
-    target_class = target_params.get_int_param("Tracking_Params", "Detect_Class_B01");
+    target_class = target_params.get_int_param("target_track_params.target_class_mobilenet_ssd_v2");
 
 #elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
 
-    target_class = target_params.get_int_param("Tracking_Params", "Detect_Class_Orin");
-    target_similarity_thresh = target_params.get_float_param("Tracking_Params", "Track_similarity_thresh");
-    max_reid_batch = target_params.get_int_param("Tracking_Params", "Track_max_reid_batch");
+    target_class = target_params.get_int_param("target_track_params.target_class_yolov8");
+    target_similarity_thresh = target_params.get_float_param("target_track_params.reid_sim_thresh");
+    max_reid_batch = target_params.get_int_param("target_track_params.reid_max_batch_size");
 
 #elif defined(BLD_WIN)
 
-    target_class = target_params.get_int_param("Tracking_Params", "Detect_Class_Orin");
+    target_class = target_params.get_int_param("target_track_params.target_class_yolov8");
 
 #else
 
@@ -407,23 +407,23 @@ void update_target_info(void)
 }
 
 /********************************************************************************
- * Function: Tracking
- * Description: Tracking class constructor.
+ * Function: TargetTracking
+ * Description: TargetTracking class constructor.
  ********************************************************************************/
-Tracking::Tracking(void) {};
+TargetTracking::TargetTracking(void) {};
 
 /********************************************************************************
- * Function: ~Tracking
- * Description: Tracking class destructor.
+ * Function: ~TargetTracking
+ * Description: TargetTracking class destructor.
  ********************************************************************************/
-Tracking::~Tracking(void) {};
+TargetTracking::~TargetTracking(void) {};
 
 /********************************************************************************
  * Function: init
  * Description: Initialize all track target variables.  Run once at the start
  *              of the program.
  ********************************************************************************/
-bool Tracking::init(void)
+bool TargetTracking::init(void)
 {
     get_tracking_params();
 
@@ -476,7 +476,7 @@ bool Tracking::init(void)
  * Description: Determine target to be tracked and maintain identity of target
  *              from loop to loop.
  ********************************************************************************/
-void Tracking::loop(void)
+void TargetTracking::loop(void)
 {
     filter_detections();
     track_objects();
@@ -489,7 +489,7 @@ void Tracking::loop(void)
  * Function: shutdown
  * Description: Cleanup code to run at the end of the program.
  ********************************************************************************/
-void Tracking::shutdown(void)
+void TargetTracking::shutdown(void)
 {
 }
 

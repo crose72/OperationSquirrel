@@ -11,13 +11,13 @@
 #include "mav_data_hub.h"
 #include "mav_utils.h"
 #include "vehicle_controller.h"
-#include "detect_target.h"
-#include "track_target.h"
-#include "localize_target.h"
-#include "path_planner.h"
+#include "target_detection.h"
+#include "target_tracking.h"
+#include "target_localization.h"
+#include "velocity_controller.h"
 #include "time_calc.h"
 #include "timer.h"
-#include "path_planner.h"
+#include "velocity_controller.h"
 
 /********************************************************************************
  * Globals
@@ -132,8 +132,8 @@ TestHarness g_h;
 void init_test_inputs(void)
 {
     // Load the CSV input file
-    std::string test_input_file_path = test_params.get_string_param("Input_File", "File_Path");
-    std::string test_input_file_name = test_params.get_string_param("Input_File", "File_Name");
+    std::string test_input_file_path = test_params.get_string_param("Input_File.File_Path");
+    std::string test_input_file_name = test_params.get_string_param("Input_File.File_Name");
     test_inputs = test_input_file_path + test_input_file_name;
     g_csv = std::make_unique<CSVReader>(test_inputs, ',');
 
@@ -157,8 +157,8 @@ void init_test_inputs(void)
 
 void init_test_outputs(void)
 {
-    test_output_path = test_params.get_string_param("Output_File", "File_Path");
-    test_output_file_name = test_params.get_string_param("Output_File", "File_Name");
+    test_output_path = test_params.get_string_param("Output_File.File_Path");
+    test_output_file_name = test_params.get_string_param("Output_File.File_Name");
     test_unique_output_file_name = generate_unique_filename(test_output_path, test_output_file_name);
 
     test_output_file.open(test_unique_output_file_name);
@@ -203,15 +203,15 @@ void init_software_components(void)
 {
     // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
     // Initialize all inputs to the software component
-    Localize::init();
-    PathPlanner::init();
+    TargetLocalization::init();
+    VelocityController::init();
 }
 
 void run_loops(void)
 {
     // MODIFY FOR YOUR TEST ONLY - EVERYTHING ELSE STAYS THE SAME
-    Localize::loop();
-    PathPlanner::loop();
+    TargetLocalization::loop();
+    VelocityController::loop();
 }
 
 void setup(void)

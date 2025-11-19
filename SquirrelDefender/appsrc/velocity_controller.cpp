@@ -1,5 +1,5 @@
 /********************************************************************************
- * @file    path_planner.cpp
+ * @file    velocity_controller.cpp
  * @author  Cameron Rose
  * @date    3/12/2025
  * @brief   The path planner contains the MPC setup and solving for the optimal
@@ -11,15 +11,15 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "path_planner.h"
+#include "velocity_controller.h"
 #include "video_io.h"
 #include "param_reader.h"
 #include "pid.h"
-#include "localize_target.h"
+#include "target_localization.h"
 #include "time_calc.h"
-#include "track_target.h"
+#include "target_tracking.h"
 #include "mav_data_hub.h"
-#include "path_planner.h"
+#include "velocity_controller.h"
 #include "signal_processing.h"
 #include <spdlog/spdlog.h>
 
@@ -183,38 +183,38 @@ void get_path_params(void)
     ParamReader follow_control("../params.json");
 
     // Accessing Vel_PID_x parameters
-    Kp_x = follow_control.get_float_param("PID_vx_forward", "Kp");
-    Ki_x = follow_control.get_float_param("PID_vx_forward", "Ki");
-    Kd_x = follow_control.get_float_param("PID_vx_forward", "Kd");
+    Kp_x = follow_control.get_float_param("velocity_control.pid_vx_forward.kp");
+    Ki_x = follow_control.get_float_param("velocity_control.pid_vx_forward.ki");
+    Kd_x = follow_control.get_float_param("velocity_control.pid_vx_forward.kd");
 
     // Accessing Vel_PID_y parameters
-    Kp_y = follow_control.get_float_param("PID_vy_forward", "Kp");
-    Ki_y = follow_control.get_float_param("PID_vy_forward", "Ki");
-    Kd_y = follow_control.get_float_param("PID_vy_forward", "Kd");
+    Kp_y = follow_control.get_float_param("velocity_control.pid_vy_forward.kp");
+    Ki_y = follow_control.get_float_param("velocity_control.pid_vy_forward.ki");
+    Kd_y = follow_control.get_float_param("velocity_control.pid_vy_forward.kd");
 
     // Accessing Vel_PID_x parameters for reverse movement
-    Kp_x_rev = follow_control.get_float_param("PID_vx_reverse", "Kp");
-    Ki_x_rev = follow_control.get_float_param("PID_vx_reverse", "Ki");
-    Kd_x_rev = follow_control.get_float_param("PID_vx_reverse", "Kd");
+    Kp_x_rev = follow_control.get_float_param("velocity_control.pid_vx_reverse.kp");
+    Ki_x_rev = follow_control.get_float_param("velocity_control.pid_vx_reverse.ki");
+    Kd_x_rev = follow_control.get_float_param("velocity_control.pid_vx_reverse.kd");
 
     // Accessing Vel_PID_y parameters for reverse movment
-    Kp_y_rev = follow_control.get_float_param("PID_vy_reverse", "Kp");
-    Ki_y_rev = follow_control.get_float_param("PID_vy_reverse", "Ki");
-    Kd_y_rev = follow_control.get_float_param("PID_vy_reverse", "Kd");
+    Kp_y_rev = follow_control.get_float_param("velocity_control.pid_vy_reverse.kp");
+    Ki_y_rev = follow_control.get_float_param("velocity_control.pid_vy_reverse.ki");
+    Kd_y_rev = follow_control.get_float_param("velocity_control.pid_vy_reverse.kd");
 
     // Accessing Yaw PID parameters
-    Kp_yaw = follow_control.get_float_param("PID_yaw", "Kp");
-    Ki_yaw = follow_control.get_float_param("PID_yaw", "Ki");
-    Kd_yaw = follow_control.get_float_param("PID_yaw", "Kd");
+    Kp_yaw = follow_control.get_float_param("velocity_control.pid_yaw_forward.kp");
+    Ki_yaw = follow_control.get_float_param("velocity_control.pid_yaw_forward.ki");
+    Kd_yaw = follow_control.get_float_param("velocity_control.pid_yaw_forward.kd");
 
     // Follow params
-    x_desired = follow_control.get_float_param("Follow_Params", "Desired_X_offset");
-    y_desired = follow_control.get_float_param("Follow_Params", "Desired_Y_offset");
+    x_desired = follow_control.get_float_param("velocity_control.follow_dist_x_m");
+    y_desired = follow_control.get_float_param("velocity_control.follow_dist_y_m");
 
-    vxy_cmd_max_allowed_accel = follow_control.get_float_param("Follow_Params", "CMD_vxy_max_allowed_accel");
-    vxy_cmd_max_allowed_jerk = follow_control.get_float_param("Follow_Params", "CMD_vxy_max_allowed_jerk");
-    x_error_dot_filt_coef = follow_control.get_float_param("Follow_Params", "X_error_dot_filt");
-    vxy_cmd_ff_brake_gain = follow_control.get_float_param("Follow_Params", "CMD_vxy_ff_brake_gain");
+    vxy_cmd_max_allowed_accel = follow_control.get_float_param("velocity_control.max_accel_mps2");
+    vxy_cmd_max_allowed_jerk = follow_control.get_float_param("velocity_control.max_jerk_mps3");
+    x_error_dot_filt_coef = follow_control.get_float_param("velocity_control.follow_dist_error_dot_filt_coef");
+    vxy_cmd_ff_brake_gain = follow_control.get_float_param("velocity_control.velocity_ff_brake_gain");
 }
 
 /********************************************************************************
@@ -422,24 +422,29 @@ void dtrmn_vel_cmd(void)
     x_error_prv = g_pos_err_x;
 }
 
-/********************************************************************************
- * Function: PathPlanner
- * Description: PathPlanner class constructor.
- ********************************************************************************/
-PathPlanner::PathPlanner(void) {}
+void dtrmn_vel_ff_cmd(void)
+{
+    //
+}
 
 /********************************************************************************
- * Function: ~PathPlanner
- * Description: PathPlanner class destructor.
+ * Function: VelocityController
+ * Description: VelocityController class constructor.
  ********************************************************************************/
-PathPlanner::~PathPlanner(void) {}
+VelocityController::VelocityController(void) {}
+
+/********************************************************************************
+ * Function: ~VelocityController
+ * Description: VelocityController class destructor.
+ ********************************************************************************/
+VelocityController::~VelocityController(void) {}
 
 /********************************************************************************
  * Function: init
  * Description: Initialize all planner variables.  Run once at the start
  *              of the program.
  ********************************************************************************/
-bool PathPlanner::init(void)
+bool VelocityController::init(void)
 {
     get_path_params();
 
@@ -473,19 +478,20 @@ bool PathPlanner::init(void)
  * Function: loop
  * Description: Function to run every loop.
  ********************************************************************************/
-void PathPlanner::loop(void)
+void VelocityController::loop(void)
 {
     calc_veh_speed();
     calc_follow_error();
     calc_yaw_target_error();
     dtrmn_vel_cmd();
+    dtrmn_vel_ff_cmd();
 }
 
 /********************************************************************************
  * Function: shutdown
  * Description: Function to clean up planner at the end of the program.
  ********************************************************************************/
-void PathPlanner::shutdown(void)
+void VelocityController::shutdown(void)
 {
     // place clean up code here
 }

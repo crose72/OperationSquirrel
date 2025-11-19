@@ -17,10 +17,10 @@
 #include <iostream>
 #include <sstream>
 #include "mav_data_hub.h"
-#include "path_planner.h"
-#include "track_target.h"
-#include "localize_target.h"
-#include "detect_target.h"
+#include "velocity_controller.h"
+#include "target_tracking.h"
+#include "target_localization.h"
+#include "target_detection.h"
 #include "time_calc.h"
 #include "system_controller.h"
 #include "video_io.h"

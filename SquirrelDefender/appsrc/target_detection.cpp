@@ -1,7 +1,7 @@
 #ifdef ENABLE_CV
 
 /********************************************************************************
- * @file    detect_target.cpp
+ * @file    target_detection.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
  * @brief   All methods needed to initialize and create a detection network and
@@ -9,21 +9,21 @@
 ********************************************************************************/
 
 /********************************************************************************
-* Includes
-********************************************************************************/
-#include "detect_target.h"
+ * Includes
+ ********************************************************************************/
+#include "target_detection.h"
 
 /********************************************************************************
-* Typedefs
-********************************************************************************/
+ * Typedefs
+ ********************************************************************************/
 
 /********************************************************************************
-* Private macros and defines
-********************************************************************************/
+ * Private macros and defines
+ ********************************************************************************/
 
 /********************************************************************************
-* Object definitions
-********************************************************************************/
+ * Object definitions
+ ********************************************************************************/
 
 /********************************************************************************
  * Calibration definitions
@@ -34,22 +34,22 @@
  ********************************************************************************/
 
 /********************************************************************************
- * Function: Detection
+ * Function: TargetDetection
  * Description: Class constructor
  ********************************************************************************/
-Detection::Detection(void) {};
+TargetDetection::TargetDetection(void) {};
 
 /********************************************************************************
- * Function: ~Detection
+ * Function: ~TargetDetection
  * Description: Class destructor
  ********************************************************************************/
-Detection::~Detection(void) {};
+TargetDetection::~TargetDetection(void) {};
 
 /********************************************************************************
  * Function: initialize_detection_net
  * Description: Delete detection network to free up resources.
  ********************************************************************************/
-bool Detection::init(void)
+bool TargetDetection::init(void)
 {
 #ifdef BLD_JETSON_B01
 
@@ -74,7 +74,7 @@ bool Detection::init(void)
  * Function: detection_loop
  * Description: Process video stream and output detected objects.
  ********************************************************************************/
-void Detection::loop(void)
+void TargetDetection::loop(void)
 {
 #ifdef BLD_JETSON_B01
 
@@ -99,7 +99,7 @@ void Detection::loop(void)
  * Function: shutdown
  * Description: Shutdown detection network
  ********************************************************************************/
-void Detection::shutdown(void)
+void TargetDetection::shutdown(void)
 {
 #ifdef BLD_JETSON_B01
 

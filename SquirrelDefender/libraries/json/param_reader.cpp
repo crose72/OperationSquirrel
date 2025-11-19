@@ -47,43 +47,77 @@ ParamReader::~ParamReader(void) {}
  * Function: get_float_params
  * Description: Return the values of parameters that are of type float.
  ********************************************************************************/
-float ParamReader::get_float_param(const std::string &group, const std::string &key) const
+float ParamReader::get_float_param(const std::string &path) const
 {
-    return root[group][key].asFloat();
+    const Json::Value *node = resolve_path(path);
+    if (!node)
+        return 0.0f;
+    return node->asFloat();
 }
 
 /********************************************************************************
  * Function: get_uint32_params
  * Description: Return the values of parameters that are of type uint32_t.
  ********************************************************************************/
-uint32_t ParamReader::get_uint32_param(const std::string &group, const std::string &key) const
+uint32_t ParamReader::get_uint32_param(const std::string &path) const
 {
-    return root[group][key].asUInt();
+    const Json::Value *node = resolve_path(path);
+    if (!node)
+        return 0u;
+    return node->asUInt();
 }
 
 /********************************************************************************
  * Function: get_int_param
  * Description: Return the values of parameters that are of type int.
  ********************************************************************************/
-int ParamReader::get_int_param(const std::string &group, const std::string &key) const
+int ParamReader::get_int_param(const std::string &path) const
 {
-    return root[group][key].asInt();
+    const Json::Value *node = resolve_path(path);
+    if (!node)
+        return 0;
+    return node->asInt();
 }
 
 /********************************************************************************
  * Function: get_bool_params
  * Description: Return the values of parameters that are of type bool.
  ********************************************************************************/
-bool ParamReader::get_bool_param(const std::string &group, const std::string &key) const
+bool ParamReader::get_bool_param(const std::string &path) const
 {
-    return root[group][key].asBool();
+    const Json::Value *node = resolve_path(path);
+    if (!node)
+        return false;
+    return node->asBool();
 }
 
 /********************************************************************************
  * Function: get_string_param
  * Description: Return the value of parameters that are of type string.
  ********************************************************************************/
-std::string ParamReader::get_string_param(const std::string &group, const std::string &key) const
+std::string ParamReader::get_string_param(const std::string &path) const
 {
-    return root[group][key].asString();
+    const Json::Value *node = resolve_path(path);
+    if (!node)
+        return "";
+    return node->asString();
+}
+
+const Json::Value *ParamReader::resolve_path(const std::string &path) const
+{
+    const Json::Value *node = &root;
+    std::stringstream ss(path);
+    std::string segment;
+
+    while (std::getline(ss, segment, '.'))
+    {
+        if (!node->isMember(segment))
+        {
+            spdlog::error("ParamReader: Missing JSON key in path: {}", segment);
+            return nullptr;
+        }
+        node = &(*node)[segment];
+    }
+
+    return node;
 }
