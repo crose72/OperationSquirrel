@@ -3,11 +3,11 @@
         "File_PathX": "../test_suite/test_data/2025-05-10-ann-arbor/original/",
         "File_Path": "../test_suite/test_data/2025-11-14-mtn-rd-park/sprints1/",
         "File_NameX": "follow_2_ann-arbor.csv",
-        "File_Name": "data_1_fixed_deg_test.csv"
+        "File_Name": "data_3_fixed_deg_test.csv"
     },
     "Output_File": {
         "File_Path": "../test_suite/test_data/decision_to_throw/",
         "File_NameX": "follow_data_mtn-rd-park_2025-11-05_test",
-        "File_Name": "sprints1_data_1_fixed-2025-11-14_test"
+        "File_Name": "sprints1_data_3_fixed-2025-11-14_test"
     }
 }
