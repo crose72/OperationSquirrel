@@ -127,6 +127,12 @@ float g_veh_vel_x_est;
 float g_veh_vel_y_est;
 float g_pos_err_x_dot;
 float x_error_dot_prv;
+float g_ctrl_prdtd_time_to_stop;
+float g_ctrl_prdtd_time_to_reach_tgt;
+bool g_ctrl_apprchng_tgt;
+bool g_ctrl_brake_cmd;
+float g_veh_acc_x_est;
+float veh_vel_x_est_prv;
 
 /********************************************************************************
  * Calibration definitions
@@ -164,6 +170,10 @@ float vxy_cmd_max_allowed_accel = (float)2.5; // m/s²  -> used as shaping accel
 float vxy_cmd_max_allowed_jerk = (float)8.0;  // m/s^3 for x and y (jerk cap)
 float x_error_dot_filt_coef = (float)0.0;
 float vxy_cmd_ff_brake_gain = (float)0.0;
+float ctrl_arx_veh_vel_alpha = (float)0.0;
+float ctrl_arx_veh_vel_beta = (float)0.0;
+float ctrl_ebrake_vel_desired = (float)0.0;
+float ctrl_ebrake_dist_thresh = (float)0.0;
 
 /********************************************************************************
  * Function definitions
@@ -180,41 +190,46 @@ void calc_veh_speed(void);
  ********************************************************************************/
 void get_path_params(void)
 {
-    ParamReader follow_control("../params.json");
+    ParamReader vel_ctrl_params("../params.json");
 
     // Accessing Vel_PID_x parameters
-    Kp_x = follow_control.get_float_param("velocity_control.pid_vx_forward.kp");
-    Ki_x = follow_control.get_float_param("velocity_control.pid_vx_forward.ki");
-    Kd_x = follow_control.get_float_param("velocity_control.pid_vx_forward.kd");
+    Kp_x = vel_ctrl_params.get_float_param("velocity_control.pid_vx_forward.kp");
+    Ki_x = vel_ctrl_params.get_float_param("velocity_control.pid_vx_forward.ki");
+    Kd_x = vel_ctrl_params.get_float_param("velocity_control.pid_vx_forward.kd");
 
     // Accessing Vel_PID_y parameters
-    Kp_y = follow_control.get_float_param("velocity_control.pid_vy_forward.kp");
-    Ki_y = follow_control.get_float_param("velocity_control.pid_vy_forward.ki");
-    Kd_y = follow_control.get_float_param("velocity_control.pid_vy_forward.kd");
+    Kp_y = vel_ctrl_params.get_float_param("velocity_control.pid_vy_forward.kp");
+    Ki_y = vel_ctrl_params.get_float_param("velocity_control.pid_vy_forward.ki");
+    Kd_y = vel_ctrl_params.get_float_param("velocity_control.pid_vy_forward.kd");
 
     // Accessing Vel_PID_x parameters for reverse movement
-    Kp_x_rev = follow_control.get_float_param("velocity_control.pid_vx_reverse.kp");
-    Ki_x_rev = follow_control.get_float_param("velocity_control.pid_vx_reverse.ki");
-    Kd_x_rev = follow_control.get_float_param("velocity_control.pid_vx_reverse.kd");
+    Kp_x_rev = vel_ctrl_params.get_float_param("velocity_control.pid_vx_reverse.kp");
+    Ki_x_rev = vel_ctrl_params.get_float_param("velocity_control.pid_vx_reverse.ki");
+    Kd_x_rev = vel_ctrl_params.get_float_param("velocity_control.pid_vx_reverse.kd");
 
     // Accessing Vel_PID_y parameters for reverse movment
-    Kp_y_rev = follow_control.get_float_param("velocity_control.pid_vy_reverse.kp");
-    Ki_y_rev = follow_control.get_float_param("velocity_control.pid_vy_reverse.ki");
-    Kd_y_rev = follow_control.get_float_param("velocity_control.pid_vy_reverse.kd");
+    Kp_y_rev = vel_ctrl_params.get_float_param("velocity_control.pid_vy_reverse.kp");
+    Ki_y_rev = vel_ctrl_params.get_float_param("velocity_control.pid_vy_reverse.ki");
+    Kd_y_rev = vel_ctrl_params.get_float_param("velocity_control.pid_vy_reverse.kd");
 
     // Accessing Yaw PID parameters
-    Kp_yaw = follow_control.get_float_param("velocity_control.pid_yaw_forward.kp");
-    Ki_yaw = follow_control.get_float_param("velocity_control.pid_yaw_forward.ki");
-    Kd_yaw = follow_control.get_float_param("velocity_control.pid_yaw_forward.kd");
+    Kp_yaw = vel_ctrl_params.get_float_param("velocity_control.pid_yaw_forward.kp");
+    Ki_yaw = vel_ctrl_params.get_float_param("velocity_control.pid_yaw_forward.ki");
+    Kd_yaw = vel_ctrl_params.get_float_param("velocity_control.pid_yaw_forward.kd");
 
     // Follow params
-    x_desired = follow_control.get_float_param("velocity_control.follow_dist_x_m");
-    y_desired = follow_control.get_float_param("velocity_control.follow_dist_y_m");
+    x_desired = vel_ctrl_params.get_float_param("velocity_control.follow_dist_x_m");
+    y_desired = vel_ctrl_params.get_float_param("velocity_control.follow_dist_y_m");
 
-    vxy_cmd_max_allowed_accel = follow_control.get_float_param("velocity_control.max_accel_mps2");
-    vxy_cmd_max_allowed_jerk = follow_control.get_float_param("velocity_control.max_jerk_mps3");
-    x_error_dot_filt_coef = follow_control.get_float_param("velocity_control.follow_dist_error_dot_filt_coef");
-    vxy_cmd_ff_brake_gain = follow_control.get_float_param("velocity_control.velocity_ff_brake_gain");
+    vxy_cmd_max_allowed_accel = vel_ctrl_params.get_float_param("velocity_control.max_accel_mps2");
+    vxy_cmd_max_allowed_jerk = vel_ctrl_params.get_float_param("velocity_control.max_jerk_mps3");
+    x_error_dot_filt_coef = vel_ctrl_params.get_float_param("velocity_control.follow_dist_error_dot_filt_coef");
+    vxy_cmd_ff_brake_gain = vel_ctrl_params.get_float_param("velocity_control.velocity_ff_brake_gain");
+
+    ctrl_arx_veh_vel_alpha = vel_ctrl_params.get_float_param("velocity_control.arx_veh_vel_model_alpha");
+    ctrl_arx_veh_vel_beta = vel_ctrl_params.get_float_param("velocity_control.arx_veh_vel_model_beta");
+    ctrl_ebrake_vel_desired = vel_ctrl_params.get_float_param("velocity_control.e_brake_vel_desired");
+    ctrl_ebrake_dist_thresh = vel_ctrl_params.get_float_param("velocity_control.min_e_brake_dist_thresh");
 }
 
 /********************************************************************************
@@ -256,6 +271,8 @@ void calc_veh_speed(void)
 {
     g_veh_vel_x_est = cosf(g_mav_veh_yaw_rad) * g_mav_veh_vel_ned_x + sinf(g_mav_veh_yaw_rad) * g_mav_veh_vel_ned_y;
     g_veh_vel_y_est = cosf(g_mav_veh_yaw_rad) * g_mav_veh_vel_ned_y - sinf(g_mav_veh_yaw_rad) * g_mav_veh_vel_ned_x;
+    g_veh_acc_x_est = div((g_veh_vel_x_est - veh_vel_x_est_prv), g_app_dt);
+    veh_vel_x_est_prv = g_veh_vel_x_est;
 }
 
 /********************************************************************************
@@ -424,14 +441,34 @@ void dtrmn_vel_cmd(void)
 
 void dtrmn_vel_ff_cmd(void)
 {
-    //
+    // Braking time needed is when is 0
+    if (ctrl_ebrake_vel_desired < g_veh_vel_x_est)
+    {
+        g_ctrl_prdtd_time_to_stop = g_app_dt * div(std::log(div(ctrl_ebrake_vel_desired, g_veh_vel_x_est)),
+                                                   std::log(ctrl_arx_veh_vel_alpha));
+    }
+    else
+    {
+        g_ctrl_prdtd_time_to_stop = (float)0.0;
+    }
+    g_ctrl_prdtd_time_to_reach_tgt = std::abs(div(g_pos_err_x, g_tgt_vel_x_est));
+    if (g_ctrl_prdtd_time_to_reach_tgt > (float)50.0)
+    {
+        g_ctrl_prdtd_time_to_reach_tgt = (float)50.0;
+    }
+    g_ctrl_apprchng_tgt = (g_tgt_vel_x_est < (float)0.0 ? true : false);
+    g_ctrl_brake_cmd = (g_ctrl_apprchng_tgt &&
+                        g_pos_err_x < ctrl_ebrake_dist_thresh &&
+                        g_ctrl_prdtd_time_to_stop < g_ctrl_prdtd_time_to_reach_tgt);
 }
 
 /********************************************************************************
  * Function: VelocityController
  * Description: VelocityController class constructor.
  ********************************************************************************/
-VelocityController::VelocityController(void) {}
+VelocityController::VelocityController(void)
+{
+}
 
 /********************************************************************************
  * Function: ~VelocityController

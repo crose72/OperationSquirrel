@@ -98,7 +98,11 @@
     "max_velocity_mps": 10.0,
     "max_accel_mps2": 2.5,
     "max_jerk_mps3": 5.0,
-    "velocity_ff_brake_gain": -1.0
+    "velocity_ff_brake_gain": -1.0,
+    "arx_veh_vel_model_alpha": 0.949064,
+    "arx_veh_vel_model_beta": 0.0351753,
+    "e_brake_vel_desired": 0.05,
+    "min_e_brake_dist_thresh": 10.0
   },
   "camera_params": {
     "sensor_mode": 0,
