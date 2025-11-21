@@ -174,6 +174,7 @@ float ctrl_arx_veh_vel_alpha = (float)0.0;
 float ctrl_arx_veh_vel_beta = (float)0.0;
 float ctrl_ebrake_vel_desired = (float)0.0;
 float ctrl_ebrake_dist_thresh = (float)0.0;
+float ctrl_ebrake_vel_thresh = (float)0.0;
 
 /********************************************************************************
  * Function definitions
@@ -230,6 +231,7 @@ void get_path_params(void)
     ctrl_arx_veh_vel_beta = vel_ctrl_params.get_float_param("velocity_control.arx_veh_vel_model_beta");
     ctrl_ebrake_vel_desired = vel_ctrl_params.get_float_param("velocity_control.e_brake_vel_desired");
     ctrl_ebrake_dist_thresh = vel_ctrl_params.get_float_param("velocity_control.min_e_brake_dist_thresh");
+    ctrl_ebrake_vel_thresh = vel_ctrl_params.get_float_param("velocity_control.min_e_brake_vel_thresh");
 }
 
 /********************************************************************************
@@ -459,7 +461,8 @@ void dtrmn_vel_ff_cmd(void)
     g_ctrl_apprchng_tgt = (g_tgt_vel_x_est < (float)0.0 ? true : false);
     g_ctrl_brake_cmd = (g_ctrl_apprchng_tgt &&
                         g_pos_err_x < ctrl_ebrake_dist_thresh &&
-                        g_ctrl_prdtd_time_to_stop < g_ctrl_prdtd_time_to_reach_tgt);
+                        g_veh_vel_x_est > ctrl_ebrake_vel_thresh &&
+                        g_ctrl_prdtd_time_to_reach_tgt < g_ctrl_prdtd_time_to_stop);
 }
 
 /********************************************************************************
