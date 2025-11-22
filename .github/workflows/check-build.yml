@@ -1,0 +1,25 @@
+name: Build SquirrelDefender
+
+on:
+  pull_request:
+    branches:
+      - master
+      - dev
+
+jobs:
+  run-dev:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repo (with submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+
+      - name: Make script executable
+        run: chmod +x scripts/run.sh
+
+      - name: Build SquirrelDefender
+        run: ./scripts/run.sh dev ubuntu-22.04_sm86
