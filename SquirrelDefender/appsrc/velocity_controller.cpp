@@ -133,6 +133,7 @@ bool g_ctrl_apprchng_tgt;
 bool g_ctrl_brake_cmd;
 float g_veh_acc_x_est;
 float veh_vel_x_est_prv;
+float g_sim_veh_vel_x_est;
 
 /********************************************************************************
  * Calibration definitions
@@ -183,6 +184,7 @@ void get_path_params(void);
 void calc_follow_error(void);
 void calc_yaw_target_error(void);
 void dtrmn_vel_cmd(void);
+void dtrmn_mod_vel_cmd(void);
 void calc_veh_speed(void);
 
 /********************************************************************************
@@ -441,7 +443,12 @@ void dtrmn_vel_cmd(void)
     x_error_prv = g_pos_err_x;
 }
 
-void dtrmn_vel_ff_cmd(void)
+/********************************************************************************
+ * Function: dtrmn_mod_vel_cmd
+ * Description: Determine when to apply braking velocity - a modification of the
+ *              velocity command to prevent overshooting the target.
+ ********************************************************************************/
+void dtrmn_mod_vel_cmd(void)
 {
     // Braking time needed is when is 0
     if (ctrl_ebrake_vel_desired < g_veh_vel_x_est)
@@ -458,11 +465,17 @@ void dtrmn_vel_ff_cmd(void)
     {
         g_ctrl_prdtd_time_to_reach_tgt = (float)50.0;
     }
+
     g_ctrl_apprchng_tgt = (g_tgt_vel_x_est < (float)0.0 ? true : false);
     g_ctrl_brake_cmd = (g_ctrl_apprchng_tgt &&
                         g_pos_err_x < ctrl_ebrake_dist_thresh &&
                         g_veh_vel_x_est > ctrl_ebrake_vel_thresh &&
                         g_ctrl_prdtd_time_to_reach_tgt < g_ctrl_prdtd_time_to_stop);
+
+    g_ctrl_vel_x_cmd = (g_ctrl_brake_cmd ? (float)0.0 : g_ctrl_vel_x_cmd);
+
+    g_sim_veh_vel_x_est = ctrl_arx_veh_vel_alpha * g_sim_veh_vel_x_est +
+                          ctrl_arx_veh_vel_beta * g_ctrl_vel_x_cmd;
 }
 
 /********************************************************************************
@@ -524,7 +537,7 @@ void VelocityController::loop(void)
     calc_follow_error();
     calc_yaw_target_error();
     dtrmn_vel_cmd();
-    dtrmn_vel_ff_cmd();
+    dtrmn_mod_vel_cmd();
 }
 
 /********************************************************************************

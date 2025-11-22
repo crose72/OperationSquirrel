@@ -260,19 +260,19 @@ void DataLogger::log_data(void)
         m.set_gps_vz(g_mav_gps_vel_z);
         m.set_gps_hdg(g_mav_gps_heading_cdeg);
 
-        m.set_roll(g_mav_veh_roll_rad);
-        m.set_pitch(g_mav_veh_pitch_rad);
-        m.set_yaw(g_mav_veh_yaw_rad);
-        m.set_rollspeed(g_mav_veh_roll_rate);
-        m.set_pitchspeed(g_mav_veh_pitch_rate);
-        m.set_yawspeed(g_mav_veh_yaw_rate);
+        m.set_roll(g_mav_veh_roll_rad * (float)180.0 / M_PI);
+        m.set_pitch(g_mav_veh_pitch_rad * (float)180.0 / M_PI);
+        m.set_yaw(g_mav_veh_yaw_rad * (float)180.0 / M_PI);
+        m.set_rollspeed(g_mav_veh_roll_rate * (float)180.0 / M_PI);
+        m.set_pitchspeed(g_mav_veh_pitch_rate * (float)180.0 / M_PI);
+        m.set_yawspeed(g_mav_veh_yaw_rate * (float)180.0 / M_PI);
 
-        m.set_local_ned_x(g_mav_veh_pos_ned_x * (float)180.0 / M_PI);
-        m.set_local_ned_y(g_mav_veh_pos_ned_y * (float)180.0 / M_PI);
-        m.set_local_ned_z(g_mav_veh_pos_ned_z * (float)180.0 / M_PI);
-        m.set_local_ned_vx(g_mav_veh_vel_ned_x * (float)180.0 / M_PI);
-        m.set_local_ned_vy(g_mav_veh_vel_ned_y * (float)180.0 / M_PI);
-        m.set_local_ned_vz(g_mav_veh_vel_ned_z * (float)180.0 / M_PI);
+        m.set_local_ned_x(g_mav_veh_pos_ned_x);
+        m.set_local_ned_y(g_mav_veh_pos_ned_y);
+        m.set_local_ned_z(g_mav_veh_pos_ned_z);
+        m.set_local_ned_vx(g_mav_veh_vel_ned_x);
+        m.set_local_ned_vy(g_mav_veh_vel_ned_y);
+        m.set_local_ned_vz(g_mav_veh_vel_ned_z);
 
         m.set_q1_actual(g_mav_att_actual_q1);
         m.set_q2_actual(g_mav_att_actual_q2);
@@ -401,8 +401,8 @@ void DataLogger::log_data(void)
         m.set_frame_id(g_cam0_frame_id);
 
         // Camera and angular geometry (converted to degrees where appropriate)
-        m.set_delta_angle(g_cam0_delta_angle_rad * (float)180.0f / M_PI);
-        m.set_camera_tilt_angle(g_cam0_angle_rad * (float)180.0f / M_PI);
+        m.set_delta_angle(g_cam0_delta_angle_rad * (float)180.0 / M_PI);
+        m.set_camera_tilt_angle(g_cam0_angle_rad * (float)180.0 / M_PI);
 
         m.set_delta_distance_x_m(g_tgt_pos_x_delta);
         m.set_delta_distance_z_m(g_tgt_pos_z_delta);
