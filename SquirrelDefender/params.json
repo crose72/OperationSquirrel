@@ -103,7 +103,7 @@
     "arx_veh_vel_model_beta": 0.0351753,
     "e_brake_vel_desired": 0.05,
     "min_e_brake_dist_thresh": 10.0,
-    "min_e_brake_vel_thresh": 3.5
+    "min_e_brake_vel_thresh": 3.50
   },
   "camera_params": {
     "sensor_mode": 0,
