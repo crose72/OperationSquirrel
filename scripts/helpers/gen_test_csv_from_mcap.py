@@ -123,24 +123,28 @@ TOPIC_CONFIG = {
         "g_tgt_pos_z_delta": "delta_distance_z_m",
 
         # EKF-estimated state (positions / velocities / accelerations)
-        "g_tgt_pos_x_est": "target_pos_x_est",
-        "g_tgt_pos_y_est": "target_pos_y_est",
-        "g_tgt_vel_x_est": "target_vel_x_est",
-        "g_tgt_vel_y_est": "target_vel_y_est",
-        "g_tgt_acc_x_est": "target_acc_x_est",
-        "g_tgt_acc_y_est": "target_acc_y_est",
+        "g_tgt_pos_x_est": "pos_x_est",
+        "g_tgt_pos_y_est": "pos_y_est",
+        "g_tgt_vel_x_est": "vel_x_est",
+        "g_tgt_vel_y_est": "vel_y_est",
+        "g_tgt_acc_x_est": "acc_x_est",
+        "g_tgt_acc_y_est": "acc_y_est",
 
         # Data validity
         "g_tgt_meas_valid": "is_measurement_valid",
     },
 
     "/control/output": {
-        "g_tgt_too_close": "target_too_close",
-        "g_pos_err_x": "x_error",
-        "g_pos_err_y": "y_error",
-        "g_ctrl_vel_x_cmd": "vx_adjust",
-        "g_ctrl_vel_y_cmd": "vy_adjust",
-        "g_ctrl_vel_z_cmd": "vz_adjust",
+        "g_tgt_too_close": "is_target_too_close",
+        "g_pos_err_x": "pos_error_x_m",
+        "g_pos_err_y": "pos_error_y_m",
+        "g_ctrl_vel_x_cmd": "cmd_vel_x_mps",
+        "g_ctrl_vel_y_cmd": "cmd_vel_y_mps",
+        "g_ctrl_vel_z_cmd": "cmd_vel_z_mps",
+        "g_yaw_err": "yaw_error",
+        "g_veh_yaw_playback_adj": "yaw_playback",
+        "g_ctrl_yaw_tgt": "yaw_target",
+        "g_ctrl_yaw_cmd": "cmd_yawrate_rps",
     },
 
     # MAVLink system/status

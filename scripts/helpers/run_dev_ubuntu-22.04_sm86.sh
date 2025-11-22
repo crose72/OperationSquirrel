@@ -32,6 +32,7 @@ xhost +local:root >/dev/null 2>&1 || true
 
 CONTAINER_NAME="squirreldefender-dev"
 IMAGE_NAME="crose72/os-dev:cuda12.6-trt10.5-cv4.10-sm86-vpi3.2-mcap-ubuntu22"
+IMAGE_NAME_CICD="ghcr.io/crose72/os-dev:cuda12.6-trt10.5-cv4.10-sm86-vpi3.2-mcap-ubuntu22"
 
 # --------------------------------------------------------------
 # Device List
@@ -102,7 +103,7 @@ if [ "$IS_CI" = true ]; then
 
     docker run --rm \
         -v $GITHUB_WORKSPACE/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender \
-        $IMAGE_NAME \
+        $IMAGE_NAME_CICD \
         bash -c "
             cd /workspace/OperationSquirrel/SquirrelDefender &&
             mkdir -p build &&
