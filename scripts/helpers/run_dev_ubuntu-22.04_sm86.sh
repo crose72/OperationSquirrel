@@ -103,7 +103,7 @@ if [ "$IS_CI" = true ]; then
 
     docker run --rm \
         -v $GITHUB_WORKSPACE/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender \
-        $IMAGE_NAME_CICD \
+        $IMAGE_NAME \
         bash -c "
             cd /workspace/OperationSquirrel/SquirrelDefender &&
             mkdir -p build &&
