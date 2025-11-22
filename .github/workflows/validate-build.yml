@@ -1,4 +1,4 @@
-name: Validate build
+name: Build SquirrelDefender
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - dev
 
 jobs:
-  build4:
+  build_ubuntu22:
     runs-on: ubuntu-22.04
     timeout-minutes: 20
 
@@ -20,6 +20,14 @@ jobs:
 
       - name: Make build script executable
         run: chmod +x scripts/run.sh
+
+      - name: Check GHCR_PAT length
+        run: echo "Token length: ${#GHCR_PAT}"
+        env:
+          GHCR_PAT: ${{ secrets.GHCR_PAT }}
+
+      - name: Log in to GHCR with PAT
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u crose72 --password-stdin
 
       - name: Build SquirrelDefender (BLD_WSL config)
         run: ./scripts/run.sh dev ubuntu-22.04_sm86
