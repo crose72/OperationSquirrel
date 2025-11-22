@@ -159,6 +159,7 @@ void create_gstreamer_pipelines(std::string &capture_pipeline,
     int capture_output_width = cfg.get_int_param("camera_params.capture_output_width");
     int capture_output_height = cfg.get_int_param("camera_params.capture_output_height");
     std::string output_format = cfg.get_string_param("camera_params.output_format");
+    int flip_method = cfg.get_int_param("camera_params.flip_method");
 
     /**************** ENCODER PARAMETERS ****************/
     int bitrate = cfg.get_int_param("encoder_params.bitrate");
@@ -181,7 +182,15 @@ void create_gstreamer_pipelines(std::string &capture_pipeline,
            << "video/x-raw(memory:NVMM),format=" << input_format
            << ",width=" << input_width << ",height=" << input_height
            << ",framerate=" << input_rate << " ! "
-           << "nvvidconv ! video/x-raw,format=BGRx,width=" << capture_output_width
+           << "nvvidconv";
+
+    if (flip_method != 0)
+    {
+        // nvvidconv supports flip-method directly
+        ss_cap << " flip-method=" << flip_method;
+    }
+
+    ss_cap << " ! video/x-raw,format=BGRx,width=" << capture_output_width
            << ",height=" << capture_output_height << " ! "
            << "videoconvert ! video/x-raw,format=" << output_format
            << ",width=" << capture_output_width << ",height=" << capture_output_height << " ! "
