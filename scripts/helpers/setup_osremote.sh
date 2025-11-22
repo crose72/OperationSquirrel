@@ -5,7 +5,7 @@ USER_NAME=$(whoami)
 SCRIPT_PATH="/home/$USER_NAME/workspaces/os-dev/OperationSquirrel/scripts/toggle_osremote.sh"
 DATA_PATH="/home/$USER_NAME/workspaces/os-dev/OperationSquirrel/SquirrelDefender/data/*"
 SUDOERS_FILE="/etc/sudoers.d/osremote_toggle"
-HOTSPOT_NAME="OSS_AP"
+HOTSPOT_NAME="$(hostname | tr '[:lower:]' '[:upper:]')_AP"
 HOTSPOT_PASSWORD="SquirrelDefender"
 
 # Detect Wi-Fi interface automatically
