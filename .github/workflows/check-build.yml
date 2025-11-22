@@ -7,7 +7,7 @@ on:
       - dev
 
 jobs:
-  build_ubuntu22:
+  check-build-x86:
     runs-on: ubuntu-22.04
     timeout-minutes: 20
 
