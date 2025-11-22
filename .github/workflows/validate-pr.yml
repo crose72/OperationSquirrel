@@ -1,0 +1,29 @@
+name: Valid PR source branch
+
+on:
+  pull_request:
+    branches:
+      - master
+      - dev
+
+jobs:
+  valid-pr-master:
+    # Run ONLY for PRs into master
+    if: github.base_ref == 'master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail if PR origin branch is not dev
+        run: |
+          if [ "${{ github.head_ref }}" != "dev" ]; then
+            echo "❌ Only PRs from 'dev' may be merged into master."
+            exit 1
+          fi
+          echo "✔️ PR from dev into master."
+
+  valid-pr-dev:
+    # Run ONLY for PRs into dev
+    if: github.base_ref == 'dev'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Always succeed for PRs into dev
+        run: echo "✔️ PR into dev — allowed."

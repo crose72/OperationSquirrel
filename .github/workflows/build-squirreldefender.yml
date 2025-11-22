@@ -1,0 +1,25 @@
+name: Build SquirrelDefender
+
+on:
+  pull_request:
+    branches:
+      - master
+      - dev
+
+jobs:
+  build-ubuntu-22.04:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Make build script executable
+        run: chmod +x scripts/run.sh
+
+      - name: Build SquirrelDefender (BLD_WSL config)
+        run: ./scripts/run.sh dev ubuntu-22.04_sm86
