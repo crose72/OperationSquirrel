@@ -1,4 +1,4 @@
-name: Build SquirrelDefender
+name: Validate SquirrelDefender build
 
 on:
   pull_request:
