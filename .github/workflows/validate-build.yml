@@ -1,4 +1,4 @@
-name: Validate SquirrelDefender build
+name: Validate build
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - dev
 
 jobs:
-  build-ubuntu-22.04:
+  build4:
     runs-on: ubuntu-22.04
     timeout-minutes: 20
 
