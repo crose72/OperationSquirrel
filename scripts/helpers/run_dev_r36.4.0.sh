@@ -9,6 +9,13 @@
 
 set -e
 
+# Detect GitHub Actions CI
+if [ "$GITHUB_ACTIONS" = "true" ]; then
+    IS_CI=true
+else
+    IS_CI=false
+fi
+
 MODE=${1:-plain}  # default = plain
 OS_WS=${OS_WS:-/home/$USER/workspaces/os-dev}
 
@@ -84,7 +91,32 @@ fi
 # --------------------------------------------------------------
 # 🚀 Launch a new container
 # --------------------------------------------------------------
-if [[ "$MODE" == "osremote" ]]; then
+if [ "$IS_CI" = true ]; then
+    echo "🤖 GitHub CI detected — running non-interactive container build..."
+
+    docker run --rm \
+        -v ${OS_WS}/OperationSquirrel/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender \
+        $IMAGE_NAME \
+        bash -c "
+            cd /workspace/OperationSquirrel/SquirrelDefender &&
+            mkdir -p build &&
+            cd build &&
+            cmake .. \
+                -DBLD_WSL=ON \
+                -DBLD_JETSON_B01=OFF \
+                -DBLD_JETSON_ORIN_NANO=OFF \
+                -DBLD_WIN=OFF \
+                -DWIN_TCP=OFF \
+                -DWIN_SERIAL=OFF \
+                -DWIN_ENABLE_CV=OFF \
+                -DBUILD_TEST_HARNESS=OFF \
+                -DENABLE_GDB=OFF \
+                -DENABLE_SECRET_SQUIRREL=OFF &&
+            make -j\$(nproc)
+        "
+
+    exit 0
+elif [[ "$MODE" == "osremote" ]]; then
   echo "📱 Launching persistent container for OSRemote (Flutter app)..."
   nohup docker run --runtime nvidia -dit --network host \
     --privileged --ipc=host \
