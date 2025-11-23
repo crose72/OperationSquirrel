@@ -291,7 +291,7 @@ void DataLogger::log_data(void)
 
     // MAV IMU raw
     {
-        os::logger::MavImuRaw m;
+        os::logger::MavImu m;
         logTime(m.mutable_t(), g_app_epoch_ns);
         m.set_frame_id(g_cam0_frame_id);
 
@@ -740,12 +740,12 @@ bool DataLogger::init(void)
     // Register channels (schema names must match package.Message)
     mMCAPLogger->addChannel("/system/state", "os.logger.SystemStateMsg", "protobuf");
     mMCAPLogger->addChannel("/target/detection", "os.logger.TargetDetection", "protobuf");
-    mMCAPLogger->addChannel("/target/state", "os.logger.TargetDetection", "protobuf");
+    mMCAPLogger->addChannel("/target/state", "os.logger.TargetState", "protobuf");
     mMCAPLogger->addChannel("/control/output", "os.logger.ControlOutput", "protobuf");
 
     mMCAPLogger->addChannel("/mav/system", "os.logger.MavSystem", "protobuf");
     mMCAPLogger->addChannel("/mav/kinematics", "os.logger.MavKinematics", "protobuf");
-    mMCAPLogger->addChannel("/mav/imu", "os.logger.MavImuRaw", "protobuf");
+    mMCAPLogger->addChannel("/mav/imu", "os.logger.MavImu", "protobuf");
     mMCAPLogger->addChannel("/mav/rangefinder", "os.logger.MavRangefinder", "protobuf");
     mMCAPLogger->addChannel("/mav/flow", "os.logger.MavOpticalFlow", "protobuf");
 

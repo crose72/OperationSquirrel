@@ -51,59 +51,54 @@
     "target_bbox_center_y_history_size": 125
   },
   "velocity_control": {
-      "pid_vx_forward": {
-        "kp": 0.6,
-        "ki": 0.0,
-        "kd": 0.1
-      },
-      "pid_vy_forward": {
-        "kp": 0.04,
-        "ki": 0.0,
-        "kd": 0.001
-      },
-      "pid_vz_forward": {
-        "kp": 0.0,
-        "ki": 0.0,
-        "kd": 0.0
-      },
-      "pid_vx_reverse": {
-        "kp": 0.6,
-        "ki": 0.009,
-        "kd": 0.1
-      },
-      "pid_vy_reverse": {
-        "kp": 0.03,
-        "ki": 0.0,
-        "kd": 0.001
-      },
-      "pid_vz_reverse": {
-        "kp": 0.0,
-        "ki": 0.0,
-        "kd": 0.0
-      },
-      "pid_yaw_forward": {
-        "kp": 0.024,
-        "ki": 0.0,
-        "kd": 0.015
-      },
-      "pid_yaw_reverse": {
-        "kp": 0.024,
-        "ki": 0.0,
-        "kd": 0.015
-      },
+    "pid_vx_forward": {
+      "kp": 0.6,
+      "ki": 0.0,
+      "kd": 0.1
+    },
+    "pid_vy_forward": {
+      "kp": 0.04,
+      "ki": 0.0,
+      "kd": 0.001
+    },
+    "pid_vz_forward": {
+      "kp": 0.0,
+      "ki": 0.0,
+      "kd": 0.0
+    },
+    "pid_vx_reverse": {
+      "kp": 0.6,
+      "ki": 0.009,
+      "kd": 0.1
+    },
+    "pid_vy_reverse": {
+      "kp": 0.03,
+      "ki": 0.0,
+      "kd": 0.001
+    },
+    "pid_vz_reverse": {
+      "kp": 0.0,
+      "ki": 0.0,
+      "kd": 0.0
+    },
+    "pid_yaw_forward": {
+      "kp": 0.024,
+      "ki": 0.0,
+      "kd": 0.015
+    },
+    "pid_yaw_reverse": {
+      "kp": 0.024,
+      "ki": 0.0,
+      "kd": 0.015
+    },
     "follow_dist_x_m": 10.0,
     "follow_dist_y_m": 0.0,
     "follow_dist_z_m": 0.0,
     "follow_dist_error_dot_filt_coef": 0.8,
     "max_velocity_mps": 10.0,
-    "max_accel_mps2": 100.0,
-    "max_jerk_mps3": 100.0,
-    "velocity_ff_brake_gain": -1.0,
-    "arx_veh_vel_model_alpha": 0.949064,
-    "arx_veh_vel_model_beta": 0.0351753,
-    "e_brake_vel_desired": 0.05,
-    "min_e_brake_dist_thresh": 10.0,
-    "min_e_brake_vel_thresh": 3.50
+    "max_accel_mps2": 5.0,
+    "max_jerk_mps3": 10.0,
+    "velocity_ff_brake_gain": -1.0
   },
   "camera_params": {
     "sensor_mode": 0,
@@ -143,31 +138,30 @@
   },
   "gps_denied_control": {
     "alt_pid": {
-        "kp": 0.6,
-        "ki": 0.05,
-        "kd": 0.15,
-        "tau": 0.15,
-        "decay": 0.98,
-        "max_integral": 10.0
-      },
-      "vz_pid": {
-        "kp": 0.4,
-        "ki": 0.1,
-        "kd": 0.05,
-        "tau": 0.10,
-        "decay": 0.98,
-        "max_integral": 10.0
-      },
-      "thrust_control": {
-        "max_throttle": 0.9,
-        "throttle_slew_time": 2.0,
-        "alt_hold_tolerance": 0.3,
-        "climb_detect_vz": 0.1,
-        "climb_detect_alt": 0.3
-      },
-      "target_alt": {
-        "altitude": 20.0
-      }
+      "kp": 0.6,
+      "ki": 0.05,
+      "kd": 0.15,
+      "tau": 0.15,
+      "decay": 0.98,
+      "max_integral": 10.0
+    },
+    "vz_pid": {
+      "kp": 0.4,
+      "ki": 0.1,
+      "kd": 0.05,
+      "tau": 0.1,
+      "decay": 0.98,
+      "max_integral": 10.0
+    },
+    "thrust_control": {
+      "max_throttle": 0.9,
+      "throttle_slew_time": 2.0,
+      "alt_hold_tolerance": 0.3,
+      "climb_detect_vz": 0.1,
+      "climb_detect_alt": 0.3
+    },
+    "target_alt": {
+      "altitude": 20.0
+    }
   }
-
 }
