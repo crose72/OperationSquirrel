@@ -101,8 +101,9 @@ arma::mat P_loc;     // Estimate error covariance
 arma::colvec x0_loc; // Initial state
 arma::colvec u0_loc; // Observed initial measurements
 
-std::chrono::milliseconds g_target_lost_dbc;
-std::chrono::milliseconds target_lost_dbc_reset;
+std::chrono::milliseconds g_target_lost_dbc_ms;
+std::chrono::milliseconds target_lost_dbc_reset_ms;
+float target_lost_dbc_reset_sec = (float)0.0;
 bool g_tgt_lost;
 bool target_is_lost_prv;
 float g_tgt_lost_dbc_sec;
@@ -222,7 +223,8 @@ void get_localization_params(void)
     target_det_edge_of_frame_buffer = localization_params.get_float_param("target_loc_params.target_bbox_min_dist_from_edge");
     min_target_bbox_area = localization_params.get_float_param("target_loc_params.target_bbox_min_area");
     int target_lost_dbc_reset_val = localization_params.get_float_param("target_loc_params.target_bbox_lost_min_time_ms");
-    target_lost_dbc_reset = static_cast<std::chrono::milliseconds>(target_lost_dbc_reset_val);
+    target_lost_dbc_reset_sec = (float)target_lost_dbc_reset_val / (float)1000.0;
+    target_lost_dbc_reset_ms = static_cast<std::chrono::milliseconds>(target_lost_dbc_reset_val);
 }
 
 /********************************************************************************
@@ -374,7 +376,7 @@ void dtrmn_target_loc_img(void)
 
     if (g_tgt_meas_valid)
     {
-        g_target_lost_dbc = (std::chrono::milliseconds)0;
+        g_target_lost_dbc_ms = (std::chrono::milliseconds)0;
         g_tgt_lost_dbc_sec = (float)0.0;
     }
     else if (target_data_useful_prv && !g_tgt_meas_valid)
@@ -385,11 +387,11 @@ void dtrmn_target_loc_img(void)
     {
 #if defined(BLD_WSL)
 
-        g_target_lost_dbc += std::chrono::milliseconds((int)(g_app_dt * 1000));
+        g_target_lost_dbc_ms += std::chrono::milliseconds((int)(g_app_dt * 1000));
 
 #else
 
-        g_target_lost_dbc = target_data_useful_dbc.getDur(); // how long without a measurement we could use
+        g_target_lost_dbc_ms = target_data_useful_dbc.getDur(); // how long without a measurement we could use
 
 #endif
 
@@ -398,19 +400,19 @@ void dtrmn_target_loc_img(void)
 
 #if defined(BLD_WSL)
 
-    g_tgt_lost = g_tgt_lost_dbc_sec > 1.0;
+    g_tgt_lost = g_tgt_lost_dbc_sec > target_lost_dbc_reset_sec;
 
 #else
 
-    g_tgt_lost = g_target_lost_dbc > target_lost_dbc_reset;
+    g_tgt_lost = g_target_lost_dbc_ms > target_lost_dbc_reset_ms;
 
 #endif
 
     if (!g_tgt_lost)
     {
         // Moving average for more smoothing - modifies the history vector
-        g_tgt_cntr_offset_x_pix_filt = moving_average(target_x_pix_hist4avg, g_tgt_cntr_offset_y_pix, x_buffer_idx4avg, x_sum);
-        g_tgt_cntr_offset_y_pix_filt = moving_average(target_y_pix_hist4avg, g_tgt_cntr_offset_x_pix, y_buffer_idx4avg, y_sum);
+        g_tgt_cntr_offset_x_pix_filt = moving_average(target_x_pix_hist4avg, g_tgt_cntr_offset_x_pix, x_buffer_idx4avg, x_sum);
+        g_tgt_cntr_offset_y_pix_filt = moving_average(target_y_pix_hist4avg, g_tgt_cntr_offset_y_pix, y_buffer_idx4avg, y_sum);
 
         // Convert the offset to meters
         g_tgt_cntr_offset_x_m = g_tgt_cntr_offset_x_pix_filt * g_cam0_m_per_pix;
