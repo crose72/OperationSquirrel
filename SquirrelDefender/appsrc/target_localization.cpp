@@ -411,8 +411,8 @@ void dtrmn_target_loc_img(void)
     if (!g_tgt_lost)
     {
         // Moving average for more smoothing - modifies the history vector
-        g_tgt_cntr_offset_x_pix_filt = moving_average(target_x_pix_hist4avg, g_tgt_cntr_offset_y_pix, x_buffer_idx4avg, x_sum);
-        g_tgt_cntr_offset_y_pix_filt = moving_average(target_y_pix_hist4avg, g_tgt_cntr_offset_x_pix, y_buffer_idx4avg, y_sum);
+        g_tgt_cntr_offset_x_pix_filt = moving_average(target_x_pix_hist4avg, g_tgt_cntr_offset_x_pix, x_buffer_idx4avg, x_sum);
+        g_tgt_cntr_offset_y_pix_filt = moving_average(target_y_pix_hist4avg, g_tgt_cntr_offset_y_pix, y_buffer_idx4avg, y_sum);
 
         // Convert the offset to meters
         g_tgt_cntr_offset_x_m = g_tgt_cntr_offset_x_pix_filt * g_cam0_m_per_pix;
