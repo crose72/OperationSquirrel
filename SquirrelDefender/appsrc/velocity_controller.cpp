@@ -176,6 +176,7 @@ float ctrl_arx_veh_vel_beta = (float)0.0;
 float ctrl_ebrake_vel_desired = (float)0.0;
 float ctrl_ebrake_dist_thresh = (float)0.0;
 float ctrl_ebrake_vel_thresh = (float)0.0;
+float ctrl_tgt_vel_x_filt_coef = (float)0.0;
 
 /********************************************************************************
  * Function definitions
@@ -234,6 +235,8 @@ void get_path_params(void)
     ctrl_ebrake_vel_desired = vel_ctrl_params.get_float_param("velocity_control.e_brake_vel_desired");
     ctrl_ebrake_dist_thresh = vel_ctrl_params.get_float_param("velocity_control.min_e_brake_dist_thresh");
     ctrl_ebrake_vel_thresh = vel_ctrl_params.get_float_param("velocity_control.min_e_brake_vel_thresh");
+
+    ctrl_tgt_vel_x_filt_coef = vel_ctrl_params.get_float_param("target_loc_params.target_vel_x_filt_coef");
 }
 
 /********************************************************************************
@@ -450,6 +453,9 @@ void dtrmn_vel_cmd(void)
  ********************************************************************************/
 void dtrmn_mod_vel_cmd(void)
 {
+    static float tgt_vel_x_est_prv = (float)0.0;
+
+    g_tgt_vel_x_est = low_pass_filter(g_tgt_vel_x_est, tgt_vel_x_est_prv, x_error_dot_filt_coef);
     // Braking time needed is when is 0
     if (ctrl_ebrake_vel_desired < g_veh_vel_x_est)
     {
@@ -473,6 +479,16 @@ void dtrmn_mod_vel_cmd(void)
                         g_ctrl_prdtd_time_to_reach_tgt < g_ctrl_prdtd_time_to_stop);
 
     g_ctrl_vel_x_cmd = (g_ctrl_brake_cmd ? (float)0.0 : g_ctrl_vel_x_cmd);
+
+    if (g_app_time_s >= (float)14.0)
+    {
+        g_ctrl_vel_x_cmd = vxy_cmd_ff_brake_gain;
+    }
+
+    if (g_app_time_s >= (float)14.0 && g_veh_vel_x_est < (float)0.5)
+    {
+        g_ctrl_vel_x_cmd = (float)0.0;
+    }
 
     g_sim_veh_vel_x_est = ctrl_arx_veh_vel_alpha * g_sim_veh_vel_x_est +
                           ctrl_arx_veh_vel_beta * g_ctrl_vel_x_cmd;

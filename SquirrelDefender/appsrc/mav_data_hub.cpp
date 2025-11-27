@@ -247,11 +247,11 @@ void proc_mav_gps_int_msg(const mavlink_message_t *msg)
     g_mav_gps_vel_z = global_pos_int.vz;
     g_mav_gps_heading_cdeg = global_pos_int.hdg;
 
-    // #ifdef DEBUG_BUILD
+#ifdef DEBUG_BUILD
 
     print_global_position_int(global_pos_int);
 
-    // #endif // DEBUG_BUILD
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
@@ -470,11 +470,11 @@ void proc_mav_position_local_ned_msg(const mavlink_message_t *msg)
     g_mav_veh_vel_ned_y = position_local_ned.vy;
     g_mav_veh_vel_ned_z = position_local_ned.vz;
 
-    // #ifdef DEBUG_BUILD
+#ifdef DEBUG_BUILD
 
     print_position_local_ned(position_local_ned);
 
-    // #endif // DEBUG_BUILD
+#endif // DEBUG_BUILD
 }
 
 /********************************************************************************
