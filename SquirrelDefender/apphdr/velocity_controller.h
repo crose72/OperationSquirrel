@@ -27,6 +27,12 @@ extern float g_yaw_err;
 extern float g_veh_vel_x_est;
 extern float g_veh_vel_y_est;
 extern float g_pos_err_x_dot;
+extern float g_ctrl_prdtd_time_to_stop;
+extern float g_ctrl_prdtd_time_to_reach_tgt;
+extern bool g_ctrl_apprchng_tgt;
+extern bool g_ctrl_brake_cmd;
+extern float g_veh_acc_x_est;
+extern float g_sim_veh_vel_x_est;
 
 /********************************************************************************
  * Function prototypes

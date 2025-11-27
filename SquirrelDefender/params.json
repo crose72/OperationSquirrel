@@ -48,7 +48,8 @@
     "target_bbox_min_dist_from_edge": 50.0,
     "target_bbox_lost_min_time_ms": 1000,
     "target_bbox_center_x_history_size": 10,
-    "target_bbox_center_y_history_size": 125
+    "target_bbox_center_y_history_size": 50,
+    "target_vel_x_filt_coef": 0.2
   },
   "velocity_control": {
     "pid_vx_forward": {
@@ -94,11 +95,16 @@
     "follow_dist_x_m": 10.0,
     "follow_dist_y_m": 0.0,
     "follow_dist_z_m": 0.0,
-    "follow_dist_error_dot_filt_coef": 0.8,
+    "follow_dist_error_dot_filt_coef": 0.1,
     "max_velocity_mps": 10.0,
-    "max_accel_mps2": 5.0,
+    "max_accel_mps2": 3.5,
     "max_jerk_mps3": 10.0,
-    "velocity_ff_brake_gain": -1.0
+    "velocity_ff_brake_gain": 0.0,
+    "arx_veh_vel_model_alpha": 0.949064,
+    "arx_veh_vel_model_beta": 0.0351753,
+    "e_brake_vel_desired": 0.05,
+    "min_e_brake_dist_thresh": 10.0,
+    "min_e_brake_vel_thresh": 3.5
   },
   "camera_params": {
     "sensor_mode": 0,
