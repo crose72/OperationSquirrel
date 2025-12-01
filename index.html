@@ -9,6 +9,16 @@
 
 <body>
 
+<nav class="navbar">
+    <a href="index.html">Home</a>
+    <a href="curriculum.html">Curriculum</a>
+    <a href="tech-specs.html">Tech Specs</a>
+    <a href="pricing.html">Pricing</a>
+    <a href="resources.html">Teacher Resources</a>
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+</nav>
+
 <header class="hero">
     <h1>Operation Squirrel</h1>
     <h2>AI Drone Development Kit for Schools & Research</h2>
@@ -38,15 +48,17 @@
 
 <section>
     <h2>Key Benefits — Real Skills That Lead to Real Job Offers</h2>
-    <p class="note">
-        (Multiple employers have already hired candidates based on their work with this platform.)
+
+    <p class="impact-note">
+        <strong>Multiple employers have already hired candidates based on their work with this platform.</strong>
     </p>
 
     <ul>
         <li><strong>Real Engineering Skills — Not Toy-Level Coding</strong><br>
             Students learn industry-standard tools used in robotics and autonomy:
             <ul class="sublist">
-                <li>Linux, Docker, Git/GitHub workflows</li>
+                <li>Linux, Docker</li>
+                <li>Git/GitHub workflows</li>
                 <li>C++, CUDA, TensorRT, GPU-accelerated OpenCV</li>
                 <li>Real-time flight control loops, PID, Kalman filters, sensor fusion</li>
                 <li>Hardware/software debugging, MCAP data logging, data-driven algorithm design</li>
@@ -80,11 +92,10 @@
     <p><strong>Included basics:</strong></p>
     <ul>
         <li>Getting Started Guide</li>
-        <li>Safety checklist</li>
-        <li>Example mini-projects (MAVLink basics, simple control scripts)</li>
-        <li>Intro AI examples (object detection, simple filters, basic KF concepts)</li>
-        <li>Sample datasets (MCAP logs for data analysis)</li>
-        <li>Teacher onboarding & setup support</li>
+        <li>Example code</li>
+        <li>Sample datasets</li>
+        <li>Simulation guide</li>
+        <li>Teacher onboarding & support</li>
     </ul>
 
     <p><strong>Optional Add-ons:</strong> Extended curriculum, advanced workshops, and on-site training.</p>
@@ -92,20 +103,23 @@
 
 <section>
     <h2>Pricing</h2>
-    <p><strong>Operation Squirrel Full Dev Kit</strong></p>
-    <p>Includes:</p>
+    <p><strong>Operation Squirrel Full Dev Kit Includes:</strong></p>
     <ul>
-        <li>Fully assembled & test-flown hardware</li>
-        <li>Jetson setup + complete development environment</li>
-        <li>1 year of updates & engineering support</li>
-        <li>Access for all teachers & students in your program</li>
+        <li>Fully assembled quadcopter</li>
+        <li>Jetson Orin Nano pre-configured</li>
+        <li>1 year of updates & expert engineering support</li>
+        <li>Curriculum access</li>
     </ul>
 
     <p><strong>Discounts available</strong> for orders of 3+ units.</p>
-    <p><strong>Add-ons:</strong> spares kit, custom workshops, curriculum development.</p>
 
-    <a href="mailto:crose.flickrobotics@gmail.com" class="cta">Contact Us</a>
+    <a href="contact.html" class="cta">Request a Quote</a>
 </section>
 
 <footer class="footer">
-    © 2025 Operation Squirrel —
+    © <span id="year"></span> Operation Squirrel — Open-source robotics platform for education & research.
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
