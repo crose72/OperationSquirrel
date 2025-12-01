@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Curriculum – Operation Squirrel</title>
+    <title>Curriculum - Operation Squirrel</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -20,49 +20,301 @@
 
 <header class="subhero">
     <h1>Curriculum Overview</h1>
-    <p>Turn-key robotics education built on real-world engineering tools.</p>
+    <p>Build real autonomy step by step.</p>
 </header>
 
 <section>
-    <h2>What Students Learn</h2>
+    <h2>Fly often - fly far. Learn by doing.</h2>
+    Operation Squirrel is built around a simple idea: students should 
+    <strong>fly early and fly often</strong> so they can progressively unlock the skills needed for careers in 
+    engineering, software development, and beyond. This is a deeply hands-on project.
+    
+    <p>
+    Success is built from many small wins that compound over time. Failing early and failing fast is just as 
+    important as those small victories - real learning happens when students try, receive feedback, and refine 
+    their approach. 
+    </p>
+    
+    <p>
+    The first engineers who developed and tested this platform have already received high-value job offers in robotics 
+    and autonomous systems — directly because of the experience gained here.
+    </p>
+</section>
+
+<section>
+    <h2>Track 1 - Drone Basics, Safety, Early Flight, and AI intro</h2>
+    <p><strong>Duration:</strong> ~1-2 weeks &nbsp; | &nbsp; <strong>Level:</strong> Beginner</p>
+
+    <p>
+        Students get into the air quickly while learning safe operating practices and the fundamentals of working 
+        with drones. They fly manually and in assisted modes, view live telemetry, and begin communicating with 
+        their drone using the Jetson Orin Nano. They also run their first AI detection demo. By the end of Track 1, 
+        students can navigate the ArduPilot drone ecosystem and connect their aircraft to the Operation Squirrel 
+        autonomous stack.
+    </p>
+
     <ul>
-        <li>Linux, Docker, and Git fundamentals</li>
-        <li>GPU programming basics (CUDA)</li>
-        <li>Computer vision (OpenCV, YOLOv8)</li>
-        <li>Real-time data pipelines</li>
-        <li>Control systems: PID, Kalman filtering</li>
-        <li>MAVLink messaging & autonomous flight</li>
-        <li>Data logging and analysis using MCAP</li>
+        <li>Unboxing, hardware overview, and Operation Squirrel introduction</li>
+        <li>Introduction to ArduPilot and SITL</li>
+        <li>Ground stations (Mission Planner / QGroundControl)</li>
+        <li>Introduction to MAVLink</li>
+        <li>Role of companion computers</li>
+        <li>Introduction to the NVIDIA Jetson Orin Nano, Linux, SSH, and development tools</li>
+        <li>Connecting the Jetson Orin Nano to SITL</li>
+        <li>Connecting the Jetson Orin Nano to the physical drone</li>
+        <li>Real time AI detection on Jetson Orin Nano</li>
+    </ul>
+
+    <p><strong>Outcomes:</strong></p>
+    <ul>
+        <li>Identify and describe the core components of a drone system</li>
+        <li>Perform basic pre-flight and safety checks</li>
+        <li>Control a simulated drone using SITL</li>
+        <li>Control a real drone using a ground station</li>
+        <li>Interpret basic telemetry data from Mission Planner / QGroundControl</li>
+        <li>Send and receive basic MAVLink messages and commands to a real/simulated drone</li>
+        <li>Navigate the Jetson development environment (Linux, SSH, development tools)</li>
+        <li>Control a real/simulated drone from the Jetson</li>
+        <li>Explain how companion computers, MAVLink, and ArduPilot work together</li>
+        <li>Run a basic AI detection demo on the Jetson Orin Nano</li>
     </ul>
 </section>
 
 <section>
-    <h2>Course Structure</h2>
-    <ol>
-        <li>Introduction to Robotics & Safety</li>
-        <li>Getting Started with Jetson Orin Nano</li>
-        <li>Running Your First AI Detection Model</li>
-        <li>Understanding Tracking & Localization</li>
-        <li>Building Simple Autonomous Behaviors</li>
-        <li>Flight Control Theory (PID, filters)</li>
-        <li>Simulation → Real Drone Pipeline</li>
-        <li>Capstone Project: Full Autonomous Demo</li>
-    </ol>
-</section>
+    <h2>Track 2 - MAVLink Motion Control Fundamentals</h2>
+    <p><strong>Duration:</strong> ~1 week &nbsp; | &nbsp; <strong>Level:</strong> Beginner-Intermediate</p>
 
-<section>
-    <h2>Sample Lessons</h2>
+    <p>
+        Before building their own controllers, students explore how drones interpret high-level 
+        motion commands through MAVLink. They send velocity, position, and acceleration setpoints 
+        from the Jetson Orin Nano, observe how the flight controller responds, and analyze 
+        real-world effects such as overshoot, delay, and sensor noise. This hands-on module builds the intuition needed 
+        for designing PID controllers in Track 2.
+    </p>
+
     <ul>
-        <li><strong>Lesson 1:</strong> Booting Jetson, SSH, Linux basics</li>
-        <li><strong>Lesson 5:</strong> Real-time object detection</li>
-        <li><strong>Lesson 7:</strong> MAVLink commands for control</li>
-        <li><strong>Lesson 10:</strong> Autonomous AI-following mode</li>
-        <li><strong>Capstone:</strong> Build and test a custom autonomy feature</li>
+        <li>Sending position setpoints via MAVLink</li>
+        <li>Sending velocity setpoints via MAVLink</li>
+        <li>Sending acceleration setpoints via MAVLink</li>
+        <li>Understanding Guided and Guided-NOGPS modes</li>
+        <li>Reference frames: Local NED vs body-frame control</li>
+        <li>Observing overshoot, lag, and stabilization behavior</li>
+        <li>Basic step-input testing (move, stop, rotate)</li>
+        <li>Analyzing response in SITL before testing on hardware</li>
+        <li>Testing MAVLink control with real drone</li>
+    </ul>
+
+    <p><strong>Outcomes:</strong></p>
+    <ul>
+        <li>Send and interpret MAVLink position, velocity, and acceleration commands</li>
+        <li>Explain how the flight controller stabilizes motion beneath high-level commands</li>
+        <li>Identify overshoot, lag, and noise in drone responses</li>
+        <li>Use simulation to analyze command-response behavior</li>
+        <li>Prepare filtered sensor inputs and control logic for PID development</li>
     </ul>
 </section>
 
 <section>
-    <p><a href="contact.html" class="cta">Request Full Curriculum PDF</a></p>
+    <h2>Track 3 - Control Systems: PID, Filtering & Smooth Motion</h2>
+    <p><strong>Duration:</strong> ~3-5 weeks &nbsp; | &nbsp; <strong>Level:</strong> Intermediate</p>
+
+    <p>
+        Students learn how to turn noisy, real-world measurements into smooth and predictable motion. 
+        They implement PID controllers, apply filtering to reduce noise, and use simulation 
+        to tune their control loops before validating their designs on the real drone in supervised, 
+        constrained scenarios.
+    </p>
+
+    <ul>
+        <li>Understanding control concepts: error, proportional / integral / derivative terms</li>
+        <li>Implementing a simple PID loop</li>
+        <li>Expanding to 2D PID control for target-relative motion</li>
+        <li>Low-pass filtering to reduce measurement noise</li>
+        <li>Gain tuning: adjusting P, I, and D for stability and responsiveness</li>
+        <li>Using simulation to iterate and tune control loops safely</li>
+        <li>Testing constrained behaviors on the real drone</li>
+        <li>Implementing basic autonomous behaviors (e.g., “move toward” / “back away”) using PID output</li>
+        <li>Understanding saturation, safety limits, and actuator constraints</li>
+    </ul>
+
+    <p><strong>Outcomes:</strong></p>
+    <ul>
+        <li>Explain how PID controllers work and describe the role of each term (P, I, and D)</li>
+        <li>Implement a functional 1D PID controller in simulation</li>
+        <li>Expand PID logic to 2D control for tracking or position adjustment</li>
+        <li>Apply low-pass filtering to smooth noisy measurements</li>
+        <li>Tune PID gains using simulation before deploying to real hardware</li>
+        <li>Validate PID performance on the real drone in supervised, constrained tests</li>
+        <li>Design a simple autonomous behavior using filtered sensor measurements and PID output</li>
+        <li>Describe how saturation limits and safety constraints protect the vehicle during control</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Track 3.5 - Rapid Development & Tuning with OSRemote</h2>
+    <p><strong>Duration:</strong> ~1-2 days &nbsp; | &nbsp; <strong>Level:</strong> Intermediate</p>
+
+    <p>
+        After experiencing the challenges of manual PID tuning, students learn how to dramatically 
+        speed up development using the OSRemote app. They adjust gains, filters, and behavior parameters 
+        in real time without rebuilding code, enabling rapid iteration and more intuitive controller design.
+    </p>
+
+    <ul>
+        <li>Connecting OSRemote to the Jetson for live parameter editing</li>
+        <li>Real-time tuning of PID gains and filter coefficients</li>
+        <li>Testing instant behavior changes in simulation and real flight</li>
+        <li>Creating and switching between tuning profiles</li>
+        <li>Understanding runtime vs build-time parameters</li>
+    </ul>
+
+    <p><strong>Outcomes:</strong></p>
+    <ul>
+        <li>Use OSRemote to tune parameters in real time</li>
+        <li>Improve controller performance with rapid iteration cycles</li>
+        <li>Create and test parameter profiles for various behaviors</li>
+        <li>Apply fast tuning methods to future KF and autonomy modules</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Track 4 - Tracking & State Estimation (Kalman Filters)</h2>
+    <p><strong>Duration:</strong> ~3-5 weeks &nbsp; | &nbsp; <strong>Level:</strong> Intermediate-Advanced</p>
+
+    <p>
+        Students learn why raw detection data alone is not ideal for reliable autonomy (too noisy, delayed, or 
+        inconsistent). They build Kalman Filters to estimate smooth, continuous target motion from noisy camera 
+        measurements. Students validate their filters in both SITL simulation and supervised real flight, tune 
+        noise models, visualize performance live, and integrate KF outputs into the control system built in 
+        Track 2.
+    </p>
+
+    <ul>
+        <li>Why state estimation is required: measurement noise, jitter, delay, and dropout</li>
+        <li>Difference between sensor measurements and model-based predictions</li>
+        <li>Prediction step: estimating future state from motion models</li>
+        <li>Update step: incorporating new sensor measurements</li>
+        <li>Kalman Gain: balancing trust between prediction and measurement</li>
+        <li>Building a 1D → 2D Kalman Filter (position + velocity)</li>
+        <li>Testing and visualizing KF output in SITL simulation</li>
+        <li>Injecting artificial noise into simulation to study filter behavior</li>
+        <li>Running Kalman Filters in real-time on the drone during supervised flight</li>
+        <li>Tuning Q (process noise) and R (measurement noise) matrices</li>
+        <li>Comparing raw detection vs KF estimate vs predicted positions</li>
+        <li>Using KF output to drive smoother and more stable PID behaviors</li>
+        <li>Understanding limitations: unmodeled motion, delays, and edge cases</li>
+    </ul>
+
+    <p><strong>Outcomes:</strong></p>
+    <ul>
+        <li>Explain the role of state estimation in robotics and autonomy</li>
+        <li>Implement and test a Kalman Filter in simulation and real flight</li>
+        <li>Tune Q and R to balance prediction accuracy and measurement trust</li>
+        <li>Analyze KF behavior using both SITL data and real flight logs</li>
+        <li>Replace noisy raw detections with stable KF estimates for control</li>
+        <li>Integrate KF output into PID-based autonomous behaviors</li>
+        <li>Diagnose common KF issues (latency, divergence, under/overfitting)</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Track 5 - Full Autonomy & Capstone Projects</h2>
+    <p><strong>Duration:</strong> ~4-6+ weeks &nbsp; | &nbsp; <strong>Level:</strong> Advanced</p>
+
+    <p>
+        Students combine perception, tracking, and control into a complete autonomy pipeline. They design, 
+        test, and deploy a custom autonomous behavior of their choice, using the perception, filtering, 
+        and control tools built throughout the course. The capstone project is intentionally open-ended, 
+        allowing students to explore creative ideas while following a structured simulation → tethered → 
+        supervised flight workflow.
+    </p>
+
+    <ul>
+        <li>Integrating YOLO detection, KF tracking, and PID control loops</li>
+        <li>Understanding sensor measurements vs model-based predictions</li>
+        <li>Predicting future target motion for smoother following</li>
+        <li>Designing safe, reliable, and robust autonomous behaviors</li>
+        <li>Simulation → tethered → free-flight testing workflow</li>
+        <li>Capstone options: person-follow, payload timing, gesture control, reacquisition, etc.</li>
+    </ul>
+
+    <p><strong>Outcomes:</strong></p>
+    <ul>
+        <li>Build a complete perception → tracking → control autonomy stack</li>
+        <li>Design and implement a custom autonomous behavior from scratch</li>
+        <li>Use prediction and filtering to improve autonomy performance</li>
+        <li>Conduct safe supervised flight tests of student-written autonomy code</li>
+        <li>Present a multi-week capstone project demonstrating engineering mastery</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Sample Lesson Titles</h2>
+    <p>Below are example lessons drawn from across the tracks to illustrate the type of hands-on work students do throughout the course:</p>
+
+    <ul>
+        <li><strong>Track 1 - Drone Basics, Safety & AI Intro</strong>
+            <ul>
+                <li>First Flight: Safety, Arming, and Assisted Modes</li>
+                <li>Inside the Drone: Hardware, Sensors, and What They Actually Do</li>
+                <li>Mission Planner &amp; QGroundControl: Reading Telemetry Like an Engineer</li>
+                <li>Your First AI Demo: Running Real-Time Object Detection on Jetson</li>
+            </ul>
+        </li>
+
+        <li><strong>Track 2 - MAVLink Motion Control</strong>
+            <ul>
+                <li>Talking to the Drone: Sending Your First MAVLink Motion Commands</li>
+                <li>Stop, Go, Hover: Understanding Step Responses and Overshoot</li>
+            </ul>
+        </li>
+
+        <li><strong>Track 3 - PID Control Systems</strong>
+            <ul>
+                <li>From Error to Action: Building a Simple PID Controller</li>
+                <li>Tuning P, I, and D: Stability vs Responsiveness</li>
+                <li>Smooth Motion: Filtering Noisy Signals with Low-Pass Filters</li>
+            </ul>
+        </li>
+
+        <li><strong>Track 4 - Tracking &amp; Kalman Filters</strong>
+            <ul>
+                <li>Why Raw Data Fails: Filtering and State Estimation Basics</li>
+                <li>Predict, Update, Correct: Building a 2D Kalman Filter for Tracking</li>
+            </ul>
+        </li>
+
+        <li><strong>Track 5 - Full Autonomy &amp; Deployment</strong>
+            <ul>
+                <li>From Simulation to Sky: Deploying a Complete Autonomous Behavior</li>
+            </ul>
+        </li>
+    </ul>
+</section>
+
+<section>
+    <h2>Student Learning Outcomes</h2>
+    <p>By the end of the full sequence, students will be able to:</p>
+    <ul>
+        <li>Safely operate and configure a fully autonomous drone platform.</li>
+        <li>Work in a Linux + Docker environment on NVIDIA Jetson hardware.</li>
+        <li>Run real-time AI perception (YOLO + OpenCV) on live camera feeds.</li>
+        <li>Design, tune, and debug basic control loops (PID) for motion.</li>
+        <li>Implement a simple Kalman filter for target tracking and prediction.</li>
+        <li>Integrate perception, estimation, and control into a working autonomy stack.</li>
+        <li>Use logged data (MCAP) to analyze, debug, and improve system performance.</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Request the Full Curriculum</h2>
+    <p>
+        A detailed, teacher-ready curriculum package is available, including lesson plans, slides,
+        project guides, and assessment ideas for each track.
+    </p>
+    <p>
+        <a href="contact.html" class="cta">Request Full Curriculum</a>
+    </p>
 </section>
 
 </body>

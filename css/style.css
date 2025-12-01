@@ -1,79 +1,164 @@
+/* ============================================
+   BRAND VARIABLES
+============================================ */
+:root {
+    /* Primary Colors */
+    --color-navy: #0b1d60;
+    --color-navy-light: #152c7a;
+    --color-green: #3ad29f;
+    --color-green-dark: #2ab98a;
+
+    /* Neutrals */
+    --color-white: #ffffff;
+    --color-offwhite: #fafafa;
+    --color-gray: #333333;
+    --color-gray-muted: #6b6b6b;
+
+    /* Optional accent */
+    --color-accent: #50aaff; /* small use only */
+
+    /* Fonts */
+    --font-header: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    --max-width: 900px;
+}
+
+/* ============================================
+   GLOBAL BASE
+============================================ */
 body {
+    background: var(--color-offwhite);
+    color: var(--color-gray);
+    font-family: var(--font-body);
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #fafafa;
-    color: #333;
-    line-height: 1.6;
-}
-
-/* Navigation */
-.navbar {
-    background: #111;
-    padding: 12px;
-    text-align: center;
-}
-.navbar a {
-    color: #fff;
-    margin: 0 12px;
-    text-decoration: none;
-    font-weight: bold;
-}
-.navbar a.active {
-    color: #4fc3f7;
-}
-.navbar a:hover {
-    color: #4fc3f7;
-}
-
-/* Hero sections */
-.hero {
-    padding: 80px 20px;
-    background: #1a237e;
-    color: #fff;
-    text-align: center;
-}
-.subhero {
-    padding: 50px 20px;
-    background: #303f9f;
-    color: #fff;
-    text-align: center;
-}
-
-.tagline {
-    font-size: 1.2em;
-    margin-top: 10px;
-}
-
-/* Content sections */
-section {
-    padding: 40px 20px;
-    max-width: 900px;
-    margin: auto;
+    line-height: 1.65;
 }
 
 h1, h2, h3 {
-    color: #1a237e;
+    font-family: var(--font-header);
+    color: var(--color-navy-light);
+    margin-top: 0;
+    line-height: 1.25;
 }
 
-/* Buttons */
+h1 { font-size: 2.8rem; font-weight: 700; }
+h2 { font-size: 2rem; font-weight: 700; margin-bottom: 1rem; }
+h3 { font-size: 1.4rem; font-weight: 600; }
+
+/* ============================================
+   NAVIGATION
+============================================ */
+.navbar {
+    background: var(--color-navy);
+    padding: 14px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar a {
+    color: var(--color-white);
+    margin: 0 14px;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.navbar a.active,
+.navbar a:hover {
+    color: var(--color-green);
+}
+
+/* ============================================
+   HERO
+============================================ */
+.hero {
+    background-color: var(--color-green);
+    color: var(--color-white);
+    padding: 4rem 2rem;
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 300px;
+}
+
+.tagline {
+    font-size: 1.3rem;
+    margin-top: 12px;
+    font-weight: 300;
+    color: var(--color-white);
+}
+
+/* ============================================
+   BIG STATEMENT
+============================================ */
+.hero-statement {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: var(--color-offwhite);
+}
+
+.big-phrase {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.big-phrase span {
+    display: block;
+    color: var(--color-green);
+}
+
+/* ============================================
+   SECTIONS
+============================================ */
+section {
+    padding: 50px 20px;
+    max-width: var(--max-width);
+    margin: auto;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+ul.sublist li {
+    margin-top: 4px;
+    color: var(--color-gray-muted);
+}
+
+/* ============================================
+   BUTTONS
+============================================ */
 .cta {
     display: inline-block;
-    padding: 10px 20px;
-    background: #1a237e;
-    color: #fff;
+    padding: 14px 26px;
+    background: var(--color-green);
+    color: var(--color-white);
     text-decoration: none;
     border-radius: 6px;
-    margin-top: 20px;
-}
-.cta:hover {
-    background: #3949ab;
+    margin-top: 24px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: 0.2s ease-in-out;
 }
 
-/* Footer */
+.cta:hover {
+    background: var(--color-green-dark);
+}
+
+/* ============================================
+   FOOTER
+============================================ */
 .footer {
-    background: #111;
-    color: #fff;
+    background: var(--color-navy);
+    color: var(--color-white);
     text-align: center;
-    padding: 20px;
-    margin-top: 40px;
+    padding: 25px;
+    margin-top: 50px;
+    font-size: 0.9rem;
 }
