@@ -19,7 +19,7 @@ import importlib.util
 import sys
 from pathlib import Path
 
-proto_dir = Path("/home/crose72/workspaces/os-dev/OperationSquirrel/SquirrelDefender/proto")
+proto_dir = Path("/home/crose72/workspaces/os-dev/operationsquirrel/squirreldefender/proto")
 
 def load_proto(module_name: str, file_path: Path):
     """Load a protobuf Python file manually and register it in sys.modules."""

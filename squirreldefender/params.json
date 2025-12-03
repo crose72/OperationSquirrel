@@ -1,0 +1,167 @@
+{
+  "mission_params": {
+    "takeoff_alt_m": 7.3,
+    "min_mission_alt_cm": 550,
+    "min_mission_alt_mm": 5500,
+    "mission_start_delay_count": 500
+  },
+  "target_det_params": {
+    "max_batch_size": 4,
+    "inference_precision": 0,
+    "gpu_device": 0,
+    "allow_gpu_fallback": false,
+    "min_hits_to_track": 25,
+    "min_frames_to_drop_track": 10,
+    "track_iou_thresh": 0.1
+  },
+  "target_track_params": {
+    "target_bbox_center_filt_coef": 0.75,
+    "target_det_conf_thresh": 0.65,
+    "target_class_yolov8": 0,
+    "target_class_mobilenet_ssd_v2": 1,
+    "reid_max_batch_size": 32,
+    "reid_sim_thresh": 0.55
+  },
+  "target_loc_params": {
+    "h_pos_x_00": 1.0,
+    "h_pos_y_11": 1.0,
+    "q_pos_x_00": 0.0001,
+    "q_pos_y_11": 0.0001,
+    "q_vel_x_22": 0.00001,
+    "q_vel_y_33": 0.00001,
+    "q_acc_x_44": 0.00001,
+    "q_acc_y_55": 0.00001,
+    "r_pos_x_00": 0.01,
+    "r_pos_y_11": 0.001,
+    "p_pos_x_00": 0.1,
+    "p_pos_y_11": 0.1,
+    "p_vel_x_22": 0.1,
+    "p_vel_y_33": 0.1,
+    "p_acc_x_44": 0.1,
+    "p_acc_y_55": 0.1,
+    "target_los_height_eq_coef": 1680.557,
+    "target_los_height_eq_pow": -0.863,
+    "target_los_width_eq_coef": 540.456,
+    "target_los_width_eq_pow": -0.758,
+    "known_object_height_all_dist": 1.778,
+    "target_bbox_min_area": 1500.0,
+    "target_bbox_min_dist_from_edge": 50.0,
+    "target_bbox_lost_min_time_ms": 1000,
+    "target_bbox_center_x_history_size": 10,
+    "target_bbox_center_y_history_size": 125
+  },
+  "velocity_control": {
+    "pid_vx_forward": {
+      "kp": 0.6,
+      "ki": 0.0,
+      "kd": 0.1
+    },
+    "pid_vy_forward": {
+      "kp": 0.04,
+      "ki": 0.0,
+      "kd": 0.001
+    },
+    "pid_vz_forward": {
+      "kp": 0.0,
+      "ki": 0.0,
+      "kd": 0.0
+    },
+    "pid_vx_reverse": {
+      "kp": 0.6,
+      "ki": 0.009,
+      "kd": 0.1
+    },
+    "pid_vy_reverse": {
+      "kp": 0.03,
+      "ki": 0.0,
+      "kd": 0.001
+    },
+    "pid_vz_reverse": {
+      "kp": 0.0,
+      "ki": 0.0,
+      "kd": 0.0
+    },
+    "pid_yaw_forward": {
+      "kp": 0.024,
+      "ki": 0.0,
+      "kd": 0.015
+    },
+    "pid_yaw_reverse": {
+      "kp": 0.024,
+      "ki": 0.0,
+      "kd": 0.015
+    },
+    "follow_dist_x_m": 10.0,
+    "follow_dist_y_m": 0.0,
+    "follow_dist_z_m": 0.0,
+    "follow_dist_error_dot_filt_coef": 0.8,
+    "max_velocity_mps": 10.0,
+    "max_accel_mps2": 5.0,
+    "max_jerk_mps3": 10.0,
+    "velocity_ff_brake_gain": -1.0
+  },
+  "camera_params": {
+    "sensor_mode": 0,
+    "wb_mode": 1,
+    "ae_antibanding_mode": 2,
+    "tnr_mode": 0,
+    "ee_mode": 0,
+    "exposure_min": 2000,
+    "exposure_max": 8000000,
+    "gain_min": 1.0,
+    "gain_max": 4.0,
+    "isp_dgain_min": 1.0,
+    "isp_dgain_max": 1.0,
+    "input_format": "NV12",
+    "capture_input_width": 3280,
+    "capture_input_height": 2464,
+    "input_framerate": "21/1",
+    "output_format": "BGR",
+    "capture_output_width": 1640,
+    "capture_output_height": 1232,
+    "flip_method": 0
+  },
+  "encoder_params": {
+    "bitrate": 16000,
+    "speed_preset": "veryfast",
+    "tune": "zerolatency",
+    "key_int_max": 21,
+    "threads": 0,
+    "mux_faststart": true
+  },
+  "camera_control_params": {
+    "video_input_width": 1640.0,
+    "video_input_height": 1232.0,
+    "video_output_framerate": 21.0,
+    "cam0_fov_degrees": 105.0,
+    "cam0_tilt_down_angle_degrees": 28.017636
+  },
+  "gps_denied_control": {
+    "alt_pid": {
+      "kp": 0.6,
+      "ki": 0.05,
+      "kd": 0.15,
+      "tau": 0.15,
+      "decay": 0.98,
+      "max_integral": 10.0
+    },
+    "vz_pid": {
+      "kp": 0.4,
+      "ki": 0.1,
+      "kd": 0.05,
+      "tau": 0.1,
+      "decay": 0.98,
+      "max_integral": 10.0
+    },
+    "thrust_control": {
+      "max_throttle": 0.9,
+      "throttle_slew_time": 2.0,
+      "alt_hold_tolerance": 0.3,
+      "climb_detect_vz": 0.1,
+      "climb_detect_alt": 0.3
+    },
+    "target_alt": {
+      "altitude": 20.0
+    }
+  }
+}

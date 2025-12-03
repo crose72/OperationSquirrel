@@ -1,9 +1,9 @@
-[submodule "SquirrelDefender/modules/kf"]
-	path = SquirrelDefender/modules/kf
+[submodule "squirreldefender/modules/kf"]
+	path = squirreldefender/modules/kf
 	url = https://github.com/auralius/kalman-cpp.git
-[submodule "SquirrelDefender/modules/trtinfer"]
-	path = SquirrelDefender/modules/trtinfer
+[submodule "squirreldefender/modules/trtinfer"]
+	path = squirreldefender/modules/trtinfer
 	url = https://github.com/crose72/trtinfer.git
-[submodule "SquirrelDefender/modules/mcap"]
-	path = SquirrelDefender/modules/mcap
+[submodule "squirreldefender/modules/mcap"]
+	path = squirreldefender/modules/mcap
 	url = https://github.com/crose72/mcap_builder.git

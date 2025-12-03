@@ -67,7 +67,7 @@ DOCKER_VOLUMES=(
   --volume /tmp/argus_socket:/tmp/argus_socket
   --volume /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra
   --volume ${OS_WS}:/workspace
-  --volume ${OS_WS}/OperationSquirrel/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender
+  --volume ${OS_WS}/operationsquirrel/squirreldefender:/workspace/operationsquirrel/squirreldefender
 )
 
 # --------------------------------------------------------------
@@ -87,7 +87,7 @@ if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
   if [ "$(docker ps -q -f name=^${CONTAINER_NAME}$)" ]; then
     echo "📦 Already running — attaching..."
     docker exec -it ${CONTAINER_NAME} bash -c \
-      "cd /workspace/OperationSquirrel/SquirrelDefender/build && exec bash"
+      "cd /workspace/operationsquirrel/squirreldefender/build && exec bash"
   else
     echo "▶️ Restarting container..."
     docker start -ai ${CONTAINER_NAME}
@@ -102,10 +102,10 @@ if [ "$IS_CI" = true ]; then
     echo "🤖 GitHub CI detected — running non-interactive WSL build inside container..."
 
     docker run --rm \
-        -v $GITHUB_WORKSPACE/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender \
+        -v $GITHUB_WORKSPACE/squirreldefender:/workspace/operationsquirrel/squirreldefender \
         $IMAGE_NAME \
         bash -c "
-            cd /workspace/OperationSquirrel/SquirrelDefender &&
+            cd /workspace/operationsquirrel/squirreldefender &&
             mkdir -p build &&
             cd build &&
             cmake .. \
@@ -156,4 +156,4 @@ docker run --gpus all -it --rm --network host \
   "${DOCKER_VOLUMES[@]}" \
   --name ${CONTAINER_NAME} \
   ${IMAGE_NAME} \
-  bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build && exec bash"
+  bash -c "cd /workspace/operationsquirrel/squirreldefender/build && exec bash"

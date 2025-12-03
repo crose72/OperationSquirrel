@@ -1,0 +1,7 @@
+LABEL jetclocks
+	MENU LABEL JetsonIOCustom Header Config: <HDR40 User Custom [2025-05-31-231810]>
+	LINUX /boot/Image
+      FDT /boot/dtb/kernel_tegra234-p3768-0000+p3767-0005-nv-super.dtb
+	INITRD /boot/initrd
+	APPEND ${cbootargs} root=PARTUUID=6926ff3e-64c3-4e81-ac95-cf51608778be rw rootwait rootfstype=ext4 mminit_loglevel=4 console=ttyTCU0,115200 firmware_class.path=/etc/firmware fbcon=map:0 nospectre_bhb video=efifb:off console=tty0
+	OVERLAYS /boot/jetson-io-hdr40-user-custom.dtbo

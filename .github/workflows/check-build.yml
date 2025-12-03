@@ -1,4 +1,4 @@
-name: Build SquirrelDefender
+name: Build squirreldefender
 
 on:
   pull_request:
@@ -21,5 +21,5 @@ jobs:
       - name: Make build script executable
         run: chmod +x scripts/run.sh
 
-      - name: Build SquirrelDefender (BLD_WSL config)
+      - name: Build squirreldefender (BLD_WSL config)
         run: ./scripts/run.sh dev ubuntu-22.04_sm86

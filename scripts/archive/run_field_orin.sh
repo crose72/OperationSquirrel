@@ -31,4 +31,4 @@ sudo docker run --runtime nvidia -it --rm --network host \
   --volume /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra \
   --name squirreldefender-field \
   crose72/jetpack-r36.4.0:field \
-  bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build && exec bash"
+  bash -c "cd /workspace/operationsquirrel/squirreldefender/build && exec bash"

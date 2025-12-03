@@ -8,8 +8,8 @@ FULL_IMAGE_NAME="$IMAGE_NAME:$IMAGE_TAG"    # Full image name with tag
 
 # Source and destination paths for copying build outputs from the squirreldefender-field
 CONTAINER_NAME="squirreldefender-field"
-SRC_PATH="/workspace/OperationSquirrel/SquirrelDefender/build"
-DEST_PATH="${OS_WS}/OperationSquirrel/SquirrelDefender/build-field"
+SRC_PATH="/workspace/operationsquirrel/squirreldefender/build"
+DEST_PATH="${OS_WS}/operationsquirrel/squirreldefender/build-field"
 
 # Set default build type to "dev"
 BUILD_TYPE="dev"

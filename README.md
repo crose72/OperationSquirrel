@@ -1,4 +1,4 @@
-# OperationSquirrel
+# operationsquirrel
 
 ## The drone
 <img src="https://github.com/user-attachments/assets/e551dd46-b7c2-478f-9a46-858f54ebddc5" alt="Image 1" width="640">
@@ -31,7 +31,7 @@ This project is aimed at creating an autonomous drone to deliver static and/or d
 - `docs` - instructions on how to set up the simulation and code documentation
 - `scratch` - sandbox for experimental code worth saving
 - `scripts` - scripts to automatically install dependencies or do other tasks
-- `SquirrelDefender` - autonomous drone code for companion computer or ground station
+- `squirreldefender` - autonomous drone code for companion computer or ground station
 - `tools` - tools for processing data or performing other useful tasks
 - `wsl` - WSL2 kernel that supports USBIPD (connecting usb devices to wsl)
 
@@ -41,7 +41,7 @@ If you need help or the instructions are unclear, please reach out in the discor
 
 ## Introduction (TL:DR)
  
-Some things you might be wondering about this project are "How do I use this?", "What does the code do?"  If you want to make an autonomous drone that is able to identify and follow a target based an object detector that is performing inference on a live camera feed, then the code in the SquirrelDefender folder is what you want.  
+Some things you might be wondering about this project are "How do I use this?", "What does the code do?"  If you want to make an autonomous drone that is able to identify and follow a target based an object detector that is performing inference on a live camera feed, then the code in the squirreldefender folder is what you want.  
 
 You need two things for this project to work for you.  First you need a device on which to compile the code (Jetson Nano, Jetson Orin Nano, Windows laptop, microcontroller, etc).  Second you need a drone (real or simulated).
 
@@ -63,8 +63,8 @@ The above introduction hopefully provided some context for what this project is 
 
 If you want to understand how the software is written and the flow, look at `docs/diagrams/software-architecture`.
 
-- Follow the instructions in [README](https://github.com/crose72/OperationSquirrel/blob/dev/SquirrelDefender/README.md) to compile and run the program
-- Follow the instructions in [01-Setting-up-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/01-Setting-up-SITL.md) to setup the simulation environment.
-- Follow the instructions in [02-Connecting-to-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/02-Connecting-to-SITL.md) to control the simulated drone with your Jetson
-- (Optional) Follow the instructions in [03-Setting-up-AirSim-with-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/03-Setting-up-AirSim-with-SITL.md) to setup a photo-realistic simulation
-- Follow the instruction in [Pre-Flight Checklist](https://github.com/crose72/OperationSquirrel/blob/dev/docs/Pre-Flight-Checklist.md) if you're ready to fly a drone autonomously
+- Follow the instructions in [README](https://github.com/crose72/operationsquirrel/blob/dev/squirreldefender/README.md) to compile and run the program
+- Follow the instructions in [01-Setting-up-SITL](https://github.com/crose72/operationsquirrel/blob/dev/docs/01-Setting-up-SITL.md) to setup the simulation environment.
+- Follow the instructions in [02-Connecting-to-SITL](https://github.com/crose72/operationsquirrel/blob/dev/docs/02-Connecting-to-SITL.md) to control the simulated drone with your Jetson
+- (Optional) Follow the instructions in [03-Setting-up-AirSim-with-SITL](https://github.com/crose72/operationsquirrel/blob/dev/docs/03-Setting-up-AirSim-with-SITL.md) to setup a photo-realistic simulation
+- Follow the instruction in [Pre-Flight Checklist](https://github.com/crose72/operationsquirrel/blob/dev/docs/Pre-Flight-Checklist.md) if you're ready to fly a drone autonomously
