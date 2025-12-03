@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project definition
-project(SquirrelDefender)
+project(squirreldefender)
 
 #=============================================================================
 # Environment Variables Used (when USE_ENV_VAR=ON):
@@ -404,7 +404,7 @@ if (BLD_JETSON_ORIN_NANO OR BLD_WSL)
 endif()
 
 #=============================================================================
-# Libraries - Standalone code that is used in SquirrelDefender but is not the 
+# Libraries - Standalone code that is used in squirreldefender but is not the 
 # "business logic".  Can be easily ported to another project or replaced
 # with other suitable code.  They end up being included in the SOURCES that 
 # build the program.
@@ -468,7 +468,7 @@ if(BLD_JETSON_ORIN_NANO OR BLD_WSL)
 endif()
 
 #=============================================================================
-# Set SquirrelDefender Source files and locations
+# Set squirreldefender Source files and locations
 #=============================================================================
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/apphdr)

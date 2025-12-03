@@ -25,7 +25,7 @@
         <mxCell id="LY-ArOaM2LhRFUvLQoWM-15" value="" style="group" vertex="1" connectable="0" parent="1">
           <mxGeometry x="707.5" y="280" width="107.5" height="100" as="geometry" />
         </mxCell>
-        <mxCell id="LY-ArOaM2LhRFUvLQoWM-11" value="SquirrelDefender" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="LY-ArOaM2LhRFUvLQoWM-15">
+        <mxCell id="LY-ArOaM2LhRFUvLQoWM-11" value="squirreldefender" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="LY-ArOaM2LhRFUvLQoWM-15">
           <mxGeometry y="40" width="107.5" height="60" as="geometry" />
         </mxCell>
         <mxCell id="LY-ArOaM2LhRFUvLQoWM-9" value="&lt;span style=&quot;text-wrap: wrap;&quot;&gt;Jetson&lt;/span&gt;&lt;div&gt;&lt;span style=&quot;text-wrap: wrap;&quot;&gt;Nano&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="LY-ArOaM2LhRFUvLQoWM-15">

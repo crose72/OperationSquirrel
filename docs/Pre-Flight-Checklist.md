@@ -2,22 +2,22 @@
 
 ## Description
 
-This document will outline high level steps that should be followed to prepare for a test flight with a real drone.  It is assumed that you have successfully completed the instructions in [README](https://github.com/crose72/OperationSquirrel/blob/dev/SquirrelDefender/README.md) to have a compiled SquirrelDefender program, and have configured your Jetson to run the SquirrelDefender program as soon as you power it on.  
+This document will outline high level steps that should be followed to prepare for a test flight with a real drone.  It is assumed that you have successfully completed the instructions in [README](https://github.com/crose72/operationsquirrel/blob/dev/squirreldefender/README.md) to have a compiled squirreldefender program, and have configured your Jetson to run the squirreldefender program as soon as you power it on.  
 
-When you go to do autonomous flight you're probably going to go to a field with the drone and set it on the ground, and then plug in the battery to power the drone.  Then, with Jetson mounted onto your drone somehow, you are going to power the Jetson (possibly with a barrel jack connected to the drone's LiPo battery) and will probably want to have the drone takeoff and start following you without needing your laptop or a computer monitor in order to start the `squirreldefender` program.  Thus, you need to make sure that the program start as soon as you turn on the Jetson, and the instructions for that are in [README](https://github.com/crose72/OperationSquirrel/blob/dev/SquirrelDefender/README.md).
+When you go to do autonomous flight you're probably going to go to a field with the drone and set it on the ground, and then plug in the battery to power the drone.  Then, with Jetson mounted onto your drone somehow, you are going to power the Jetson (possibly with a barrel jack connected to the drone's LiPo battery) and will probably want to have the drone takeoff and start following you without needing your laptop or a computer monitor in order to start the `squirreldefender` program.  Thus, you need to make sure that the program start as soon as you turn on the Jetson, and the instructions for that are in [README](https://github.com/crose72/operationsquirrel/blob/dev/squirreldefender/README.md).
 
 These instructions are written with ArduPilot in mind, but any drone that uses mavlink should work with this code (such as iNav or PX4).
 
 ## Preparing for flight
 
-### SquirrelDefender Setup
+### squirreldefender Setup
 
-1. SquirrelDefender program compiled [README](https://github.com/crose72/OperationSquirrel/blob/dev/SquirrelDefender/README.md)
-2. SquirrelDefender program runs when Jetson is powered on [README](https://github.com/crose72/OperationSquirrel/blob/dev/SquirrelDefender/README.md)
+1. squirreldefender program compiled [README](https://github.com/crose72/operationsquirrel/blob/dev/squirreldefender/README.md)
+2. squirreldefender program runs when Jetson is powered on [README](https://github.com/crose72/operationsquirrel/blob/dev/squirreldefender/README.md)
 3. Set desired takeoff height in `vehicle_controller.cpp` (default is ~4-7m)
 4. Set desired follow distance in `follow_target.cpp` (if you have a reason to change it)
 5. Set PID gains in `follow_target.cpp` (if you have a reason to change them)
-6. Verify the SquirrelDefender program in SITL
+6. Verify the squirreldefender program in SITL
     - It's helpful to make sure that at least the mavlink communication is working and when you start the program you see the drone start moving left/right/forward based on when you are in from of the camera
     - Any sanity check you need to be confident it will work on the real drone
 

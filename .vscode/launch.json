@@ -5,13 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "SquirrelDefender Orin",
+            "name": "squirreldefender Orin",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/workspace/OperationSquirrel/SquirrelDefender/build/squirreldefender",
+            "program": "/workspace/operationsquirrel/squirreldefender/build/squirreldefender",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "/workspace/OperationSquirrel/SquirrelDefender/build",
+            "cwd": "/workspace/operationsquirrel/squirreldefender/build",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
@@ -23,11 +23,11 @@
                 },
                 {
                     "description": "Set source path",
-                    "text": "directory /workspace/OperationSquirrel/SquirrelDefender",
+                    "text": "directory /workspace/operationsquirrel/squirreldefender",
                     "ignoreFailures": false
                 }
             ],
-            "preLaunchTask": "SquirrelDefender Orin: Build",
+            "preLaunchTask": "squirreldefender Orin: Build",
             "miDebuggerPath": "/usr/bin/gdb",
             "pipeTransport": {
                 "pipeCwd": "${workspaceFolder}",
@@ -36,17 +36,17 @@
                 "debuggerPath": "/usr/bin/gdb"
             },
             "sourceFileMap": {
-                "/workspace/OperationSquirrel/SquirrelDefender": "${workspaceFolder}/SquirrelDefender"
+                "/workspace/operationsquirrel/squirreldefender": "${workspaceFolder}/squirreldefender"
             }
         },
         {
             "name": "Path Planner: Debug Example",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/scratch/modules-example/SquirrelDefender/path_planner/build/path_planner_example",
+            "program": "${workspaceFolder}/scratch/modules-example/squirreldefender/path_planner/build/path_planner_example",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/scratch/modules-example/SquirrelDefender/path_planner",
+            "cwd": "${workspaceFolder}/scratch/modules-example/squirreldefender/path_planner",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",

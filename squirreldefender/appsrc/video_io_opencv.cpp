@@ -224,7 +224,7 @@ void create_gstreamer_pipelines(std::string &capture_pipeline,
 bool create_video_io_streams(void)
 {
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
-    const std::string base_path = "/workspace/OperationSquirrel/SquirrelDefender/data/";
+    const std::string base_path = "/workspace/operationsquirrel/squirreldefender/data/";
 #else
     const std::string base_path = "./";
 #endif

@@ -61,13 +61,13 @@ mkdir ~/workspaces/os-dev
 cd ~/workspaces/os-dev
 
 # Clone the repository
-git clone https://github.com/crose72/OperationSquirrel.git --recursive
+git clone https://github.com/crose72/operationsquirrel.git --recursive
 
 # Add the user to docker
 sudo usermod -aG docker $USER && newgrp docker
 
 # Go to and execute the setup script
-cd OperationSquirrel/scripts
+cd operationsquirrel/scripts
 ../setup.sh squirreldefender --jetson=orin # for the Orin nano, --jetson=b01 for the B01 nano
 
 # This setup script will execute a python script that will allow you to configure your csi camera.
@@ -85,7 +85,7 @@ chmod +x ~/.xprofile
 sudo reboot now
 
 # Run the container
-cd ~/workspaces/os-dev/OperationSquirrel/scripts
+cd ~/workspaces/os-dev/operationsquirrel/scripts
 ./run.sh dev orin
 
 # Test the camera inside the container (sanity check before testing squirreldefender)
@@ -94,13 +94,13 @@ nvgstcapture-1.0
 
 ### Dev container:
 
-Outside of the container edit `SquirrelDefender/CMakeLists.txt` file and enable `BLD_JETSON_ORIN_NANO` or `BLD_JETSON_B01`.
+Outside of the container edit `squirreldefender/CMakeLists.txt` file and enable `BLD_JETSON_ORIN_NANO` or `BLD_JETSON_B01`.
 
 Next, run the script to start up the dev container for your jetson 
 
 ```bash
 # Go to scripts folder
-cd OperationSquirrel/scripts
+cd operationsquirrel/scripts
 
 # Run the container
 ./run.sh dev orin
@@ -109,7 +109,7 @@ cd OperationSquirrel/scripts
 ./run.sh dev b01
 ```
 
-A terminal inside the container should open up.  If `SquirrelDefender/build` doesn't exist on your jetson then you need to create it since the dev container opens to that path (the `setup.sh` should take care of this).  You can now make changes to the code outside of the container (the code is mounted into the container), and compile and run the executable inside the container.  Inside the container do the following:
+A terminal inside the container should open up.  If `squirreldefender/build` doesn't exist on your jetson then you need to create it since the dev container opens to that path (the `setup.sh` should take care of this).  You can now make changes to the code outside of the container (the code is mounted into the container), and compile and run the executable inside the container.  Inside the container do the following:
 
 ```bash
 # Build
@@ -172,7 +172,7 @@ Let's say you're at the park with your jetson and your drone, and you want to tr
     - Execute `./run.sh dev orin` (or whatever jetson you're using)
     - Make changes to the code
     - Recompile the code
-3. Build the SquirrelDefender container
+3. Build the squirreldefender container
     - Execute `./build.sh squirreldefender orin` (or whatever jetson you're using)
     - (Choose N if you don't need to push the container to docker hub - since you're at the park I don't think you do)
 4. Enable the squirreldefender service (if not already enabled)
@@ -181,7 +181,7 @@ Let's say you're at the park with your jetson and your drone, and you want to tr
 
 #### Clock skew error when Jetson no longer has wifi connection
 
-When the Jetson has no internet connection the system time defaults to 1969.  Since you're probably working in the present (2025 and beyond), any files you've touched will likey have a timestamp in the present.  This timestamp is after 1969 by a lot.  So if you go to compile the squirreldefender program the compiler will notice that the files have a timestamp millions of seconds in the future, resulting in a clock skew when recompiling.  To solve this issue, create a systemd service to automatically move the system time to a few seconds after the latest timestamp in the OperationSquirrel repo.
+When the Jetson has no internet connection the system time defaults to 1969.  Since you're probably working in the present (2025 and beyond), any files you've touched will likey have a timestamp in the present.  This timestamp is after 1969 by a lot.  So if you go to compile the squirreldefender program the compiler will notice that the files have a timestamp millions of seconds in the future, resulting in a clock skew when recompiling.  To solve this issue, create a systemd service to automatically move the system time to a few seconds after the latest timestamp in the operationsquirrel repo.
 
 The `setup.sh` should take care of this, but here is the manual setup for your benefit.
 
@@ -242,7 +242,7 @@ Note: Defaults on the Orin are fine for all of these if you have JP6.1 or 6.2.  
 
 ### Setup:
 
-Setup swap.  Either run [setup-swap.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/setup-swap.sh) or you can manually install some swap:
+Setup swap.  Either run [setup-swap.sh](https://github.com/crose72/operationsquirrel/blob/dev/scripts/setup-swap.sh) or you can manually install some swap:
 
 ```
 sudo fallocate -l 8G /mnt/8GB.swap
@@ -253,14 +253,14 @@ Then add the following line to the end of /etc/fstab to make the change persiste
     /mnt/8GB.swap  none  swap  sw 0  0
 ```
 
-Copy the script [Install-Jetson-Orin-Nano-dependencies.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/Install-Jetson-Orin-Nano-dependencies.sh) to your favorite GitHub folder because it will clone some repos wherever you run this script, so just make sure to put it wherever you are okay with having those repositories.
+Copy the script [Install-Jetson-Orin-Nano-dependencies.sh](https://github.com/crose72/operationsquirrel/blob/dev/scripts/Install-Jetson-Orin-Nano-dependencies.sh) to your favorite GitHub folder because it will clone some repos wherever you run this script, so just make sure to put it wherever you are okay with having those repositories.
 
 ### Compile and run the program:
 
 ```bash
 # Clone the repository
-git clone https://github.com/crose72/OperationSquirrel.git --recursive
-cd OperationSquirrel/SquirrelDefender
+git clone https://github.com/crose72/operationsquirrel.git --recursive
+cd operationsquirrel/squirreldefender
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -288,9 +288,9 @@ sudo ./squirreldefender ../test_data/video.mp4
 
 ### Setup:
 
-If you want to update your cmake version then you can run the script I made to install 3.28 [Install-CMake-3.28.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/Install-CMake-3.28.sh).
+If you want to update your cmake version then you can run the script I made to install 3.28 [Install-CMake-3.28.sh](https://github.com/crose72/operationsquirrel/blob/dev/scripts/Install-CMake-3.28.sh).
 
-Setup swap.  Either run [setup-swap.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/setup-swap.sh) or you can manually install some swap:
+Setup swap.  Either run [setup-swap.sh](https://github.com/crose72/operationsquirrel/blob/dev/scripts/setup-swap.sh) or you can manually install some swap:
 
 ```bash
 sudo fallocate -l 8G /mnt/8GB.swap
@@ -301,16 +301,16 @@ Then add the following line to the end of /etc/fstab to make the change persiste
     /mnt/8GB.swap  none  swap  sw 0  0
 ```
 
-Copy the script [Install-Jetson-Nano-B01-dependencies.sh](https://github.com/crose72/OperationSquirrel/blob/dev/scripts/Install-Jetson-Nano-B01-dependencies.sh) to your favorite GitHub folder because it will clone some repos wherever you run this script, so just make sure to put it wherever you are okay with having those repositories.
+Copy the script [Install-Jetson-Nano-B01-dependencies.sh](https://github.com/crose72/operationsquirrel/blob/dev/scripts/Install-Jetson-Nano-B01-dependencies.sh) to your favorite GitHub folder because it will clone some repos wherever you run this script, so just make sure to put it wherever you are okay with having those repositories.
 
-Edit `SquirrelDefender/CMakeLists.txt` file and enable `BLD_JETSON_B01`.
+Edit `squirreldefender/CMakeLists.txt` file and enable `BLD_JETSON_B01`.
 
 ### Compile and run the program:
 
 ```bash
 # Clone the repository
-git clone https://github.com/crose72/OperationSquirrel.git --recursive
-cd OperationSquirrel/SquirrelDefender
+git clone https://github.com/crose72/operationsquirrel.git --recursive
+cd operationsquirrel/squirreldefender
 mkdir build
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
@@ -341,7 +341,7 @@ sudo nano /etc/systemd/system/squirreldefender.service
     Type=simple
     ExecStartPre=/bin/systemctl restart nvargus-daemon.service
     ExecStart=<path-to-exe>/squirreldefender
-    WorkingDirectory=<path-to-build-folder>//SquirrelDefender/build
+    WorkingDirectory=<path-to-build-folder>//squirreldefender/build
     StandardOutput=journal
     StandardError=journal
     Restart=always
@@ -402,7 +402,7 @@ mkdir ~/workspaces/os-dev
 cd ~/workspaces/os-dev
 
 # Clone the repository
-git clone https://github.com/crose72/OperationSquirrel.git --recursive
+git clone https://github.com/crose72/operationsquirrel.git --recursive
 
 # Add the user to docker
 sudo usermod -aG docker $USER && newgrp docker
@@ -417,7 +417,7 @@ sudo nano ~/.bashrc # or you can use vim if you prefer
 source ~/.bashrc
 
 # Run the container
-cd ~/workspaces/os-dev/OperationSquirrel/scripts
+cd ~/workspaces/os-dev/operationsquirrel/scripts
 ./scripts/run_dev_ubuntu-22.04.sh
 ```
 

@@ -454,7 +454,7 @@ bool TargetTracking::init(void)
 
     OSNet::Config config;
     const std::string engine_path =
-        "/workspace/OperationSquirrel/SquirrelDefender/networks/osnet/oxnet_x0_25.engine.NVIDIAGeForceRTX3060LaptopGPU.fp16.batch32";
+        "/workspace/operationsquirrel/squirreldefender/networks/osnet/oxnet_x0_25.engine.NVIDIAGeForceRTX3060LaptopGPU.fp16.batch32";
 
     osnet_extractor = new OSNet(engine_path, config);
 
@@ -462,7 +462,7 @@ bool TargetTracking::init(void)
 
     OSNet::Config config;
     const std::string engine_path =
-        "/workspace/OperationSquirrel/SquirrelDefender/networks/osnet/osnet_x0_25.engine.Orin.fp16.batch32";
+        "/workspace/operationsquirrel/squirreldefender/networks/osnet/osnet_x0_25.engine.Orin.fp16.batch32";
 
     osnet_extractor = new OSNet(engine_path, config);
 

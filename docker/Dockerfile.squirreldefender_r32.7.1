@@ -6,20 +6,20 @@ WORKDIR /workspace/
 # Allow build-time selection of the source folder (default to "build")
 ARG BUILD_FOLDER=build
 
-# Copy the selected SquirrelDefender build folder and any other necessary folders into the container
-COPY SquirrelDefender/${BUILD_FOLDER}/ /workspace/OperationSquirrel/SquirrelDefender/build/
-COPY SquirrelDefender/data/ /workspace/OperationSquirrel/SquirrelDefender/data/
-COPY SquirrelDefender/models/ /workspace/OperationSquirrel/SquirrelDefender/networks/
-COPY SquirrelDefender/params.json /workspace/OperationSquirrel/SquirrelDefender/params.json
+# Copy the selected squirreldefender build folder and any other necessary folders into the container
+COPY squirreldefender/${BUILD_FOLDER}/ /workspace/operationsquirrel/squirreldefender/build/
+COPY squirreldefender/data/ /workspace/operationsquirrel/squirreldefender/data/
+COPY squirreldefender/models/ /workspace/operationsquirrel/squirreldefender/networks/
+COPY squirreldefender/params.json /workspace/operationsquirrel/squirreldefender/params.json
 
 # Remove any data files that are currently saved in the jetson filesystem (don't want to mix and match data)
-RUN rm -rf /workspace/OperationSquirrel/SquirrelDefender/data/*
+RUN rm -rf /workspace/operationsquirrel/squirreldefender/data/*
 
 # Make the binary executable
-RUN chmod +x /workspace/OperationSquirrel/SquirrelDefender/build/squirreldefender
+RUN chmod +x /workspace/operationsquirrel/squirreldefender/build/squirreldefender
 
 # Set working directory to the program's build directory
-WORKDIR /workspace/OperationSquirrel/SquirrelDefender/build/
+WORKDIR /workspace/operationsquirrel/squirreldefender/build/
 
 # Set the command to run your program when the container starts
 CMD ["./squirreldefender"]

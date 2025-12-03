@@ -12,9 +12,9 @@ BASHRC_PATH="/home/$USER_NAME/.bashrc"
 XPROFILE_PATH="/home/$USER_NAME/.xprofile"
 
 # --------------------------------------------------------------------------
-# Common environment setup (for both SquirrelDefender and OSRemote)
+# Common environment setup (for both squirreldefender and OSRemote)
 # --------------------------------------------------------------------------
-echo "🧩 Running common setup for all OperationSquirrel tools..."
+echo "🧩 Running common setup for all operationsquirrel tools..."
 
 # 1. Ensure workspace exists
 mkdir -p "$WORKSPACE_PATH"

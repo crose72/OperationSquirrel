@@ -31,9 +31,9 @@ sudo docker run --runtime nvidia -it --rm --network host \
   --volume /tmp/.X11-unix:/tmp/.X11-unix \
   --volume /tmp/argus_socket:/tmp/argus_socket \
   --volume /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra \
-  --volume ${OS_WS}/OperationSquirrel/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender \
+  --volume ${OS_WS}/operationsquirrel/squirreldefender:/workspace/operationsquirrel/squirreldefender \
   --volume ${OS_WS}/YOLOv8-TensorRT-CPP:/workspace/YOLOv8-TensorRT-CPP \
   --name squirreldefender-dev \
   crose72/os-dev:jetson-inference-r32.7.1-latest \
-  bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build \
+  bash -c "cd /workspace/operationsquirrel/squirreldefender/build \
     && exec bash"

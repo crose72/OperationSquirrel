@@ -59,6 +59,6 @@ sudo docker run --rm --runtime nvidia --network host \
   --volume /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra \
   --volume /dev/dri:/dev/dri \
   --volume /run:/run \
-  -v "$LOG_DIR":/workspace/OperationSquirrel/SquirrelDefender/data/ \
+  -v "$LOG_DIR":/workspace/operationsquirrel/squirreldefender/data/ \
   --name $CONTAINER_NAME \
   crose72/os-release:squirreldefender-jetpack-r36.4.0-latest

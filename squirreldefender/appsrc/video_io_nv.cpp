@@ -131,7 +131,7 @@ bool create_input_video_stream(void)
  ********************************************************************************/
 bool create_output_vid_stream(void)
 {
-    std::string base_path = "file:///home/crose72/workspaces/os-dev/OperationSquirrel/SquirrelDefender/data/";
+    std::string base_path = "file:///home/crose72/workspaces/os-dev/operationsquirrel/squirreldefender/data/";
     std::string base_name = "output";
     std::string extension = ".mp4";
     std::string file_name = generate_unique_file_name(base_name, extension);
