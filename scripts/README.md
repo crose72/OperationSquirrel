@@ -9,16 +9,16 @@ This folder contains scripts used to **build, run, and configure** the Operation
 
 | Script | Purpose |
 |--------|----------|
-| **`run.sh`** | Runs either the **development** or **SquirrelDefender** container for a specified target (e.g. Orin, B01, Ubuntu). |
-| **`build.sh`** | Builds the **SquirrelDefender** container for a specified target (e.g. Orin, B01). |
-| **`setup.sh`** | Configures a Jetson to automatically start SquirrelDefender on power-up. Also configures OSRemote. |
+| **`run.sh`** | Runs either the **development** or **squirreldefender** container for a specified target (e.g. Orin, B01, Ubuntu). |
+| **`build.sh`** | Builds the **squirreldefender** container for a specified target (e.g. Orin, B01). |
+| **`setup.sh`** | Configures a Jetson to automatically start squirreldefender on power-up. Also configures OSRemote. |
 | **`gen_test_csv_from_mcap.sh`** | Converts `.mcap` logs into test-harness compatible CSVs. |
 | **`toggle_osremote.sh`** | Toggle jetson between hotspot mode and it's usual wifi connection. |
 
 ## 🚀 Example: `run.sh`
 
 ```bash
-cd OperationSquirrel/scripts
+cd operationsquirrel/scripts
 
 # dev containers
 # for the orin
@@ -41,7 +41,7 @@ cd OperationSquirrel/scripts
 ## 🚀 Example: `build.sh`
 
 ```bash
-cd OperationSquirrel/scripts
+cd operationsquirrel/scripts
 
 # squirreldefender containers (deployment)
 
@@ -56,7 +56,7 @@ cd OperationSquirrel/scripts
 
 ```bash
 # After starting up the jetson
-cd OperationSquirrel/scripts
+cd operationsquirrel/scripts
 # Don't run as sudo - will cause the squirreldefender.service to look for the run script in the /home/root/ path, you want /home/$USER/
 ./setup.sh squirreldefender --jetson=[orin|b01] # sets up the jetson to run the release container when the jetson powers on
 
@@ -68,7 +68,7 @@ cd OperationSquirrel/scripts
 ## 🚀 Example: `toggle_osremote.sh`
 
 ```bash
-cd OperationSquirrel/scripts
+cd operationsquirrel/scripts
 sudo ./toggle_osremote.sh
 
 # If connected to wifi, running this script will save your wifi credentials and put the jetson in access point mode (hotspot).  You can then connect your phone to this "hotspot" and use the OSRemote app to improve your dev experience in the field.  If the jetson is in hotspot mode and you are back in range of your wifi, running this script should connect the jetson back to the wifi network it was on before.
@@ -81,7 +81,7 @@ sudo ./toggle_osremote.sh
 python3 -m venv os-venv
 source os-venv/bin/activate
 
-cd OperationSquirrel/scripts
+cd operationsquirrel/scripts
 ./gen_test_csv_from_mcap.sh --proto ../proto ../test_data/2025-10-31-test-flight/*.mcap
 ```
 
@@ -110,5 +110,5 @@ Before building for the first time, copy the device tree model:
 The dev container builds opencv from a script, and that script needs to know which Jetson is being used so it can compile opencv for the correct GPU generation/architecture.  So before building dev for the first time you need to copy the device tree model to the `docker/fake-proc/device-tree/` folder before building the container, like so.
 
 ```
-sudo cp /proc/device-tree/model <path-to-OperationSquirrel-repo>/docker/fake-proc/device-tree/model
+sudo cp /proc/device-tree/model <path-to-operationsquirrel-repo>/docker/fake-proc/device-tree/model
 ```

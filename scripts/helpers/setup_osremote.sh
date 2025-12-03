@@ -2,11 +2,11 @@
 set -e  # Exit immediately on error
 
 USER_NAME=$(whoami)
-SCRIPT_PATH="/home/$USER_NAME/workspaces/os-dev/OperationSquirrel/scripts/toggle_osremote.sh"
-DATA_PATH="/home/$USER_NAME/workspaces/os-dev/OperationSquirrel/SquirrelDefender/data/*"
+SCRIPT_PATH="/home/$USER_NAME/workspaces/os-dev/operationsquirrel/scripts/toggle_osremote.sh"
+DATA_PATH="/home/$USER_NAME/workspaces/os-dev/operationsquirrel/squirreldefender/data/*"
 SUDOERS_FILE="/etc/sudoers.d/osremote_toggle"
 HOTSPOT_NAME="$(hostname | tr '[:lower:]' '[:upper:]')_AP"
-HOTSPOT_PASSWORD="SquirrelDefender"
+HOTSPOT_PASSWORD="squirreldefender"
 
 # Detect Wi-Fi interface automatically
 WIFI_IF=$(nmcli device | awk '/wifi/ {print $1; exit}')

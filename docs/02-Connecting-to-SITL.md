@@ -4,13 +4,13 @@
 
 These instructions walk the user through how to control a simulated drone using the mavlink protocol over TCP.  It works in WSL/WSL2 and connects to the ArduPilot SITL without any additional hardware.  It will ARM the drone (if pre-arm checks pass), request some mavlink messages from the flight controller, and cause the drone to takeoff and fly in a predetermined pattern.  It is intended to simulate the code that will run on the Jetson Nano or other companion computer without needing anything but your laptop (or any computer running the SITL).  
 
-***These instructions depend on [01-Setting-up-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/01-Setting-up-SITL.md).  They also assume you've successfully compiled and run the squirreldefender program on WSL.***
+***These instructions depend on [01-Setting-up-SITL](https://github.com/crose72/operationsquirrel/blob/dev/docs/01-Setting-up-SITL.md).  They also assume you've successfully compiled and run the squirreldefender program on WSL.***
 
-### Cloning the OperationSquirrel repo
+### Cloning the operationsquirrel repo
 
 1. Clone the repo
 
-- `git clone --recurse-submodules https://github.com/crose72/OperationSquirrel.git`
+- `git clone --recurse-submodules https://github.com/crose72/operationsquirrel.git`
 
 2. Update the submodules
 
@@ -27,9 +27,9 @@ These instructions walk the user through how to control a simulated drone using 
 
 - `sim_vehicle.py --console --map`
 
-3. Go to OperationSquirrel/SquirrelDefender
+3. Go to operationsquirrel/squirreldefender
 
-- `cd OperationSquirrel/SquirrelDefender`
+- `cd operationsquirrel/squirreldefender`
 
 4. Compile the code
     - `mkdir build`
@@ -53,7 +53,7 @@ Note: This requires two instances of WSL/WSL2 to be open, one for running SITL, 
 
 These instructions walk the user through how to use the Jetson Nano to control a simulated drone using the mavlink protocol over UART serial communication.  It can also be configured to work in WSL2 and connect to the ArduPilot SITL without any additional hardware (this is outlined in a "Connecting-WSL-code-to-SITL").  It will ARM the drone (if pre-arm checks pass), request some mavlink messages from the flight controller, and cause the drone to takeoff and fly in a predetermined pattern.  It should easily work for raspberry pi or other companion computers, however the UART will likely need to be configured a little differently and use the appropriate read and write functions for the desired platform.  
 
-***These instructions depend on [01-Setting-up-SITL](https://github.com/crose72/OperationSquirrel/blob/dev/docs/01-Setting-up-SITL.md).***
+***These instructions depend on [01-Setting-up-SITL](https://github.com/crose72/operationsquirrel/blob/dev/docs/01-Setting-up-SITL.md).***
 
 ***They also assume you've successfully compiled and run the squirreldefender program on the Jetson.***
 
@@ -106,9 +106,9 @@ It temporarily enables access to the physical UART port (or whichever port you n
 
 - `sim_vehicle.py --console --map -A --serial1=uart:/dev/ttyUSB0:115200`
 
-13. Go to OperationSquirrel/SquirrelDefender
+13. Go to operationsquirrel/squirreldefender
 
-- `cd OperationSquirrel/SquirrelDefender`
+- `cd operationsquirrel/squirreldefender`
 
 14. Compile the code
     - `make`
@@ -122,9 +122,9 @@ It temporarily enables access to the physical UART port (or whichever port you n
 
 1. Connect Jetson Nano UART pins to the flight controller UART pins
 2. Configure the appropriate flight controller UART port in mission planner to send and receive mavlink messages
-3. Go to OperationSquirrel/SquirrelDefender
+3. Go to operationsquirrel/squirreldefender
 
-- `cd OperationSquirrel/SquirrelDefender`
+- `cd operationsquirrel/squirreldefender`
 
 4. Compile the code
     - `make`
