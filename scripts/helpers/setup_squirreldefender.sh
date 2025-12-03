@@ -32,7 +32,7 @@ BASHRC_PATH="/home/$USER_NAME/.bashrc"
 CLOCK_FIX_SCRIPT="/usr/local/bin/clock-skew-fix.sh"
 SQUIRRELDEFENDER_SERVICE="/etc/systemd/system/squirreldefender.service"
 CLOCK_FIX_SERVICE="/etc/systemd/system/clock-skew-fix.service"
-BUILD_DIR=".$SCRIPT_DIR/../SquirrelDefender/build"
+BUILD_DIR=".$SCRIPT_DIR/../squirreldefender/build"
 
 # 1. Add user to docker
 # Note: commented out, doesn't work in script apparently
@@ -59,7 +59,7 @@ echo "  export OS_WS=$WORKSPACE_PATH"
 echo "Creating squirreldefender.service for Jetson: $JETSON_TYPE"
 cat <<EOF | sudo tee "$SQUIRRELDEFENDER_SERVICE" > /dev/null
 [Unit]
-Description=SquirrelDefender program
+Description=squirreldefender program
 After=network.target nvargus-daemon.service graphical.target multi-user.target
 Wants=graphical.target
 
@@ -67,7 +67,7 @@ Wants=graphical.target
 Environment="OS_WS=$WORKSPACE_PATH"
 Restart=off
 ExecStartPre=/bin/bash -c 'sleep 5'
-ExecStart=/bin/bash $WORKSPACE_PATH/OperationSquirrel/scripts/run.sh squirreldefender ${JETSON_TYPE}
+ExecStart=/bin/bash $WORKSPACE_PATH/operationsquirrel/scripts/run.sh squirreldefender ${JETSON_TYPE}
 ExecStop=/usr/bin/docker stop squirreldefender
 StandardOutput=journal
 StandardError=journal
@@ -82,7 +82,7 @@ echo "Creating clock-skew-fix.sh..."
 cat <<EOF | sudo tee "$CLOCK_FIX_SCRIPT" > /dev/null
 #!/bin/bash
 
-latest=\$(find /home/$USER_NAME/workspaces/os-dev/OperationSquirrel/SquirrelDefender -type f -exec stat -c %Y {} + 2>/dev/null | sort -n | tail -1)
+latest=\$(find /home/$USER_NAME/workspaces/os-dev/operationsquirrel/squirreldefender -type f -exec stat -c %Y {} + 2>/dev/null | sort -n | tail -1)
 now=\$(date +%s)
 
 if [ -n "\$latest" ] && [ "\$now" -lt "\$latest" ]; then

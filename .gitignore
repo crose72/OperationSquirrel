@@ -1,7 +1,7 @@
 ﻿/.vscode
 /.vs
-SquirrelDefender/modules/SecretSquirrel
-SquirrelDefender/test_suite/test_data
+squirreldefender/modules/SecretSquirrel
+squirreldefender/test_suite/test_data
 **/build*/
 *_pb2.py
 **/__pycache__

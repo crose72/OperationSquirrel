@@ -3,26 +3,26 @@ FROM crose72/jetpack-r36.4.0:dev
 # Set working directory
 WORKDIR /workspace/
 
-# Copy the SquirrelDefender program into the container (exe is built externally using the dev container)
-COPY ../SquirrelDefender/apphdr /workspace/OperationSquirrel/SquirrelDefender/apphdr
-COPY ../SquirrelDefender/appsrc /workspace/OperationSquirrel/SquirrelDefender/appsrc
-COPY ../SquirrelDefender/modules /workspace/OperationSquirrel/SquirrelDefender/modules
-COPY ../SquirrelDefender/cmake /workspace/OperationSquirrel/SquirrelDefender/cmake
-COPY ../SquirrelDefender/build /workspace/OperationSquirrel/SquirrelDefender/build
-COPY ../SquirrelDefender/data /workspace/OperationSquirrel/SquirrelDefender/data
-COPY ../SquirrelDefender/data /workspace/OperationSquirrel/SquirrelDefender/data
-COPY ../SquirrelDefender/test_flights /workspace/OperationSquirrel/SquirrelDefender/test_flights
-COPY ../SquirrelDefender/test_suite /workspace/OperationSquirrel/SquirrelDefender/test_suite
-COPY ../SquirrelDefender/test_data /workspace/OperationSquirrel/SquirrelDefender/test_data
-COPY ../SquirrelDefender/CMakeLists.txt /workspace/OperationSquirrel/SquirrelDefender/CMakeLists.txt
+# Copy the squirreldefender program into the container (exe is built externally using the dev container)
+COPY ../squirreldefender/apphdr /workspace/operationsquirrel/squirreldefender/apphdr
+COPY ../squirreldefender/appsrc /workspace/operationsquirrel/squirreldefender/appsrc
+COPY ../squirreldefender/modules /workspace/operationsquirrel/squirreldefender/modules
+COPY ../squirreldefender/cmake /workspace/operationsquirrel/squirreldefender/cmake
+COPY ../squirreldefender/build /workspace/operationsquirrel/squirreldefender/build
+COPY ../squirreldefender/data /workspace/operationsquirrel/squirreldefender/data
+COPY ../squirreldefender/data /workspace/operationsquirrel/squirreldefender/data
+COPY ../squirreldefender/test_flights /workspace/operationsquirrel/squirreldefender/test_flights
+COPY ../squirreldefender/test_suite /workspace/operationsquirrel/squirreldefender/test_suite
+COPY ../squirreldefender/test_data /workspace/operationsquirrel/squirreldefender/test_data
+COPY ../squirreldefender/CMakeLists.txt /workspace/operationsquirrel/squirreldefender/CMakeLists.txt
 
 # Remove any data files that are currently saved in the jetson filesystem (don't want to mix and match data)
-RUN rm -rf /workspace/OperationSquirrel/SquirrelDefender/data/*
+RUN rm -rf /workspace/operationsquirrel/squirreldefender/data/*
 
-RUN rm -rf /workspace/OperationSquirrel/SquirrelDefender/build-field/
+RUN rm -rf /workspace/operationsquirrel/squirreldefender/build-field/
 
 # Make the binary executable
-RUN chmod +x /workspace/OperationSquirrel/SquirrelDefender/build/squirreldefender
+RUN chmod +x /workspace/operationsquirrel/squirreldefender/build/squirreldefender
 
 # Set working directory to the program's build directory
-WORKDIR /workspace/OperationSquirrel/SquirrelDefender/build/
+WORKDIR /workspace/operationsquirrel/squirreldefender/build/

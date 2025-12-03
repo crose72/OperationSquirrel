@@ -23,7 +23,7 @@ RUN wget https://cmake.org/files/v3.28/cmake-3.28.0-linux-aarch64.sh && \
 # Copy fake model file so OpenCV build script knows which Jetson to compile for the OpenCV install script
 # Create the docker/fake-proc/device-tree/model folder inside this folder
 # Now copy the proc file
-# sudo cp /proc/device-tree/model <path-to-OperationSquirrel-repo>/docker/fake-proc/device-tree/model
+# sudo cp /proc/device-tree/model <path-to-operationsquirrel-repo>/docker/fake-proc/device-tree/model
 COPY docker/fake-proc/device-tree/model /opt/device-tree/model
 
 # OpenCV 'cause we're cool like that

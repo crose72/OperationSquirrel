@@ -61,7 +61,7 @@ DOCKER_VOLUMES=(
   --volume /tmp/.X11-unix:/tmp/.X11-unix
   --volume /tmp/argus_socket:/tmp/argus_socket
   --volume /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra
-  --volume ${OS_WS}/OperationSquirrel/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender
+  --volume ${OS_WS}/operationsquirrel/squirreldefender:/workspace/operationsquirrel/squirreldefender
 )
 
 # --------------------------------------------------------------
@@ -80,7 +80,7 @@ fi
 if [ "$(docker ps -aq -f name=^${CONTAINER_NAME}$)" ]; then
   if [ "$(docker ps -q -f name=^${CONTAINER_NAME}$)" ]; then
     echo "📦 Container '${CONTAINER_NAME}' is already running — attaching..."
-    docker exec -it ${CONTAINER_NAME} bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build && exec bash"
+    docker exec -it ${CONTAINER_NAME} bash -c "cd /workspace/operationsquirrel/squirreldefender/build && exec bash"
   else
     echo "▶️  Restarting stopped container '${CONTAINER_NAME}'..."
     docker start -ai ${CONTAINER_NAME}
@@ -95,10 +95,10 @@ if [ "$IS_CI" = true ]; then
     echo "🤖 GitHub CI detected — running non-interactive container build..."
 
     docker run --rm \
-        -v ${OS_WS}/OperationSquirrel/SquirrelDefender:/workspace/OperationSquirrel/SquirrelDefender \
+        -v ${OS_WS}/operationsquirrel/squirreldefender:/workspace/operationsquirrel/squirreldefender \
         $IMAGE_NAME \
         bash -c "
-            cd /workspace/OperationSquirrel/SquirrelDefender &&
+            cd /workspace/operationsquirrel/squirreldefender &&
             mkdir -p build &&
             cd build &&
             cmake .. \
@@ -136,5 +136,5 @@ else
     "${DOCKER_VOLUMES[@]}" \
     --name ${CONTAINER_NAME} \
     ${IMAGE_NAME} \
-    bash -c "cd /workspace/OperationSquirrel/SquirrelDefender/build && exec bash"
+    bash -c "cd /workspace/operationsquirrel/squirreldefender/build && exec bash"
 fi

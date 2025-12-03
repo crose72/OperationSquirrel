@@ -2,9 +2,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "SquirrelDefender Orin: Build",
+            "label": "squirreldefender Orin: Build",
             "type": "shell",
-            "command": "docker exec -it squirreldefender-dev bash -c 'cd /workspace/OperationSquirrel/SquirrelDefender/build && cmake -DBLD_JETSON_ORIN_NANO=ON -DENABLE_GDB=ON .. && make -j6'",
+            "command": "docker exec -it squirreldefender-dev bash -c 'cd /workspace/operationsquirrel/squirreldefender/build && cmake -DBLD_JETSON_ORIN_NANO=ON -DENABLE_GDB=ON .. && make -j6'",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -14,14 +14,14 @@
         {
             "label": "Path Planner: CMake Configure",
             "type": "shell",
-            "command": "cd ${workspaceFolder}/scratch/modules-example/SquirrelDefender/path_planner && rm -rf build && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..",
+            "command": "cd ${workspaceFolder}/scratch/modules-example/squirreldefender/path_planner && rm -rf build && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug ..",
             "group": "build",
             "problemMatcher": []
         },
         {
             "label": "Path Planner: Build Example",
             "type": "shell",
-            "command": "cd ${workspaceFolder}/scratch/modules-example/SquirrelDefender/path_planner/build && make -j6",
+            "command": "cd ${workspaceFolder}/scratch/modules-example/squirreldefender/path_planner/build && make -j6",
             "group": {
                 "kind": "build",
                 "isDefault": true

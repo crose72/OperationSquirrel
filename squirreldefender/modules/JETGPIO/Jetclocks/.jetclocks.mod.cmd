@@ -1,0 +1,1 @@
+cmd_/home/crose72/workspaces/os-dev/OperationSquirrel/SquirrelDefender/modules/JETGPIO/Jetclocks/jetclocks.mod := printf '%s\n'   jetclocks.o | awk '!x[$$0]++ { print("/home/crose72/workspaces/os-dev/OperationSquirrel/SquirrelDefender/modules/JETGPIO/Jetclocks/"$$0) }' > /home/crose72/workspaces/os-dev/OperationSquirrel/SquirrelDefender/modules/JETGPIO/Jetclocks/jetclocks.mod

@@ -13,7 +13,7 @@ else
 fi
 
 HOTSPOT_NAME="OSS_AP"
-HOTSPOT_PASS="SquirrelDefender"
+HOTSPOT_PASS="squirreldefender"
 WIFI_DEV="wlP1p1s0"
 CONFIG_DIR="$USER_HOME/.osremote_net"
 STATE_FILE="$CONFIG_DIR/state"
