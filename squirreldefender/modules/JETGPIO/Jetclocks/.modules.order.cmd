@@ -1,0 +1,1 @@
+cmd_/home/crose72/workspaces/os-dev/OperationSquirrel/SquirrelDefender/modules/JETGPIO/Jetclocks/modules.order := {   echo /home/crose72/workspaces/os-dev/OperationSquirrel/SquirrelDefender/modules/JETGPIO/Jetclocks/jetclocks.ko; :; } | awk '!x[$$0]++' - > /home/crose72/workspaces/os-dev/OperationSquirrel/SquirrelDefender/modules/JETGPIO/Jetclocks/modules.order
