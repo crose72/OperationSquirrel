@@ -6,6 +6,7 @@
     <title>Pricing – Operation Squirrel</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
 <nav class="navbar">
@@ -13,42 +14,58 @@
     <a href="curriculum.html">Curriculum</a>
     <a href="tech-specs.html">Tech Specs</a>
     <a href="pricing.html" class="active">Pricing</a>
-    <a href="resources.html">Teacher Resources</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
 </nav>
 
-<header class="subhero">
-    <h1>Pricing</h1>
-    <p>Flexible options for schools, universities, and STEM programs.</p>
-</header>
+<div class="page-container">
 
-<section>
-    <h2>Operation Squirrel Full Dev Kit</h2>
+    <section>
+        <h1>Pricing</h1>
+        <p>Flexible options for schools, universities, and STEM programs.</p>
+    </section>    
 
-    <ul>
-        <li>Fully assembled quadcopter</li>
-        <li>Jetson Orin Nano pre-configured</li>
-        <li>Autonomous flight software</li>
-        <li>Curriculum access for all teachers & students</li>
-        <li>1 year of updates and engineering support</li>
-        <li>Simulation & data analysis tools</li>
-    </ul>
+    <section>
+        <h2>Operation Squirrel Full Dev Kit</h2>
+        <p>
+            A complete, classroom-ready AI drone development kit built for hands-on robotics,
+            computer vision, and autonomy education. Every kit includes real hardware,
+            real AI, and a full teaching platform.
+        </p>
 
-    <p><strong>Discounts available for 3+, 10+, and district-wide purchases.</strong></p>
+        <ul>
+            <li>Fully assembled quadcopter (ready-to-fly with AI-following)</li>
+            <li>Jetson Orin Nano (pre-configured with CUDA, TensorRT, OpenCV)</li>
+            <li>Autonomous Flight Stack (tracking, detection, control)</li>
+            <li>Complete curriculum for all teachers & students</li>
+            <li>1 year of updates and engineering support</li>
+            <li>Simulation & data analysis tools (SITL + MCAP)</li>
+        </ul>
 
-    <a href="contact.html" class="cta">Request a Quote</a>
-</section>
+        <p class="note"><strong>Discounts available for 3+, 10+, and district-wide purchases.</strong></p>
 
-<section>
-    <h2>Add-ons</h2>
-    <ul>
-        <li>Spares kit</li>
-        <li>On-site workshops</li>
-        <li>Extended curriculum</li>
-        <li>Custom research support</li>
-    </ul>
-</section>
+        <a href="contact.html" class="cta">Request a Quote</a>
+    </section>
+
+    <section>
+        <h2>Add-Ons & Services</h2>
+        <p>Optional packages to help schools scale their robotics and AI programs.</p>
+
+        <ul>
+            <li>Spares kit (motors, props, arms, and essential components)</li>
+            <li>On-site or virtual workshops for teachers or students</li>
+            <li>Extended curriculum units (advanced autonomy & vision)</li>
+            <li>Custom research support for university labs</li>
+        </ul>
+    </section>
+
+</div> <!-- END page-container -->
+
+<footer class="footer">
+    © <span id="year"></span> Operation Squirrel — Open-source robotics platform for education & research.
+</footer>
+
+<script src="js/main.js"></script>
 
 </body>
 </html>

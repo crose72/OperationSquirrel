@@ -5,7 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tech Specs – Operation Squirrel</title>
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* Page-specific enhancements */
+
+        .page-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .spec-section {
+            background: var(--color-white);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin-bottom: 32px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.04);
+        }
+
+        .spec-section h2 {
+            margin-top: 0;
+            color: var(--color-navy);
+            margin-bottom: 12px;
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 30px;
+        }
+
+        ul.spec-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        @media (max-width: 700px) {
+            .spec-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
 <nav class="navbar">
@@ -13,48 +60,94 @@
     <a href="curriculum.html">Curriculum</a>
     <a href="tech-specs.html" class="active">Tech Specs</a>
     <a href="pricing.html">Pricing</a>
-    <a href="resources.html">Teacher Resources</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
 </nav>
 
-<header class="subhero">
+<div class="page-container">
+
     <h1>Technical Specifications</h1>
-    <p>Industry-grade hardware and software designed for education.</p>
-</header>
+    <p class="tagline">Hardware, onboard compute, and full software stack included in Operation Squirrel.</p>
 
-<section>
-    <h2>Drone Hardware</h2>
-    <ul>
-        <li>Frame: 5” quadcopter</li>
-        <li>Motors: 2207 brushless</li>
-        <li>Flight Controller: ArduPilot-compatible</li>
-        <li>GPS/Compass: Included</li>
-        <li>Battery: 4S LiPo</li>
-    </ul>
-</section>
+    <!-- Drone Hardware -->
+    <div class="spec-section">
+        <h2>Drone Hardware</h2>
+        <div class="spec-grid">
+            <ul class="spec-list">
+                <li>450mm quadcopter frame (F450-class)</li>
+                <li>2212/920KV brushless motors</li>
+                <li>ArduPilot-compatible flight controller</li>
+                <li>GPS + compass module included</li>
+                <li>3S LiPo battery</li>
+            </ul>
+    
+            <ul class="spec-list">
+                <li>Full sensor suite (IMU, barometer, compass, GPS)</li>
+                <li>Onboard voltage & current monitoring</li>
+                <li>Receiver included (ELRS recommended)</li>
+                <li>VTX-ready (optional add-on)</li>
+                <li>Plug-and-play wiring harness</li>
+            </ul>
+        </div>
+    </div>
+    
 
-<section>
-    <h2>Jetson Orin Nano Features</h2>
-    <ul>
-        <li>1024-core GPU</li>
-        <li>CPU: 6-core ARM</li>
-        <li>CUDA, TensorRT, cuDNN</li>
-        <li>Ubuntu-based environment</li>
-        <li>Pre-configured containers</li>
-    </ul>
-</section>
+    <!-- Jetson Hardware -->
+    <div class="spec-section">
+        <h2>Jetson Orin Nano Hardware</h2>
+        <div class="spec-grid">
+            <ul class="spec-list">
+                <li>1024-core NVIDIA Ampere GPU</li>
+                <li>CUDA Compute Capability: 8.7</li>
+                <li>6-core ARM Cortex-A78 CPU</li>
+                <li>8GB unified LPDDR5 memory</li>
+                <li>M.2 NVMe + SD storage support</li>
+            </ul>
+            <ul class="spec-list">
+                <li>CSI camera support (IMX219/IMX477)</li>
+                <li>High-efficiency power profile</li>
+                <li>Compact carrier board integration</li>
+                <li>Ubuntu 22.04 LTS</li>
+            </ul>
+        </div>
+    </div>
 
-<section>
-    <h2>Software Stack</h2>
-    <ul>
-        <li>OpenCV with CUDA acceleration</li>
-        <li>TensorRT-optimized YOLOv8</li>
-        <li>OSRemote management app</li>
-        <li>MCAP logging system</li>
-        <li>MAVLink communication & control</li>
-    </ul>
-</section>
+    <!-- AI Compute & Acceleration (Preinstalled) -->
+    <div class="spec-section">
+        <h2>AI Compute & Acceleration Stack</h2>
+        <div class="spec-grid">
+            <ul class="spec-list">
+                <li>CUDA 12.x</li>
+                <li>TensorRT 10.x (optimized engines)</li>
+                <li>cuDNN 9.x</li>
+                <li>OpenCV 4.10 (CUDA-enabled)</li>
+            </ul>
+            <ul class="spec-list">
+                <li>NVIDIA JetPack 6.2 (L4T)</li>
+                <li>NVIDIA Container Runtime (Docker)</li>
+                <li>TensorRT-optimized YOLOv8 inference</li>
+                <li>GStreamer accelerated video pipeline</li>
+            </ul>
+        </div>
+    </div>
 
-</body>
-</html>
+    <!-- Autonomous Flight Software Stack -->
+    <div class="spec-section">
+        <h2>Autonomous Flight Software Stack</h2>
+        <div class="spec-grid">
+            <ul class="spec-list">
+                <li>Real-time autonomous target tracking & following</li>
+                <li>TensorRT-accelerated YOLOv8 perception</li>
+                <li>GPU-accelerated vision pipeline (60+ FPS capable)</li>
+                <li>Predictive path estimation (ARX model + filtering)</li>
+            </ul>
+            <ul class="spec-list">
+                <li>MAVLink flight control integration</li>
+                <li>MCAP data & video logging system</li>
+                <li>Full desktop simulation environment (Software-in-the-Loop, no drone required)</li>
+                <li>Jetson-in-the-loop testing (Hardware-in-the-Loop with simulated or real flight controller)</li>
+                <li>OSRemote Android app (SSH, config, containers)</li>
+            </ul>
+        </div>
+    </div>
+</div>
