@@ -32,7 +32,7 @@ BASHRC_PATH="/home/$USER_NAME/.bashrc"
 CLOCK_FIX_SCRIPT="/usr/local/bin/clock-skew-fix.sh"
 SQUIRRELDEFENDER_SERVICE="/etc/systemd/system/squirreldefender.service"
 CLOCK_FIX_SERVICE="/etc/systemd/system/clock-skew-fix.service"
-BUILD_DIR=".$SCRIPT_DIR/../squirreldefender/build"
+BUILD_DIR="$WORKSPACE_PATH/operationsquirrel/squirreldefender/build"
 
 # 1. Add user to docker
 # Note: commented out, doesn't work in script apparently
@@ -41,7 +41,7 @@ BUILD_DIR=".$SCRIPT_DIR/../squirreldefender/build"
 # 2. Create or update .xprofile (allows the containers access to the camera and display)
 echo "Creating ~/.xprofile..."
 cat <<EOF > "$XPROFILE_PATH"
-export DISPLAY=:0
+export DISPLAY=:$DISPLAY_NUM
 xhost +
 EOF
 chmod +x "$XPROFILE_PATH"
@@ -67,7 +67,7 @@ Wants=graphical.target
 Environment="OS_WS=$WORKSPACE_PATH"
 Restart=off
 ExecStartPre=/bin/bash -c 'sleep 5'
-ExecStart=/bin/bash $WORKSPACE_PATH/operationsquirrel/scripts/run.sh squirreldefender ${JETSON_TYPE}
+ExecStart=/bin/bash "$WORKSPACE_PATH/operationsquirrel/scripts/run.sh" squirreldefender ${JETSON_TYPE}
 ExecStop=/usr/bin/docker stop squirreldefender
 StandardOutput=journal
 StandardError=journal
@@ -118,7 +118,59 @@ sudo systemctl enable clock-skew-fix.service
 # 9. Configure the camera
 sudo /opt/nvidia/jetson-io/jetson-io.py
 
-# 10. Final steps
+# 10. Install Docker + NVIDIA runtime (auto-detect JetPack version)
+
+###############################################
+#  JETPACK 6.x — Docker + NVIDIA Runtime Setup
+###############################################
+echo "➡ Installing Docker + NVIDIA Container Toolkit for JetPack 6.x..."
+
+UBUNTU_VERSION=$(lsb_release -rs)
+echo "🔍 Ubuntu version detected: $UBUNTU_VERSION"
+
+###############################################
+# 0. Remove upstream Docker repo (prevents conflicts)
+###############################################
+if [ -f /etc/apt/sources.list.d/docker.list ]; then
+    echo "⚠️ Removing upstream Docker repo to prevent conflicts..."
+    sudo rm /etc/apt/sources.list.d/docker.list
+fi
+
+sudo apt-get update
+sudo apt-get install -y curl gnupg2
+
+###############################################
+# 1. Install Docker only if not present
+###############################################
+if ! command -v docker &> /dev/null; then
+    echo "📦 Docker not found — installing..."
+    sudo apt-get install -y docker.io
+    sudo systemctl enable docker
+    sudo systemctl start docker
+else
+    echo "✔ Docker already installed — skipping."
+fi
+
+###############################################
+# 2. Install NVIDIA Container Toolkit (from JetPack repos)
+###############################################
+echo "📦 Installing NVIDIA Container Toolkit (JetPack repo)..."
+
+sudo apt-get update
+sudo apt-get install -y nvidia-container-toolkit
+
+###############################################
+# 3. Configure Docker to use NVIDIA runtime
+###############################################
+echo "🔧 Configuring Docker runtime..."
+
+sudo nvidia-ctk runtime configure --runtime=docker
+
+sudo systemctl restart docker
+
+echo "✔ JetPack 6.x GPU runtime fully configured (no GitHub repos needed!)."
+
+# 11. Final steps
 echo "To complete the setup: 
     source ~/.bashrc
     chmod +x ~/.xprofile
