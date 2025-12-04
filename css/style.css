@@ -218,3 +218,17 @@ ul.spec-list {
         grid-template-columns: 1fr;
     }
 }
+
+/* ============================================
+   BRAND PHRASE (single-line version for all non-hero pages)
+============================================ */
+.brand-phrase {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-navy-light);
+    margin: 0 0 1.5rem 0;
+}
+
+.brand-phrase span {
+    color: var(--color-green);
+}
