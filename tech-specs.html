@@ -5,52 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tech Specs – Operation Squirrel</title>
     <link rel="stylesheet" href="css/style.css">
-
-    <style>
-        /* Page-specific enhancements */
-
-        .page-container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        h1 {
-            margin-bottom: 10px;
-        }
-
-        .spec-section {
-            background: var(--color-white);
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px 25px;
-            margin-bottom: 32px;
-            box-shadow: 0px 2px 5px rgba(0,0,0,0.04);
-        }
-
-        .spec-section h2 {
-            margin-top: 0;
-            color: var(--color-navy);
-            margin-bottom: 12px;
-        }
-
-        .spec-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px 30px;
-        }
-
-        ul.spec-list {
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        @media (max-width: 700px) {
-            .spec-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -90,7 +44,6 @@
             </ul>
         </div>
     </div>
-    
 
     <!-- Jetson Hardware -->
     <div class="spec-section">
@@ -112,7 +65,7 @@
         </div>
     </div>
 
-    <!-- AI Compute & Acceleration (Preinstalled) -->
+    <!-- AI Compute -->
     <div class="spec-section">
         <h2>AI Compute & Acceleration Stack</h2>
         <div class="spec-grid">
@@ -131,7 +84,7 @@
         </div>
     </div>
 
-    <!-- Autonomous Flight Software Stack -->
+    <!-- Autonomy Stack -->
     <div class="spec-section">
         <h2>Autonomous Flight Software Stack</h2>
         <div class="spec-grid">
@@ -144,10 +97,14 @@
             <ul class="spec-list">
                 <li>MAVLink flight control integration</li>
                 <li>MCAP data & video logging system</li>
-                <li>Full desktop simulation environment (Software-in-the-Loop, no drone required)</li>
-                <li>Jetson-in-the-loop testing (Hardware-in-the-Loop with simulated or real flight controller)</li>
-                <li>OSRemote Android app (SSH, config, containers)</li>
+                <li>Full desktop simulation environment (SITL)</li>
+                <li>Jetson-in-the-loop testing</li>
+                <li>OSRemote Android app</li>
             </ul>
         </div>
     </div>
+
 </div>
+
+</body>
+</html>
