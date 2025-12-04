@@ -1,7 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
+# Validate required vars
+if [[ -z "$HOTSPOT_NAME" || -z "$WIFI_IF" ]]; then
+    echo "❌ Missing autostart environment variables."
+    exit 1
+fi
+
 SERVICE_FILE="/etc/systemd/system/oss_ap-autostart.service"
+
+echo "⚙️ Creating systemd autostart service..."
 
 sudo tee "$SERVICE_FILE" >/dev/null <<EOF
 [Unit]
