@@ -5,7 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About – Operation Squirrel</title>
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .page-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .about-section {
+            background: var(--color-white);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin-bottom: 32px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.04);
+        }
+
+        .about-section h2 {
+            margin-top: 0;
+            color: var(--color-navy);
+            margin-bottom: 12px;
+        }
+    </style>
 </head>
+
 <body>
 
 <nav class="navbar">
@@ -17,29 +41,35 @@
     <a href="contact.html">Contact</a>
 </nav>
 
-<header class="subhero">
-    <h1>About Operation Squirrel</h1>
-    <p>Open-source robotics built for schools, students, and aspiring engineers.</p>
-</header>
+<div class="page-container">
 
-<section>
-    <h2>The Mission</h2>
-    <p>
-        Operation Squirrel was created to give students access to the same tools,
-        algorithms, and engineering workflows used in the robotics industry. 
-        Everything is open-source, modifiable, and designed to support real-world learning.
-    </p>
-</section>
+    <section>
+        <h1>About Operation Squirrel</h1>
+        <p>Open-source robotics built for schools, students, and aspiring engineers.</p>
+    </section>
 
-<section>
-    <h2>Why We Built This</h2>
-    <p>
-        Most educational robotics kits hide the real engineering behind closed systems.
-        Operation Squirrel is different — every part of the stack is exposed, from AI detection
-        to flight control to onboard Linux systems. Students learn real autonomy,
-        not toy-level coding.
-    </p>
-</section>
+    <div class="about-section">
+        <h2>The Mission</h2>
+        <p>
+            Operation Squirrel was created to give students access to the same tools,
+            algorithms, and engineering workflows used in the robotics industry. Everything
+            is open-source, modifiable, and designed to support real-world learning.
+        </p>
+    </div>
+
+    <div class="about-section">
+        <h2>Why We Built This</h2>
+        <p>
+            Most educational robotics kits hide the real engineering behind closed systems.
+            Operation Squirrel is different — every part of the stack is exposed, from
+            AI detection to flight control to onboard Linux systems.
+        </p>
+        <p>
+            Students learn real autonomy, not toy-level coding.
+        </p>
+    </div>
+
+</div>
 
 </body>
 </html>

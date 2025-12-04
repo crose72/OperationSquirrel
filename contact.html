@@ -5,7 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact – Operation Squirrel</title>
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .page-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .contact-section {
+            background: var(--color-white);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin-bottom: 32px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.04);
+        }
+
+        .contact-section h2 {
+            margin-top: 0;
+            color: var(--color-navy);
+            margin-bottom: 12px;
+        }
+    </style>
 </head>
+
 <body>
 
 <nav class="navbar">
@@ -17,28 +41,32 @@
     <a href="contact.html" class="active">Contact</a>
 </nav>
 
-<header class="subhero">
-    <h1>Contact / Request a Quote</h1>
-    <p>Reach out with questions, purchase inquiries, or curriculum requests.</p>
-</header>
+<div class="page-container">
 
-<section>
-    <h2>Email</h2>
-    <p><strong>flickrobotics@gmail.com</strong></p>
+    <section>
+        <h1>Contact / Request a Quote</h1>
+        <p>Reach out with questions, purchase inquiries, or curriculum requests.</p>
+    </section>
 
-    <h2>Request a Quote</h2>
-    <p>
-        Please include:
+    <div class="contact-section">
+        <h2>Email</h2>
+        <p><strong>flickrobotics@gmail.com</strong></p>
+    </div>
+
+    <div class="contact-section">
+        <h2>Request a Quote</h2>
+        <p>Please include the following details:</p>
         <ul>
             <li>Your school or organization</li>
-            <li>Number of kits</li>
+            <li>Number of kits you're considering</li>
             <li>Timeline</li>
-            <li>Any curriculum needs</li>
+            <li>Any curriculum or training needs</li>
         </ul>
-    </p>
+        <br>
+        <a href="mailto:flickrobotics@gmail.com" class="cta">Email Us</a>
+    </div>
 
-    <a href="mailto:flickrobotics@gmail.com" class="cta">Email Us</a>
-</section>
+</div>
 
 </body>
 </html>
