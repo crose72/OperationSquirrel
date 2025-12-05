@@ -1,13 +1,17 @@
 {
     "Input_File": {
         "File_PathX": "../test_suite/test_data/2025-05-10-ann-arbor/original/",
-        "File_Path": "../test_suite/test_data/2025-11-14-mtn-rd-park/sprints1/",
+        "File_Path": "..//test_suite/test_data/2025-11-14-mtn-rd-park/sprints1/",
         "File_NameX": "follow_2_ann-arbor.csv",
-        "File_Name": "data_fixed_deg_test.csv"
+        "File_PathX": "../test_suite/test_data/2025-11-14-mtn-rd-park/sprints1/",
+        "File_NameX": "data_3_fixed_deg_test.csv",
+        "File_Name": "data_fixed_test.csv"
     },
     "Output_File": {
+        "File_PathX": "../test_suite/test_data/decision_to_throw/",
         "File_Path": "../test_suite/test_data/decision_to_throw/",
         "File_NameX": "follow_data_mtn-rd-park_2025-11-05_test",
-        "File_Name": "sprints1_data_fixed-2025-11-14_test"
+        "File_NameX": "sprints1_data_3_fixed-2025-11-14_test",
+        "File_Name": "sprints1_data_fixed_2025-11-14_test"
     }
 }

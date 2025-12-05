@@ -48,7 +48,7 @@
  ********************************************************************************/
 std::mutex scheduler_mutex;
 bool g_system_init;
-Timer main_loop(std::chrono::milliseconds(25));
+Timer main_loop(std::chrono::milliseconds(60));
 Timer timer1;
 
 /********************************************************************************

@@ -32,7 +32,7 @@ inline T div(T num, T denom, T eps = (T)1e-6)
 {
     if (std::fabs(denom) < eps)
     {
-        denom = (denom >= 0 ? eps : -eps);
+        denom = (denom >= (T)0 ? eps : (T)0);
     }
     return num / denom;
 }
