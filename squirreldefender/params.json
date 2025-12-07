@@ -101,15 +101,16 @@
     "velocity_ff_brake_gain": -1.0
   },
   "camera_params": {
+    "sensor_id": 1,
     "sensor_mode": 0,
     "wb_mode": 1,
-    "ae_antibanding_mode": 2,
+    "ae_antibanding_mode": 0,
     "tnr_mode": 0,
     "ee_mode": 0,
     "exposure_min": 2000,
     "exposure_max": 8000000,
     "gain_min": 1.0,
-    "gain_max": 4.0,
+    "gain_max": 2.0,
     "isp_dgain_min": 1.0,
     "isp_dgain_max": 1.0,
     "input_format": "NV12",
