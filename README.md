@@ -64,7 +64,7 @@ The above introduction hopefully provided some context for what this project is 
 If you want to understand how the software is written and the flow, look at `docs/diagrams/software-architecture`.
 
 - Follow the instructions in [README](https://github.com/crose72/operationsquirrel/blob/dev/squirreldefender/README.md) to compile and run the program
-- Follow the instructions in [01-Setting-up-SITL](https://github.com/crose72/operationsquirrel/blob/dev/docs/01-Setting-up-SITL.md) to setup the simulation environment.
-- Follow the instructions in [02-Connecting-to-SITL](https://github.com/crose72/operationsquirrel/blob/dev/docs/02-Connecting-to-SITL.md) to control the simulated drone with your Jetson
-- (Optional) Follow the instructions in [03-Setting-up-AirSim-with-SITL](https://github.com/crose72/operationsquirrel/blob/dev/docs/03-Setting-up-AirSim-with-SITL.md) to setup a photo-realistic simulation
+- Follow the instructions in [01-setting-up-sitl](https://github.com/crose72/operationsquirrel/blob/dev/docs/01-setting-up-sitl.md) to setup the simulation environment.
+- Follow the instructions in [02-connecting-to-sitl](https://github.com/crose72/operationsquirrel/blob/dev/docs/02-connecting-to-sitl.md) to control the simulated drone with your Jetson
+- (Optional) Follow the instructions in [03-setting-up-airsim-with-sitl](https://github.com/crose72/operationsquirrel/blob/dev/docs/03-setting-up-airsim-with-sitl.md) to setup a photo-realistic simulation
 - Follow the instruction in [Pre-Flight Checklist](https://github.com/crose72/operationsquirrel/blob/dev/docs/Pre-Flight-Checklist.md) if you're ready to fly a drone autonomously

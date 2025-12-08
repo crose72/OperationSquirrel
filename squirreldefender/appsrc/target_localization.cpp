@@ -10,6 +10,9 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include <cmath>
+#include <algorithm>
+
 #include "common_inc.h"
 #include "target_localization.h"
 #include "mav_data_hub.h"
@@ -21,8 +24,6 @@
 #include "time_calc.h"
 #include "kf.h"
 #include "timer.h"
-#include <cmath>
-#include <algorithm>
 
 /********************************************************************************
  * Typedefs
