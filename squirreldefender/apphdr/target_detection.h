@@ -12,8 +12,8 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "detect_target_yolo.h"
-#include "detect_target_nv.h"
+#include "detector_yolo.h"
+#include "detector_ssd.h"
 
 /********************************************************************************
  * Exported objects

@@ -1,50 +1,34 @@
 #ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
+#ifdef BLD_JETSON_B01
 
 /********************************************************************************
- * @file    detect_target_yolo.h
+ * @file    detector_ssd.h
  * @author  Cameron Rose
  * @date    1/22/2025
  ********************************************************************************/
-#ifndef DETECT_TARGET_YOLO_H
-#define DETECT_TARGET_YOLO_H
+#ifndef DETECT_TARGET_NV_H
+#define DETECT_TARGET_NV_H
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "YOLOv8.h"
-#include <vector>
+#include "jetson-inference/detectNet.h"
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
-
-extern std::vector<Object> g_det_yolo_list;
-extern int g_det_count;
-;
-
-#elif defined(BLD_WIN)
-
-extern std::vector<YoloNet::detection> g_det_yolo_list;
-extern int g_det_count;
-;
-
-#else
-
-#error "Please define a build platform."
-
-#endif
+extern detectNet *g_det_nv_net;
+extern detectNet::Detection *g_det_nv_list;
+extern int g_det_nv_count;
 
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
-
-class YOLO
+class DetectorSSD
 {
 public:
-    YOLO(void);
-    ~YOLO(void);
+    DetectorSSD(void);
+    ~DetectorSSD(void);
 
     static bool init(void);
     static void loop(void);
@@ -53,7 +37,7 @@ public:
 private:
 };
 
-#endif // DETECT_TARGET_YOLO_H
+#endif // DETECT_TARGET_NV_H
 
-#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#endif // BLD_JETSON_B01
 #endif // ENABLE_CV

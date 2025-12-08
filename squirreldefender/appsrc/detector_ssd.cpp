@@ -2,11 +2,13 @@
 #ifdef BLD_JETSON_B01
 
 /********************************************************************************
- * @file    detect_target_nv.cpp
+ * @file    detector_ssd.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   This file contains the functions to initialize, run, and clean up
-            object detection code.
+ * @brief   This module initializes and manages the SSD Mobilenet object
+ *          detector using the Jetson-Inference library. It performs object
+ *          detection on incoming camera frames and provides a simple
+ *          init/loop/shutdown interface for the embedded system.
  ********************************************************************************/
 
 /********************************************************************************
@@ -19,7 +21,7 @@
 #include <jetson-inference/objectTrackerKLT.h>
 
 #include "common_inc.h"
-#include "detect_target_nv.h"
+#include "detector_ssd.h"
 #include "video_io.h"
 #include "param_reader.h"
 
@@ -71,10 +73,10 @@ bool create_detection_network()
 #endif
 
     // Network files
-    const char *model_path = "../networks/SSD-Mobilenet-v2/ssd_mobilenet_v2_coco.uff";
-    const char *label_path = "../networks/SSD-Mobilenet-v2/ssd_coco_labels.txt";
+    const char *model_path = "../networks/DetectorSSD-Mobilenet-v2/ssd_mobilenet_v2_coco.uff";
+    const char *label_path = "../networks/DetectorSSD-Mobilenet-v2/ssd_coco_labels.txt";
 
-    // Input/output layers for SSD models
+    // Input/output layers for DetectorSSD models
     const char *input_blob = "Input";
     const char *output_blob = "NMS";
     const char *output_count = "NMS_1";
@@ -127,22 +129,22 @@ void detect_targets()
 }
 
 /********************************************************************************
- * Function: SSD
+ * Function: DetectorSSD
  * Description: Class constructor
  ********************************************************************************/
-SSD::SSD() {}
+DetectorSSD::DetectorSSD() {}
 
 /********************************************************************************
- * Function: ~SSD
+ * Function: ~DetectorSSD
  * Description: Class destructor
  ********************************************************************************/
-SSD::~SSD() {}
+DetectorSSD::~DetectorSSD() {}
 
 /********************************************************************************
  * Function: init
  * Description: Initialize detection network.
  ********************************************************************************/
-bool SSD::init(void)
+bool DetectorSSD::init(void)
 {
     if (!create_detection_network())
     {
@@ -157,7 +159,7 @@ bool SSD::init(void)
  * Function: loop
  * Description: Process video stream and output detected objects.
  ********************************************************************************/
-void SSD::loop(void)
+void DetectorSSD::loop(void)
 {
     detect_targets();
 }
@@ -166,7 +168,7 @@ void SSD::loop(void)
  * Function: shutdown
  * Description: Shutdown detection network
  ********************************************************************************/
-void SSD::shutdown(void)
+void DetectorSSD::shutdown(void)
 {
     LogVerbose("detectnet:  shutting down...\n");
     // Jetson-inference detector uses raw pointer ownership → delete explicitly
