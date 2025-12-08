@@ -12,15 +12,16 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "detect_target_nv.h"
-#include "video_io.h"
-#include "param_reader.h"
 #include "jetson-utils/videoSource.h"
 #include "jetson-utils/videoOutput.h"
 #include "jetson-inference/objectTracker.h"
 #include <jetson-inference/objectTrackerIOU.h>
 #include <jetson-inference/objectTrackerKLT.h>
+
+#include "common_inc.h"
+#include "detect_target_nv.h"
+#include "video_io.h"
+#include "param_reader.h"
 
 /********************************************************************************
  * Typedefs
@@ -33,9 +34,9 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-detectNet *g_det_nv_net;
-detectNet::Detection *g_det_nv_list;
-int g_det_nv_count;
+detectNet *g_det_nv_net = nullptr;
+detectNet::Detection *g_det_nv_list = nullptr;
+int g_det_nv_count = (int)0;
 
 /********************************************************************************
  * Calibration definitions
@@ -49,50 +50,55 @@ void detect_targets(void);
 
 /********************************************************************************
  * Function: create_detection_network
- * Description: Initialize the network used for object detection.
+ * Description: Initialize the Jetson-Inference detectNet + tracker.
  ********************************************************************************/
-bool create_detection_network(void)
+bool create_detection_network()
 {
 #ifdef DEBUG_BUILD
+    ParamReader params("../params.json");
 
-    detect_target_nv.h detection_params("../params.json");
-
-    float detection_thresh = detection_params.get_float_param("target_det_params.target_det_conf_thresh");
-    uint32_t max_batch_size = detection_params.get_uint32_param("target_det_params.max_batch_size");
-    uint32_t min_frames = detection_params.get_uint32_param("target_det_params.min_hits_to_track");
-    uint32_t drop_frames = detection_params.get_uint32_param("target_det_params.min_frames_to_drop_track");
-    float overlap_thresh = detection_params.get_float_param("target_det_params.track_iou_thresh");
-
+    const float detection_thresh = params.get_float_param("target_det_params.target_det_conf_thresh");
+    const uint32_t max_batch_size = params.get_uint32_param("target_det_params.max_batch_size");
+    const uint32_t min_frames = params.get_uint32_param("target_det_params.min_hits_to_track");
+    const uint32_t drop_frames = params.get_uint32_param("target_det_params.min_frames_to_drop_track");
+    const float overlap_thresh = params.get_float_param("target_det_params.track_iou_thresh");
 #else
+    const float detection_thresh = 0.5f;
+    const uint32_t max_batch_size = 4;
+    const uint32_t min_frames = 25;
+    const uint32_t drop_frames = 10;
+    const float overlap_thresh = 0.1f;
+#endif
 
-    float detection_thresh = (float)0.5;
-    uint32_t max_batch_size = (uint32_t)4;
-    uint32_t min_frames = (uint32_t)25;
-    uint32_t drop_frames = (uint32_t)10;
-    float overlap_thresh = (float)0.1;
+    // Network files
+    const char *model_path = "../networks/SSD-Mobilenet-v2/ssd_mobilenet_v2_coco.uff";
+    const char *label_path = "../networks/SSD-Mobilenet-v2/ssd_coco_labels.txt";
 
-#endif // DEBUG_BUILD
-
-    const char *model = "../networks/SSD-Mobilenet-v2/ssd_mobilenet_v2_coco.uff";
-    const char *class_labels = "../networks/SSD-Mobilenet-v2/ssd_coco_labels.txt";
-    // const char *model = "../networks/SSD-Inception-v2/ssd_inception_v2_coco.uff";
-    // const char *class_labels = "../networks/SSD-Inception-v2/ssd_coco_labels.txt";
-    float thresh = (float)0.5;
+    // Input/output layers for SSD models
     const char *input_blob = "Input";
-    const char *output_blob = "NMS"; // for SSD
-    // const char *output_blob = "MarkOutput_0"; // for yolo?
-    Dims3 inputDims(3, 720, 1280);
+    const char *output_blob = "NMS";
     const char *output_count = "NMS_1";
+    Dims3 input_dims(3, 720, 1280);
 
-    // g_det_nv_net = detectNet::Create("SSD_Inception_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
-    // g_det_nv_net = detectNet::Create("SSD_Mobilenet_V2", detection_thresh, max_batch_size); // use downloaded model preloaded with jetson inference
-    g_det_nv_net = detectNet::Create(model, class_labels, thresh, input_blob, inputDims, output_blob, output_count); // load model from specific path
-    g_det_nv_net->SetTracker(objectTrackerIOU::Create(min_frames, drop_frames, overlap_thresh));
+    // Create network
+    g_det_nv_net = detectNet::Create(model_path, label_path, detection_thresh,
+                                     input_blob, input_dims, output_blob, output_count);
 
     if (!g_det_nv_net)
     {
-        LogError("detectnet:  failed to load detectNet model\n");
+        spdlog::error("detectNet: Failed to load detection model.");
         return false;
+    }
+
+    // Create and attach IOU tracker
+    auto tracker = objectTrackerIOU::Create(min_frames, drop_frames, overlap_thresh);
+    if (!tracker)
+    {
+        spdlog::warn("detectNet: Tracker creation failed. Continuing without tracking.");
+    }
+    else
+    {
+        g_det_nv_net->SetTracker(tracker);
     }
 
     return true;
@@ -100,51 +106,44 @@ bool create_detection_network(void)
 
 /********************************************************************************
  * Function: detect_targets
- * Description: Run object detection on image and return the detections and
- *              container of detected objects.
+ * Description: Runs detection on the current camera frame (CPU pointer).
  ********************************************************************************/
-void detect_targets(void)
+void detect_targets()
 {
-    uint32_t overlay_flags = 0;
+    if (!g_det_nv_net || !g_cam0_img_cpu || !g_input)
+        return;
 
-    overlay_flags = overlay_flags | detectNet::OVERLAY_LABEL | detectNet::OVERLAY_CONFIDENCE | detectNet::OVERLAY_TRACKING | detectNet::OVERLAY_LINES;
+    const uint32_t width = g_input->GetWidth();
+    const uint32_t height = g_input->GetHeight();
 
-    if (overlay_flags > 0 && g_cam0_img_cpu != NULL)
-    {
-        g_det_nv_count = g_det_nv_net->Detect(g_cam0_img_cpu, g_input->GetWidth(), g_input->GetHeight(), &g_det_nv_list, overlay_flags);
-    }
-    else if (g_cam0_img_cpu != NULL)
-    {
-        g_det_nv_count = g_det_nv_net->Detect(g_cam0_img_cpu, g_input->GetWidth(), g_input->GetHeight(), &g_det_nv_list);
-    }
-    else
-    {
-        // No other options
-    }
+    const uint32_t overlay_flags =
+        detectNet::OVERLAY_LABEL |
+        detectNet::OVERLAY_CONFIDENCE |
+        detectNet::OVERLAY_TRACKING |
+        detectNet::OVERLAY_LINES;
+
+    g_det_nv_count = g_det_nv_net->Detect(g_cam0_img_cpu, width, height,
+                                          &g_det_nv_list, overlay_flags);
 }
 
 /********************************************************************************
  * Function: SSD
  * Description: Class constructor
  ********************************************************************************/
-SSD::SSD(void) {};
+SSD::SSD() {}
 
 /********************************************************************************
  * Function: ~SSD
  * Description: Class destructor
  ********************************************************************************/
-SSD::~SSD(void) {};
+SSD::~SSD() {}
 
 /********************************************************************************
- * Function: initialize_detection_net
- * Description: Delete detection network to free up resources.
+ * Function: init
+ * Description: Initialize detection network.
  ********************************************************************************/
 bool SSD::init(void)
 {
-    g_det_nv_net = NULL;
-    g_det_nv_list = NULL;
-    g_det_nv_count = 0;
-
     if (!create_detection_network())
     {
         spdlog::error("Failed to create detection network");
@@ -170,6 +169,7 @@ void SSD::loop(void)
 void SSD::shutdown(void)
 {
     LogVerbose("detectnet:  shutting down...\n");
+    // Jetson-inference detector uses raw pointer ownership → delete explicitly
     SAFE_DELETE(g_det_nv_net);
     LogVerbose("detectnet:  shutdown complete.\n");
 }
