@@ -32,7 +32,7 @@
 bool takeoff_dbc;
 bool start_follow_mode;
 uint16_t takeoff_dbc_cnt;
-float desired_veh_alt;
+float desired_veh_alt_m;
 
 /********************************************************************************
  * Calibration definitions
@@ -84,7 +84,7 @@ void dtrmn_veh_control_action(void)
     }
     else if (g_system_state == SystemState::STANDBY)
     {
-        MavCmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, desired_veh_alt);
+        MavCmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, desired_veh_alt_m);
     }
     else if (g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
@@ -100,7 +100,7 @@ void dtrmn_veh_control_action(void)
             takeoff_dbc = true;
         }
 
-        if (takeoff_dbc && g_mav_rngfndr_dist_cm > min_mission_alt_cm || g_mav_gps_alt_rel > min_mission_alt_mm)
+        if (takeoff_dbc && (g_mav_rngfndr_dist_cm > min_mission_alt_cm || g_mav_gps_alt_rel > min_mission_alt_mm))
         {
             start_follow_mode = true;
         }
@@ -114,13 +114,13 @@ void dtrmn_veh_control_action(void)
 
 /********************************************************************************
  * Function: VehicleController
- * Description: Constructor of the VehicleController clasds.
+ * Description: Constructor
  ********************************************************************************/
 VehicleController::VehicleController(void) {}
 
 /********************************************************************************
  * Function: VehicleController
- * Description: Constructor of the VehicleController class.
+ * Description: Destructor
  ********************************************************************************/
 VehicleController::~VehicleController(void) {}
 
@@ -132,12 +132,10 @@ bool VehicleController::init(void)
 {
     ParamReader mission_params("../params.json");
 
-    takeoff_dbc = false;
-    start_follow_mode = false;
     takeoff_dbc_cnt = mission_params.get_float_param("mission_params.mission_start_delay_count");
     min_mission_alt_cm = mission_params.get_float_param("mission_params.min_mission_alt_cm");
     min_mission_alt_mm = mission_params.get_float_param("mission_params.min_mission_alt_mm");
-    desired_veh_alt = mission_params.get_float_param("mission_params.takeoff_alt_m");
+    desired_veh_alt_m = mission_params.get_float_param("mission_params.takeoff_alt_m");
 
     return true;
 }
