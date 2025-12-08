@@ -2,14 +2,19 @@
  * @file    velocity_controller.cpp
  * @author  Cameron Rose
  * @date    3/12/2025
- * @brief   The path planner contains the MPC setup and solving for the optimal
- *          flight path to deliver a payload to a moving target.  An external
- *          MPC library will be used to solve the MPC problem statement.
+ * @brief   Computes velocity commands (vx, vy, yaw rate) for target following.
+ *          Uses PID controllers, motion profiling (S-curve), and target error
+ *          from the perception system to generate smoothed velocity inputs.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include <algorithm> // for std::min/std::max
+#include <cmath>     // for sin/cos/atan2
+
+#include <spdlog/spdlog.h>
+
 #include "common_inc.h"
 #include "velocity_controller.h"
 #include "video_io.h"
@@ -19,12 +24,7 @@
 #include "time_calc.h"
 #include "target_tracking.h"
 #include "mav_data_hub.h"
-#include "velocity_controller.h"
 #include "signal_processing.h"
-#include <spdlog/spdlog.h>
-
-#include <algorithm> // for std::min/std::max
-#include <cmath>     // for sin/cos/atan2
 
 /********************************************************************************
  * Typedefs
@@ -99,34 +99,48 @@ struct MotionProfiler2D
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
+
+// PID controllers
 PID pid_forwd;
 PID pid_rev;
-MotionProfiler2D g_vel_shaper; // shapes (g_ctrl_vel_x_cmd, g_ctrl_vel_y_cmd)
+
+// Motion profiling (velocity shaping / S-curve filtering)
+MotionProfiler2D g_vel_shaper;
+
+// Target tracking + position error state
 bool g_tgt_too_close;
-bool yaw_initial_latched;
 float g_pos_err_x;
 float g_pos_err_y;
+float g_pos_err_x_dot;
+float x_error_prv;
+float x_error_dot_prv;
+bool target_valid_last_cycle;
+
+// Vehicle velocity (body-frame estimates)
+float g_veh_vel_x_est;
+float g_veh_vel_y_est;
+
+// Control command outputs (post-PID + shaping)
 float g_ctrl_vel_x_cmd;
 float g_ctrl_vel_y_cmd;
 float g_ctrl_vel_z_cmd;
-float g_ctrl_yaw_tgt;
-float yaw_initial;
-float min_yaw;
-float max_yaw;
 float g_ctrl_yaw_cmd;
+float g_ctrl_yaw_tgt;
+
+// Yaw handling and playback compensation
+bool yaw_initial_latched;
+float yaw_initial;
+float g_veh_yaw_playback_adj;
 float g_mav_veh_yaw_prv;
 float g_yaw_err;
-float g_veh_yaw_playback_adj;
-float x_error_prv;
+float min_yaw;
+float max_yaw;
+
+// Feed-forward braking / profile state
 float vx_adjust_prv;
 float vx_decel_prof_idx;
 bool decel_profile_active;
 int profile_sign;
-bool target_valid_last_cycle;
-float g_veh_vel_x_est;
-float g_veh_vel_y_est;
-float g_pos_err_x_dot;
-float x_error_dot_prv;
 
 /********************************************************************************
  * Calibration definitions
@@ -157,8 +171,8 @@ float Kp_yaw = (float)0.08;
 float Ki_yaw = (float)0.0;
 float Kd_yaw = (float)0.00005;
 
-float x_desired = (float)4.0;
-float y_desired = (float)0.0;
+float follow_dist_x_m = (float)4.0;
+float follow_dist_y_m = (float)0.0;
 
 float vxy_cmd_max_allowed_accel = (float)2.5; // m/s²  -> used as shaping accel cap
 float vxy_cmd_max_allowed_jerk = (float)8.0;  // m/s^3 for x and y (jerk cap)
@@ -208,8 +222,8 @@ void get_path_params(void)
     Kd_yaw = follow_control.get_float_param("velocity_control.pid_yaw_forward.kd");
 
     // Follow params
-    x_desired = follow_control.get_float_param("velocity_control.follow_dist_x_m");
-    y_desired = follow_control.get_float_param("velocity_control.follow_dist_y_m");
+    follow_dist_x_m = follow_control.get_float_param("velocity_control.follow_dist_x_m");
+    follow_dist_y_m = follow_control.get_float_param("velocity_control.follow_dist_y_m");
 
     vxy_cmd_max_allowed_accel = follow_control.get_float_param("velocity_control.max_accel_mps2");
     vxy_cmd_max_allowed_jerk = follow_control.get_float_param("velocity_control.max_jerk_mps3");
@@ -230,22 +244,22 @@ void calc_follow_error(void)
     }
     else
     {
-        g_pos_err_x = (g_tgt_pos_x_est - x_desired);
+        g_pos_err_x = (g_tgt_pos_x_est - follow_dist_x_m);
     }
 
     // Currently set to 0 - not sending a y component velocity vector
-    g_pos_err_y = y_desired;
+    g_pos_err_y = follow_dist_y_m;
 
     // Error derivative
-    if (!target_valid_last_cycle && g_tgt_valid ||
-        !g_tgt_valid && target_valid_last_cycle)
+    if ((!target_valid_last_cycle && g_tgt_valid) ||
+        (!g_tgt_valid && target_valid_last_cycle))
     {
         g_pos_err_x_dot = (float)0.0;
     }
     else
     {
 
-        g_pos_err_x_dot = div((g_pos_err_x - x_error_prv), g_app_dt);
+        g_pos_err_x_dot = div_zero_protect((g_pos_err_x - x_error_prv), g_app_dt);
         g_pos_err_x_dot = low_pass_filter(g_pos_err_x_dot, x_error_dot_prv, x_error_dot_filt_coef);
     }
 
@@ -448,24 +462,6 @@ bool VelocityController::init(void)
 {
     get_path_params();
 
-    g_tgt_too_close = false;
-    g_pos_err_x = (float)0.0;
-    g_pos_err_y = (float)0.0;
-    g_ctrl_vel_x_cmd = (float)0.0;
-    g_ctrl_vel_y_cmd = (float)0.0;
-    g_ctrl_vel_z_cmd = (float)0.0;
-    g_ctrl_yaw_tgt = (float)0.0;
-    yaw_initial = (float)0.0;
-    yaw_initial_latched = false;
-    max_yaw = (float)0.0;
-    min_yaw = (float)0.0;
-    g_ctrl_yaw_cmd = (float)0.0;
-    g_mav_veh_yaw_prv = (float)0.0;
-    g_yaw_err = (float)0.0;
-    g_veh_yaw_playback_adj = (float)0.0;
-    x_error_prv = (float)0.0;
-    vx_adjust_prv = (float)0.0;
-    target_valid_last_cycle = false;
     g_vel_shaper.setLimits(/*a_max_xy=*/vxy_cmd_max_allowed_accel,
                            /*j_max_xy=*/vxy_cmd_max_allowed_jerk);
     g_vel_shaper.reset(/*vx=*/(float)0.0,

@@ -28,12 +28,13 @@ float first_derivative(float current, float previous, float dt);
 float second_derivative(float current, float prev, float prev2, float dt);
 
 template <typename T>
-inline T div(T num, T denom, T eps = (T)1e-6)
+inline T div_zero_protect(T num, T denom, T eps = (T)1e-6)
 {
     if (std::fabs(denom) < eps)
     {
-        denom = (denom >= 0 ? eps : -eps);
+        denom = (denom >= (T)0 ? eps : -eps);
     }
+
     return num / denom;
 }
 
