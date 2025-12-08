@@ -2,18 +2,22 @@
  * @file    mav_data_hub.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Handles all incoming mavlink messages: set the desired message rate,
- *          parse serial data for mavlink messages, additional processing before
- *          passing to the rest of the program.
+ * @brief   Central hub for handling incoming MAVLink communication.
+ *          Responsible for configuring message rates, reading and parsing
+ *          MAVLink bytes from the serial port, decoding messages, updating
+ *          global MAVLink state variables, and forwarding processed data
+ *          to the rest of the system. This module also manages opening and
+ *          closing the MAVLink serial connection.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include <spdlog/spdlog.h>
+
 #include "common_inc.h"
 #include "mav_data_hub.h"
 #include "mav_utils.h"
-#include <spdlog/spdlog.h>
 
 /********************************************************************************
  * Typedefs
@@ -551,7 +555,11 @@ void proc_mav_attitude_quaternion_msg(const mavlink_message_t *msg)
     g_mav_att_actual_roll_rate = attitude_quaternion.rollspeed;
     g_mav_att_actual_pitch_rate = attitude_quaternion.pitchspeed;
     g_mav_att_actual_yaw_rate = attitude_quaternion.yawspeed;
-    g_mav_att_repr_offset_q[4] = attitude_quaternion.repr_offset_q[4];
+
+    for (int i = 0; i < 4; i++)
+    {
+        g_mav_att_repr_offset_q[i] = attitude_quaternion.repr_offset_q[i];
+    }
 
 #ifdef DEBUG_BUILD
 
@@ -629,8 +637,12 @@ void proc_mav_distance_sensor_msg(const mavlink_message_t *msg)
     g_mav_rngfndr_cov = distance_sensor.covariance;
     g_mav_rngfndr_fov_horiz_rad = distance_sensor.horizontal_fov;
     g_mav_rngfndr_fov_vert_rad = distance_sensor.vertical_fov;
-    g_mav_rngfndr_quat[4] = distance_sensor.quaternion[4];
     g_mav_rngfndr_quality = distance_sensor.signal_quality;
+
+    for (int i = 0; i < 4; i++)
+    {
+        g_mav_rngfndr_quat[i] = distance_sensor.quaternion[i];
+    }
 
 #ifdef DEBUG_BUILD
 
@@ -779,102 +791,6 @@ MavMsg::~MavMsg() {};
  ********************************************************************************/
 bool MavMsg::init(void)
 {
-    g_mav_cmd_id = 0;
-    g_mav_cmd_result = 0;
-    g_mav_cmd_progress = 0;
-    g_mav_cmd_result_param2 = 0;
-    g_mav_cmd_tgt_sys = 0;
-    g_mav_cmd_tgt_comp = 0;
-    g_mav_sys_sensors_present = 0;
-    g_mav_sys_sensors_enabled = 0;
-    g_mav_sys_sensors_health = 0;
-
-    g_mav_sys_load = 0;
-    g_mav_batt_voltage_mv = 0;
-    g_mav_batt_current_ma = 0;
-    g_mav_comm_drop_rate = 0;
-
-    g_mav_comm_errors = 0;
-    g_mav_err_count1 = 0;
-    g_mav_err_count2 = 0;
-    g_mav_err_count3 = 0;
-    g_mav_err_count4 = 0;
-    g_mav_batt_remaining_pct = 0;
-    g_mav_sys_sensors_present_ext = 0;
-    g_mav_sys_sensors_enabled_ext = 0;
-    g_mav_sys_sensors_health_ext = 0;
-
-    g_mav_mode_custom = 0;
-    g_ctrl_land_override = false;
-    g_mav_type = 0;
-    g_mav_autopilot_type = 0;
-    g_mav_mode_base = 0;
-    g_mav_state = 0;
-    g_mav_version = 0;
-
-    g_mav_gps_lat = 0;
-    g_mav_gps_lon = 0;
-    g_mav_gps_alt_msl = 0;
-    g_mav_gps_alt_rel = 0;
-    g_mav_gps_vel_x = 0;
-    g_mav_gps_vel_y = 0;
-    g_mav_gps_vel_z = 0;
-    g_mav_gps_heading_cdeg = 0;
-
-    g_mav_veh_roll_rad = 0.0;
-    g_mav_veh_pitch_rad = 0.0;
-    g_mav_veh_yaw_rad = 0.0;
-    g_mav_veh_roll_rate = 0.0;
-    g_mav_veh_pitch_rate = 0.0;
-    g_mav_veh_yaw_rate = 0.0;
-
-    g_mav_imu_accel_x = 0;
-    g_mav_imu_accel_y = 0;
-    g_mav_imu_accel_z = 0;
-    g_mav_imu_gyro_x = 0;
-    g_mav_imu_gyro_y = 0;
-    g_mav_imu_gyro_z = 0;
-    g_mav_imu_mag_x = 0;
-    g_mav_imu_mag_y = 0;
-    g_mav_imu_mag_z = 0;
-
-    g_mav_att_target_q1 = 0.0;
-    g_mav_att_target_q2 = 0.0;
-    g_mav_att_target_q3 = 0.0;
-    g_mav_att_target_q4 = 0.0;
-    g_mav_att_target_roll_rate = 0.0;
-    g_mav_att_target_pitch_rate = 0.0;
-    g_mav_att_target_yaw_rate = 0.0;
-    g_mav_att_target_thrust = 0.0;
-    attitude_target_mask = 0;
-
-    g_mav_att_actual_q1 = 0.0;
-    g_mav_att_actual_q2 = 0.0;
-    g_mav_att_actual_q3 = 0.0;
-    g_mav_att_actual_q4 = 0.0;
-    g_mav_att_actual_roll_rate = 0.0;
-    g_mav_att_actual_pitch_rate = 0.0;
-    g_mav_att_actual_yaw_rate = 0.0;
-    g_mav_att_repr_offset_q[0] = 0.0;
-    g_mav_att_repr_offset_q[1] = 0.0;
-    g_mav_att_repr_offset_q[2] = 0.0;
-    g_mav_att_repr_offset_q[3] = 0.0;
-
-    g_mav_rngfndr_min_cm = 0;
-    g_mav_rngfndr_max_cm = 0;
-    g_mav_rngfndr_dist_cm = 0;
-    g_mav_rngfndr_type = 0;
-    g_mav_rngfndr_id = 0;
-    g_mav_rngfndr_orient = 0;
-    g_mav_rngfndr_cov = 0;
-    g_mav_rngfndr_fov_horiz_rad = 0.0;
-    g_mav_rngfndr_fov_vert_rad = 0.0;
-    g_mav_rngfndr_quat[0] = 0.0;
-    g_mav_rngfndr_quat[1] = 0.0;
-    g_mav_rngfndr_quat[2] = 0.0;
-    g_mav_rngfndr_quat[3] = 0.0;
-    g_mav_rngfndr_quality = 0;
-
     if (!start_mav_comm() ||
         !start_message_subscriptions())
     {
