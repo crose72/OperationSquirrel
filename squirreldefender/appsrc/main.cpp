@@ -9,12 +9,14 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "scheduler.h"
-#include "global_objects.h"
-#include <spdlog/spdlog.h>
 #include <mutex>
 #include <signal.h>
 #include <fenv.h>
+
+#include <spdlog/spdlog.h>
+
+#include "scheduler.h"
+#include "global_objects.h"
 
 #pragma STDC FENV_ACCESS ON
 

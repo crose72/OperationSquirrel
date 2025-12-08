@@ -9,6 +9,11 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include <mutex>
+#include <signal.h>
+#include <chrono>
+#include <thread>
+
 #include "common_inc.h"
 #include "scheduler.h"
 #include "datalog.h"
@@ -29,11 +34,6 @@
 #include "status_io.h"
 
 #endif // BLD_JETSON_B01
-
-#include <mutex>
-#include <signal.h>
-#include <chrono>
-#include <thread>
 
 /********************************************************************************
  * Typedefs

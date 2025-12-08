@@ -45,7 +45,7 @@ public:
     static void shutdown();
     static void log_data();
 
-    void publishAnnotations(uint64_t ts_ns, const os::logger::Objects &objs);
+    void publish_annotations(uint64_t ts_ns, const os::logger::Objects &objs);
 
     static inline void logTime(os::logger::Time *t, uint64_t ts_ns)
     {
@@ -56,18 +56,18 @@ public:
     template <typename ProtoMsg>
     static bool publish(const std::string &topic, const ProtoMsg &msg, uint64_t timestamp)
     {
-        if (!mMCAPLogger)
+        if (!mcap_logger)
             return false; // not initialized yet
         std::string bytes;
         if (!msg.SerializeToString(&bytes))
             return false;
 
         std::lock_guard<std::mutex> lk(s_mtx); // safe if called from multiple threads
-        return mMCAPLogger->logMessage(topic, bytes, timestamp);
+        return mcap_logger->logMessage(topic, bytes, timestamp);
     }
 
 private:
-    static std::unique_ptr<MCAPLogger> mMCAPLogger;
+    static std::unique_ptr<MCAPLogger> mcap_logger;
     static std::mutex s_mtx;
 };
 
