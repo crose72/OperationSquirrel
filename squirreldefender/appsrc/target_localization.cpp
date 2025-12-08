@@ -599,55 +599,24 @@ TargetLocalization::~TargetLocalization(void) {};
 
 /********************************************************************************
  * Function: init
- * Description: Initialize all TargetLocalization target variables.  Run once at the start
- *              of the program.
+ * Description: Initialize localization variables
  ********************************************************************************/
 bool TargetLocalization::init(void)
 {
     get_localization_params();
     init_kf_loc();
 
-    g_tgt_los_dist_from_pix_height = (float)0.0;
-    g_tgt_los_dist_from_pix_width = (float)0.0;
-    g_tgt_pos_x_meas = (float)0.0;
-    g_tgt_pos_y_meas = (float)0.0;
-    g_tgt_pos_z_meas = (float)0.0;
-    g_tgt_los_dist_meas = (float)0.0;
-    g_cam0_delta_angle_rad = (float)0.0;
-    g_cam0_angle_rad = (float)0.0;
-    g_tgt_pos_x_delta = (float)0.0;
-    g_tgt_pos_z_delta = (float)0.0;
-    g_cam0_comp_angle_rad = (float)0.0;
-    x_target_prv = (float)0.0;
-    y_target_prv = (float)0.0;
-    loc_target_valid_prv = false;
-    g_tgt_meas_valid = false;
-    camera_comp_angle_abs = (float)0.0;
-    g_cam0_fov_height = (float)0.0;
     g_cam0_m_per_pix = (float)0.00001;
-    g_tgt_cntr_offset_x_m = (float)0.0;
     target_y_pix_hist4avg.assign(y_pix_window, (float)0.0);
     target_x_pix_hist4avg.assign(x_pix_window, (float)0.0);
-    g_tgt_cntr_offset_x_pix_filt = (float)0.0;
-    g_tgt_cntr_offset_y_pix_filt = (float)0.0;
-    y_buffer_idx4avg = (int)0;
-    y_sum = (float)0.0;
-    x_buffer_idx4avg = (int)0;
-    x_sum = (float)0.0;
-    g_cam0_los_m = (float)0.0;
-    target_valid_prv = false;
-    kf_loc_reset = false;
-    g_tgt_lost = false;
-    target_is_lost_prv = false;
-    target_data_useful_prv = false;
 
     return true;
 }
 
 /********************************************************************************
  * Function: loop
- * Description: Return control parameters for the vehicle to TargetLocalization a designated
- *              target at a distance.
+ * Description: Process tracked/detected targets and locate them in engineering
+ *              units.
  ********************************************************************************/
 void TargetLocalization::loop(void)
 {
