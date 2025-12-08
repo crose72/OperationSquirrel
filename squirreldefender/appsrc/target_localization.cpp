@@ -393,10 +393,10 @@ void dtrmn_target_loc_img(void)
     // Only consider targets whose bounding boxes are not smashed against the
     // video frame, and at least a certain size (to prevent bad estimation)
     g_tgt_meas_valid = (g_tgt_valid &&
-                        (!(g_tgt_center_y_px < target_det_edge_of_frame_buffer ||
-                           g_tgt_center_y_px > (g_cam0_img_height_px - target_det_edge_of_frame_buffer)) &&
-                         !(g_tgt_center_x_px < target_det_edge_of_frame_buffer ||
-                           g_tgt_center_x_px > (g_cam0_img_width_px - target_det_edge_of_frame_buffer)) &&
+                        (!(g_tgt_cntr_y_px < target_det_edge_of_frame_buffer ||
+                           g_tgt_cntr_y_px > (g_cam0_img_height_px - target_det_edge_of_frame_buffer)) &&
+                         !(g_tgt_cntr_x_px < target_det_edge_of_frame_buffer ||
+                           g_tgt_cntr_x_px > (g_cam0_img_width_px - target_det_edge_of_frame_buffer)) &&
                          !((g_tgt_width_pix * g_tgt_height_pix) < min_target_bbox_area)));
 
     if (g_tgt_meas_valid)

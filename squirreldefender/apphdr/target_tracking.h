@@ -27,8 +27,8 @@ extern float g_tgt_left_px;
 extern float g_tgt_right_px;
 extern float g_tgt_top_px;
 extern float g_tgt_bottom_px;
-extern float g_tgt_center_y_px;
-extern float g_tgt_center_x_px;
+extern float g_tgt_cntr_y_px;
+extern float g_tgt_cntr_x_px;
 extern float g_tgt_class_id;
 extern float g_tgt_conf;
 
