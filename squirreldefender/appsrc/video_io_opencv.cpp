@@ -140,6 +140,7 @@ void create_gstreamer_pipelines(std::string &capture_pipeline,
 
     /**************** CAMERA PARAMETERS ****************/
     int sensor_mode = cfg.get_int_param("camera_params.sensor_mode");
+    int sensor_id = cfg.get_int_param("camera_params.sensor_id");
     int wb_mode = cfg.get_int_param("camera_params.wb_mode");
     int aeantibanding = cfg.get_int_param("camera_params.ae_antibanding_mode");
     int tnr_mode = cfg.get_int_param("camera_params.tnr_mode");
@@ -171,14 +172,15 @@ void create_gstreamer_pipelines(std::string &capture_pipeline,
 
     /**************** BUILD CAPTURE PIPELINE ****************/
     std::ostringstream ss_cap;
-    ss_cap << "nvarguscamerasrc sensor-mode=" << sensor_mode
-           << " wb_mode=" << wb_mode
-           << " aeantibanding=" << aeantibanding
-           << " tnr-mode=" << tnr_mode
-           << " ee-mode=" << ee_mode
-           << " exposuretimerange=\"" << exposure_min << " " << exposure_max << "\""
-           << " gainrange=\"" << gain_min << " " << gain_max << "\""
-           << " ispdigitalgainrange=\"" << isp_dgain_min << " " << isp_dgain_max << "\" ! "
+    ss_cap << "nvarguscamerasrc sensor-id=" << sensor_id << " "
+           << "sensor-mode=" << sensor_mode << " "
+           << "wb_mode=" << wb_mode << " "
+           << "aeantibanding=" << aeantibanding << " "
+           << "tnr-mode=" << tnr_mode << " "
+           << "ee-mode=" << ee_mode << " "
+           << "exposuretimerange=\"" << exposure_min << " " << exposure_max << "\""
+           << "gainrange=\"" << gain_min << " " << gain_max << "\""
+           << "ispdigitalgainrange=\"" << isp_dgain_min << " " << isp_dgain_max << "\" ! "
            << "video/x-raw(memory:NVMM),format=" << input_format
            << ",width=" << input_width << ",height=" << input_height
            << ",framerate=" << input_rate << " ! "
@@ -464,7 +466,7 @@ bool VideoCV::init(void)
     g_cam0_img_valid = false;
     g_cam0_img_cpu = NULL;
     g_video_end = false;
-    cam0_video_out_fps_actual = (float)16.67;
+    cam0_video_out_fps_actual = (float)21.0;
     g_cam0_frame_id = (uint32_t)0;
 
     if (!create_video_io_streams())
