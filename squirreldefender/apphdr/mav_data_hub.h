@@ -91,7 +91,7 @@ extern float g_mav_att_repr_offset_q[4];
 
 extern uint16_t g_mav_rngfndr_min_cm;
 extern uint16_t g_mav_rngfndr_max_cm;
-extern uint16_t g_mav_rngfndr_dist_m;
+extern uint16_t g_mav_rngfndr_dist_cm;
 extern uint8_t g_mav_rngfndr_type;
 extern uint8_t g_mav_rngfndr_id;
 extern uint8_t g_mav_rngfndr_orient;

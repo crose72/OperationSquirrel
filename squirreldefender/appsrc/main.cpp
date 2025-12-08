@@ -79,8 +79,6 @@ int main(int argc, char **argv)
 
     // Default path is to use a live camera feed
     g_app_video_input_path = "";
-    g_app_use_video_playback = false;
-    g_app_stop = false;
 
     if (argc > 1)
     {

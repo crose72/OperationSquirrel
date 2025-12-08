@@ -311,7 +311,7 @@ void DataLogger::log_data(void)
         logTime(m.mutable_t(), g_app_epoch_ns);
         m.set_frame_id(g_cam0_frame_id);
 
-        m.set_current_distance(g_mav_rngfndr_dist_m);
+        m.set_current_distance(g_mav_rngfndr_dist_cm);
         m.set_signal_quality(g_mav_rngfndr_quality);
 
         publish("/mav/rangefinder", m, g_app_epoch_ns);
@@ -551,7 +551,7 @@ void write_headers(void)
                               "g_mav_imu_gyro_x",
                               "g_mav_imu_gyro_y",
                               "g_mav_imu_gyro_z",
-                              "g_mav_rngfndr_dist_m",
+                              "g_mav_rngfndr_dist_cm",
                               "g_mav_rngfndr_quality",
                               "g_mav_flow_vel_x",
                               "g_mav_flow_vel_y",
@@ -659,7 +659,7 @@ void log_data(void)
                                std::to_string(g_mav_imu_gyro_x),
                                std::to_string(g_mav_imu_gyro_y),
                                std::to_string(g_mav_imu_gyro_z),
-                               std::to_string(g_mav_rngfndr_dist_m),
+                               std::to_string(g_mav_rngfndr_dist_cm),
                                std::to_string(g_mav_rngfndr_quality),
                                std::to_string(g_mav_flow_vel_x),
                                std::to_string(g_mav_flow_vel_y),

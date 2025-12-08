@@ -1,4 +1,8 @@
 {
+  "system_params": {
+    "min_flight_alt_cm": 100,
+    "min_flight_alt_mm": 1000
+  },
   "mission_params": {
     "takeoff_alt_m": 7.3,
     "min_mission_alt_cm": 550,

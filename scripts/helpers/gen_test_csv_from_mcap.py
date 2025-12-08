@@ -219,7 +219,7 @@ TOPIC_CONFIG = {
 
     # MAVLink rangefinder
     "/mav/rangefinder": {
-        "g_mav_rngfndr_dist_m": "current_distance",
+        "g_mav_rngfndr_dist_cm": "current_distance",
         "g_mav_rngfndr_quality": "signal_quality",
     },
 

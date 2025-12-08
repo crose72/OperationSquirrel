@@ -114,7 +114,7 @@ float g_mav_att_repr_offset_q[4];  /*<  Collective thrust, normalized to 0 .. 1 
 
 uint16_t g_mav_rngfndr_min_cm;     /*< [cm] Minimum distance the sensor can measure*/
 uint16_t g_mav_rngfndr_max_cm;     /*< [cm] Maximum distance the sensor can measure*/
-uint16_t g_mav_rngfndr_dist_m;     /*< [cm] Current distance reading*/
+uint16_t g_mav_rngfndr_dist_cm;    /*< [cm] Current distance reading*/
 uint8_t g_mav_rngfndr_type;        /*<  Type of distance sensor.*/
 uint8_t g_mav_rngfndr_id;          /*<  Onboard ID of the sensor*/
 uint8_t g_mav_rngfndr_orient;      /*<  Direction the sensor faces. downward-facing: ROTATION_PITCH_270, upward-facing: ROTATION_PITCH_90, backward-facing: ROTATION_PITCH_180, forward-facing: ROTATION_NONE, left-facing: ROTATION_YAW_90, right-facing: ROTATION_YAW_270*/
@@ -622,7 +622,7 @@ void proc_mav_distance_sensor_msg(const mavlink_message_t *msg)
 
     g_mav_rngfndr_min_cm = distance_sensor.min_distance;
     g_mav_rngfndr_max_cm = distance_sensor.max_distance;
-    g_mav_rngfndr_dist_m = distance_sensor.current_distance;
+    g_mav_rngfndr_dist_cm = distance_sensor.current_distance;
     g_mav_rngfndr_type = distance_sensor.type;
     g_mav_rngfndr_id = distance_sensor.id;
     g_mav_rngfndr_orient = distance_sensor.orientation;
@@ -862,7 +862,7 @@ bool MavMsg::init(void)
 
     g_mav_rngfndr_min_cm = 0;
     g_mav_rngfndr_max_cm = 0;
-    g_mav_rngfndr_dist_m = 0;
+    g_mav_rngfndr_dist_cm = 0;
     g_mav_rngfndr_type = 0;
     g_mav_rngfndr_id = 0;
     g_mav_rngfndr_orient = 0;

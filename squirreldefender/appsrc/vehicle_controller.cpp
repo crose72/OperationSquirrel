@@ -100,7 +100,7 @@ void dtrmn_veh_control_action(void)
             takeoff_dbc = true;
         }
 
-        if (takeoff_dbc && g_mav_rngfndr_dist_m > min_mission_alt_cm || g_mav_gps_alt_rel > min_mission_alt_mm)
+        if (takeoff_dbc && g_mav_rngfndr_dist_cm > min_mission_alt_cm || g_mav_gps_alt_rel > min_mission_alt_mm)
         {
             start_follow_mode = true;
         }
