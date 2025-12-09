@@ -95,8 +95,9 @@
       "ki": 0.0,
       "kd": 0.015
     },
-    "follow_dist_x_m": 10.0,
-    "follow_dist_y_m": 0.0,
+    "yaw_deadband_thresh": 50.0,
+    "des_follow_dist_x_m": 10.0,
+    "des_follow_dist_y_m": 0.0,
     "follow_dist_z_m": 0.0,
     "follow_dist_error_dot_filt_coef": 0.8,
     "max_velocity_mps": 10.0,
