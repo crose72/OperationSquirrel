@@ -426,7 +426,7 @@ bool VelocityController::init(void)
 
     // TODO: FOV should be in radians - swap for radians version and then update PID for new units
     // pinhole camera model
-    yaw_rad_per_pix = (float)2.0 * std::tan(g_cam0_fov_deg * (float)0.5) / g_cam0_img_width_px;
+    yaw_rad_per_pix = (float)2.0 * std::tan(g_cam0_fov_rad * (float)0.5) / g_cam0_img_width_px;
 
     g_vel_shaper.setLimits(/*a_max_xy=*/vxy_cmd_max_allowed_accel,
                            /*j_max_xy=*/vxy_cmd_max_allowed_jerk);

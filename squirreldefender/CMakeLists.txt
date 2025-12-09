@@ -57,7 +57,7 @@ option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
-option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" OFF)
+option(BLD_TEST_HARNESS "Compiling test harness code for data playback" OFF)
 option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" OFF)
 option(ENABLE_SECRET_SQUIRREL "Compile custom code with the open source Operation Squirrel" ON)
 
@@ -158,6 +158,10 @@ endfunction()
 #=============================================================================
 # Define Preprocessor Directives Based on Build Options
 #=============================================================================
+
+if (BLD_TEST_HARNESS)
+    add_definitions(-DBLD_TEST_HARNESS)
+endif()
 
 # Optionally include code that is specific to different platforms
 if (BLD_JETSON_B01)
@@ -449,10 +453,10 @@ file(GLOB KF_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.cpp)
 file(GLOB KF_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.h)
 
 if(ENABLE_SECRET_SQUIRREL)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/secretsquirrel/src)
 
-    file(GLOB SS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.cpp)
-    file(GLOB SS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.h)
+    file(GLOB SS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/secretsquirrel/src/*.cpp)
+    file(GLOB SS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/secretsquirrel/src/*.h)
 endif()
 
 if(BLD_JETSON_ORIN_NANO OR BLD_WSL)    
@@ -579,7 +583,7 @@ endif()
 #=============================================================================
 
 # Build only the test harness or the full executable speeds up compile time (so worth it!)
-if (NOT BUILD_TEST_HARNESS)
+if (NOT BLD_TEST_HARNESS)
     message(STATUS "Building the squirreldefender program")  
     if (BLD_JETSON_B01)
         cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
@@ -726,7 +730,7 @@ endif()
 # Build Test Harness for each supported platform
 #=============================================================================
 
-if (BUILD_TEST_HARNESS)
+if (BLD_TEST_HARNESS)
     message(STATUS "Building the test harness (not squirreldefender)")
     if (BLD_JETSON_ORIN_NANO OR BLD_WSL)
 
@@ -761,7 +765,7 @@ if (BUILD_TEST_HARNESS)
 
         # Delivery test code
         set(DELIVERY_TEST_SOURCES ${TEST_SOURCE_BASE})
-        list(APPEND DELIVERY_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/test_suite/test_payload_delivery.cpp)
+        list(APPEND DELIVERY_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/secretsquirrel/test_suite/test_payload_delivery.cpp)
         list(APPEND DELIVERY_TEST_HEADERS ${TEST_UTIL_HEADERS})
 
         cuda_add_executable(test_payload_delivery ${DELIVERY_TEST_SOURCES} ${DELIVERY_TEST_HEADERS})

@@ -102,8 +102,8 @@ TOPIC_CONFIG = {
         "g_tgt_conf": "confidence",
 
         # Bounding box geometry
-        "g_tgt_cntr_offset_x_pix": "bbox_offset_x_px",
-        "g_tgt_cntr_offset_y_pix": "bbox_offset_y_px",
+        "g_tgt_cntr_offset_x_pix": "bbox_center_offset_x_px_raw",
+        "g_tgt_cntr_offset_y_pix": "bbox_center_offset_y_px_raw",
         "g_tgt_height_pix": "bbox_height_px",
         "g_tgt_width_pix": "bbox_width_px",
         "g_tgt_aspect_ratio": "bbox_aspect_ratio",
@@ -113,8 +113,8 @@ TOPIC_CONFIG = {
         "g_tgt_bottom_px": "bbox_bottom_px",
 
         # Center (filtered)
-        "g_tgt_cntr_offset_x_pix_filt": "bbox_center_x_px",
-        "g_tgt_cntr_offset_y_pix_filt": "bbox_center_y_px",
+        "g_tgt_cntr_offset_x_pix_filt": "bbox_center_offset_x_px_filt",
+        "g_tgt_cntr_offset_y_pix_filt": "bbox_center_offset_y_px_filt",
 
         # EKF / deltas
         "g_cam0_delta_angle_deg": "delta_angle_deg",

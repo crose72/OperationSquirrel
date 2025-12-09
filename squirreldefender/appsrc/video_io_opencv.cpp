@@ -463,8 +463,7 @@ VideoCV::~VideoCV(void) {}
 
 /********************************************************************************
  * Function: init
- * Description: Code to initialize video streams to run onces at the start of the
- *              program.
+ * Description: Initialize video streams.
  ********************************************************************************/
 bool VideoCV::init(void)
 {
@@ -472,10 +471,14 @@ bool VideoCV::init(void)
 
     cam0_video_out_fps_actual = (float)21.0;
 
+#ifndef BLD_TEST_HARNESS
+
     if (!create_video_io_streams())
     {
         return false;
     }
+
+#endif
 
     return true;
 }
