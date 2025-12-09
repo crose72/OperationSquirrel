@@ -9,7 +9,6 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "mav_serial.h"
 #include <cstdint> // for uint8_t, uint16_t, etc.
 
 #if defined(BLD_LINUX_SERIAL) || defined(BLD_WSL) // for linux
@@ -36,6 +35,8 @@
 #include <string.h>                // For string manipulation
 
 #endif
+
+#include "mav_serial.h"
 
 /********************************************************************************
  * Private macros and defines

@@ -2,7 +2,7 @@
  * @file    pid.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   PID3 controller implementation from basic to complex.
+ * @brief   PID controller implementation and variations.
  ********************************************************************************/
 
 /********************************************************************************

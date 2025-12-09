@@ -2,6 +2,7 @@
  * @file    param_reader.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Provide utilities for accessing parameters from a json file.
  ********************************************************************************/
 #ifndef JSON_UTILS_H
 #define JSON_UTILS_H

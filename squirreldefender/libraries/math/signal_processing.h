@@ -2,6 +2,7 @@
  * @file    signal_processing.h
  * @author  Cameron Rose
  * @date    4/29/2025
+ * @brief   Utilities for signal processing, such as low/high pass filters.
  ********************************************************************************/
 #ifndef SIGNAL_PROCESSING_H
 #define SIGNAL_PROCESSING_H

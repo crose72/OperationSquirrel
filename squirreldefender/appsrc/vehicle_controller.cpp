@@ -62,7 +62,7 @@ void follow_mode(void)
 
     if (g_tgt_valid)
     {
-        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity, g_ctrl_yaw_cmd);
+        MavMotion::cmd_velocity_ned(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity, g_ctrl_yaw_cmd);
     }
 }
 

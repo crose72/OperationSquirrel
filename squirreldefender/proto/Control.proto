@@ -21,5 +21,5 @@ message ControlOutput {
   float cmd_vel_x_mps   = 30; // commanded forward  velocity (m/s)
   float cmd_vel_y_mps   = 31; // commanded lateral   velocity (m/s)
   float cmd_vel_z_mps   = 32; // commanded vertical  velocity (m/s)
-  float cmd_yawrate_rps = 33; // commanded yaw rate  (rad/s)
+  float cmd_yaw_rad = 33; // commanded yaw (radians)
 }

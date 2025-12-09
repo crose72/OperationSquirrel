@@ -353,7 +353,7 @@ void DataLogger::log_data(void)
         m.set_cmd_vel_x_mps(g_ctrl_vel_x_cmd);
         m.set_cmd_vel_y_mps(g_ctrl_vel_y_cmd);
         m.set_cmd_vel_z_mps(g_ctrl_vel_z_cmd);
-        m.set_cmd_yawrate_rps(g_ctrl_yaw_cmd);
+        m.set_cmd_yaw_rad(g_ctrl_yaw_cmd);
 
         publish("/control/output", m, g_app_epoch_ns);
     }

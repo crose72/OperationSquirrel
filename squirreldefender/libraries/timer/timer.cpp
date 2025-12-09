@@ -2,7 +2,7 @@
  * @file    timer.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Time calculations.
+ * @brief   Utilities for timing calculations.
  ********************************************************************************/
 
 /********************************************************************************

@@ -2,7 +2,7 @@
  * @file    mav_cmd.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Utilities for sending mavlink commands over UART serial pins.
+ * @brief   Utilities for sending mavlink commands.
  ********************************************************************************/
 
 /********************************************************************************

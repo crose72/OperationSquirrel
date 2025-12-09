@@ -4,6 +4,8 @@
  * @file    mav_serial.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Utilities for sending and receiving mavlink messages over UART or TCP
+ *          for simulated and real serial connections.
  ********************************************************************************/
 #ifndef MAV_SERIAL_H
 #define MAV_SERIAL_H
