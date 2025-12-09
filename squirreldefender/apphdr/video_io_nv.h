@@ -17,7 +17,7 @@
  * Exported objects
  ********************************************************************************/
 extern bool g_cam0_img_valid;
-extern videoSource *g_input;
+extern videoSource *g_cam0_input_nv;
 extern uchar3 *g_cam0_img_cpu;
 extern float g_cam0_img_width_px;
 extern float g_cam0_img_height_px;

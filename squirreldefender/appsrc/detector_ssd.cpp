@@ -112,11 +112,11 @@ bool create_detection_network()
  ********************************************************************************/
 void detect_targets()
 {
-    if (!g_det_nv_net || !g_cam0_img_cpu || !g_input)
+    if (!g_det_nv_net || !g_cam0_img_cpu || !g_cam0_input_nv)
         return;
 
-    const uint32_t width = g_input->GetWidth();
-    const uint32_t height = g_input->GetHeight();
+    const uint32_t width = g_cam0_input_nv->GetWidth();
+    const uint32_t height = g_cam0_input_nv->GetHeight();
 
     const uint32_t overlay_flags =
         detectNet::OVERLAY_LABEL |

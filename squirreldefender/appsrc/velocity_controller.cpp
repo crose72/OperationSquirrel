@@ -406,13 +406,13 @@ void dtrmn_vel_ff_cmd(void)
 
 /********************************************************************************
  * Function: VelocityController
- * Description: VelocityController class constructor.
+ * Description: Constructor
  ********************************************************************************/
 VelocityController::VelocityController(void) {}
 
 /********************************************************************************
  * Function: ~VelocityController
- * Description: VelocityController class destructor.
+ * Description: Destructor
  ********************************************************************************/
 VelocityController::~VelocityController(void) {}
 

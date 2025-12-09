@@ -45,7 +45,7 @@ float g_cam0_fov_rad;
 float g_cam0_fov_rad_half;
 bool g_video_end;
 float cam0_video_out_fps_actual;
-bool file_stream_created;
+bool vid_out_created_nv;
 cv::VideoWriter video_writer;
 cv::Mat image_overlay;
 
@@ -283,12 +283,12 @@ bool create_video_io_streams(void)
     if (!video_writer.open(video_out_pipeline, cv::CAP_GSTREAMER, 0, cam0_video_out_fps, cv::Size(g_cam0_img_width_px, g_cam0_img_height_px), true))
     {
         spdlog::error("video_io_opencv: failed to open GStreamer VideoWriter\n");
-        file_stream_created = false;
+        vid_out_created_nv = false;
         return false;
     }
 
     spdlog::info("Recording to: " + full_path);
-    file_stream_created = true;
+    vid_out_created_nv = true;
 
     // Calculate new center if video playback has a different size
     g_cam0_img_width_cx = g_cam0_img_width_px * (float)0.5;
@@ -398,7 +398,7 @@ void video_mods(void)
 bool save_video(void)
 {
     // write video file
-    if (video_writer.isOpened() && g_cam0_img_valid && file_stream_created)
+    if (video_writer.isOpened() && g_cam0_img_valid && vid_out_created_nv)
     {
         video_writer.write(g_cam0_img_cpu);
         return true;
