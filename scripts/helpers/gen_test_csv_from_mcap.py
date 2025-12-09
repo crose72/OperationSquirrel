@@ -62,11 +62,28 @@ TOPICS = {
 
 # --------------------------------------------------------------------------
 # ⚙️ Signals to be converted from deg -> rad
+#  These are radians in the code - converted to deg for humans, convert
+#  back when creating the csv
 # --------------------------------------------------------------------------
 RAD_PER_DEG = math.pi / 180.0
 
 # Convert selected degree fields → radians
-DEGREE_FIELDS_TO_CONVERT = {}
+DEGREE_FIELDS_TO_CONVERT = {
+    # TargetDetection
+    "delta_angle_deg",
+    "camera_tilt_deg",
+
+    # MavKinematics
+    "roll",
+    "pitch",
+    "yaw",
+    "rollspeed",
+    "pitchspeed",
+    "yawspeed",
+    "roll_rate_actual",
+    "pitch_rate_actual",
+    "yaw_rate_actual",
+}
 
 # --------------------------------------------------------------------------
 # ⚙️ CONFIGURATION — per-topic field mappings
@@ -247,7 +264,7 @@ def flatten(msg, prefix=""):
 # --------------------------------------------------------------------------
 def process_mcap(input_mcap: str):
     """Read one .mcap file, extract selected data, and export it to CSV."""
-    output_csv = os.path.splitext(input_mcap)[0] + "_test.csv"
+    output_csv = os.path.splitext(input_mcap)[0] + ".csv"
     print(f"\n🧩 Processing {input_mcap} → {output_csv}")
 
     # Step 1: Parse every message from the MCAP log.
@@ -322,10 +339,30 @@ def process_mcap(input_mcap: str):
 # 🚀 Main
 # --------------------------------------------------------------------------
 if __name__ == "__main__":
+
+    # The bash wrapper passes exactly ONE argument:
+    # either a file OR a directory
+    if len(sys.argv) < 2:
+        sys.exit("❌ No path to mcap files provided.")
+
+    input_path = sys.argv[1]
+
+    # Expand folder → list of .mcap files
     files = []
-    for arg in sys.argv[1:]:
-        files.extend(glob.glob(arg))
-    if not files:
-        sys.exit("❌ No MCAP files provided.")
+    if os.path.isdir(input_path):
+        files = sorted(glob.glob(os.path.join(input_path, "*.mcap")))
+        if not files:
+            sys.exit(f"❌ No .mcap files found in directory: {input_path}")
+    elif os.path.isfile(input_path):
+        if not input_path.endswith(".mcap"):
+            sys.exit(f"❌ Input file is not an .mcap: {input_path}")
+        files = [input_path]
+    else:
+        sys.exit("❌ Input path is neither a file nor a directory.")
+
+    print(f"📁 Found {len(files)} MCAP file(s) to process.")
+
     for f in files:
         process_mcap(f)
+
+    print("\n🎉 All MCAPs processed successfully.\n")
