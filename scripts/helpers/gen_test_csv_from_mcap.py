@@ -53,7 +53,7 @@ TOPICS = {
     "/control/output": Control_pb2.ControlOutput,
     "/mav/system": Mavlink_pb2.MavSystem,
     "/mav/kinematics": Mavlink_pb2.MavKinematics,
-    "/mav/imu": Mavlink_pb2.MavImuRaw,
+    "/mav/imu": Mavlink_pb2.MavImu,
     "/mav/rangefinder": Mavlink_pb2.MavRangefinder,
     "/mav/flow": Mavlink_pb2.MavOpticalFlow,
     "/detection/objects": Detection_pb2.Objects,
@@ -219,7 +219,7 @@ TOPIC_CONFIG = {
 
     # MAVLink rangefinder
     "/mav/rangefinder": {
-        "g_mav_rngfndr_dist_cm": "current_distance",
+        "g_mav_rngfndr_dist_m": "current_distance",
         "g_mav_rngfndr_quality": "signal_quality",
     },
 
