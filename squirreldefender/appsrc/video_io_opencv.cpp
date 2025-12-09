@@ -5,22 +5,26 @@
  * @file    video_io_cv.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Configure and start video streams on jetson orin using opencv and
+ * @brief   Configure and start video streams using opencv and
  *          gstreamer.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "video_io_opencv.h"
-#include "time_calc.h"
-#include <opencv2/cudaimgproc.hpp>
-#include <spdlog/spdlog.h>
 #include <sstream>
 #include <filesystem>
 #include <fstream>
 #include <cmath>
+#include <string>
+
+#include <opencv2/cudaimgproc.hpp>
+#include <spdlog/spdlog.h>
+
+#include "common_inc.h"
+#include "video_io_opencv.h"
+#include "time_calc.h"
+#include "param_reader.h"
 
 /********************************************************************************
  * Typedefs
@@ -45,7 +49,7 @@ float g_cam0_fov_rad;
 float g_cam0_fov_rad_half;
 bool g_video_end;
 float cam0_video_out_fps_actual;
-bool vid_out_created_nv;
+bool file_stream_created;
 cv::VideoWriter video_writer;
 cv::Mat image_overlay;
 
@@ -92,23 +96,24 @@ bool file_exists(const std::string &name)
  * Function: generate_unique_file_name
  * Description: Generate a unique file name by incrementing the name by 1.
  ********************************************************************************/
-std::string generate_unique_file_name(const std::string &base_name, const std::string &extension)
+std::string generate_unique_file_name(const std::string &base_name,
+                                      const std::string &extension)
 {
-    std::string file_name = base_path + base_name + extension;
-    int index = 1;
+    int index = 0;
 
-    while (file_exists(file_name))
+    while (true)
     {
-        file_name = base_path + base_name + "_" + std::to_string(index) + extension;
+        std::string candidate =
+            (index == 0)
+                ? base_name + extension
+                : base_name + "_" + std::to_string(index) + extension;
+
+        if (!file_exists(base_path + candidate))
+            return candidate;
+
         index++;
     }
-
-    return file_name;
 }
-
-#include <string>
-#include <sstream>
-#include "param_reader.h" // Your existing ParamReader class
 
 /********************************************************************************
  * Function: get_video_io_params
@@ -121,7 +126,7 @@ void get_video_io_params(void)
     g_cam0_img_width_px = cfg.get_float_param("camera_control_params.video_input_width");
     g_cam0_img_height_px = cfg.get_float_param("camera_control_params.video_input_height");
     cam0_video_out_fps = cfg.get_float_param("camera_control_params.video_output_framerate");
-    g_cam0_fov_deg = cfg.get_float_param("camera_control_params.video_output_framerate");
+    g_cam0_fov_deg = cfg.get_float_param("camera_control_params.cam0_fov_degrees");
     g_cam0_tilt_deg = cfg.get_float_param("camera_control_params.cam0_tilt_down_angle_degrees");
     g_cam0_tilt_rad = g_cam0_tilt_deg * M_PI / (float)180.0;
     g_cam0_fov_rad = g_cam0_fov_deg * M_PI / (float)180.0;
@@ -226,9 +231,9 @@ void create_gstreamer_pipelines(std::string &capture_pipeline,
 bool create_video_io_streams(void)
 {
 #if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
-    const std::string base_path = "/workspace/operationsquirrel/squirreldefender/data/";
+    base_path = "/workspace/operationsquirrel/squirreldefender/data/";
 #else
-    const std::string base_path = "./";
+    base_path = "./";
 #endif
 
     // Make sure the folder exists
@@ -283,12 +288,12 @@ bool create_video_io_streams(void)
     if (!video_writer.open(video_out_pipeline, cv::CAP_GSTREAMER, 0, cam0_video_out_fps, cv::Size(g_cam0_img_width_px, g_cam0_img_height_px), true))
     {
         spdlog::error("video_io_opencv: failed to open GStreamer VideoWriter\n");
-        vid_out_created_nv = false;
+        file_stream_created = false;
         return false;
     }
 
     spdlog::info("Recording to: " + full_path);
-    vid_out_created_nv = true;
+    file_stream_created = true;
 
     // Calculate new center if video playback has a different size
     g_cam0_img_width_cx = g_cam0_img_width_px * (float)0.5;
@@ -344,6 +349,8 @@ void overlay_text(
     int thickness)
 {
     std::ostringstream stream;
+
+    // TODO: change to std::string text = label + ": " + value; ?
     stream << std::fixed << value;
 
     std::string text = label + ": " + stream.str();
@@ -398,7 +405,7 @@ void video_mods(void)
 bool save_video(void)
 {
     // write video file
-    if (video_writer.isOpened() && g_cam0_img_valid && vid_out_created_nv)
+    if (video_writer.isOpened() && g_cam0_img_valid && file_stream_created)
     {
         video_writer.write(g_cam0_img_cpu);
         return true;
@@ -463,11 +470,7 @@ bool VideoCV::init(void)
 {
     get_video_io_params();
 
-    g_cam0_img_valid = false;
-    g_cam0_img_cpu = NULL;
-    g_video_end = false;
     cam0_video_out_fps_actual = (float)21.0;
-    g_cam0_frame_id = (uint32_t)0;
 
     if (!create_video_io_streams())
     {
