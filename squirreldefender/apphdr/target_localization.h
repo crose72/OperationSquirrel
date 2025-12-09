@@ -4,6 +4,10 @@
  * @file    target_localization.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Target localization module that converts image detections into
+ *          line-of-sight vectors, metric position estimates, and derived
+ *          kinematics. Provides initialization, per-frame update, and cleanup
+ *          for the localization pipeline.
  ********************************************************************************/
 #ifdef ENABLE_CV
 

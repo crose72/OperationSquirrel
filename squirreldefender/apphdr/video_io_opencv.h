@@ -5,6 +5,10 @@
  * @file    video_io_opencv.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Video capture and recording interface using OpenCV and GStreamer.
+ *          Supports Jetson Orin Nano (CSI via GStreamer), Windows webcams,
+ *          and WSL2 virtual capture. Provides CPU and GPU frame access for
+ *          downstream detection and tracking modules.
  ********************************************************************************/
 #ifndef VIDEO_IO_CV_H
 #define VIDEO_IO_CV_H

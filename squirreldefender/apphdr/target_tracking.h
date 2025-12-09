@@ -4,6 +4,10 @@
  * @file    target_tracking.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Extracts and maintains per-frame tracking information for the target,
+ *          including bounding-box geometry, pixel offsets, class ID, and
+ *          confidence. Acts as a lightweight tracking layer between detection
+ *          and localization.
  ********************************************************************************/
 #ifndef TRACK_TARGET_H
 #define TRACK_TARGET_H

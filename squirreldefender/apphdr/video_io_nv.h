@@ -5,6 +5,9 @@
  * @file    video_io_nv.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Video capture interface for Jetson Nano B01 using NVIDIA's
+ *          jetson-utils and nvargus. Handles CSI camera initialization,
+ *          frame acquisition, and output streaming to file/display.
  ********************************************************************************/
 #ifndef VIDEO_IO_NV_H
 #define VIDEO_IO_NV_H

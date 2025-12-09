@@ -4,6 +4,12 @@
  * @file    datalog.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Data logging interface for MCAP-based or legacy logging backends.
+ *
+ *          This header defines the DataLogger class, which provides a unified
+ *          logging API across platforms. On Jetson Orin Nano and WSL builds,
+ *          MCAP is used for structured protobuf logging. Otherwise, the legacy
+ *          logger is used.
  ********************************************************************************/
 #ifndef DATALOG_H
 #define DATALOG_H
@@ -71,7 +77,7 @@ private:
     static std::mutex s_mtx;
 };
 
-#else // default to old logger
+#else // Legacy logger fallback
 
 class DataLogger
 {

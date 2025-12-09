@@ -5,6 +5,9 @@
  * @file    detector_ssd.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   SSD-based object detection using NVIDIA Jetson Inference on the
+ *          Jetson Nano B01 (CSI camera). This module manages initialization,
+ *          inference, and cleanup of the detectNet SSD model.
  ********************************************************************************/
 #ifndef DETECT_TARGET_NV_H
 #define DETECT_TARGET_NV_H
@@ -24,11 +27,12 @@ extern int g_det_nv_count;
 /********************************************************************************
  * Function prototypes and Class Definitions
  ********************************************************************************/
+
 class DetectorSSD
 {
 public:
-    DetectorSSD(void);
-    ~DetectorSSD(void);
+    DetectorSSD();
+    ~DetectorSSD();
 
     static bool init(void);
     static void loop(void);

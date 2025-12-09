@@ -2,6 +2,7 @@
  * @file    global_calibrations.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Global calibration constants shared across the software system.
  ********************************************************************************/
 #ifndef GLOBAL_CALIBRATIONS_H
 #define GLOBAL_CALIBRATIONS_H
