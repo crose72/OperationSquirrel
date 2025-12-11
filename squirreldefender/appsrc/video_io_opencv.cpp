@@ -1,5 +1,5 @@
 #ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WIN) || defined(BLD_WSL)
 
 /********************************************************************************
  * @file    video_io_cv.cpp
@@ -230,7 +230,7 @@ void create_gstreamer_pipelines(std::string &capture_pipeline,
  ********************************************************************************/
 bool create_video_io_streams(void)
 {
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
     base_path = "/workspace/operationsquirrel/squirreldefender/data/";
 #else
     base_path = "./";
@@ -252,7 +252,7 @@ bool create_video_io_streams(void)
     // Use live camera feed or use prerecorded video
     if (!g_app_use_video_playback)
     {
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
         cam0_capture.open(video_cap_pipeline, cv::CAP_GSTREAMER);
 
@@ -519,5 +519,5 @@ void VideoCV::shutdown(void)
     spdlog::info("video:  shutdown complete.\n");
 }
 
-#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
+#endif // defined(BLD_JETSON_ORIN) || defined(BLD_WIN) || defined(BLD_WSL)
 #endif // ENABLE_CV

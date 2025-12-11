@@ -377,7 +377,7 @@ DataLogger::~DataLogger() {};
  ********************************************************************************/
 bool DataLogger::init(void)
 {
-#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_B01) || defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     data_file_path = "../data/";
 

@@ -55,7 +55,7 @@ bool TargetDetection::init(void)
 
     return DetectorSSD::init();
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     return DetectorYOLO::init();
 
@@ -80,7 +80,7 @@ void TargetDetection::loop(void)
 
     return DetectorSSD::loop();
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     return DetectorYOLO::loop();
 
@@ -105,7 +105,7 @@ void TargetDetection::shutdown(void)
 
     return DetectorSSD::shutdown();
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     return DetectorYOLO::shutdown();
 

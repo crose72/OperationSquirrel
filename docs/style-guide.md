@@ -107,7 +107,7 @@ These are variables stored in memory and treated like configuration, **not macro
 
 ```cpp
 #define ENABLE_CV
-#define BLD_JETSON_ORIN_NANO
+#define BLD_JETSON_ORIN
 #define BLD_WIN
 ```
 
@@ -205,7 +205,7 @@ Modules must:
 Platform selection should only occur at module boundaries:
 
 ```cpp
-#if defined(BLD_JETSON_ORIN_NANO)
+#if defined(BLD_JETSON_ORIN)
 // TensorRT backend
 #elif defined(BLD_WIN)
 // OpenCV DNN backend

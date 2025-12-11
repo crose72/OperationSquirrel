@@ -1,5 +1,5 @@
 #ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WIN) || defined(BLD_WSL)
 
 /********************************************************************************
  * @file    detector_yolo.h
@@ -22,7 +22,7 @@
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
 // Native linux supports TensorRT based inference
 extern std::vector<Object> g_det_yolo_list;
@@ -59,5 +59,5 @@ private:
 
 #endif // DETECT_TARGET_YOLO_H
 
-#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
+#endif // defined(BLD_JETSON_ORIN) || defined(BLD_WIN) || defined(BLD_WSL)
 #endif // ENABLE_CV

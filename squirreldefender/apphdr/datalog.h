@@ -17,7 +17,7 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
 #include "mcap_logger.h"
 #include "Common.pb.h"
@@ -38,7 +38,7 @@
  * Function prototypes and Class Definitions
  ********************************************************************************/
 
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
 class DataLogger
 {

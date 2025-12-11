@@ -1,5 +1,5 @@
 #ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WIN) || defined(BLD_WSL)
 
 /********************************************************************************
  * @file    detector_yolo.cpp
@@ -32,7 +32,7 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
 YOLOv8 *yolov8_detector;
 std::vector<Object> g_det_yolo_list;
@@ -68,7 +68,7 @@ void detect_targets(void)
 {
     if (g_cam0_img_valid)
     {
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
         g_det_yolo_list = yolov8_detector->detectObjects(g_cam0_img_cpu);
         g_det_count = g_det_yolo_list.size();
@@ -109,7 +109,7 @@ DetectorYOLO::~DetectorYOLO() {};
  ********************************************************************************/
 bool DetectorYOLO::init(void)
 {
-#if defined(BLD_JETSON_ORIN_NANO)
+#if defined(BLD_JETSON_ORIN)
 
     YOLOv8::Config config;
     const std::string engine_path = "/workspace/operationsquirrel/squirreldefender/networks/yolov8s/yolov8s.engine.orin.fp16";
@@ -159,7 +159,7 @@ void DetectorYOLO::loop(void)
  ********************************************************************************/
 void DetectorYOLO::shutdown(void)
 {
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     delete yolov8_detector;
     yolov8_detector = nullptr;
@@ -175,5 +175,5 @@ void DetectorYOLO::shutdown(void)
 #endif
 }
 
-#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
+#endif // defined(BLD_JETSON_ORIN) || defined(BLD_WIN) || defined(BLD_WSL)
 #endif // ENABLE_CV

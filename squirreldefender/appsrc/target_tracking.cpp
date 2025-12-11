@@ -147,7 +147,7 @@ void get_tracking_params(void)
 
     tgt_det_class = target_params.get_int_param("target_track_params.target_class_mobilenet_ssd_v2");
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     tgt_det_class = target_params.get_int_param("target_track_params.target_class_yolov8");
     target_similarity_thresh = target_params.get_float_param("target_track_params.reid_sim_thresh");
@@ -170,7 +170,7 @@ void get_tracking_params(void)
  ********************************************************************************/
 void filter_detections(void)
 {
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     target_candidates.clear();
     target_candidate_imgs.clear();
@@ -208,7 +208,7 @@ void filter_detections(void)
  ********************************************************************************/
 void track_objects(void)
 {
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     // Extract features of each detected target
     if (!target_candidate_imgs.empty() && target_candidate_imgs.size() <= max_reid_batch)
@@ -292,7 +292,7 @@ void select_target(void)
         }
     }
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     for (int n = 0; n < g_det_count; ++n)
     {
@@ -351,7 +351,7 @@ void get_target_info(void)
         g_tgt_bottom_px = g_det_nv_list[g_tgt_detect_id].Bottom;
     }
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     if (g_tgt_detect_id >= 0)
     {
@@ -461,7 +461,7 @@ bool TargetTracking::init(void)
 
     osnet_extractor = new OSNet(engine_path, config);
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+#elif defined(BLD_JETSON_ORIN)
 
     OSNet::Config config;
     const std::string engine_path =

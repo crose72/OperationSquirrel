@@ -51,7 +51,7 @@ project(squirreldefender)
 
 # Choose ONLY ONE platform for the build (BLD_JETSON_B01, BLD_WSL, BLD_WIN) 
 option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" OFF)
-option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" ON)
+option(BLD_JETSON_ORIN "Compiling for Jetson Orin Nano, with video and computer visiono functionality" ON)
 option(BLD_WSL "Compiling for BLD_WSL" OFF)
 option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
@@ -71,7 +71,7 @@ option(USE_ENV_VAR "Use environment variables for library paths" OFF)
 # Ensure only one build platform is selected
 set(BUILD_PLATFORMS 0)
 
-if(BLD_JETSON_ORIN_NANO)
+if(BLD_JETSON_ORIN)
     math(EXPR BUILD_PLATFORMS "${BUILD_PLATFORMS} + 1")
 endif()
 
@@ -170,10 +170,10 @@ if (BLD_JETSON_B01)
     message("Building for BLD_JETSON_B01 with serial comms.")
     add_definitions(-DENABLE_CV)
     message("Enabled video and computer vision functionality.")
-elseif (BLD_JETSON_ORIN_NANO)
-    add_definitions(-DBLD_JETSON_ORIN_NANO)
+elseif (BLD_JETSON_ORIN)
+    add_definitions(-DBLD_JETSON_ORIN)
     add_definitions(-DBLD_LINUX_SERIAL)
-    message("Building for BLD_JETSON_ORIN_NANO with serial comms.")
+    message("Building for BLD_JETSON_ORIN with serial comms.")
     add_definitions(-DENABLE_CV)
     message("Enabled video and computer vision functionality.")
 elseif(BLD_WSL)
@@ -222,7 +222,7 @@ if(BLD_JETSON_B01)
     find_package(Armadillo REQUIRED)
     find_package(LAPACK REQUIRED)
     find_package(BLAS REQUIRED)
-elseif(BLD_JETSON_ORIN_NANO OR BLD_WSL)
+elseif(BLD_JETSON_ORIN OR BLD_WSL)
     find_package(CUDA REQUIRED)
     find_package(OpenCV REQUIRED)
     find_package(TensorRT REQUIRED)
@@ -297,7 +297,7 @@ if(USE_ENV_VAR)
         link_directories($ENV{LIB_OPENCV})
         link_directories($ENV{LIB_CUDA})
         link_directories($ENV{LIB_TEGRA})
-    elseif(BLD_JETSON_ORIN_NANO OR BLD_WSL)
+    elseif(BLD_JETSON_ORIN OR BLD_WSL)
         # Validate required Jetson environment variables
         foreach(var LIB_JETSONINFERENCE LIB_JETSONUTILS LIB_OPENCV LIB_CUDA LIB_TEGRA
                     HDR_JETSONINFERENCE HDR_JETSONUTILS HDR_OPENCV HDR_CUDA)
@@ -348,7 +348,7 @@ else()
             /usr/lib/aarch64-linux-gnu/tegra
         )
 
-    elseif(BLD_JETSON_ORIN_NANO OR BLD_WSL)
+    elseif(BLD_JETSON_ORIN OR BLD_WSL)
         set(SD_COMMON_INCLUDE_DIRS
             /usr/local/cuda/include
             /usr/include/opencv4
@@ -383,7 +383,7 @@ else()
     endif()
 endif()
 
-if (BLD_JETSON_ORIN_NANO OR BLD_WSL)
+if (BLD_JETSON_ORIN OR BLD_WSL)
     set(SD_COMMON_LINK_LIBS
         # MCAP deps
         mcap
@@ -459,7 +459,7 @@ if(ENABLE_SECRET_SQUIRREL)
     file(GLOB SS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/secretsquirrel/src/*.h)
 endif()
 
-if(BLD_JETSON_ORIN_NANO OR BLD_WSL)    
+if(BLD_JETSON_ORIN OR BLD_WSL)    
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/trtinfer/src)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/trtinfer/include)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/logger)
@@ -598,7 +598,7 @@ if (NOT BLD_TEST_HARNESS)
                             ${ARMADILLO_LIBRARIES} 
                             ${LAPACK_LIBRARIES} 
                             ${BLAS_LIBRARIES})
-    elseif (BLD_JETSON_ORIN_NANO OR BLD_WSL)
+    elseif (BLD_JETSON_ORIN OR BLD_WSL)
         cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
         set_target_debug_flags(squirreldefender)
 
@@ -732,7 +732,7 @@ endif()
 
 if (BLD_TEST_HARNESS)
     message(STATUS "Building the test harness (not squirreldefender)")
-    if (BLD_JETSON_ORIN_NANO OR BLD_WSL)
+    if (BLD_JETSON_ORIN OR BLD_WSL)
 
         # Test source base
         list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/appsrc/main.cpp")

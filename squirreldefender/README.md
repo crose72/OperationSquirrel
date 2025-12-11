@@ -94,7 +94,7 @@ nvgstcapture-1.0
 
 ### Dev container:
 
-Outside of the container edit `squirreldefender/CMakeLists.txt` file and enable `BLD_JETSON_ORIN_NANO` or `BLD_JETSON_B01`.
+Outside of the container edit `squirreldefender/CMakeLists.txt` file and enable `BLD_JETSON_ORIN` or `BLD_JETSON_B01`.
 
 Next, run the script to start up the dev container for your jetson 
 

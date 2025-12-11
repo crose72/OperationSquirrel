@@ -1,5 +1,5 @@
 #ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WIN) || defined(BLD_WSL)
 
 /********************************************************************************
  * @file    video_io_opencv.h
@@ -55,5 +55,5 @@ private:
 
 #endif // VIDEO_IO_CV_H
 
-#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#endif // defined(BLD_JETSON_ORIN) || defined(BLD_WIN)
 #endif // ENABLE_CV

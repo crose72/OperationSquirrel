@@ -18,7 +18,7 @@
 
 #include "video_io_nv.h"
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WIN) || defined(BLD_WSL)
 
 #include "video_io_opencv.h"
 
