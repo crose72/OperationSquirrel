@@ -62,7 +62,7 @@ void follow_mode(void)
 
     if (g_tgt_valid)
     {
-        MavMotion::cmd_velocity_ned(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity, g_ctrl_yaw_cmd);
+        MavMotion::cmd_velocity_ned(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id, target_velocity, g_ctrl_yaw_cmd);
     }
 }
 
@@ -76,15 +76,15 @@ void dtrmn_veh_control_action(void)
 {
     if (g_system_state == SystemState::INIT)
     {
-        MavCmd::set_mode_guided(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+        MavCmd::set_mode_guided(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id);
     }
     else if (g_system_state == SystemState::PRE_ARM_GOOD)
     {
-        MavCmd::arm_vehicle(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+        MavCmd::arm_vehicle(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id);
     }
     else if (g_system_state == SystemState::STANDBY)
     {
-        MavCmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, desired_veh_alt_m);
+        MavCmd::takeoff_gps(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id, desired_veh_alt_m);
     }
     else if (g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
@@ -156,5 +156,5 @@ void VehicleController::loop(void)
 void VehicleController::shutdown(void)
 {
     // When operating with OSRemote we don't want it to land every time
-    // MavCmd::set_mode_land(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+    // MavCmd::set_mode_land(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id);
 }

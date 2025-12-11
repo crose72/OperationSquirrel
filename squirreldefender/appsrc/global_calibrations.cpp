@@ -16,7 +16,7 @@
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-const uint8_t SENDER_SYS_ID = (uint8_t)0;  // MAVLink system ID for the Jetson sender
-const uint8_t SENDER_COMP_ID = (uint8_t)0; // MAVLink component ID for the Jetson sender
-const uint8_t TARGET_SYS_ID = (uint8_t)1;  // MAVLink system ID for the flight controller
-const uint8_t TARGET_COMP_ID = (uint8_t)1; // MAVLink component ID for the flight controller
+const uint8_t companion_sys_id = (uint8_t)0;  // MAVLink system ID for the Jetson sender
+const uint8_t companion_comp_id = (uint8_t)0; // MAVLink component ID for the Jetson sender
+const uint8_t autopilot_sys_id = (uint8_t)1;  // MAVLink system ID for the flight controller
+const uint8_t autopilot_comp_id = (uint8_t)1; // MAVLink component ID for the flight controller

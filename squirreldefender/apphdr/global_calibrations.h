@@ -15,9 +15,9 @@
 /********************************************************************************
  * Global calibration declarations
  ********************************************************************************/
-extern const uint8_t SENDER_SYS_ID;
-extern const uint8_t SENDER_COMP_ID;
-extern const uint8_t TARGET_SYS_ID;
-extern const uint8_t TARGET_COMP_ID;
+extern const uint8_t companion_sys_id;
+extern const uint8_t companion_comp_id;
+extern const uint8_t autopilot_sys_id;
+extern const uint8_t autopilot_comp_id;
 
 #endif // GLOBAL_CALIBRATIONS_H

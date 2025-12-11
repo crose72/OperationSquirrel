@@ -169,8 +169,8 @@ bool start_mav_comm(void) { return MavSerial::start_mav_comm(); }; // Open up ua
 void stop_mav_comm(void) { MavSerial::stop_mav_comm(); };          // Stop mavlink comms on uart port
 uint8_t read_mav_msg(void) { return MavSerial::read_mav_msg(); };  // Read a byte
 void subscribe(uint16_t msg_id, float msg_interval);               // Subscribe to a mavlink message at desired rate
-void set_msg_rate(uint16_t msg_id, float msg_interval) { MavCmd::set_mav_msg_rate(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, msg_id, msg_interval); };
-void req_msg(uint16_t msg_id) { MavCmd::req_mav_msg(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, msg_id); };
+void set_msg_rate(uint16_t msg_id, float msg_interval) { MavCmd::set_mav_msg_rate(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id, msg_id, msg_interval); };
+void req_msg(uint16_t msg_id) { MavCmd::req_mav_msg(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id, msg_id); };
 bool start_message_subscriptions(void);
 void parse_mav_msgs(void);
 

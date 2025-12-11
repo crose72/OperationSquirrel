@@ -73,10 +73,10 @@ void takeoff(float thrust_value)
     float thrust_body[3] = {0, 0, 0};
 
     MavMotion::send_cmd_set_attitude_target(
-        SENDER_SYS_ID,
-        SENDER_COMP_ID,
-        TARGET_SYS_ID,
-        TARGET_COMP_ID,
+        companion_sys_id,
+        companion_comp_id,
+        autopilot_sys_id,
+        autopilot_comp_id,
         0b00000111, // ignore rates, use attitude+thrust
         q,
         0, 0, 0,
@@ -131,10 +131,10 @@ void init_flight(void)
     takeoff_target_alt = height_control.get_float_param("Target.Altitude");
 
     // --- MAVLink setup ---
-    MavCmd::read_param(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID,
+    MavCmd::read_param(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id,
                        "MOT_THST_HOVER", -1);
-    MavCmd::set_mode_guided_nogps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
-    MavCmd::arm_vehicle(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+    MavCmd::set_mode_guided_nogps(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id);
+    MavCmd::arm_vehicle(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id);
 
     takeoff_state = TAKEOFF_SPOOLUP;
     init = true;
