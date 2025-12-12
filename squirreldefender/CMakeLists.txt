@@ -466,7 +466,7 @@ if(BLD_JETSON_ORIN OR BLD_WSL)
 
     # include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/mcap/include/)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/trtinfer)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/mcap_builder)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/mcap)
     
     file(GLOB MCAP_LOGGER_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/libraries/logger/*.cpp)
     file(GLOB MCAP_LOGGER_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/libraries/logger/*.h)
