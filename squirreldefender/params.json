@@ -106,7 +106,7 @@
     "velocity_ff_brake_gain": -1.0
   },
   "camera_params": {
-    "sensor_id": 1,
+    "sensor_id": 0,
     "sensor_mode": 0,
     "wb_mode": 1,
     "ae_antibanding_mode": 0,
