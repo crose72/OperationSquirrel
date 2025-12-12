@@ -3,8 +3,8 @@
 # 🐿️ Operation Squirrel - Ubuntu 22.04 (CUDA sm86) Dev Container Launcher
 # ------------------------------------------------------------------------------
 # Usage:
-#   ./run_dev_ubuntu22_sm86.sh              → normal interactive dev session
-#   ./run_dev_ubuntu22_sm86.sh osremote     → persistent container for OSRemote
+#   ./run_dev_ubuntu22-sm86.sh              → normal interactive dev session
+#   ./run_dev_ubuntu22-sm86.sh osremote     → persistent container for OSRemote
 # ==============================================================================
 
 set -e
@@ -124,7 +124,6 @@ if [ "$IS_CI" = true ]; then
 
     exit 0
 fi
-
 
 # --------------------------------------------------------------
 # Persistent mode (flutter OSRemote)
