@@ -10,11 +10,12 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include <fstream>
+#include <unordered_map>
+
 #include <mcap/internal.hpp> // important to include this before write.hpp and writer.inl
 #include <mcap/writer.hpp>
 #include <mcap/types.hpp>
-#include <fstream>
-#include <unordered_map>
 
 /********************************************************************************
  * Typedefs / Enums / Structs
