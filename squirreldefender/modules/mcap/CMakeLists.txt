@@ -13,7 +13,7 @@ set(MCAP_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 # ======================================
 # Sources
 # ======================================
-# OPTION B (no .cpp files): fallback to header-only model
+# Create a dummy mcap.cpp file to create a static library
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/mcap.cpp"
 "#define MCAP_IMPLEMENTATION\n#include <mcap/mcap.hpp>\n")
 set(MCAP_SOURCES "${CMAKE_CURRENT_BINARY_DIR}/mcap.cpp")

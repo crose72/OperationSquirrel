@@ -106,9 +106,9 @@ if [ "$IS_CI" = true ]; then
         $IMAGE_NAME \
         bash -c "
             cd /workspace/operationsquirrel/squirreldefender &&
+            rm -rf build &&
             mkdir -p build &&
-            cd build &&
-            cmake .. \
+            cmake -S . -B build/.cmake \
                 -DBLD_WSL=ON \
                 -DBLD_JETSON_B01=OFF \
                 -DBLD_JETSON_ORIN=OFF \
@@ -118,12 +118,13 @@ if [ "$IS_CI" = true ]; then
                 -DWIN_ENABLE_CV=OFF \
                 -DBUILD_TEST_HARNESS=OFF \
                 -DENABLE_GDB=OFF \
-                -DENABLE_SECRET_SQUIRREL=OFF &&
-            make -j\$(nproc)
+                -DENABLE_SECRET_SQUIRREL=OFF && \
+            cmake --build build/.cmake -- -j$(nproc)
         "
 
     exit 0
 fi
+
 
 # --------------------------------------------------------------
 # Persistent mode (flutter OSRemote)

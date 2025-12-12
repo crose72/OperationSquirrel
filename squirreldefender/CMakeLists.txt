@@ -1,6 +1,21 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.22)
 
-# Project definition
+# Hide all internal CMake junk inside build/.cmake/
+set(CMAKE_FILES_DIRECTORY ".cmake")
+set(CMAKE_CACHEFILE_DIR ".cmake")
+set(CMAKE_COMPILE_COMMANDS_OUTPUT_DIRECTORY ".cmake")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Because CMAKE_BINARY_DIR == build/.cmake,
+# we go one level up (..) to put things into the visible build/ folder.
+
+# Put static and shared libs inside build/lib/
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../lib")
+
+# Put executables inside build/
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/..")
+
 project(squirreldefender)
 
 #=============================================================================
@@ -515,7 +530,9 @@ if (OS_PROTO_ABS)
   endforeach()
 
   # Unique generated dir (top-level build tree)
-  set(SQUIRREL_GEN_DIR "${CMAKE_BINARY_DIR}/generated_squirrel_protos")
+#   set(SQUIRREL_GEN_DIR "${CMAKE_BINARY_DIR}/generated_protobufs")
+  set(SQUIRREL_GEN_DIR "${CMAKE_BINARY_DIR}/.cmake/generated_protobufs")
+
 
   # One-time prep: ensure the output dir exists before any proto rules
   add_custom_target(squirrel_protos_prep
