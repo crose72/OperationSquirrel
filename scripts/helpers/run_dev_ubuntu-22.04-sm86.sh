@@ -116,7 +116,7 @@ if [ "$IS_CI" = true ]; then
                 -DWIN_TCP=OFF \
                 -DWIN_SERIAL=OFF \
                 -DWIN_ENABLE_CV=OFF \
-                -DBUILD_TEST_HARNESS=OFF \
+                -DBLD_TEST_HARNESS=OFF \
                 -DENABLE_GDB=OFF \
                 -DENABLE_SECRET_SQUIRREL=OFF && \
             cmake --build build/.cmake -- -j$(nproc)

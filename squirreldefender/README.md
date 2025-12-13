@@ -83,7 +83,6 @@ On the Jetson, perform the following setup outside of the container and then ver
 
     # Or run using a video file
     ./squirreldefender ../test_data/video.mp4
-
     ```
 
 ## Folder structure

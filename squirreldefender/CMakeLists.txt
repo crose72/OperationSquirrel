@@ -66,7 +66,7 @@ project(squirreldefender)
 
 # Choose ONLY ONE platform for the build (BLD_JETSON_B01, BLD_WSL, BLD_WIN) 
 option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" OFF)
-option(BLD_JETSON_ORIN "Compiling for Jetson Orin Nano, with video and computer visiono functionality" OFF)
+option(BLD_JETSON_ORIN "Compiling for Jetson Orin Nano, with video and computer visiono functionality" ON)
 option(BLD_WSL "Compiling for BLD_WSL" ON)
 option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
