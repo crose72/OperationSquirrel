@@ -34,7 +34,7 @@ On the Jetson, perform the following setup outside of the container and then ver
 
     # Run setup script (installs env + CSI camera config)
     cd operationsquirrel/scripts
-    ../setup.sh squirreldefender --jetson=orin # or --jetson=b01
+    ./setup.sh squirreldefender --jetson=orin # or --jetson=b01
     ```
 
 2. Finish setup
