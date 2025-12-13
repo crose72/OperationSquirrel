@@ -61,31 +61,6 @@ TOPICS = {
 }
 
 # --------------------------------------------------------------------------
-# ⚙️ Signals to be converted from deg -> rad
-#  These are radians in the code - converted to deg for humans, convert
-#  back when creating the csv
-# --------------------------------------------------------------------------
-RAD_PER_DEG = math.pi / 180.0
-
-# Convert selected degree fields → radians
-DEGREE_FIELDS_TO_CONVERT = {
-    # TargetDetection
-    "delta_angle_deg",
-    "camera_tilt_deg",
-
-    # MavKinematics
-    "roll",
-    "pitch",
-    "yaw",
-    "rollspeed",
-    "pitchspeed",
-    "yawspeed",
-    "roll_rate_actual",
-    "pitch_rate_actual",
-    "yaw_rate_actual",
-}
-
-# --------------------------------------------------------------------------
 # ⚙️ CONFIGURATION — per-topic field mappings
 # --------------------------------------------------------------------------
 # This maps from MCAP topic → {CSV column: protobuf field name}.
@@ -283,16 +258,6 @@ def process_mcap(input_mcap: str):
             msg.ParseFromString(message.data)
             # Flatten into a dict of {field_name: value}
             data = flatten(msg)
-
-            # Convert degrees → radians for known angular fields
-            for key in list(data.keys()):
-                field_name = key.split(".")[-1]  # handle nested fields like x.y.z
-                if field_name in DEGREE_FIELDS_TO_CONVERT:
-                    try:
-                        data[key] = float(data[key]) * RAD_PER_DEG
-                    except:
-                        pass
-
 
             # Record the timestamp (ns since epoch) and topic.
             data["timestamp_ns"] = message.log_time
