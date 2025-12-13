@@ -61,8 +61,8 @@ uint16_t MCAPLogger::addChannel(const std::string &topic,
 {
     // Load the FileDescriptorSet that CMake generated.
     const std::string descPath =
-#ifdef SCHEMA_DESC_PATH
-        SCHEMA_DESC_PATH;
+#ifdef OS_MCAP_SCHEMA_PATH
+        OS_MCAP_SCHEMA_PATH;
 #else
         "schemas.desc"; // fallback if not defined by CMake
 #endif

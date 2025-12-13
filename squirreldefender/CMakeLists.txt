@@ -542,7 +542,9 @@ if (OS_PROTO_ABS)
 
   # Unique generated dir (top-level build tree)
 #   set(SQUIRREL_GEN_DIR "${CMAKE_BINARY_DIR}/generated_protobufs")
-  set(SQUIRREL_GEN_DIR "${CMAKE_BINARY_DIR}/.cmake/generated_protobufs")
+    # Generated protobuf artifacts (project-owned, but disposable)
+    set(SQUIRREL_GEN_DIR "${CMAKE_BINARY_DIR}/gen/proto")
+
 
 
   # One-time prep: ensure the output dir exists before any proto rules
@@ -599,9 +601,11 @@ if (OS_PROTO_ABS)
   add_dependencies(squirrel_protos_desc squirrel_protos_prep)
 
   # Optional: copy descriptor next to top-level binaries
-  add_custom_command(TARGET squirrel_protos_desc POST_BUILD
+    add_custom_command(TARGET squirrel_protos_desc POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${SQUIRREL_DESC_OUT} ${CMAKE_BINARY_DIR}/schemas.desc)
+            ${SQUIRREL_DESC_OUT}
+            ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/schemas.desc
+    )
 
 else()
   message(STATUS "[squirrel_protos] No .proto files in ${OS_PROTO_DIR}")
@@ -635,6 +639,10 @@ if (NOT BLD_TEST_HARNESS)
                             squirrel_protos
                             ${Protobuf_LIBRARIES}
                             ${SD_COMMON_LINK_LIBS})
+        target_compile_definitions(squirreldefender PRIVATE
+            OS_MCAP_SCHEMA_PATH="${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/schemas.desc"
+        )
+                        
 
         # Wire in protos only if they were defined
         if (TARGET squirrel_protos)
