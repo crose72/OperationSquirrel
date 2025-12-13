@@ -176,12 +176,12 @@ void DataLogger::log_data(void)
         m.set_gps_vz(g_mav_gps_vel_z);
         m.set_gps_hdg(g_mav_gps_heading_cdeg);
 
-        m.set_roll(g_mav_veh_roll_rad * (float)180.0 / M_PI);
-        m.set_pitch(g_mav_veh_pitch_rad * (float)180.0 / M_PI);
-        m.set_yaw(g_mav_veh_yaw_rad * (float)180.0 / M_PI);
-        m.set_rollspeed(g_mav_veh_roll_rate * (float)180.0 / M_PI);
-        m.set_pitchspeed(g_mav_veh_pitch_rate * (float)180.0 / M_PI);
-        m.set_yawspeed(g_mav_veh_yaw_rate * (float)180.0 / M_PI);
+        m.set_roll(g_mav_veh_roll_rad);
+        m.set_pitch(g_mav_veh_pitch_rad);
+        m.set_yaw(g_mav_veh_yaw_rad);
+        m.set_rollspeed(g_mav_veh_roll_rate);
+        m.set_pitchspeed(g_mav_veh_pitch_rate);
+        m.set_yawspeed(g_mav_veh_yaw_rate);
 
         m.set_local_ned_x(g_mav_veh_pos_ned_x);
         m.set_local_ned_y(g_mav_veh_pos_ned_y);
@@ -195,9 +195,9 @@ void DataLogger::log_data(void)
         m.set_q3_actual(g_mav_att_actual_q3);
         m.set_q4_actual(g_mav_att_actual_q4);
 
-        m.set_roll_rate_actual(g_mav_att_actual_roll_rate * (float)180.0 / M_PI);
-        m.set_pitch_rate_actual(g_mav_att_actual_pitch_rate * (float)180.0 / M_PI);
-        m.set_yaw_rate_actual(g_mav_att_actual_yaw_rate * (float)180.0 / M_PI);
+        m.set_roll_rate_actual(g_mav_att_actual_roll_rate);
+        m.set_pitch_rate_actual(g_mav_att_actual_pitch_rate);
+        m.set_yaw_rate_actual(g_mav_att_actual_yaw_rate);
 
         for (int i = 0; i < 4; ++i)
             m.add_repr_offset_q(g_mav_att_repr_offset_q[i]);
@@ -317,8 +317,8 @@ void DataLogger::log_data(void)
         m.set_frame_id(g_cam0_frame_id);
 
         // Camera and angular geometry (converted to degrees where appropriate)
-        m.set_delta_angle(g_cam0_delta_angle_rad * (float)180.0 / M_PI);
-        m.set_camera_tilt_angle(g_cam0_angle_rad * (float)180.0 / M_PI);
+        m.set_delta_angle(g_cam0_delta_angle_rad);
+        m.set_camera_tilt_angle(g_cam0_angle_rad);
 
         m.set_delta_distance_x_m(g_tgt_pos_x_delta);
         m.set_delta_distance_z_m(g_tgt_pos_z_delta);
