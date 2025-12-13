@@ -1,6 +1,10 @@
 /********************************************************************************
  * @file    time_calc.h
+ * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Application-wide timing utilities, maintaining frame time,
+ *          delta time, and epoch timestamps. Used by all modules for
+ *          synchronized timing.
  ********************************************************************************/
 #ifndef TIME_CALC_H
 #define TIME_CALC_H

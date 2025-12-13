@@ -249,7 +249,7 @@ RENAME_MAP = {
     # --- Rangefinder ---
     "g_mav_veh_rngfdr_min_distance":       "g_mav_rngfndr_min_cm",
     "g_mav_veh_rngfdr_max_distance":       "g_mav_rngfndr_max_cm",
-    "g_mav_veh_rngfdr_current_distance":   "g_mav_rngfndr_dist_m",
+    "g_mav_veh_rngfdr_current_distance":   "g_mav_rngfndr_dist_cm",
     "g_mav_veh_rngfdr_type":               "g_mav_rngfndr_type",
     "g_mav_veh_rngfdr_id":                 "g_mav_rngfndr_id",
     "g_mav_veh_rngfdr_orientation":        "g_mav_rngfndr_orient",

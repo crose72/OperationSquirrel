@@ -73,3 +73,24 @@ if ! grep -q "export OS_WS=" "$BASHRC_PATH"; then
     echo "export OS_WS=$WORKSPACE_PATH" >> "$BASHRC_PATH"
     echo "✅ Added OS_WS to ~/.bashrc"
 fi
+
+# --------------------------------------------------------------------------
+# Ensure build folder structure exists for squirreldefender
+# --------------------------------------------------------------------------
+SDF_PATH="$WORKSPACE_PATH/operationsquirrel/squirreldefender"
+BUILD_DIR="$SDF_PATH/build"
+CMAKE_DIR="$BUILD_DIR/.cmake"
+
+echo "📁 Ensuring squirreldefender build directories exist..."
+
+if [[ ! -d "$BUILD_DIR" ]]; then
+    mkdir -p "$BUILD_DIR"
+    echo "  ➕ Created: $BUILD_DIR"
+fi
+
+if [[ ! -d "$CMAKE_DIR" ]]; then
+    mkdir -p "$CMAKE_DIR"
+    echo "  ➕ Created: $CMAKE_DIR"
+fi
+
+echo "✅ Build directory ready: $CMAKE_DIR"

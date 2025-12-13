@@ -4,7 +4,7 @@ set -euo pipefail
 echo "🔧 Starting MCAP → CSV conversion..."
 
 # --- Parse arguments ---
-PROTO_DIR="proto"  # default
+PROTO_DIR="../squirreldefender/proto"  # default protobufs path
 ARGS=()
 
 while [[ $# -gt 0 ]]; do

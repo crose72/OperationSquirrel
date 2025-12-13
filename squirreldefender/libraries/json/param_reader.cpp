@@ -51,8 +51,51 @@ float ParamReader::get_float_param(const std::string &path) const
 {
     const Json::Value *node = resolve_path(path);
     if (!node)
-        return 0.0f;
+        return (float)0.0;
     return node->asFloat();
+}
+
+/********************************************************************************
+ * Function: get_uint8_param
+ * Description: Return the values of parameters that are of type uint8_t.
+ ********************************************************************************/
+uint8_t ParamReader::get_uint8_param(const std::string &path) const
+{
+    const Json::Value *node = resolve_path(path);
+    if (!node)
+        return (uint8_t)0;
+
+    uint32_t value = node->asUInt();
+    if (value > UINT8_MAX)
+    {
+        spdlog::warn("ParamReader: Value out of uint8_t range for '{}': {}",
+                     path, value);
+        return UINT8_MAX;
+    }
+
+    return static_cast<uint8_t>(value);
+}
+
+/********************************************************************************
+ * Function: get_uint16_param
+ * Description: Return the values of parameters that are of type uint16_t.
+ ********************************************************************************/
+uint16_t ParamReader::get_uint16_param(const std::string &path) const
+{
+    const Json::Value *node = resolve_path(path);
+    if (!node)
+        return (uint16_t)0;
+
+    // Clamp to uint16_t range to avoid accidental overflow
+    uint32_t value = node->asUInt();
+    if (value > UINT16_MAX)
+    {
+        spdlog::warn("ParamReader: Value out of uint16_t range for '{}': {}",
+                     path, value);
+        return UINT16_MAX;
+    }
+
+    return static_cast<uint16_t>(value);
 }
 
 /********************************************************************************
@@ -63,7 +106,7 @@ uint32_t ParamReader::get_uint32_param(const std::string &path) const
 {
     const Json::Value *node = resolve_path(path);
     if (!node)
-        return 0u;
+        return (uint32_t)0;
     return node->asUInt();
 }
 
@@ -75,7 +118,7 @@ int ParamReader::get_int_param(const std::string &path) const
 {
     const Json::Value *node = resolve_path(path);
     if (!node)
-        return 0;
+        return (int)0;
     return node->asInt();
 }
 

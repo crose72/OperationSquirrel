@@ -32,10 +32,10 @@ MavMotion::MavMotion(void) {}
 MavMotion::~MavMotion(void) {}
 
 /********************************************************************************
- * Function: cmd_position_NED
+ * Function: cmd_position_ned
  * Description: Move to an x,y,z coordinate in the NED frame.
  ********************************************************************************/
-void MavMotion::cmd_position_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float position_target[3])
+void MavMotion::cmd_position_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float position_target[3])
 {
     float yaw_target = 0.0;
     uint16_t options = 0;
@@ -51,10 +51,10 @@ void MavMotion::cmd_position_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, 
 }
 
 /********************************************************************************
- * Function: cmd_velocity_NED
+ * Function: cmd_velocity_ned
  * Description: Move in direction of vector vx,vy,vz in the NED frame.
  ********************************************************************************/
-void MavMotion::cmd_velocity_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target[3], float yaw_target)
+void MavMotion::cmd_velocity_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target[3], float yaw_target)
 {
     uint16_t options = 0;
 
@@ -67,10 +67,10 @@ void MavMotion::cmd_velocity_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, 
 }
 
 /********************************************************************************
- * Function: cmd_velocity_xy_NED
+ * Function: cmd_velocity_xy_ned
  * Description: Move in xy plane given a vector vx,vy in the NED frame.
  ********************************************************************************/
-void MavMotion::cmd_velocity_xy_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target[3])
+void MavMotion::cmd_velocity_xy_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target[3])
 {
     float yaw_target = 0.0;
     uint16_t options = 0;
@@ -85,10 +85,10 @@ void MavMotion::cmd_velocity_xy_NED(uint8_t sender_sys_id, uint8_t sender_comp_i
 }
 
 /********************************************************************************
- * Function: cmd_velocity_x_NED
+ * Function: cmd_velocity_x_ned
  * Description: Move in direction of vector vx in the NED frame.
  ********************************************************************************/
-void MavMotion::cmd_velocity_x_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target)
+void MavMotion::cmd_velocity_x_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target)
 {
     uint16_t options = 0;
 
@@ -100,10 +100,10 @@ void MavMotion::cmd_velocity_x_NED(uint8_t sender_sys_id, uint8_t sender_comp_id
 }
 
 /********************************************************************************
- * Function: cmd_velocity_y_NED
+ * Function: cmd_velocity_y_ned
  * Description: Move in direction of vector vy in the NED frame.
  ********************************************************************************/
-void MavMotion::cmd_velocity_y_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target)
+void MavMotion::cmd_velocity_y_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target)
 {
     uint16_t options = 0;
 
@@ -117,10 +117,10 @@ void MavMotion::cmd_velocity_y_NED(uint8_t sender_sys_id, uint8_t sender_comp_id
 }
 
 /********************************************************************************
- * Function: cmd_velocity_y_NED
+ * Function: cmd_velocity_y_ned
  * Description: Move in direction of vector vy in the NED frame.
  ********************************************************************************/
-void MavMotion::cmd_velocity_z_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target)
+void MavMotion::cmd_velocity_z_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target)
 {
     uint16_t options = 0;
 

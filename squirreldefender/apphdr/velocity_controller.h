@@ -2,6 +2,8 @@
  * @file    velocity_controller
  * @author  Cameron Rose
  * @date    3/12/2025
+ * @brief   Computes and regulates vehicle velocity commands. Applies smoothing,
+ *          filtering, limits, and control logic for target-relative motion.
  ********************************************************************************/
 
 #ifndef VELOCITY_CONTROLLER_H

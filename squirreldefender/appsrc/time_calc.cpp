@@ -8,10 +8,11 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "time_calc.h"
 #include <chrono>
 #include <cmath>
+
+#include "common_inc.h"
+#include "time_calc.h"
 
 /********************************************************************************
  * Typedefs
@@ -24,20 +25,22 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-float app_elapsed_time_prv;
-float g_app_time_s;
-uint64_t g_app_time_ns;
-float g_app_dt;
-bool g_app_first_loop;
-std::chrono::time_point<std::chrono::steady_clock> start_time;
-std::chrono::duration<float, std::milli> elapsed_time((float)0.0);
 
-// single steady baseline for elapsed time
-static std::chrono::steady_clock::time_point g_start_steady;
+// Runtime elapsed timing (steady_clock)
+float g_app_time_s;     // Elapsed app time [s], truncated to ms
+float g_app_dt;         // Delta time between loops [s]
+uint64_t g_app_time_ns; // Elapsed app time since start [ns]
+float app_time_s_prv;   // Previous loop timestamp [s] for computing dt
 
-// offset that maps steady_clock → system_clock epoch (computed at init)
-static uint64_t g_offset_ns = 0;
-uint64_t g_app_epoch_ns = 0;
+// Epoch timing (wall clock)
+uint64_t g_app_epoch_ns; // Current Unix epoch time [ns]
+uint64_t g_offset_ns;    // steady_clock → epoch offset [ns]
+
+// App start baseline (steady_clock)
+static std::chrono::steady_clock::time_point g_start_steady; // Steady-clock baseline at init
+
+// Loop initialization flag
+bool g_app_first_loop; // True on the first loop iteration
 
 /********************************************************************************
  * Calibration definitions
@@ -83,14 +86,15 @@ static inline uint64_t epoch_now_ns()
 
 /********************************************************************************
  * Function: calc_app_runtime
- * Description: Class constructor
+ * Description: Calculate how long the program has been running.  Use
+ *              steady_clock monotomic timing.
  ********************************************************************************/
 void calc_app_runtime(void)
 {
     if (g_app_first_loop)
     {
         g_app_first_loop = false;
-        app_elapsed_time_prv = 0.0f;
+        app_time_s_prv = 0.0f;
         g_app_time_s = 0.0f;
         g_app_dt = 0.0f;
         return;
@@ -104,11 +108,11 @@ void calc_app_runtime(void)
     // convert to seconds (float) for your existing API, with ms precision
     const float app_elapsed_time_tmp = static_cast<float>(elapsed_ns) * 1e-9f;
 
-    g_app_dt = app_elapsed_time_tmp - app_elapsed_time_prv;
+    g_app_dt = app_elapsed_time_tmp - app_time_s_prv;
 
     // Truncate to three decimal places (ms)
     g_app_time_s = std::floor(app_elapsed_time_tmp * 1000.0f) / 1000.0f;
-    app_elapsed_time_prv = g_app_time_s;
+    app_time_s_prv = g_app_time_s;
 }
 
 /********************************************************************************
@@ -129,12 +133,7 @@ Time::~Time(void) {}
  ********************************************************************************/
 bool Time::init(void)
 {
-    g_app_time_s = (float)0.0;
-    g_app_dt = (float)0.0;
-    app_elapsed_time_prv = (float)0.0;
     g_app_first_loop = true;
-    g_app_time_ns = (uint64_t)0;
-
     g_start_steady = std::chrono::steady_clock::now();
 
     // compute fixed offset so steady→epoch is monotonic but epoch-referenced

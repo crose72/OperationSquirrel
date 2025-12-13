@@ -2,6 +2,7 @@
  * @file    custom_print.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Custom print statements using c formatted print statements or c++ IO.
  ********************************************************************************/
 #ifndef CUSTOM_PRINT_H
 #define CUSTOM_PRINT_H

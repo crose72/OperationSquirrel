@@ -2,6 +2,7 @@
  * @file    mcap_logger.h
  * @author  Cameron Rose
  * @date    9/26/2025
+ * @brief   A C++ class to enable logging into MCAP files.
  ********************************************************************************/
 #ifndef MCAP_LOGGER_H
 #define MCAP_LOGGER_H
@@ -9,11 +10,12 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include <fstream>
+#include <unordered_map>
+
 #include <mcap/internal.hpp> // important to include this before write.hpp and writer.inl
 #include <mcap/writer.hpp>
 #include <mcap/types.hpp>
-#include <fstream>
-#include <unordered_map>
 
 /********************************************************************************
  * Typedefs / Enums / Structs

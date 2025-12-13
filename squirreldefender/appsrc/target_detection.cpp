@@ -53,15 +53,15 @@ bool TargetDetection::init(void)
 {
 #ifdef BLD_JETSON_B01
 
-    return SSD::init();
+    return DetectorSSD::init();
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
-    return YOLO::init();
+    return DetectorYOLO::init();
 
 #elif defined(BLD_WIN)
 
-    return YOLO::init();
+    return DetectorYOLO::init();
 
 #else
 
@@ -78,15 +78,15 @@ void TargetDetection::loop(void)
 {
 #ifdef BLD_JETSON_B01
 
-    return SSD::loop();
+    return DetectorSSD::loop();
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
-    return YOLO::loop();
+    return DetectorYOLO::loop();
 
 #elif defined(BLD_WIN)
 
-    return YOLO::loop();
+    return DetectorYOLO::loop();
 
 #else
 
@@ -103,15 +103,15 @@ void TargetDetection::shutdown(void)
 {
 #ifdef BLD_JETSON_B01
 
-    return SSD::shutdown();
+    return DetectorSSD::shutdown();
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
-    return YOLO::shutdown();
+    return DetectorYOLO::shutdown();
 
 #elif defined(BLD_WIN)
 
-    return YOLO::shutdown();
+    return DetectorYOLO::shutdown();
 
 #else
 

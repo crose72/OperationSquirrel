@@ -2,6 +2,7 @@
  * @file    curve_fitting.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Utilities for regression.
  ********************************************************************************/
 #ifndef CURVE_FITTING_H
 #define CURVE_FITTING_H

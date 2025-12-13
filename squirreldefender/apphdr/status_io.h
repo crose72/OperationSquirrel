@@ -4,6 +4,9 @@
  * @file    status_io.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Jetson Nano B01 hardware I/O for status LEDs and user input buttons.
+ *          Provides simple static functions for signaling system states and
+ *          handling save-video button presses.
  ********************************************************************************/
 #ifndef JETSON_B01_IO_H
 #define JETSON_B01_IO_H

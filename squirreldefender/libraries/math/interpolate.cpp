@@ -2,15 +2,16 @@
  * @file    interpolate.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Utilities for interpolating within 1D and 2D arrays.
+ * @brief   Utilities for interpolating within xD arrays.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "interpolate.h"
 #include <stdint.h>
 #include <cmath>
+
+#include "interpolate.h"
 
 /********************************************************************************
  * Private macros and defines

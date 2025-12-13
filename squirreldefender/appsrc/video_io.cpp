@@ -55,7 +55,7 @@ bool Video::init(void)
 
     return VideoNV::init();
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     return VideoCV::init();
 
@@ -80,7 +80,7 @@ void Video::in_loop(void)
 
     VideoNV::in_loop();
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     VideoCV::in_loop();
 
@@ -105,7 +105,7 @@ void Video::out_loop(void)
 
     VideoNV::out_loop();
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     VideoCV::out_loop();
 
@@ -130,7 +130,7 @@ void Video::shutdown(void)
 
     VideoNV::shutdown();
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     VideoCV::shutdown();
 

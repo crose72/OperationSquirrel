@@ -25,8 +25,8 @@ case "$PLATFORM" in
     b01)
         BUILD_TAG="r32.7.1"
         ;;
-    ubuntu-22.04_sm86)
-        BUILD_TAG="ubuntu-22.04_sm86"
+    ubuntu-22.04-sm86)
+        BUILD_TAG="ubuntu-22.04-sm86"
         ;;
     *)
         echo "❌ Invalid platform: $PLATFORM"

@@ -1,26 +1,30 @@
 #ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WIN) || defined(BLD_WSL)
 
 /********************************************************************************
  * @file    video_io_cv.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Configure and start video streams on jetson orin using opencv and
+ * @brief   Configure and start video streams using opencv and
  *          gstreamer.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "video_io_opencv.h"
-#include "time_calc.h"
-#include <opencv2/cudaimgproc.hpp>
-#include <spdlog/spdlog.h>
 #include <sstream>
 #include <filesystem>
 #include <fstream>
 #include <cmath>
+#include <string>
+
+#include <opencv2/cudaimgproc.hpp>
+#include <spdlog/spdlog.h>
+
+#include "common_inc.h"
+#include "video_io_opencv.h"
+#include "time_calc.h"
+#include "param_reader.h"
 
 /********************************************************************************
  * Typedefs
@@ -92,23 +96,24 @@ bool file_exists(const std::string &name)
  * Function: generate_unique_file_name
  * Description: Generate a unique file name by incrementing the name by 1.
  ********************************************************************************/
-std::string generate_unique_file_name(const std::string &base_name, const std::string &extension)
+std::string generate_unique_file_name(const std::string &base_name,
+                                      const std::string &extension)
 {
-    std::string file_name = base_path + base_name + extension;
-    int index = 1;
+    int index = 0;
 
-    while (file_exists(file_name))
+    while (true)
     {
-        file_name = base_path + base_name + "_" + std::to_string(index) + extension;
+        std::string candidate =
+            (index == 0)
+                ? base_name + extension
+                : base_name + "_" + std::to_string(index) + extension;
+
+        if (!file_exists(base_path + candidate))
+            return candidate;
+
         index++;
     }
-
-    return file_name;
 }
-
-#include <string>
-#include <sstream>
-#include "param_reader.h" // Your existing ParamReader class
 
 /********************************************************************************
  * Function: get_video_io_params
@@ -121,7 +126,7 @@ void get_video_io_params(void)
     g_cam0_img_width_px = cfg.get_float_param("camera_control_params.video_input_width");
     g_cam0_img_height_px = cfg.get_float_param("camera_control_params.video_input_height");
     cam0_video_out_fps = cfg.get_float_param("camera_control_params.video_output_framerate");
-    g_cam0_fov_deg = cfg.get_float_param("camera_control_params.video_output_framerate");
+    g_cam0_fov_deg = cfg.get_float_param("camera_control_params.cam0_fov_degrees");
     g_cam0_tilt_deg = cfg.get_float_param("camera_control_params.cam0_tilt_down_angle_degrees");
     g_cam0_tilt_rad = g_cam0_tilt_deg * M_PI / (float)180.0;
     g_cam0_fov_rad = g_cam0_fov_deg * M_PI / (float)180.0;
@@ -140,6 +145,7 @@ void create_gstreamer_pipelines(std::string &capture_pipeline,
 
     /**************** CAMERA PARAMETERS ****************/
     int sensor_mode = cfg.get_int_param("camera_params.sensor_mode");
+    int sensor_id = cfg.get_int_param("camera_params.sensor_id");
     int wb_mode = cfg.get_int_param("camera_params.wb_mode");
     int aeantibanding = cfg.get_int_param("camera_params.ae_antibanding_mode");
     int tnr_mode = cfg.get_int_param("camera_params.tnr_mode");
@@ -171,14 +177,15 @@ void create_gstreamer_pipelines(std::string &capture_pipeline,
 
     /**************** BUILD CAPTURE PIPELINE ****************/
     std::ostringstream ss_cap;
-    ss_cap << "nvarguscamerasrc sensor-mode=" << sensor_mode
-           << " wb_mode=" << wb_mode
-           << " aeantibanding=" << aeantibanding
-           << " tnr-mode=" << tnr_mode
-           << " ee-mode=" << ee_mode
-           << " exposuretimerange=\"" << exposure_min << " " << exposure_max << "\""
-           << " gainrange=\"" << gain_min << " " << gain_max << "\""
-           << " ispdigitalgainrange=\"" << isp_dgain_min << " " << isp_dgain_max << "\" ! "
+    ss_cap << "nvarguscamerasrc sensor-id=" << sensor_id << " "
+           << "sensor-mode=" << sensor_mode << " "
+           << "wb_mode=" << wb_mode << " "
+           << "aeantibanding=" << aeantibanding << " "
+           << "tnr-mode=" << tnr_mode << " "
+           << "ee-mode=" << ee_mode << " "
+           << "exposuretimerange=\"" << exposure_min << " " << exposure_max << "\""
+           << "gainrange=\"" << gain_min << " " << gain_max << "\""
+           << "ispdigitalgainrange=\"" << isp_dgain_min << " " << isp_dgain_max << "\" ! "
            << "video/x-raw(memory:NVMM),format=" << input_format
            << ",width=" << input_width << ",height=" << input_height
            << ",framerate=" << input_rate << " ! "
@@ -223,10 +230,10 @@ void create_gstreamer_pipelines(std::string &capture_pipeline,
  ********************************************************************************/
 bool create_video_io_streams(void)
 {
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
-    const std::string base_path = "/workspace/operationsquirrel/squirreldefender/data/";
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
+    base_path = "/workspace/operationsquirrel/squirreldefender/data/";
 #else
-    const std::string base_path = "./";
+    base_path = "./";
 #endif
 
     // Make sure the folder exists
@@ -245,7 +252,7 @@ bool create_video_io_streams(void)
     // Use live camera feed or use prerecorded video
     if (!g_app_use_video_playback)
     {
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
         cam0_capture.open(video_cap_pipeline, cv::CAP_GSTREAMER);
 
@@ -342,6 +349,8 @@ void overlay_text(
     int thickness)
 {
     std::ostringstream stream;
+
+    // TODO: change to std::string text = label + ": " + value; ?
     stream << std::fixed << value;
 
     std::string text = label + ": " + stream.str();
@@ -454,23 +463,22 @@ VideoCV::~VideoCV(void) {}
 
 /********************************************************************************
  * Function: init
- * Description: Code to initialize video streams to run onces at the start of the
- *              program.
+ * Description: Initialize video streams.
  ********************************************************************************/
 bool VideoCV::init(void)
 {
     get_video_io_params();
 
-    g_cam0_img_valid = false;
-    g_cam0_img_cpu = NULL;
-    g_video_end = false;
-    cam0_video_out_fps_actual = (float)16.67;
-    g_cam0_frame_id = (uint32_t)0;
+    cam0_video_out_fps_actual = (float)21.0;
+
+#ifndef BLD_TEST_HARNESS
 
     if (!create_video_io_streams())
     {
         return false;
     }
+
+#endif
 
     return true;
 }
@@ -511,5 +519,5 @@ void VideoCV::shutdown(void)
     spdlog::info("video:  shutdown complete.\n");
 }
 
-#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
+#endif // defined(BLD_JETSON_ORIN) || defined(BLD_WIN) || defined(BLD_WSL)
 #endif // ENABLE_CV

@@ -3,8 +3,8 @@
 # 🐿️ Operation Squirrel - Ubuntu 22.04 (CUDA sm86) Dev Container Launcher
 # ------------------------------------------------------------------------------
 # Usage:
-#   ./run_dev_ubuntu22_sm86.sh              → normal interactive dev session
-#   ./run_dev_ubuntu22_sm86.sh osremote     → persistent container for OSRemote
+#   ./run_dev_ubuntu22-sm86.sh              → normal interactive dev session
+#   ./run_dev_ubuntu22-sm86.sh osremote     → persistent container for OSRemote
 # ==============================================================================
 
 set -e
@@ -106,20 +106,20 @@ if [ "$IS_CI" = true ]; then
         $IMAGE_NAME \
         bash -c "
             cd /workspace/operationsquirrel/squirreldefender &&
+            rm -rf build &&
             mkdir -p build &&
-            cd build &&
-            cmake .. \
+            cmake -S . -B build/.cmake \
                 -DBLD_WSL=ON \
                 -DBLD_JETSON_B01=OFF \
-                -DBLD_JETSON_ORIN_NANO=OFF \
+                -DBLD_JETSON_ORIN=OFF \
                 -DBLD_WIN=OFF \
                 -DWIN_TCP=OFF \
                 -DWIN_SERIAL=OFF \
                 -DWIN_ENABLE_CV=OFF \
-                -DBUILD_TEST_HARNESS=OFF \
+                -DBLD_TEST_HARNESS=OFF \
                 -DENABLE_GDB=OFF \
-                -DENABLE_SECRET_SQUIRREL=OFF &&
-            make -j\$(nproc)
+                -DENABLE_SECRET_SQUIRREL=OFF && \
+            cmake --build build/.cmake -- -j$(nproc)
         "
 
     exit 0

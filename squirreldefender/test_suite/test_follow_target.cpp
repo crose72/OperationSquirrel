@@ -184,8 +184,8 @@ void get_test_inputs(size_t data_index)
     time_prv = g_app_time_s;
 
     // Calculate target bbox center manually - not logged originally
-    g_tgt_center_x_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
-    g_tgt_center_y_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
+    g_tgt_cntr_x_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
+    g_tgt_cntr_y_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
 }
 
 void write_test_outputs(void)

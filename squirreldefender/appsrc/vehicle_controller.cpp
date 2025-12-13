@@ -32,7 +32,7 @@
 bool takeoff_dbc;
 bool start_follow_mode;
 uint16_t takeoff_dbc_cnt;
-float desired_veh_alt;
+float desired_veh_alt_m;
 
 /********************************************************************************
  * Calibration definitions
@@ -62,7 +62,7 @@ void follow_mode(void)
 
     if (g_tgt_valid)
     {
-        MavMotion::cmd_velocity_NED(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, target_velocity, g_ctrl_yaw_cmd);
+        MavMotion::cmd_velocity_ned(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id, target_velocity, g_ctrl_yaw_cmd);
     }
 }
 
@@ -76,15 +76,15 @@ void dtrmn_veh_control_action(void)
 {
     if (g_system_state == SystemState::INIT)
     {
-        MavCmd::set_mode_guided(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+        MavCmd::set_mode_guided(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id);
     }
     else if (g_system_state == SystemState::PRE_ARM_GOOD)
     {
-        MavCmd::arm_vehicle(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+        MavCmd::arm_vehicle(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id);
     }
     else if (g_system_state == SystemState::STANDBY)
     {
-        MavCmd::takeoff_gps(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID, desired_veh_alt);
+        MavCmd::takeoff_gps(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id, desired_veh_alt_m);
     }
     else if (g_system_state == SystemState::IN_FLIGHT_GOOD)
     {
@@ -100,7 +100,7 @@ void dtrmn_veh_control_action(void)
             takeoff_dbc = true;
         }
 
-        if (takeoff_dbc && g_mav_rngfndr_dist_m > min_mission_alt_cm || g_mav_gps_alt_rel > min_mission_alt_mm)
+        if (takeoff_dbc && (g_mav_rngfndr_dist_cm > min_mission_alt_cm || g_mav_gps_alt_rel > min_mission_alt_mm))
         {
             start_follow_mode = true;
         }
@@ -114,13 +114,13 @@ void dtrmn_veh_control_action(void)
 
 /********************************************************************************
  * Function: VehicleController
- * Description: Constructor of the VehicleController clasds.
+ * Description: Constructor
  ********************************************************************************/
 VehicleController::VehicleController(void) {}
 
 /********************************************************************************
  * Function: VehicleController
- * Description: Constructor of the VehicleController class.
+ * Description: Destructor
  ********************************************************************************/
 VehicleController::~VehicleController(void) {}
 
@@ -132,12 +132,10 @@ bool VehicleController::init(void)
 {
     ParamReader mission_params("../params.json");
 
-    takeoff_dbc = false;
-    start_follow_mode = false;
     takeoff_dbc_cnt = mission_params.get_float_param("mission_params.mission_start_delay_count");
     min_mission_alt_cm = mission_params.get_float_param("mission_params.min_mission_alt_cm");
     min_mission_alt_mm = mission_params.get_float_param("mission_params.min_mission_alt_mm");
-    desired_veh_alt = mission_params.get_float_param("mission_params.takeoff_alt_m");
+    desired_veh_alt_m = mission_params.get_float_param("mission_params.takeoff_alt_m");
 
     return true;
 }
@@ -158,5 +156,5 @@ void VehicleController::loop(void)
 void VehicleController::shutdown(void)
 {
     // When operating with OSRemote we don't want it to land every time
-    // MavCmd::set_mode_land(SENDER_SYS_ID, SENDER_COMP_ID, TARGET_SYS_ID, TARGET_COMP_ID);
+    // MavCmd::set_mode_land(companion_sys_id, companion_comp_id, autopilot_sys_id, autopilot_comp_id);
 }

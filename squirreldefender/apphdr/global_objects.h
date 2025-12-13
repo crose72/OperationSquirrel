@@ -2,6 +2,7 @@
  * @file    global_objects.cpp
  * @author  Cameron Rose
  * @date    7/30/2025
+ * @brief   Global variables shared across the software system.
  ********************************************************************************/
 #ifndef GLOBAL_OBJECTS_H
 #define GLOBAL_OBJECTS_H

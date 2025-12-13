@@ -4,6 +4,8 @@
  * @file    system_controller.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   High-level system state manager. Provides initialization, periodic
+ *          updates, and global control handling.
  ********************************************************************************/
 #ifndef SYSTEM_CONTROLLER_H
 #define SYSTEM_CONTROLLER_H

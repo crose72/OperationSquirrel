@@ -4,6 +4,9 @@
  * @file    video_io.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Platform-selection layer for video input/output. Routes video I/O
+ *          to the Jetson Nano B01 (VideoNV) or to the OpenCV/GStreamer path
+ *          (VideoCV) for all other supported platforms.
  ********************************************************************************/
 #ifndef VIDEO_IO_H
 #define VIDEO_IO_H
@@ -15,7 +18,7 @@
 
 #include "video_io_nv.h"
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WIN) || defined(BLD_WSL)
 
 #include "video_io_opencv.h"
 

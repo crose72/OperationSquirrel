@@ -28,7 +28,7 @@ cd operationsquirrel/scripts
 ./run dev b01
 
 # for ubuntu-22.02 with gpu sm 8.6
-./run.sh dev ubuntu-22.04_sm86
+./run.sh dev ubuntu-22.04-sm86
 
 # squirreldefender containers (deployment)
 # for the orin
