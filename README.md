@@ -1,6 +1,6 @@
 # operationsquirrel
 
-## The drone
+### The drone
 <img src="https://github.com/user-attachments/assets/e551dd46-b7c2-478f-9a46-858f54ebddc5" alt="Image 1" width="640">
 
 ### Drone stabilization test
@@ -24,38 +24,64 @@ And I'll be uploading an even better video than this one soon!
 
 ## Description
 
-This project is aimed at creating an autonomous drone to deliver static and/or dynamic payloads to a moving target.  Advanced control methods, path planning algorithms, localization, AI/ML techniques and more will be deployed to achieve this goal.  The engineering feats accomplished along the way are stepping stones for other exciting problems.  The work done for this project can be expanded to protect crops from birds, home security, deliveries, or any other creative use.
+Operation Squirrel is an autonomous drone research project focused on visual target following, payload delivery, advanced control systems, and robust real‑world robotics engineering.
 
-- `ardupilot` - flight controller parameters, firmware, and other ardupilot related things
-- `docker` - dockerfiles for building containers
-- `docs` - instructions on how to set up the simulation and code documentation
-- `scratch` - sandbox for experimental code worth saving
-- `scripts` - scripts to automatically install dependencies or do other tasks
-- `squirreldefender` - autonomous drone code for companion computer or ground station
-- `tools` - tools for processing data or performing other useful tasks
-- `wsl` - WSL2 kernel that supports USBIPD (connecting usb devices to wsl)
+The system combines:
+- CUDA accelerated YOLOv8 object detection
+- Real‑time tracking + sensor fusion
+- Autonomous flight behaviors
+- Hardware‑in‑loop simulation
+- Robust MCAP telemetry logging
+
+The engineering work is broadly applicable to agriculture, home security, education, delivery robotics, and more.
+
+Repository structure:
+- `ardupilot` — flight controller configs, firmware, tuning
+- `docker` — container definitions
+- `docs` — documentation + setup guides
+- `scripts` — setup + automation scripts
+- `squirreldefender` — main autonomy/vision/control stack
 
 Developer chat: <https://discord.gg/Uxg9tpVMP9>
 
-If you need help or the instructions are unclear, please reach out in the discord  :)
+If anything is unclear, join the Discord — we help fast :)
 
 ## Introduction (TL:DR)
  
-Some things you might be wondering about this project are "How do I use this?", "What does the code do?"  If you want to make an autonomous drone that is able to identify and follow a target based an object detector that is performing inference on a live camera feed, then the code in the squirreldefender folder is what you want.  
+If you want an **autonomous drone that follows a target using computer vision**, this project gives you everything.
 
-You need two things for this project to work for you.  First you need a device on which to compile the code (Jetson Nano, Jetson Orin Nano, Windows laptop, microcontroller, etc).  Second you need a drone (real or simulated).
+`squirreldefender` is the Jetson‑powered companion‑computer stack that:
+- Reads camera frames
+- Runs high‑speed YOLOv8 detection
+- Tracks a target
+- Computes control commands
+- Sends MAVLink to the flight controller
+- Logs everything
 
-If you don't have a Jetson and never will, not to fear, you can still compile the `squirreldefender` code on your laptop, run the simulation, and it will control the simulated drone based on your webcam feed.
+## How you can use this project
 
-If you have a Jetson or other SBC but you don't have a drone, don't worry, you can compile the `squirreldefender` code on the jetson, connect the jetson to your laptop via FTDI to USB device, run the simulation on the laptop, and then run the program on the jetson and it will control the drone based on the camera feed from your jetson.
+You only need **two things**:
+1. A device to run squirreldefender (Jetson, WSL2, Linux laptop)
+2. A drone (real or simulated)
 
-If you have a Jetson and a drone, hooray!  Same thing as above but now you connect the UART pins on your Jetson to the UART on your drone, which should be configured for Mavlink 2.
+### Scenarios
 
-What if you don't have a Jetson but you have a drone, hooray!  If you have an fpv camera on your drone and are able to stream that back to your laptop (or technically the Jetson if you didn't want to mount the Jetson onto the drone), then you can follow a target using the fpv camera feed and as long as you have a SiK radio or something similar to send out the mavlink commands to the drone, this will work.
+✔ No Jetson? Use your laptop webcam with SITL
+> Runs the full autonomy stack on WSL2/Linux. SITL simulates the drone.
 
-What if you don't have a Jetson but you have a drone and a windows laptop, hooray!  Well, sort of.  If you have a SiK radio connected to one of the USB ports on your laptop you can actually send commands to the drone with our code that way too (though mission planner and q grount control can do that too).
+✔ Jetson + no drone? Use SITL
+> Jetson → FTDI → laptop → SITL. Camera on Jetson; flight simulated.
 
-Okay now that I've told you many ways in which you can use this project I'll leave it up to you to decide how to use it for your needs.
+✔ Jetson + drone? Full real‑world autonomy
+> Jetson → UART → flight controller. Camera → Jetson → squirreldefender.
+
+✔ No Jetson + drone + FPV? Use FPV feed
+> Laptop processes FPV video and sends MAVLink via SiK radio.
+
+✔ Windows laptop + drone? Yes
+> SITL + SiK radio + WSL2 + Docker.
+
+You choose how to deploy — everything is modular.
 
 ## Getting started
 
@@ -63,8 +89,8 @@ The above introduction hopefully provided some context for what this project is 
 
 If you want to understand how the software is written and the flow, look at `docs/diagrams/software-architecture`.
 
-- Follow the instructions in [README](https://github.com/crose72/operationsquirrel/blob/dev/squirreldefender/README.md) to compile and run the program
-- Follow the instructions in [01-setting-up-sitl](https://github.com/crose72/operationsquirrel/blob/dev/docs/01-setting-up-sitl.md) to setup the simulation environment.
-- Follow the instructions in [02-connecting-to-sitl](https://github.com/crose72/operationsquirrel/blob/dev/docs/02-connecting-to-sitl.md) to control the simulated drone with your Jetson
-- (Optional) Follow the instructions in [03-setting-up-airsim-with-sitl](https://github.com/crose72/operationsquirrel/blob/dev/docs/03-setting-up-airsim-with-sitl.md) to setup a photo-realistic simulation
-- Follow the instruction in [Pre-Flight Checklist](https://github.com/crose72/operationsquirrel/blob/dev/docs/Pre-Flight-Checklist.md) if you're ready to fly a drone autonomously
+- Compile & run `squirreldefender` [README](https://github.com/crose72/operationsquirrel/blob/dev/squirreldefender/README.md)
+- Set up SITL Simulation [01-setting-up-sitl](https://github.com/crose72/operationsquirrel/blob/dev/docs/01-setting-up-sitl.md)
+- Connecting Jetson/WSL2/Linux to SITL [02-connecting-to-sitl](https://github.com/crose72/operationsquirrel/blob/dev/docs/02-connecting-to-sitl.md)
+- (Optional) AirSim photorealistic simulation [03-setting-up-airsim-with-sitl](https://github.com/crose72/operationsquirrel/blob/dev/docs/03-setting-up-airsim-with-sitl.md)
+- Pre-flight checklist [Pre-Flight Checklist](https://github.com/crose72/operationsquirrel/blob/dev/docs/Pre-Flight-Checklist.md)
