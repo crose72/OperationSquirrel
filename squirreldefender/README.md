@@ -26,7 +26,7 @@ On the Jetson, perform the following setup outside of the container and then ver
 
     ```bash
     # Create a workspace
-    mkdir ~/workspaces/os-dev
+    mkdir -p ~/workspaces/os-dev
     cd ~/workspaces/os-dev
 
     # Clone the repository
