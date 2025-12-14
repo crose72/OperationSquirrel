@@ -22,4 +22,4 @@ jobs:
         run: chmod +x scripts/run.sh
 
       - name: Build squirreldefender (BLD_WSL config)
-        run: ./scripts/run.sh dev ubuntu-22.04_sm86
+        run: ./scripts/run.sh dev ubuntu-22.04-sm86

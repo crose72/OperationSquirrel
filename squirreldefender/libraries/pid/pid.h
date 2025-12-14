@@ -2,6 +2,7 @@
  * @file    pid.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   PID controller implementation and variations.
  ********************************************************************************/
 #ifndef PID_CONTROLLER_H
 #define PID_CONTROLLER_H

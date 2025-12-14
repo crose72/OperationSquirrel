@@ -2,6 +2,7 @@
  * @file    interpolate.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Utilities for interpolating within xD arrays.
  ********************************************************************************/
 #ifndef INTERPOLATE_H
 #define INTERPOLATE_H

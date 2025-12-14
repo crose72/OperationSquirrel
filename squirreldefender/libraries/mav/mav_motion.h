@@ -2,6 +2,8 @@
  * @file    mav_motion_utils.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Utilities for controlling the position, velocity, acceleration, or
+ *          attitude of the vehicle.
  ********************************************************************************/
 #ifndef MAV_MOTION_H
 #define MAV_MOTION_H
@@ -24,12 +26,12 @@ class MavMotion
     ~MavMotion();
 
 public:
-    static void cmd_position_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float position_target[3]);
-    static void cmd_velocity_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target[3], float yaw_target);
-    static void cmd_velocity_xy_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target[3]);
-    static void cmd_velocity_x_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target);
-    static void cmd_velocity_y_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target);
-    static void cmd_velocity_z_NED(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target);
+    static void cmd_position_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float position_target[3]);
+    static void cmd_velocity_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target[3], float yaw_target);
+    static void cmd_velocity_xy_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target[3]);
+    static void cmd_velocity_x_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target);
+    static void cmd_velocity_y_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target);
+    static void cmd_velocity_z_ned(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_sys_id, uint8_t target_comp_id, float velocity_target);
     static void send_cmd_position_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component,
                                          float x, float y, float z, float yaw, uint16_t type_mask, uint8_t coordinate_frame);
     static void send_cmd_velocity_target(uint8_t sender_sys_id, uint8_t sender_comp_id, uint8_t target_system, uint8_t target_component,

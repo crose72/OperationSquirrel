@@ -4,7 +4,7 @@
         {
             "label": "squirreldefender Orin: Build",
             "type": "shell",
-            "command": "docker exec -it squirreldefender-dev bash -c 'cd /workspace/operationsquirrel/squirreldefender/build && cmake -DBLD_JETSON_ORIN_NANO=ON -DENABLE_GDB=ON .. && make -j6'",
+            "command": "docker exec -it squirreldefender-dev bash -c 'cd /workspace/operationsquirrel/squirreldefender/build && cmake -DBLD_JETSON_ORIN=ON -DENABLE_GDB=ON .. && make -j6'",
             "group": {
                 "kind": "build",
                 "isDefault": true

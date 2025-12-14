@@ -2,6 +2,7 @@
  * @file    global_types.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Global types shared across the software system.
  ********************************************************************************/
 #ifndef GLOBAL_TYPES_H
 #define GLOBAL_TYPES_H

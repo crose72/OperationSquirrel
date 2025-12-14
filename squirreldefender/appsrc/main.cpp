@@ -9,12 +9,14 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "scheduler.h"
-#include "global_objects.h"
-#include <spdlog/spdlog.h>
 #include <mutex>
 #include <signal.h>
 #include <fenv.h>
+
+#include <spdlog/spdlog.h>
+
+#include "scheduler.h"
+#include "global_objects.h"
 
 #pragma STDC FENV_ACCESS ON
 
@@ -73,12 +75,12 @@ void attach_sig_handler(void)
  ********************************************************************************/
 int main(int argc, char **argv)
 {
-    // Enable to catch NaN, Inf, and other errors
+    // Optional floating-point exceptions for debugging
+    // to catch NaN, Inf, and other errors (DO NOT USE FOR REAL FLIGHT)
     // feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
 
+    // Default path is to use a live camera feed
     g_app_video_input_path = "";
-    g_app_use_video_playback = false;
-    g_app_stop = false;
 
     if (argc > 1)
     {
@@ -86,19 +88,26 @@ int main(int argc, char **argv)
         g_app_use_video_playback = true;
     }
 
+    // Allow the program to complete by pressing Ctrl+C in terminal
     attach_sig_handler();
 
+    // Initialize the software modules
     if (Scheduler::init() != 0)
     {
         return Scheduler::init();
     }
 
+    // Main scheduler loop
     while (!g_app_stop)
     {
         Scheduler::loop();
     }
 
+    // Graceful shutdown
     Scheduler::shutdown();
+
+    // Ensures logs and files are flushed to disk
+    // (save everything now so files are not lost/corrupt)
     ::sync();
 
     return 0;

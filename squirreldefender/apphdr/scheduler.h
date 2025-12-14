@@ -2,6 +2,9 @@
  * @file    scheduler.h
  * @author  Cameron Rose
  * @date    3/12/2025
+ * @brief   Top-level system scheduler responsible for initializing modules and
+ *          running the main loop execution order. Provides init/loop/shutdown
+ *          entry points used by the main application.
  ********************************************************************************/
 #ifndef SCHEDULER_H
 #define SCHEDULER_H

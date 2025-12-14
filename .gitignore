@@ -1,6 +1,6 @@
 ﻿/.vscode
 /.vs
-squirreldefender/modules/SecretSquirrel
+squirreldefender/modules/secretsquirrel
 squirreldefender/test_suite/test_data
 **/build*/
 *_pb2.py

@@ -4,8 +4,11 @@
  * @file    status_io.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Configure Jetson GPIO and provide methods for using the pins on the
- *          Jetson B0!.
+ * @brief   Handles GPIO status indicators and button input on the Jetson Nano
+ *          B01. Provides LED feedback sequences for initialization, runtime
+ *          status, error states, and program completion, as well as monitoring
+ *          the SAVE button input. Designed for the embedded-style init/loop/
+ *          shutdown architecture.
  ********************************************************************************/
 
 /********************************************************************************
@@ -35,10 +38,10 @@ int button_state_prv;
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-const int RED_LED_PIN = 18;
-const int GREEN_LED_PIN = 19;
-const int SAVE_BUTTON_PIN1 = 21;
-const int SAVE_BUTTON_PIN2 = 22;
+const int red_led_pin = 18;
+const int green_led_pin = 19;
+const int save_button_pin1 = 21; // pin1 kept for legacy wiring, unused by current code
+const int save_button_pin2 = 22;
 
 /********************************************************************************
  * Function definitions
@@ -51,7 +54,7 @@ const int SAVE_BUTTON_PIN2 = 22;
 StatusIO::StatusIO(void) {}
 
 /********************************************************************************
- * Function: Video
+ * Function: StatusIO
  * Description: Destructor
  ********************************************************************************/
 StatusIO::~StatusIO(void) {}
@@ -67,20 +70,20 @@ void StatusIO::status_initializing(void)
         // Blink three times
         for (int i = 0; i < 3; i++)
         {
-            GPIO::output(RED_LED_PIN, GPIO::HIGH);
+            GPIO::output(red_led_pin, GPIO::HIGH);
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
-            GPIO::output(RED_LED_PIN, GPIO::LOW);
+            GPIO::output(red_led_pin, GPIO::LOW);
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
-            GPIO::output(GREEN_LED_PIN, GPIO::HIGH);
+            GPIO::output(green_led_pin, GPIO::HIGH);
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
-            GPIO::output(GREEN_LED_PIN, GPIO::LOW);
+            GPIO::output(green_led_pin, GPIO::LOW);
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
         }
         // Pause before repeating
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
-    GPIO::output(GREEN_LED_PIN, GPIO::HIGH);
-    GPIO::output(RED_LED_PIN, GPIO::HIGH);
+    GPIO::output(green_led_pin, GPIO::HIGH);
+    GPIO::output(red_led_pin, GPIO::HIGH);
 }
 
 /********************************************************************************
@@ -89,8 +92,8 @@ void StatusIO::status_initializing(void)
  ********************************************************************************/
 void StatusIO::status_good(void)
 {
-    GPIO::output(GREEN_LED_PIN, GPIO::HIGH);
-    GPIO::output(RED_LED_PIN, GPIO::LOW);
+    GPIO::output(green_led_pin, GPIO::HIGH);
+    GPIO::output(red_led_pin, GPIO::LOW);
 }
 
 /********************************************************************************
@@ -99,8 +102,8 @@ void StatusIO::status_good(void)
  ********************************************************************************/
 void StatusIO::status_bad(void)
 {
-    GPIO::output(RED_LED_PIN, GPIO::HIGH);
-    GPIO::output(GREEN_LED_PIN, GPIO::LOW);
+    GPIO::output(red_led_pin, GPIO::HIGH);
+    GPIO::output(green_led_pin, GPIO::LOW);
 }
 
 /********************************************************************************
@@ -109,26 +112,26 @@ void StatusIO::status_bad(void)
  ********************************************************************************/
 void StatusIO::status_bad_blink(void)
 {
-    GPIO::output(GREEN_LED_PIN, GPIO::LOW);
+    GPIO::output(green_led_pin, GPIO::LOW);
 
     for (int i = 0; i < 3; i++)
     {
-        GPIO::output(RED_LED_PIN, GPIO::HIGH);
+        GPIO::output(red_led_pin, GPIO::HIGH);
         std::this_thread::sleep_for(std::chrono::milliseconds(25));
-        GPIO::output(RED_LED_PIN, GPIO::LOW);
+        GPIO::output(red_led_pin, GPIO::LOW);
         std::this_thread::sleep_for(std::chrono::milliseconds(25));
-        GPIO::output(RED_LED_PIN, GPIO::HIGH);
+        GPIO::output(red_led_pin, GPIO::HIGH);
         std::this_thread::sleep_for(std::chrono::milliseconds(25));
-        GPIO::output(RED_LED_PIN, GPIO::LOW);
+        GPIO::output(red_led_pin, GPIO::LOW);
         std::this_thread::sleep_for(std::chrono::milliseconds(25));
-        GPIO::output(RED_LED_PIN, GPIO::HIGH);
+        GPIO::output(red_led_pin, GPIO::HIGH);
         std::this_thread::sleep_for(std::chrono::milliseconds(25));
-        GPIO::output(RED_LED_PIN, GPIO::LOW);
+        GPIO::output(red_led_pin, GPIO::LOW);
         std::this_thread::sleep_for(std::chrono::milliseconds(25));
-        GPIO::output(RED_LED_PIN, GPIO::HIGH);
+        GPIO::output(red_led_pin, GPIO::HIGH);
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
-    GPIO::output(RED_LED_PIN, GPIO::HIGH);
+    GPIO::output(red_led_pin, GPIO::HIGH);
 }
 
 /********************************************************************************
@@ -137,19 +140,18 @@ void StatusIO::status_bad_blink(void)
  ********************************************************************************/
 void StatusIO::clear_all_leds(void)
 {
-    GPIO::output(GREEN_LED_PIN, GPIO::LOW);
-    GPIO::output(RED_LED_PIN, GPIO::LOW);
+    GPIO::output(green_led_pin, GPIO::LOW);
+    GPIO::output(red_led_pin, GPIO::LOW);
 }
 
 /********************************************************************************
  * Function: save_video_button_state
  * Description: This function will monitor the state of the button.
- *********************************
- ***********************************************/
+ ********************************************************************************/
 void StatusIO::save_video_button_state(void)
 {
     unsigned int button_state;
-    button_state = GPIO::input(SAVE_BUTTON_PIN2);
+    button_state = GPIO::input(save_button_pin2);
 
     if (button_state_prv == GPIO::LOW && button_state == GPIO::HIGH)
     {
@@ -165,7 +167,7 @@ void StatusIO::save_video_button_state(void)
 
 /********************************************************************************
  * Function: status_program_complete
- * Description: Use this sequence to indicate program is has completed.
+ * Description: Use this sequence to indicate program has completed.
  ********************************************************************************/
 void StatusIO::status_program_complete(void)
 {
@@ -174,23 +176,23 @@ void StatusIO::status_program_complete(void)
         // Blink three times
         for (int i = 0; i < 3; i++)
         {
-            GPIO::output(GREEN_LED_PIN, GPIO::HIGH);
+            GPIO::output(green_led_pin, GPIO::HIGH);
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
-            GPIO::output(GREEN_LED_PIN, GPIO::LOW);
+            GPIO::output(green_led_pin, GPIO::LOW);
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
-            GPIO::output(GREEN_LED_PIN, GPIO::HIGH);
+            GPIO::output(green_led_pin, GPIO::HIGH);
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
-            GPIO::output(GREEN_LED_PIN, GPIO::LOW);
+            GPIO::output(green_led_pin, GPIO::LOW);
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
-            GPIO::output(GREEN_LED_PIN, GPIO::HIGH);
+            GPIO::output(green_led_pin, GPIO::HIGH);
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
-            GPIO::output(GREEN_LED_PIN, GPIO::LOW);
+            GPIO::output(green_led_pin, GPIO::LOW);
             std::this_thread::sleep_for(std::chrono::milliseconds(25));
         }
         // Pause before repeating
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
     }
-    GPIO::output(GREEN_LED_PIN, GPIO::HIGH);
+    GPIO::output(green_led_pin, GPIO::HIGH);
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 }
 
@@ -201,9 +203,9 @@ void StatusIO::status_program_complete(void)
 bool StatusIO::init(void)
 {
     GPIO::setmode(GPIO::BOARD);
-    GPIO::setup(GREEN_LED_PIN, GPIO::OUT, GPIO::LOW);
-    GPIO::setup(RED_LED_PIN, GPIO::OUT, GPIO::LOW);
-    GPIO::setup(SAVE_BUTTON_PIN2, GPIO::IN); // starts low, matches SAVE_BUTTON_PIN1
+    GPIO::setup(green_led_pin, GPIO::OUT, GPIO::LOW);
+    GPIO::setup(red_led_pin, GPIO::OUT, GPIO::LOW);
+    GPIO::setup(save_button_pin2, GPIO::IN); // starts low, matches save_button_pin1
     g_save_button_press = false;
     button_state_prv = GPIO::LOW;
 
@@ -221,7 +223,7 @@ void StatusIO::loop(void)
 
 /********************************************************************************
  * Function: shutdown
- * Description: Cleanup tasks for jetson io.
+ * Description: Cleanup tasks for jetson IO.
  ********************************************************************************/
 void StatusIO::shutdown(void)
 {

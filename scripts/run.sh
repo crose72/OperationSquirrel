@@ -2,7 +2,7 @@
 set -e
 
 CONTAINER="${1}"      # dev or squirreldefender
-PLATFORM="${2}"            # orin, b01, ubuntu-22.04_sm86
+PLATFORM="${2}"            # orin, b01, ubuntu-22.04-sm86
 OSREMOTE="${3:-}"         # optional: osremote (for Flutter)
 
 SCRIPT_DIR="$(dirname "$0")"
@@ -11,7 +11,7 @@ HELPER_DIR="$SCRIPT_DIR/helpers"
 # Validate CONTAINER
 if [[ "$CONTAINER" != "dev" && "$CONTAINER" != "squirreldefender" ]]; then
     echo "❌ Invalid arguments"
-    echo "Usage: ./run.sh [dev|squirreldefender] [orin|b01|ubuntu-22.04_sm86]"
+    echo "Usage: ./run.sh [dev|squirreldefender] [orin|b01|ubuntu-22.04-sm86]"
     exit 1
 fi
 
@@ -26,12 +26,12 @@ case "$PLATFORM" in
     b01)
         RUN_TAG="r32.7.1"
         ;;
-    ubuntu-22.04_sm86)
-        RUN_TAG="ubuntu-22.04_sm86"
+    ubuntu-22.04-sm86)
+        RUN_TAG="ubuntu-22.04-sm86"
         ;;
     *)
         echo "❌ Invalid platform: $PLATFORM"
-        echo "Usage: ./run.sh [dev|squirreldefender] [orin|b01|ubuntu-22.04_sm86]"
+        echo "Usage: ./run.sh [dev|squirreldefender] [orin|b01|ubuntu-22.04-sm86]"
         exit 1
         ;;
 esac

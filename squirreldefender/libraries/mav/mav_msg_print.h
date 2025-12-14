@@ -2,6 +2,7 @@
  * @file    mav_msg_print.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Print statements for mavlink messages.
  ********************************************************************************/
 #ifndef MAV_MSG_PRINT_H
 #define MAV_MSG_PRINT_H

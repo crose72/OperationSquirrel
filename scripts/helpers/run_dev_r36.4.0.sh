@@ -104,7 +104,7 @@ if [ "$IS_CI" = true ]; then
             cmake .. \
                 -DBLD_WSL=ON \
                 -DBLD_JETSON_B01=OFF \
-                -DBLD_JETSON_ORIN_NANO=OFF \
+                -DBLD_JETSON_ORIN=OFF \
                 -DBLD_WIN=OFF \
                 -DWIN_TCP=OFF \
                 -DWIN_SERIAL=OFF \

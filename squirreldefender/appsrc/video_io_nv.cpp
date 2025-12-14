@@ -11,11 +11,12 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include <string>
+#include <fstream>
+
 #include "common_inc.h"
 #include "video_io_nv.h"
 #include "target_detection.h"
-#include <string>
-#include <fstream>
 #include "jetson-utils/videoSource.h"
 #include "jetson-utils/videoOutput.h"
 #include "jetson-inference/detectNet.h"
@@ -35,19 +36,19 @@
  ********************************************************************************/
 bool g_cam0_img_valid;
 std::string base_path = "../data/";
-bool display_stream_created;
-bool file_stream_created;
-videoSource *g_input;
-videoOutput *output_vid_file;
-videoOutput *output_vid_disp;
+bool display_output_created_nv;
+bool file_output_created_nv;
+videoSource *g_cam0_stream_nv;
+videoOutput *vid_out_nv;
+videoOutput *vid_out_disp_nv;
 uchar3 *g_cam0_img_cpu;
 
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
-const float g_cam0_img_width_px = 1280.0;
-const float g_cam0_img_height_px = 720.0;
-const float g_input_video_fps = 30;
+const float g_cam0_img_width_px = (float)1280.0;
+const float g_cam0_img_height_px = (float)720.0;
+const float g_input_video_fps = (float)30.0;
 
 /********************************************************************************
  * Function definitions
@@ -114,9 +115,9 @@ bool create_input_video_stream(void)
     // if using IMX219-160 stereo camera or H136 V1.3 and need to use option FLIP_ROTATE_180 then
     // you must compile jetson inference with cmake-DENABLE_NVMM=off
 
-    g_input = videoSource::Create(options);
+    g_cam0_stream_nv = videoSource::Create(options);
 
-    if (!g_input)
+    if (!g_cam0_stream_nv)
     {
         LogError("detectnet:  failed to create input stream\n");
         return false;
@@ -131,7 +132,7 @@ bool create_input_video_stream(void)
  ********************************************************************************/
 bool create_output_vid_stream(void)
 {
-    std::string base_path = "file:///home/crose72/workspaces/os-dev/operationsquirrel/squirreldefender/data/";
+    base_path = "file:///home/crose72/workspaces/os-dev/operationsquirrel/squirreldefender/data/";
     std::string base_name = "output";
     std::string extension = ".mp4";
     std::string file_name = generate_unique_file_name(base_name, extension);
@@ -150,23 +151,23 @@ bool create_output_vid_stream(void)
     options.frameRate = 30;
     options.zeroCopy = true;
 
-    output_vid_file = videoOutput::Create(options);
+    vid_out_nv = videoOutput::Create(options);
 
-    if (!output_vid_file)
+    if (!vid_out_nv)
     {
-        LogError("detectnet:  failed to create output_vid_file stream\n");
-        file_stream_created = false;
+        LogError("detectnet:  failed to create vid_out_nv stream\n");
+        file_output_created_nv = false;
         return false;
     }
 
-    file_stream_created = true;
+    file_output_created_nv = true;
 
     return true;
 }
 
 /********************************************************************************
  * Function: create_display_video_stream
- * Description: Create an output_vid_disp video stream from the input video stream
+ * Description: Create an vid_out_disp_nv video stream from the input video stream
  *			   for displaying and passing to other software components.
  ********************************************************************************/
 bool create_display_video_stream(void)
@@ -184,16 +185,16 @@ bool create_display_video_stream(void)
     options.numBuffers = 4;
     options.zeroCopy = true;
 
-    output_vid_disp = videoOutput::Create(options);
+    vid_out_disp_nv = videoOutput::Create(options);
 
-    if (!output_vid_disp)
+    if (!vid_out_disp_nv)
     {
-        LogError("detectnet:  failed to create output_vid_disp stream\n");
-        display_stream_created = false;
+        LogError("detectnet:  failed to create vid_out_disp_nv stream\n");
+        display_output_created_nv = false;
         return false;
     }
 
-    display_stream_created = true;
+    display_output_created_nv = true;
 
     return true;
 }
@@ -206,7 +207,7 @@ bool capture_image(void)
 {
     int status = 0;
 
-    if (!g_input->Capture(&g_cam0_img_cpu, &status))
+    if (!g_cam0_stream_nv->Capture(&g_cam0_img_cpu, &status))
     {
         if (status != videoSource::TIMEOUT)
         {
@@ -232,13 +233,13 @@ bool capture_image(void)
  ********************************************************************************/
 bool save_video(void)
 {
-    // render output_vid_disp to the display
-    if (output_vid_file != NULL)
+    // Write current frame into the MP4 output file
+    if (vid_out_nv != NULL)
     {
-        output_vid_file->Render(g_cam0_img_cpu, g_input->GetWidth(), g_input->GetHeight());
+        vid_out_nv->Render(g_cam0_img_cpu, g_cam0_stream_nv->GetWidth(), g_cam0_stream_nv->GetHeight());
 
         // check if the user quit
-        if (!output_vid_file->IsStreaming())
+        if (!vid_out_nv->IsStreaming())
         {
             return false;
         }
@@ -253,22 +254,22 @@ bool save_video(void)
  ********************************************************************************/
 bool display_video(void)
 {
-    // render output_vid_disp to the display
-    if (output_vid_disp != NULL)
+    // render vid_out_disp_nv to the display
+    if (vid_out_disp_nv != NULL)
     {
-        output_vid_disp->Render(g_cam0_img_cpu, g_input->GetWidth(), g_input->GetHeight());
+        vid_out_disp_nv->Render(g_cam0_img_cpu, g_cam0_stream_nv->GetWidth(), g_cam0_stream_nv->GetHeight());
 
 #ifdef DEBUG_BUILD
 
         // update the status bar
         char str[256];
         sprintf(str, "TensorRT %i.%i.%i | %s | Network %.0f FPS", NV_TENSORRT_MAJOR, NV_TENSORRT_MINOR, NV_TENSORRT_PATCH, precisionTypeToStr(g_det_nv_net->GetPrecision()), g_det_nv_net->GetNetworkFPS());
-        output_vid_disp->SetStatus(str);
+        vid_out_disp_nv->SetStatus(str);
 
 #endif // DEBUG_BUILD
 
         // check if the user quit
-        if (!output_vid_disp->IsStreaming())
+        if (!vid_out_disp_nv->IsStreaming())
         {
             return false;
         }
@@ -283,7 +284,7 @@ bool display_video(void)
  ********************************************************************************/
 void delete_input_video_stream(void)
 {
-    SAFE_DELETE(g_input);
+    SAFE_DELETE(g_cam0_stream_nv);
 }
 
 /********************************************************************************
@@ -292,7 +293,7 @@ void delete_input_video_stream(void)
  ********************************************************************************/
 void delete_video_file_stream(void)
 {
-    SAFE_DELETE(output_vid_file);
+    SAFE_DELETE(vid_out_nv);
 }
 
 /********************************************************************************
@@ -301,7 +302,7 @@ void delete_video_file_stream(void)
  ********************************************************************************/
 void delete_video_display_stream(void)
 {
-    SAFE_DELETE(output_vid_disp);
+    SAFE_DELETE(vid_out_disp_nv);
 }
 
 /********************************************************************************
@@ -381,14 +382,14 @@ void VideoNV::out_loop(void)
 #ifdef DEBUG_BUILD
 
     // note: put in debug build
-    if (display_stream_created)
+    if (display_output_created_nv)
     {
         display_video();
     }
 
 #endif // DEBUG_BUILD
 
-    if (file_stream_created)
+    if (file_output_created_nv)
     {
         save_video();
     }

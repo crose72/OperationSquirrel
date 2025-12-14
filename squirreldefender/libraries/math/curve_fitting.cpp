@@ -2,17 +2,17 @@
  * @file    curve_fitting.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   Utilities for regression
+ * @brief   Utilities for regression.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "curve_fitting.h"
-#include "vector_math.h"
 #include <stdint.h>
 #include <cmath>
 
+#include "curve_fitting.h"
+#include "vector_math.h"
 /********************************************************************************
  * Private macros and defines
  ********************************************************************************/

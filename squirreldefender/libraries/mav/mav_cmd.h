@@ -2,6 +2,7 @@
  * @file    mav_cmd.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Utilities for sending mavlink commands.
  ********************************************************************************/
 #ifndef MAV_CMD_H
 #define MAV_CMD_H
@@ -9,9 +10,10 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "mav_serial.h"
 #include <mavlink.h>
 #include <common.h>
+
+#include "mav_serial.h"
 
 /********************************************************************************
  * Typedefs / Enums / Structs

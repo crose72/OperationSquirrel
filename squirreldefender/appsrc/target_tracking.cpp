@@ -11,15 +11,6 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "common_inc.h"
-#include "target_tracking.h"
-#include "video_io.h"
-#include "target_detection.h"
-#include "OSNet.h"
-#include "YOLOv8.h"
-#include "video_io.h"
-#include "param_reader.h"
-#include "signal_processing.h"
 #include <opencv2/opencv.hpp>
 
 #ifdef BLD_JETSON_B01
@@ -28,6 +19,15 @@
 #include <jetson-utils/cudaRGB.h>          // For cuda functions
 
 #endif // BLD_JETSON_B01
+
+#include "common_inc.h"
+#include "video_io.h"
+#include "target_tracking.h"
+#include "target_detection.h"
+#include "OSNet.h"
+#include "YOLOv8.h"
+#include "param_reader.h"
+#include "signal_processing.h"
 
 /********************************************************************************
  * Typedefs
@@ -45,43 +45,66 @@ struct Track
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-bool target_tracked;
-bool tracking;
-bool initialized_cv_image;
-bool initialized_tracker;
-float target_detection_thresh;
-float target_class;
-bool target_valid_prv;
-bool g_tgt_valid;
-int g_tgt_detect_id;
-int g_tgt_track_id;
-float g_tgt_cntr_offset_y_pix;
-float g_tgt_cntr_offset_x_pix;
-float g_tgt_center_x_px;
-float g_tgt_center_y_px;
-float g_tgt_height_pix;
-float g_tgt_width_pix;
-float g_tgt_aspect_ratio;
-float g_tgt_left_px;
-float g_tgt_right_px;
-float g_tgt_top_px;
-float g_tgt_bottom_px;
-float g_tgt_class_id;
-float g_tgt_conf;
+
+// Target validity
+static bool tgt_valid_prv; // Was the target valid last frame?
+bool g_tgt_valid;          // Is the target valid this frame?
+
+// Target identifiers
+int g_tgt_detect_id; // Index in detection list
+int g_tgt_track_id;  // Persistent track ID (if used)
+
+// Target bounding box geometry
+float g_tgt_height_pix;   // Bounding box height  [px]
+float g_tgt_width_pix;    // Bounding box width   [px]
+float g_tgt_left_px;      // Left   edge of bbox  [px]
+float g_tgt_right_px;     // Right  edge of bbox  [px]
+float g_tgt_top_px;       // Top    edge of bbox  [px]
+float g_tgt_bottom_px;    // Bottom edge of bbox  [px]
+float g_tgt_cntr_x_px;    // Center x of bbox     [px]
+float g_tgt_cntr_y_px;    // Center y of bbox     [px]
+float g_tgt_aspect_ratio; // width / height ratio
+
+// Target center offsets from image center
+// Positive x → right, positive y → down
+float g_tgt_cntr_offset_x_pix; // bbox center x - image center x
+float g_tgt_cntr_offset_y_pix; // bbox center y - image center y
+
+// Previous frame offsets (for smoothing/filtering)
 float target_cntr_offset_x_prv;
 float target_cntr_offset_y_prv;
+
+// Target classification
+float g_tgt_class_id; // Detector class ID
+float g_tgt_conf;     // Detection confidence
+
+// Maintained bounding box (tracking through detection outages)
 cv::Rect target_bounding_box;
+
+// Re-Identification state
+
+// Candidate detections (this frame)
 std::vector<int> target_candidates;
-std::vector<cv::cuda::GpuMat> target_candidate_imgs;
-std::vector<cv::Rect> target_candidate_bboxs;
-std::vector<std::vector<float>> target_candidate_embeddings; // one per crop
+std::vector<cv::cuda::GpuMat> target_candidate_imgs; // GPU ROIs for OSNet
+std::vector<cv::Rect> target_candidate_bboxs;        // Their bounding boxes
+
+// Embeddings for each candidate (current frame)
+std::vector<std::vector<float>> target_candidate_embeddings;
+
+// Embeddings for each tracked identity (persistent)
 std::vector<std::vector<float>> tracked_object_features;
+
+// Optional container if managing richer track metadata
 std::vector<Track> tracked_targets;
+
+// OSNet engine used for feature extraction
 OSNet *osnet_extractor;
 
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
+float tgt_det_thresh = (float)0.5;
+int tgt_det_class = (int)0;
 float target_bbox_center_filt_coeff = (float)0.75;
 float target_similarity_thresh = (float)0.55;
 int max_reid_batch = (int)32;
@@ -118,21 +141,21 @@ void get_tracking_params(void)
     ParamReader target_params("../params.json");
 
     target_bbox_center_filt_coeff = target_params.get_float_param("target_track_params.target_bbox_center_filt_coef");
-    target_detection_thresh = target_params.get_float_param("target_track_params.target_det_conf_thresh");
+    tgt_det_thresh = target_params.get_float_param("target_track_params.target_det_conf_thresh");
 
 #if defined(BLD_JETSON_B01)
 
-    target_class = target_params.get_int_param("target_track_params.target_class_mobilenet_ssd_v2");
+    tgt_det_class = target_params.get_int_param("target_track_params.target_class_mobilenet_ssd_v2");
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
-    target_class = target_params.get_int_param("target_track_params.target_class_yolov8");
+    tgt_det_class = target_params.get_int_param("target_track_params.target_class_yolov8");
     target_similarity_thresh = target_params.get_float_param("target_track_params.reid_sim_thresh");
     max_reid_batch = target_params.get_int_param("target_track_params.reid_max_batch_size");
 
 #elif defined(BLD_WIN)
 
-    target_class = target_params.get_int_param("target_track_params.target_class_yolov8");
+    tgt_det_class = target_params.get_int_param("target_track_params.target_class_yolov8");
 
 #else
 
@@ -147,7 +170,7 @@ void get_tracking_params(void)
  ********************************************************************************/
 void filter_detections(void)
 {
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     target_candidates.clear();
     target_candidate_imgs.clear();
@@ -159,8 +182,8 @@ void filter_detections(void)
     for (int n = 0; n < g_det_count; ++n)
     {
         /* A detected object, classified as a person with some confidence level */
-        if (g_det_yolo_list[n].label == target_class &&
-            g_det_yolo_list[n].probability > target_detection_thresh)
+        if (g_det_yolo_list[n].label == tgt_det_class &&
+            g_det_yolo_list[n].probability > tgt_det_thresh)
         {
             cv::Rect bbox = g_det_yolo_list[n].rect; // Rect2f -> Rect (int)
             bbox &= cv::Rect(0, 0, g_cam0_img_gpu.cols, g_cam0_img_gpu.rows);
@@ -185,7 +208,7 @@ void filter_detections(void)
  ********************************************************************************/
 void track_objects(void)
 {
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     // Extract features of each detected target
     if (!target_candidate_imgs.empty() && target_candidate_imgs.size() <= max_reid_batch)
@@ -259,8 +282,8 @@ void select_target(void)
     {
         /* A tracked object, classified as a person with some confidence level */
         if (g_det_nv_list[n].TrackID >= 0 &&
-            g_det_nv_list[n].ClassID == target_class &&
-            g_det_nv_list[n].Confidence > target_detection_thresh)
+            g_det_nv_list[n].ClassID == tgt_det_class &&
+            g_det_nv_list[n].Confidence > tgt_det_thresh)
         {
             g_tgt_class_id = g_det_nv_list[n].ClassID;
             g_tgt_conf = g_det_nv_list[n].Confidence;
@@ -269,13 +292,13 @@ void select_target(void)
         }
     }
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     for (int n = 0; n < g_det_count; ++n)
     {
         /* A tracked object, classified as a person with some confidence level */
-        if (g_det_yolo_list[n].label == target_class &&
-            g_det_yolo_list[n].probability > target_detection_thresh)
+        if (g_det_yolo_list[n].label == tgt_det_class &&
+            g_det_yolo_list[n].probability > tgt_det_thresh)
         {
             g_tgt_class_id = g_det_yolo_list[n].label;
             g_tgt_conf = g_det_yolo_list[n].probability;
@@ -289,8 +312,8 @@ void select_target(void)
     for (int n = 0; n < g_det_count; ++n)
     {
         /* A tracked object, classified as a person with some confidence level */
-        if (g_det_yolo_list[n].ClassID == target_class &&
-            g_det_yolo_list[n].Confidence > target_detection_thresh)
+        if (g_det_yolo_list[n].ClassID == tgt_det_class &&
+            g_det_yolo_list[n].Confidence > tgt_det_thresh)
         {
             g_tgt_class_id = g_det_yolo_list[n].ClassID;
             g_tgt_conf = g_det_yolo_list[n].Confidence;
@@ -328,7 +351,7 @@ void get_target_info(void)
         g_tgt_bottom_px = g_det_nv_list[g_tgt_detect_id].Bottom;
     }
 
-#elif defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#elif defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
     if (g_tgt_detect_id >= 0)
     {
@@ -359,10 +382,10 @@ void get_target_info(void)
 #endif
 
     g_tgt_bottom_px = g_tgt_top_px + g_tgt_height_pix;
-    g_tgt_center_x_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
-    g_tgt_center_y_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
-    g_tgt_cntr_offset_x_pix = g_tgt_center_x_px - g_cam0_img_width_cx;
-    g_tgt_cntr_offset_y_pix = g_tgt_center_y_px - g_cam0_img_height_cy;
+    g_tgt_cntr_x_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
+    g_tgt_cntr_y_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
+    g_tgt_cntr_offset_x_pix = g_tgt_cntr_x_px - g_cam0_img_width_cx;
+    g_tgt_cntr_offset_y_pix = g_tgt_cntr_y_px - g_cam0_img_height_cy;
     g_tgt_aspect_ratio = g_tgt_width_pix / g_tgt_height_pix;
 }
 
@@ -383,7 +406,7 @@ void validate_target(void)
         g_tgt_valid = false;
     }
 
-    target_valid_prv = g_tgt_valid;
+    tgt_valid_prv = g_tgt_valid;
 }
 
 /********************************************************************************
@@ -399,10 +422,10 @@ void update_target_info(void)
     g_tgt_right_px = g_tgt_left_px + g_tgt_width_pix;
     g_tgt_top_px = target_bounding_box.y;
     g_tgt_bottom_px = g_tgt_top_px + g_tgt_height_pix;
-    g_tgt_center_x_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
-    g_tgt_center_y_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
-    g_tgt_cntr_offset_x_pix = g_tgt_center_x_px - g_cam0_img_width_cx;
-    g_tgt_cntr_offset_y_pix = g_tgt_center_y_px - g_cam0_img_height_cy;
+    g_tgt_cntr_x_px = (g_tgt_left_px + g_tgt_right_px) / 2.0f;
+    g_tgt_cntr_y_px = (g_tgt_bottom_px + g_tgt_top_px) / 2.0f;
+    g_tgt_cntr_offset_x_pix = g_tgt_cntr_x_px - g_cam0_img_width_cx;
+    g_tgt_cntr_offset_y_pix = g_tgt_cntr_y_px - g_cam0_img_height_cy;
     g_tgt_aspect_ratio = (g_tgt_height_pix >= 0.0000001 ? g_tgt_width_pix / g_tgt_height_pix : (float)0.0);
 }
 
@@ -427,27 +450,7 @@ bool TargetTracking::init(void)
 {
     get_tracking_params();
 
-    g_tgt_valid = false;
-    target_valid_prv = false;
-    g_tgt_cntr_offset_y_pix = (float)0.0;
-    g_tgt_cntr_offset_x_pix = (float)0.0;
-    g_tgt_height_pix = (float)0.0;
-    g_tgt_width_pix = (float)0.0;
-    g_tgt_aspect_ratio = (float)0.0;
-    g_tgt_left_px = (float)0.0;
-    g_tgt_right_px = (float)0.0;
-    g_tgt_top_px = (float)0.0;
-    g_tgt_bottom_px = (float)0.0;
     g_tgt_detect_id = -1;
-    g_tgt_class_id = (float)0.0;
-    g_tgt_conf = (float)0.0;
-
-    target_cntr_offset_x_prv = (float)0.0;
-    target_cntr_offset_y_prv = (float)0.0;
-
-    initialized_cv_image = false;
-    target_tracked = false;
-    tracking = false;
     target_candidates.clear();
 
 #if defined(BLD_WSL)
@@ -458,7 +461,7 @@ bool TargetTracking::init(void)
 
     osnet_extractor = new OSNet(engine_path, config);
 
-#elif defined(BLD_JETSON_ORIN_NANO)
+#elif defined(BLD_JETSON_ORIN)
 
     OSNet::Config config;
     const std::string engine_path =

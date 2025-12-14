@@ -2,6 +2,7 @@
  * @file    vector_math.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Utilities for vector operations.
  ********************************************************************************/
 #ifndef VECTOR_MATH_H
 #define VECTOR_MATH_H
