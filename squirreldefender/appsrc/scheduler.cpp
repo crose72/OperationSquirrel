@@ -2,13 +2,18 @@
  * @file    scheduler.cpp
  * @author  Cameron Rose
  * @date    3/12/2025
- * @brief   The scheduler handles the scheduling and priority of all code running
- *          in a loop.
+ * @brief   The scheduler handles the initialization, scheduling and priority
+ *          of all code in the program.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include <mutex>
+#include <signal.h>
+#include <chrono>
+#include <thread>
+
 #include "common_inc.h"
 #include "scheduler.h"
 #include "datalog.h"
@@ -23,11 +28,6 @@
 #include "velocity_controller.h"
 #include "time_calc.h"
 #include "timer.h"
-#include "velocity_controller.h"
-#include <mutex>
-#include <signal.h>
-#include <chrono>
-#include <thread>
 
 #ifdef BLD_JETSON_B01
 
@@ -78,28 +78,41 @@ Scheduler::~Scheduler(void) {};
 
 /********************************************************************************
  * Function: init
- * Description: Initialize all planner variables.  Run once at the start
- *              of the program.
+ * Description: Initialize all software components.  Run once at the start
+ *              of the program.  Returns 0 if successful, returns non-zero
+ *              number otherwise to terminate execution of the program.
  ********************************************************************************/
 int Scheduler::init(void)
 {
-
 #ifdef ENABLE_CV
 
+    /* Vision-related modules.
+     *
+     * These are initialized only when camera/video support is enabled.
+     * They depend on OpenCV, CUDA, TensorRT, and GPU memory management.
+     * The order here matches the order in which these modules run inside
+     * the main loop.
+     */
     if (!Video::init() ||
         !TargetDetection::init() ||
         !TargetTracking::init() ||
-        !TargetLocalization::init() ||
-        !VelocityController::init())
+        !TargetLocalization::init())
     {
         return 1;
     }
 
 #endif // ENABLE_CV
 
+    /* Core system modules.
+     *
+     * These modules do not rely on GPU libraries and are always required,
+     * even when computer vision is disabled. They use standard C/C++ or
+     * lightweight embedded code.
+     */
     if (!Time::init() ||
         !MavMsg::init() ||
         !DataLogger::init() ||
+        !VelocityController::init() ||
         !VehicleController::init() ||
         !SystemController::init())
     {
@@ -113,42 +126,66 @@ int Scheduler::init(void)
 
 /********************************************************************************
  * Function: loop
- * Description: Function to run every loop.
+ * Description: Run all software components.
  ********************************************************************************/
 void Scheduler::loop(void)
 {
     std::lock_guard<std::mutex> lock(scheduler_mutex);
     main_loop.start();
+
+    /* High-level system state machine.
+     * Handles arming, failsafes, and mode transitions.
+     */
     SystemController::loop();
+
+    // Handle incoming/outgoing MAVLink messages
     MavMsg::loop();
 
 #ifdef ENABLE_CV
 
+    /* Vision pipeline:
+     *   - read frame (camera or playback)
+     *   - run detector
+     *   - run tracker
+     *   - estimate 3D target position
+     *   - compute target-relative velocity commands
+     *   - output annotated frame
+     */
     Video::in_loop();
     TargetDetection::loop();
     TargetTracking::loop();
     TargetLocalization::loop();
-    VelocityController::loop();
     Video::out_loop();
 
 #endif // ENABLE_CV
 
+    // Calculate vehicle velocity commands
+    VelocityController::loop();
+
+    // Apply vehicle controls (velocity, takeoff/land, mode changes, etc.)
     VehicleController::loop();
-    Time::loop(); // Keep this before the datalogger - else MCAP breaks
+
+    // Time update must run before the logger to preserve ordering in MCAP
+    Time::loop();
+
+    // Save telemetry, detections, and visualizations
     DataLogger::loop();
     main_loop.stop();
-    main_loop.wait();
+    main_loop.wait(); // Enforce loop rate
 }
 
 /********************************************************************************
  * Function: shutdown
- * Description: Function to clean up planner at the end of the program.
+ * Description: Final tasks to ensure graceful shutdown.
  ********************************************************************************/
 void Scheduler::shutdown(void)
 {
     SystemController::shutdown();
     VehicleController::shutdown();
+
+    // Close MAVLink connections (send final commands before calling this)
     MavMsg::shutdown();
+
     DataLogger::shutdown();
     Time::shutdown();
 
@@ -156,7 +193,6 @@ void Scheduler::shutdown(void)
 
     TargetTracking::shutdown();
     TargetLocalization::shutdown();
-    VelocityController::shutdown();
     VelocityController::shutdown();
     Video::shutdown();
     TargetDetection::shutdown();

@@ -2,6 +2,8 @@
  * @file    vehicle_controller.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   High-level interface for sending control commands to the vehicle.
+ *          Performs takeoff, landing, motion control, and mode transitions.
  ********************************************************************************/
 #ifndef VEHICLE_CONTROLLER_H
 #define VEHICLE_CONTROLLER_H

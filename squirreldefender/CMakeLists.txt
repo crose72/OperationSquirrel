@@ -1,6 +1,21 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.22)
 
-# Project definition
+# Hide all internal CMake junk inside build/.cmake/
+set(CMAKE_FILES_DIRECTORY ".cmake")
+set(CMAKE_CACHEFILE_DIR ".cmake")
+set(CMAKE_COMPILE_COMMANDS_OUTPUT_DIRECTORY ".cmake")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Because CMAKE_BINARY_DIR == build/.cmake,
+# we go one level up (..) to put things into the visible build/ folder.
+
+# Put static and shared libs inside build/lib/
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../lib")
+
+# Put executables inside build/
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/..")
+
 project(squirreldefender)
 
 #=============================================================================
@@ -51,14 +66,14 @@ project(squirreldefender)
 
 # Choose ONLY ONE platform for the build (BLD_JETSON_B01, BLD_WSL, BLD_WIN) 
 option(BLD_JETSON_B01 "Compiling for Jetson Nano B01, with video and computer vision functionality" OFF)
-option(BLD_JETSON_ORIN_NANO "Compiling for Jetson Orin Nano, with video and computer visiono functionality" ON)
-option(BLD_WSL "Compiling for BLD_WSL" OFF)
+option(BLD_JETSON_ORIN "Compiling for Jetson Orin Nano, with video and computer visiono functionality" ON)
+option(BLD_WSL "Compiling for BLD_WSL" ON)
 option(BLD_WIN "Compiling for Windows environment" OFF)
 option(WIN_TCP "Compiling for Windows simulated environment" OFF)
 option(WIN_SERIAL "Compiling for Windows with connected physical devices" OFF)
 option(WIN_ENABLE_CV "Compiling for Windows with video and computer vision functionality" OFF)
-option(BUILD_TEST_HARNESS "Compiling test harness code for data playback" OFF)
-option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" OFF)
+option(BLD_TEST_HARNESS "Compiling test harness code for data playback" ON)
+option(ENABLE_GDB "Enable GDB debugger - turn OFF for release/production builds" ON)
 option(ENABLE_SECRET_SQUIRREL "Compile custom code with the open source Operation Squirrel" ON)
 
 # Option to use environment variables for library paths
@@ -71,7 +86,7 @@ option(USE_ENV_VAR "Use environment variables for library paths" OFF)
 # Ensure only one build platform is selected
 set(BUILD_PLATFORMS 0)
 
-if(BLD_JETSON_ORIN_NANO)
+if(BLD_JETSON_ORIN)
     math(EXPR BUILD_PLATFORMS "${BUILD_PLATFORMS} + 1")
 endif()
 
@@ -111,6 +126,17 @@ endif()
 
 # CMAKE modules path for Find* files and other cmake specific things
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+
+# -------------------------------------------
+# This is to ensure that the test harness builds successfully with the new
+# cleaner layout
+# Ensure CMake can still find system packages
+# even though we changed internal dirs
+# -------------------------------------------
+list(APPEND CMAKE_PREFIX_PATH "/usr/lib/x86_64-linux-gnu/cmake")
+list(APPEND CMAKE_PREFIX_PATH "/usr/share/cmake")
+list(APPEND CMAKE_PREFIX_PATH "/usr/local/lib/cmake")
+
 
 #=============================================================================
 # Debugging Settings
@@ -159,6 +185,10 @@ endfunction()
 # Define Preprocessor Directives Based on Build Options
 #=============================================================================
 
+if (BLD_TEST_HARNESS)
+    add_definitions(-DBLD_TEST_HARNESS)
+endif()
+
 # Optionally include code that is specific to different platforms
 if (BLD_JETSON_B01)
     add_definitions(-DBLD_JETSON_B01)
@@ -166,10 +196,10 @@ if (BLD_JETSON_B01)
     message("Building for BLD_JETSON_B01 with serial comms.")
     add_definitions(-DENABLE_CV)
     message("Enabled video and computer vision functionality.")
-elseif (BLD_JETSON_ORIN_NANO)
-    add_definitions(-DBLD_JETSON_ORIN_NANO)
+elseif (BLD_JETSON_ORIN)
+    add_definitions(-DBLD_JETSON_ORIN)
     add_definitions(-DBLD_LINUX_SERIAL)
-    message("Building for BLD_JETSON_ORIN_NANO with serial comms.")
+    message("Building for BLD_JETSON_ORIN with serial comms.")
     add_definitions(-DENABLE_CV)
     message("Enabled video and computer vision functionality.")
 elseif(BLD_WSL)
@@ -218,7 +248,7 @@ if(BLD_JETSON_B01)
     find_package(Armadillo REQUIRED)
     find_package(LAPACK REQUIRED)
     find_package(BLAS REQUIRED)
-elseif(BLD_JETSON_ORIN_NANO OR BLD_WSL)
+elseif(BLD_JETSON_ORIN OR BLD_WSL)
     find_package(CUDA REQUIRED)
     find_package(OpenCV REQUIRED)
     find_package(TensorRT REQUIRED)
@@ -293,7 +323,7 @@ if(USE_ENV_VAR)
         link_directories($ENV{LIB_OPENCV})
         link_directories($ENV{LIB_CUDA})
         link_directories($ENV{LIB_TEGRA})
-    elseif(BLD_JETSON_ORIN_NANO OR BLD_WSL)
+    elseif(BLD_JETSON_ORIN OR BLD_WSL)
         # Validate required Jetson environment variables
         foreach(var LIB_JETSONINFERENCE LIB_JETSONUTILS LIB_OPENCV LIB_CUDA LIB_TEGRA
                     HDR_JETSONINFERENCE HDR_JETSONUTILS HDR_OPENCV HDR_CUDA)
@@ -344,7 +374,7 @@ else()
             /usr/lib/aarch64-linux-gnu/tegra
         )
 
-    elseif(BLD_JETSON_ORIN_NANO OR BLD_WSL)
+    elseif(BLD_JETSON_ORIN OR BLD_WSL)
         set(SD_COMMON_INCLUDE_DIRS
             /usr/local/cuda/include
             /usr/include/opencv4
@@ -379,7 +409,7 @@ else()
     endif()
 endif()
 
-if (BLD_JETSON_ORIN_NANO OR BLD_WSL)
+if (BLD_JETSON_ORIN OR BLD_WSL)
     set(SD_COMMON_LINK_LIBS
         # MCAP deps
         mcap
@@ -449,17 +479,18 @@ file(GLOB KF_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.cpp)
 file(GLOB KF_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/kf/kalman/*.h)
 
 if(ENABLE_SECRET_SQUIRREL)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src)
+    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/secretsquirrel/src)
 
-    file(GLOB SS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.cpp)
-    file(GLOB SS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/src/*.h)
+    file(GLOB SS_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/secretsquirrel/src/*.cpp)
+    file(GLOB SS_HEADERS ${CMAKE_CURRENT_SOURCE_DIR}/modules/secretsquirrel/src/*.h)
 endif()
 
-if(BLD_JETSON_ORIN_NANO OR BLD_WSL)    
+if(BLD_JETSON_ORIN OR BLD_WSL)    
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/trtinfer/src)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/trtinfer/include)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/libraries/logger)
 
+    # include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules/mcap/include/)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/trtinfer)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/modules/mcap)
     
@@ -510,7 +541,11 @@ if (OS_PROTO_ABS)
   endforeach()
 
   # Unique generated dir (top-level build tree)
-  set(SQUIRREL_GEN_DIR "${CMAKE_BINARY_DIR}/generated_squirrel_protos")
+#   set(SQUIRREL_GEN_DIR "${CMAKE_BINARY_DIR}/generated_protobufs")
+    # Generated protobuf artifacts (project-owned, but disposable)
+    set(SQUIRREL_GEN_DIR "${CMAKE_BINARY_DIR}/gen/proto")
+
+
 
   # One-time prep: ensure the output dir exists before any proto rules
   add_custom_target(squirrel_protos_prep
@@ -566,9 +601,11 @@ if (OS_PROTO_ABS)
   add_dependencies(squirrel_protos_desc squirrel_protos_prep)
 
   # Optional: copy descriptor next to top-level binaries
-  add_custom_command(TARGET squirrel_protos_desc POST_BUILD
+    add_custom_command(TARGET squirrel_protos_desc POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            ${SQUIRREL_DESC_OUT} ${CMAKE_BINARY_DIR}/schemas.desc)
+            ${SQUIRREL_DESC_OUT}
+            ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/schemas.desc
+    )
 
 else()
   message(STATUS "[squirrel_protos] No .proto files in ${OS_PROTO_DIR}")
@@ -579,7 +616,7 @@ endif()
 #=============================================================================
 
 # Build only the test harness or the full executable speeds up compile time (so worth it!)
-if (NOT BUILD_TEST_HARNESS)
+if (NOT BLD_TEST_HARNESS)
     message(STATUS "Building the squirreldefender program")  
     if (BLD_JETSON_B01)
         cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
@@ -594,7 +631,7 @@ if (NOT BUILD_TEST_HARNESS)
                             ${ARMADILLO_LIBRARIES} 
                             ${LAPACK_LIBRARIES} 
                             ${BLAS_LIBRARIES})
-    elseif (BLD_JETSON_ORIN_NANO OR BLD_WSL)
+    elseif (BLD_JETSON_ORIN OR BLD_WSL)
         cuda_add_executable(squirreldefender ${SOURCES} ${HEADERS})
         set_target_debug_flags(squirreldefender)
 
@@ -602,6 +639,10 @@ if (NOT BUILD_TEST_HARNESS)
                             squirrel_protos
                             ${Protobuf_LIBRARIES}
                             ${SD_COMMON_LINK_LIBS})
+        target_compile_definitions(squirreldefender PRIVATE
+            OS_MCAP_SCHEMA_PATH="${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/schemas.desc"
+        )
+                        
 
         # Wire in protos only if they were defined
         if (TARGET squirrel_protos)
@@ -726,9 +767,9 @@ endif()
 # Build Test Harness for each supported platform
 #=============================================================================
 
-if (BUILD_TEST_HARNESS)
+if (BLD_TEST_HARNESS)
     message(STATUS "Building the test harness (not squirreldefender)")
-    if (BLD_JETSON_ORIN_NANO OR BLD_WSL)
+    if (BLD_JETSON_ORIN OR BLD_WSL)
 
         # Test source base
         list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/appsrc/main.cpp")
@@ -761,7 +802,7 @@ if (BUILD_TEST_HARNESS)
 
         # Delivery test code
         set(DELIVERY_TEST_SOURCES ${TEST_SOURCE_BASE})
-        list(APPEND DELIVERY_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/SecretSquirrel/test_suite/test_payload_delivery.cpp)
+        list(APPEND DELIVERY_TEST_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/modules/secretsquirrel/test_suite/test_payload_delivery.cpp)
         list(APPEND DELIVERY_TEST_HEADERS ${TEST_UTIL_HEADERS})
 
         cuda_add_executable(test_payload_delivery ${DELIVERY_TEST_SOURCES} ${DELIVERY_TEST_HEADERS})

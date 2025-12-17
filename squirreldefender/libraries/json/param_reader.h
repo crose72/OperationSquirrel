@@ -2,6 +2,7 @@
  * @file    param_reader.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Provide utilities for accessing parameters from a json file.
  ********************************************************************************/
 #ifndef JSON_UTILS_H
 #define JSON_UTILS_H
@@ -25,10 +26,12 @@ public:
     ParamReader(const std::string &filename);
     ~ParamReader();
 
-    float get_float_param(const std::string &group) const;
-    uint32_t get_uint32_param(const std::string &group) const;
-    int get_int_param(const std::string &group) const;
     bool get_bool_param(const std::string &group) const;
+    int get_int_param(const std::string &group) const;
+    uint8_t get_uint8_param(const std::string &path) const;
+    uint16_t get_uint16_param(const std::string &path) const;
+    uint32_t get_uint32_param(const std::string &group) const;
+    float get_float_param(const std::string &group) const;
     std::string get_string_param(const std::string &group) const;
 
 private:

@@ -4,12 +4,18 @@
  * @file    target_localization.cpp
  * @author  Cameron Rose
  * @date    1/22/2025
- * @brief   TargetLocalization the x, y, z offset of the target relative to the vehicle.
+ * @brief   Calculate the x, y, z offset of detected targets relative to the
+ *          drone in engineering units.  This module filters out unusable
+ *          bounding box measurements, converts usable measurements to an x, y,
+ *          z, distance.
  ********************************************************************************/
 
 /********************************************************************************
  * Includes
  ********************************************************************************/
+#include <cmath>
+#include <algorithm>
+
 #include "common_inc.h"
 #include "target_localization.h"
 #include "mav_data_hub.h"
@@ -21,8 +27,6 @@
 #include "time_calc.h"
 #include "kf.h"
 #include "timer.h"
-#include <cmath>
-#include <algorithm>
 
 /********************************************************************************
  * Typedefs
@@ -31,6 +35,7 @@
 /********************************************************************************
  * Private macros and defines
  ********************************************************************************/
+
 /* Max index of <DIM> based on <PARAM> */
 #define MAX_IDX_D_WIDTH 31
 #define MAX_IDX_D_HEIGHT 25
@@ -42,138 +47,158 @@
 /********************************************************************************
  * Object definitions
  ********************************************************************************/
-Timer target_data_useful_dbc;
-float g_tgt_los_dist_from_pix_height;
-float g_tgt_los_dist_from_pix_width;
-float g_tgt_pos_x_meas;
-float g_tgt_pos_y_meas;
-float g_tgt_pos_z_meas;
-float g_tgt_los_dist_meas;
-float g_cam0_delta_angle_rad; //
-float g_cam0_angle_rad;       // Angle of the camera relative to the ground, compensating for pitch
-float g_tgt_pos_x_delta;
-float g_tgt_pos_z_delta;
-float g_cam0_comp_angle_rad;
-float x_target_prv;
-float y_target_prv;
-bool y_target_hyst_actv;
-float y_target_latched;
-bool loc_target_valid_prv;
-bool g_tgt_meas_valid;
-float loc_target_center_x_prv;
-float loc_target_center_y_prv;
+
+// Target measurement state - raw and derived measurements from bounding boxes and vehicle attitude
+float g_tgt_los_dist_from_pix_height; // LOS distance estimate from bbox height
+float g_tgt_los_dist_from_pix_width;  // LOS distance estimate from bbox width
+float g_tgt_los_dist_meas;            // Final chosen LOS measurement
+
+float g_tgt_pos_x_meas; // Measured forward distance (m)
+float g_tgt_pos_y_meas; // Measured sideways distance (m)
+float g_tgt_pos_z_meas; // Measured vertical/drop distance (m)
+
+bool g_tgt_meas_valid = false; // Validity of current measurement
+bool g_tgt_lost = false;       // Target loss flag
+
+// Camera geometry and angles (runtime)
+float g_cam0_angle_rad;       // Camera angle relative to ground
+float g_cam0_comp_angle_rad;  // π/2 - tilt
+float g_cam0_delta_angle_rad; // Camera tilt + pitch
+float g_cam0_m_per_pix;       // Meters per pixel at current geometry
+float g_cam0_fov_height;      // Scene height in meters
+float g_cam0_los_m;           // Camera line-of-sight distance
+
+// Localization correction from tilt and pixel offsets
+float g_tgt_pos_x_delta; // X correction (tilt induced)
+float g_tgt_pos_z_delta; // Z correction (tilt induced)
+
+float g_tgt_cntr_offset_x_pix_filt; // Filtered horizontal pixel offset
+float g_tgt_cntr_offset_y_pix_filt; // Filtered vertical pixel offset
+float g_tgt_cntr_offset_x_m;        // Horizontal offset converted to meters
+
+// Filtering buffers (runtime)
+std::vector<float> tgt_cntr_offset_y_pix_hist;
+std::vector<float> tgt_cntr_offset_x_pix_hist;
+
+int tgt_cntr_offset_x_pix_hist_idx; // Circular buffer index
+int tgt_cntr_offset_y_pix_hist_idx;
+
+float tgt_cntr_offset_x_pix_hist_sum; // Running sums for moving average
+float tgt_cntr_offset_y_pix_hist_sum;
+
+// EKF runtime objects
+KF kf_tgt_loc;
+
+arma::mat kf_tgt_loc_A; // Transition matrix
+arma::mat kf_tgt_loc_B; // Control matrix
+arma::mat kf_tgt_loc_H; // Observation matrix
+arma::mat kf_tgt_loc_Q; // Process noise covariance
+arma::mat kf_tgt_loc_R; // Measurement noise covariance
+arma::mat kf_tgt_loc_P; // Error covariance
+
+arma::colvec kf_tgt_loc_x0; // Initial EKF state
+arma::colvec kf_tgt_loc_u0; // Control vector (unused)
+
+// EKF output estimates (runtime)
 float g_tgt_pos_x_est;
 float g_tgt_pos_y_est;
 float g_tgt_vel_x_est;
 float g_tgt_vel_y_est;
 float g_tgt_acc_x_est;
 float g_tgt_acc_y_est;
-float x_target_ekf_prv;
-float y_target_ekf_prv;
-float camera_comp_angle_abs;
-float g_cam0_fov_height;
-float g_cam0_m_per_pix;
-float g_tgt_cntr_offset_x_m;
-float g_cam0_los_m;
-static bool target_valid_prv;
-bool kf_loc_reset;
-bool target_data_useful_prv;
 
-// Buffers for moving average of target centroid
-std::vector<float> target_y_pix_hist4avg;
-std::vector<float> target_x_pix_hist4avg;
-int x_pix_window;
-int y_pix_window;
-float g_tgt_cntr_offset_x_pix_filt;
-float g_tgt_cntr_offset_y_pix_filt;
-int y_buffer_idx4avg;
-int x_buffer_idx4avg;
-float y_sum;
-float x_sum;
-
-KF kf_loc;           // Kalman Filter instance
-arma::mat A_loc;     // System dynamics matrix
-arma::mat B_loc;     // Control matrix (if needed, otherwise identity)
-arma::mat H_loc;     // Observation matrix
-arma::mat Q_loc;     // Process noise covariance
-arma::mat R_loc;     // Measurement noise covariance
-arma::mat P_loc;     // Estimate error covariance
-arma::colvec x0_loc; // Initial state
-arma::colvec u0_loc; // Observed initial measurements
-
+// Target loss timers (runtime)
+Timer tgt_lost_dbc;
 std::chrono::milliseconds g_target_lost_dbc_ms;
-std::chrono::milliseconds target_lost_dbc_reset_ms;
-float target_lost_dbc_reset_sec = (float)0.0;
-bool g_tgt_lost;
-bool target_is_lost_prv;
+
 float g_tgt_lost_dbc_sec;
+bool tgt_lost_prv;
+bool tgt_meas_valid_prv;
+
+// Previous-frame values
+float tgt_pos_x_meas_prv;
+float tgt_pos_y_meas_prv;
+
+bool tgt_valid_prv;
+
+float tgt_pos_x_est_prv;
+float tgt_pos_y_est_prv;
 
 /********************************************************************************
  * Calibration definitions
  ********************************************************************************/
+
+// Lookup tables for tilt-dependent forward/backward correction
 const float delta_offset_d[MAX_IDX_DELTA_D_OFFSET] = {
-    0.00f, 1.00f, 2.00f, 3.00f, 4.00f, 5.00f, 6.00f, 7.00f};
+    (float)0.0, (float)1.0, (float)2.0, (float)3.0,
+    (float)4.0, (float)5.0, (float)6.0, (float)7.0};
 
 const float delta_offset_pixels[MAX_IDX_DELTA_PIXEL_OFFSET] = {
-    0.00f, 50.00f, 100.00f, 150.00f, 200.00f, 250.00f, 300.00f, 350.00f};
+    (float)0.0, (float)50.0, (float)100.0, (float)150.0,
+    (float)200.0, (float)250.0, (float)300.0, (float)350.0};
 
-// Define the 2D array for target y values
 const float delta_offset[MAX_IDX_DELTA_PIXEL_OFFSET][MAX_IDX_DELTA_D_OFFSET] = {
-    {0.00f, 0.00f, 0.00f, 0.00f, 0.00f, 0.00f, 0.00f, 0.00f},
-    {0.00f, 0.08f, 0.11f, 0.15f, 0.20f, 0.27f, 0.30f, 0.40f},
-    {0.00f, 0.17f, 0.23f, 0.30f, 0.40f, 0.53f, 0.60f, 0.80f},
-    {0.00f, 0.25f, 0.34f, 0.45f, 0.60f, 0.80f, 0.90f, 1.20f},
-    {0.00f, 0.34f, 0.45f, 0.60f, 0.80f, 1.06f, 1.20f, 1.60f},
-    {0.00f, 0.42f, 0.56f, 0.75f, 1.00f, 1.33f, 1.50f, 2.00f},
-    {0.00f, 0.51f, 0.68f, 0.90f, 1.20f, 1.60f, 1.80f, 2.39f},
-    {0.00f, 0.59f, 0.79f, 1.05f, 1.40f, 1.86f, 2.10f, 2.79f}};
+    {(float)0.0, (float)0.0, (float)0.0, (float)0.0, (float)0.0, (float)0.0, (float)0.0, (float)0.0},
+    {(float)0.0, (float)0.08, (float)0.11, (float)0.15, (float)0.20, (float)0.27, (float)0.30, (float)0.40},
+    {(float)0.0, (float)0.17, (float)0.23, (float)0.30, (float)0.40, (float)0.53, (float)0.60, (float)0.80},
+    {(float)0.0, (float)0.25, (float)0.34, (float)0.45, (float)0.60, (float)0.80, (float)0.90, (float)1.20},
+    {(float)0.0, (float)0.34, (float)0.45, (float)0.60, (float)0.80, (float)1.06, (float)1.20, (float)1.60},
+    {(float)0.0, (float)0.42, (float)0.56, (float)0.75, (float)1.00, (float)1.33, (float)1.50, (float)2.00},
+    {(float)0.0, (float)0.51, (float)0.68, (float)0.90, (float)1.20, (float)1.60, (float)1.80, (float)2.39},
+    {(float)0.0, (float)0.59, (float)0.79, (float)1.05, (float)1.40, (float)1.86, (float)2.10, (float)2.79}};
 
-// Kalman filter params
-const float dt_kf_loc = 0.05;
+// EKF calibration
+const float kf_tgt_loc_dt = (float)0.05;
 
-// H_loc (Observation matrix, 2x6)
-float H_loc_00 = 1.0f;
-float H_loc_11 = 1.0f;
+float kf_tgt_loc_H_00 = (float)1.0;
+float kf_tgt_loc_H_11 = (float)1.0;
 
-// Q_loc (Process noise covariance diagonals, 6x6)
-float Q_loc_00 = 0.01f;
-float Q_loc_11 = 0.0001f;
-float Q_loc_22 = 0.00001f;
-float Q_loc_33 = 0.00001f;
-float Q_loc_44 = 0.00001f;
-float Q_loc_55 = 0.00001f;
+float kf_tgt_loc_Q_00 = (float)0.01;
+float kf_tgt_loc_Q_11 = (float)0.0001;
+float kf_tgt_loc_Q_22 = (float)0.00001;
+float kf_tgt_loc_Q_33 = (float)0.00001;
+float kf_tgt_loc_Q_44 = (float)0.00001;
+float kf_tgt_loc_Q_55 = (float)0.00001;
 
-// R_loc (Measurement noise covariance diagonals, 2x2)
-float R_loc_00 = 10.0f;
-float R_loc_11 = 40.0f;
+float kf_tgt_loc_R_00 = (float)10.0;
+float kf_tgt_loc_R_11 = (float)40.0;
 
-// P_loc (Estimate covariance diagonals, 6x6)
-float P_loc_00 = 0.1f;
-float P_loc_11 = 0.1f;
-float P_loc_22 = 0.1f;
-float P_loc_33 = 0.1f;
-float P_loc_44 = 0.1f;
-float P_loc_55 = 0.1f;
+float kf_tgt_loc_P_00 = (float)0.1;
+float kf_tgt_loc_P_11 = (float)0.1;
+float kf_tgt_loc_P_22 = (float)0.1;
+float kf_tgt_loc_P_33 = (float)0.1;
+float kf_tgt_loc_P_44 = (float)0.1;
+float kf_tgt_loc_P_55 = (float)0.1;
 
-const int n_states = 6;
-const int n_meas = 2;
-float known_obj_heigh_all_dist = (float)1.778; // Height of known object at all distances
-// Coefficients and power for the equation relating target height to distance
-// from the camera in the forward direction.  Equation solved so the input
-// is target size (bounding box in pixels) and output is target estimated
-// distance (in meters). The equation is: dist = (bbox dim / coef) ^ (1 / pow)
-float pix_height_x_coef = (float)1680.557;
-float pix_height_x_pow = (float)(-0.863);
-float pix_width_x = (float)540.456;
-float pix_width_x_pow = (float)(-0.758);
+const int kf_tgt_loc_n_states = (int)6;
+const int kf_tgt_loc_n_meas = (int)2;
+
+// LOS estimation calibration
+float tgt_los_known_height_m = (float)1.778;
+
+float tgt_los_pix_height_coef = (float)1680.557;
+float tgt_los_pix_height_pow = (float)-0.863;
+
+float tgt_los_pix_width_coef = (float)540.456;
+float tgt_los_pix_width_pow = (float)-0.758;
+
+// Target validation calibration
 float target_det_edge_of_frame_buffer = (float)50.0;
 float min_target_bbox_area = (float)3500.0;
+
+// Pixel-centroid smoothing window sizes (JSON-loaded)
+int tgt_cntr_offset_x_pix_hist_size = (int)1;
+int tgt_cntr_offset_y_pix_hist_size = (int)1;
+
+// Target lost debounce (JSON-loaded)
+float target_lost_dbc_reset_sec = (float)1.0;
+std::chrono::milliseconds target_lost_dbc_reset_ms = std::chrono::milliseconds((int)1000);
 
 /********************************************************************************
  * Function definitions
  ********************************************************************************/
 void get_localization_params(void);
-void init_kf_loc(void);
+void init_kf_target_loc(void);
 void calc_fov(void);
 void dtrmn_target_loc_img(void);
 void dtrmn_target_loc_real(void);
@@ -187,39 +212,39 @@ void get_localization_params(void)
 {
     ParamReader localization_params("../params.json");
 
-    // H_loc (Observation matrix, 2x6)
-    H_loc_00 = localization_params.get_float_param("target_loc_params.h_pos_x_00");
-    H_loc_11 = localization_params.get_float_param("target_loc_params.h_pos_y_11");
+    // kf_tgt_loc_H (Observation matrix, 2x6)
+    kf_tgt_loc_H_00 = localization_params.get_float_param("target_loc_params.h_pos_x_00");
+    kf_tgt_loc_H_11 = localization_params.get_float_param("target_loc_params.h_pos_y_11");
 
-    // Q_loc (Process noise covariance diagonals, 6x6)
-    Q_loc_00 = localization_params.get_float_param("target_loc_params.q_pos_x_00");
-    Q_loc_11 = localization_params.get_float_param("target_loc_params.q_pos_y_11");
-    Q_loc_22 = localization_params.get_float_param("target_loc_params.q_vel_x_22");
-    Q_loc_33 = localization_params.get_float_param("target_loc_params.q_vel_y_33");
-    Q_loc_44 = localization_params.get_float_param("target_loc_params.q_acc_x_44");
-    Q_loc_55 = localization_params.get_float_param("target_loc_params.q_acc_y_55");
+    // kf_tgt_loc_Q (Process noise covariance diagonals, 6x6)
+    kf_tgt_loc_Q_00 = localization_params.get_float_param("target_loc_params.q_pos_x_00");
+    kf_tgt_loc_Q_11 = localization_params.get_float_param("target_loc_params.q_pos_y_11");
+    kf_tgt_loc_Q_22 = localization_params.get_float_param("target_loc_params.q_vel_x_22");
+    kf_tgt_loc_Q_33 = localization_params.get_float_param("target_loc_params.q_vel_y_33");
+    kf_tgt_loc_Q_44 = localization_params.get_float_param("target_loc_params.q_acc_x_44");
+    kf_tgt_loc_Q_55 = localization_params.get_float_param("target_loc_params.q_acc_y_55");
 
-    // R_loc (Measurement noise covariance diagonals, 2x2)
-    R_loc_00 = localization_params.get_float_param("target_loc_params.r_pos_x_00");
-    R_loc_11 = localization_params.get_float_param("target_loc_params.r_pos_y_11");
+    // kf_tgt_loc_R (Measurement noise covariance diagonals, 2x2)
+    kf_tgt_loc_R_00 = localization_params.get_float_param("target_loc_params.r_pos_x_00");
+    kf_tgt_loc_R_11 = localization_params.get_float_param("target_loc_params.r_pos_y_11");
 
-    // P_loc (Estimate covariance diagonals, 6x6)
-    P_loc_00 = localization_params.get_float_param("target_loc_params.p_pos_x_00");
-    P_loc_11 = localization_params.get_float_param("target_loc_params.p_pos_y_11");
-    P_loc_22 = localization_params.get_float_param("target_loc_params.p_vel_x_22");
-    P_loc_33 = localization_params.get_float_param("target_loc_params.p_vel_y_33");
-    P_loc_44 = localization_params.get_float_param("target_loc_params.p_acc_x_44");
-    P_loc_55 = localization_params.get_float_param("target_loc_params.p_acc_y_55");
+    // kf_tgt_loc_P (Estimate covariance diagonals, 6x6)
+    kf_tgt_loc_P_00 = localization_params.get_float_param("target_loc_params.p_pos_x_00");
+    kf_tgt_loc_P_11 = localization_params.get_float_param("target_loc_params.p_pos_y_11");
+    kf_tgt_loc_P_22 = localization_params.get_float_param("target_loc_params.p_vel_x_22");
+    kf_tgt_loc_P_33 = localization_params.get_float_param("target_loc_params.p_vel_y_33");
+    kf_tgt_loc_P_44 = localization_params.get_float_param("target_loc_params.p_acc_x_44");
+    kf_tgt_loc_P_55 = localization_params.get_float_param("target_loc_params.p_acc_y_55");
 
     // Target centroid moving average and curve fit window sizes
-    x_pix_window = localization_params.get_int_param("target_loc_params.target_bbox_center_x_history_size");
-    y_pix_window = localization_params.get_int_param("target_loc_params.target_bbox_center_y_history_size");
+    tgt_cntr_offset_x_pix_hist_size = localization_params.get_int_param("target_loc_params.target_bbox_center_x_history_size");
+    tgt_cntr_offset_y_pix_hist_size = localization_params.get_int_param("target_loc_params.target_bbox_center_y_history_size");
 
-    pix_height_x_coef = localization_params.get_float_param("target_loc_params.target_los_height_eq_coef");
-    pix_height_x_pow = localization_params.get_float_param("target_loc_params.target_los_height_eq_pow");
-    pix_width_x = localization_params.get_float_param("target_loc_params.target_los_width_eq_coef");
-    pix_width_x_pow = localization_params.get_float_param("target_loc_params.target_los_width_eq_pow");
-    known_obj_heigh_all_dist = localization_params.get_float_param("target_loc_params.known_object_height_all_dist");
+    tgt_los_pix_height_coef = localization_params.get_float_param("target_loc_params.target_los_height_eq_coef");
+    tgt_los_pix_height_pow = localization_params.get_float_param("target_loc_params.target_los_height_eq_pow");
+    tgt_los_pix_width_coef = localization_params.get_float_param("target_loc_params.target_los_width_eq_coef");
+    tgt_los_pix_width_pow = localization_params.get_float_param("target_loc_params.target_los_width_eq_pow");
+    tgt_los_known_height_m = localization_params.get_float_param("target_loc_params.known_object_height_all_dist");
     target_det_edge_of_frame_buffer = localization_params.get_float_param("target_loc_params.target_bbox_min_dist_from_edge");
     min_target_bbox_area = localization_params.get_float_param("target_loc_params.target_bbox_min_area");
     int target_lost_dbc_reset_val = localization_params.get_float_param("target_loc_params.target_bbox_lost_min_time_ms");
@@ -228,13 +253,13 @@ void get_localization_params(void)
 }
 
 /********************************************************************************
- * Function: init_kf_loc
+ * Function: init_kf_target_loc
  * Description: Initialize kalman filter for target location estimation.
  ********************************************************************************/
-void init_kf_loc(void)
+void init_kf_target_loc(void)
 {
-    x_target_ekf_prv = 0.0;
-    y_target_ekf_prv = 0.0;
+    tgt_pos_x_est_prv = 0.0;
+    tgt_pos_y_est_prv = 0.0;
     g_tgt_pos_x_est = 0.0;
     g_tgt_pos_y_est = 0.0;
     g_tgt_vel_x_est = 0.0;
@@ -243,66 +268,66 @@ void init_kf_loc(void)
     g_tgt_acc_y_est = 0.0;
 
     // Resize matrices and set to zero initially
-    A_loc.set_size(n_states, n_states);
-    A_loc.zeros();
-    B_loc.set_size(n_states, 1);
-    B_loc.zeros();
-    H_loc.set_size(n_meas, n_states);
-    H_loc.zeros();
-    Q_loc.set_size(n_states, n_states);
-    Q_loc.zeros();
-    R_loc.set_size(n_meas, n_meas);
-    R_loc.zeros();
-    P_loc.set_size(n_states, n_states);
-    P_loc.zeros();
+    kf_tgt_loc_A.set_size(kf_tgt_loc_n_states, kf_tgt_loc_n_states);
+    kf_tgt_loc_A.zeros();
+    kf_tgt_loc_B.set_size(kf_tgt_loc_n_states, 1);
+    kf_tgt_loc_B.zeros();
+    kf_tgt_loc_H.set_size(kf_tgt_loc_n_meas, kf_tgt_loc_n_states);
+    kf_tgt_loc_H.zeros();
+    kf_tgt_loc_Q.set_size(kf_tgt_loc_n_states, kf_tgt_loc_n_states);
+    kf_tgt_loc_Q.zeros();
+    kf_tgt_loc_R.set_size(kf_tgt_loc_n_meas, kf_tgt_loc_n_meas);
+    kf_tgt_loc_R.zeros();
+    kf_tgt_loc_P.set_size(kf_tgt_loc_n_states, kf_tgt_loc_n_states);
+    kf_tgt_loc_P.zeros();
 
-    // Define system dynamics (State transition matrix A_loc)
-    A_loc << 1 << 0 << dt_kf_loc << 0 << 0.5 * pow(dt_kf_loc, 2) << 0 << arma::endr
-          << 0 << 1 << 0 << dt_kf_loc << 0 << 0.5 * pow(dt_kf_loc, 2) << arma::endr
-          << 0 << 0 << 1 << 0 << dt_kf_loc << 0 << arma::endr
-          << 0 << 0 << 0 << 1 << 0 << dt_kf_loc << arma::endr
-          << 0 << 0 << 0 << 0 << 1 << 0 << arma::endr
-          << 0 << 0 << 0 << 0 << 0 << 1 << arma::endr;
+    // Define system dynamics (State transition matrix kf_tgt_loc_A)
+    kf_tgt_loc_A << 1 << 0 << kf_tgt_loc_dt << 0 << 0.5 * pow(kf_tgt_loc_dt, 2) << 0 << arma::endr
+                 << 0 << 1 << 0 << kf_tgt_loc_dt << 0 << 0.5 * pow(kf_tgt_loc_dt, 2) << arma::endr
+                 << 0 << 0 << 1 << 0 << kf_tgt_loc_dt << 0 << arma::endr
+                 << 0 << 0 << 0 << 1 << 0 << kf_tgt_loc_dt << arma::endr
+                 << 0 << 0 << 0 << 0 << 1 << 0 << arma::endr
+                 << 0 << 0 << 0 << 0 << 0 << 1 << arma::endr;
 
     // Observation matrix (Only x and y are observed)
-    arma::mat H_loc = arma::zeros<arma::mat>(2, 6);
-    H_loc(0, 0) = H_loc_00;
-    H_loc(1, 1) = H_loc_11;
+    kf_tgt_loc_H = arma::zeros<arma::mat>(2, 6);
+    kf_tgt_loc_H(0, 0) = kf_tgt_loc_H_00;
+    kf_tgt_loc_H(1, 1) = kf_tgt_loc_H_11;
 
-    // Model covariance matrix Q_loc (process noise)
-    arma::mat Q_loc = arma::zeros<arma::mat>(6, 6);
-    Q_loc(0, 0) = Q_loc_00;
-    Q_loc(1, 1) = Q_loc_11;
-    Q_loc(2, 2) = Q_loc_22;
-    Q_loc(3, 3) = Q_loc_33;
-    Q_loc(4, 4) = Q_loc_44;
-    Q_loc(5, 5) = Q_loc_55;
+    // Model covariance matrix kf_tgt_loc_Q (process noise)
+    kf_tgt_loc_Q = arma::zeros<arma::mat>(6, 6);
+    kf_tgt_loc_Q(0, 0) = kf_tgt_loc_Q_00;
+    kf_tgt_loc_Q(1, 1) = kf_tgt_loc_Q_11;
+    kf_tgt_loc_Q(2, 2) = kf_tgt_loc_Q_22;
+    kf_tgt_loc_Q(3, 3) = kf_tgt_loc_Q_33;
+    kf_tgt_loc_Q(4, 4) = kf_tgt_loc_Q_44;
+    kf_tgt_loc_Q(5, 5) = kf_tgt_loc_Q_55;
 
-    // Measurement covariance matrix R_loc (sensor noise)
-    arma::mat R_loc = arma::zeros<arma::mat>(2, 2);
-    R_loc(0, 0) = R_loc_00;
-    R_loc(1, 1) = R_loc_11;
+    // Measurement covariance matrix kf_tgt_loc_R (sensor noise)
+    kf_tgt_loc_R = arma::zeros<arma::mat>(2, 2);
+    kf_tgt_loc_R(0, 0) = kf_tgt_loc_R_00;
+    kf_tgt_loc_R(1, 1) = kf_tgt_loc_R_11;
 
-    // Estimate covariance matrix P_loc (initial trust in the estimate)
-    arma::mat P_loc = arma::zeros<arma::mat>(6, 6);
-    P_loc(0, 0) = P_loc_00;
-    P_loc(1, 1) = P_loc_11;
-    P_loc(2, 2) = P_loc_22;
-    P_loc(3, 3) = P_loc_33;
-    P_loc(4, 4) = P_loc_44;
-    P_loc(5, 5) = P_loc_55;
+    // Estimate covariance matrix kf_tgt_loc_P (initial trust in the estimate)
+    kf_tgt_loc_P = arma::zeros<arma::mat>(6, 6);
+    kf_tgt_loc_P(0, 0) = kf_tgt_loc_P_00;
+    kf_tgt_loc_P(1, 1) = kf_tgt_loc_P_11;
+    kf_tgt_loc_P(2, 2) = kf_tgt_loc_P_22;
+    kf_tgt_loc_P(3, 3) = kf_tgt_loc_P_33;
+    kf_tgt_loc_P(4, 4) = kf_tgt_loc_P_44;
+    kf_tgt_loc_P(5, 5) = kf_tgt_loc_P_55;
 
     // Initialize Kalman Filter
-    kf_loc.InitSystem(A_loc, B_loc, H_loc, Q_loc, R_loc);
+    kf_tgt_loc.InitSystem(kf_tgt_loc_A, kf_tgt_loc_B, kf_tgt_loc_H, kf_tgt_loc_Q, kf_tgt_loc_R);
 
     // Set initial state (assuming stationary at origin)
-    x0_loc.set_size(n_states);
-    x0_loc.zeros(); // Start with zero velocity and acceleration
-    kf_loc.InitSystemState(x0_loc);
+    kf_tgt_loc_x0.set_size(kf_tgt_loc_n_states);
+    kf_tgt_loc_x0.zeros(); // Start with zero velocity and acceleration
+    kf_tgt_loc.InitSystemState(kf_tgt_loc_x0);
 
-    // Resize and reset u0_loc
-    u0_loc.set_size(n_meas);
-    u0_loc.zeros();
+    // Resize and reset kf_tgt_loc_u0
+    kf_tgt_loc_u0.set_size(kf_tgt_loc_n_meas);
+    kf_tgt_loc_u0.zeros();
 }
 
 /********************************************************************************
@@ -333,17 +358,17 @@ void calc_fov(void)
     // Height of a known object at given distance
     if (g_cam0_los_m > (float)0.0)
     {
-        float ghost_object_height = pix_height_x_coef * powf(g_cam0_los_m, pix_height_x_pow);
+        ghost_object_height = tgt_los_pix_height_coef * powf(g_cam0_los_m, tgt_los_pix_height_pow);
     }
     // How many meters a single pixel represents at the line of sight distance
     // TODO: When to use actual vs ghost object height?
     // Uses "ghost object" height - the height of the known object at the LOS distance
-    // g_cam0_m_per_pix = known_obj_heigh_all_dist / ghost_object_height;
+    // g_cam0_m_per_pix = tgt_los_known_height_m / ghost_object_height;
     // Currently gonna use the target actual height
     // Only compute m_per_pixel if we have a valid bbox height
     if (g_tgt_height_pix > (float)0.0f)
     {
-        g_cam0_m_per_pix = known_obj_heigh_all_dist / g_tgt_height_pix;
+        g_cam0_m_per_pix = tgt_los_known_height_m / g_tgt_height_pix;
         g_cam0_fov_height = g_cam0_m_per_pix * g_cam0_img_height_px;
     }
     else
@@ -368,10 +393,10 @@ void dtrmn_target_loc_img(void)
     // Only consider targets whose bounding boxes are not smashed against the
     // video frame, and at least a certain size (to prevent bad estimation)
     g_tgt_meas_valid = (g_tgt_valid &&
-                        (!(g_tgt_center_y_px < target_det_edge_of_frame_buffer ||
-                           g_tgt_center_y_px > (g_cam0_img_height_px - target_det_edge_of_frame_buffer)) &&
-                         !(g_tgt_center_x_px < target_det_edge_of_frame_buffer ||
-                           g_tgt_center_x_px > (g_cam0_img_width_px - target_det_edge_of_frame_buffer)) &&
+                        (!(g_tgt_cntr_y_px < target_det_edge_of_frame_buffer ||
+                           g_tgt_cntr_y_px > (g_cam0_img_height_px - target_det_edge_of_frame_buffer)) &&
+                         !(g_tgt_cntr_x_px < target_det_edge_of_frame_buffer ||
+                           g_tgt_cntr_x_px > (g_cam0_img_width_px - target_det_edge_of_frame_buffer)) &&
                          !((g_tgt_width_pix * g_tgt_height_pix) < min_target_bbox_area)));
 
     if (g_tgt_meas_valid)
@@ -379,9 +404,9 @@ void dtrmn_target_loc_img(void)
         g_target_lost_dbc_ms = (std::chrono::milliseconds)0;
         g_tgt_lost_dbc_sec = (float)0.0;
     }
-    else if (target_data_useful_prv && !g_tgt_meas_valid)
+    else if (tgt_meas_valid_prv && !g_tgt_meas_valid)
     {
-        target_data_useful_dbc.start(); // start timing the outage
+        tgt_lost_dbc.start(); // start timing the outage
     }
     else
     {
@@ -391,7 +416,7 @@ void dtrmn_target_loc_img(void)
 
 #else
 
-        g_target_lost_dbc_ms = target_data_useful_dbc.getDur(); // how long without a measurement we could use
+        g_target_lost_dbc_ms = tgt_lost_dbc.getDur(); // how long without a measurement we could use
 
 #endif
 
@@ -411,8 +436,8 @@ void dtrmn_target_loc_img(void)
     if (!g_tgt_lost)
     {
         // Moving average for more smoothing - modifies the history vector
-        g_tgt_cntr_offset_x_pix_filt = moving_average(target_x_pix_hist4avg, g_tgt_cntr_offset_x_pix, x_buffer_idx4avg, x_sum);
-        g_tgt_cntr_offset_y_pix_filt = moving_average(target_y_pix_hist4avg, g_tgt_cntr_offset_y_pix, y_buffer_idx4avg, y_sum);
+        g_tgt_cntr_offset_x_pix_filt = moving_average(tgt_cntr_offset_x_pix_hist, g_tgt_cntr_offset_x_pix, tgt_cntr_offset_x_pix_hist_idx, tgt_cntr_offset_x_pix_hist_sum);
+        g_tgt_cntr_offset_y_pix_filt = moving_average(tgt_cntr_offset_y_pix_hist, g_tgt_cntr_offset_y_pix, tgt_cntr_offset_y_pix_hist_idx, tgt_cntr_offset_y_pix_hist_sum);
 
         // Convert the offset to meters
         g_tgt_cntr_offset_x_m = g_tgt_cntr_offset_x_pix_filt * g_cam0_m_per_pix;
@@ -424,37 +449,56 @@ void dtrmn_target_loc_img(void)
         g_tgt_cntr_offset_x_m = (float)0.0;
     }
 
-    target_data_useful_prv = g_tgt_meas_valid;
+    tgt_meas_valid_prv = g_tgt_meas_valid;
 }
 
 /********************************************************************************
  * Function: dtrmn_target_loc_real
- * Description: Calculate the location of the target relative to the drone.
- *              First implementation will be relative to the camera, needs to use
- *              the center mass of the drone in the end though.
+ * Description:
+ *      Calculate the location of the target relative to the drone.
+ *      First implementation will be relative to the camera, needs to use
+ *      the center mass of the drone in the end though.
+ *
+ *      x is the forward distance from the drone - positive is in front of drone
+ *      y is the left to right distance from center- positive is to the right of
+ *          the drone
+ *      z is the veritcal distance below the drone
+ *
+ *      Steps:
+ *          1. Estimate LOS distance using model relating bbox size to distance.
+ *          2. Correct the estimate based on the camera's tilt angle (account for
+ *             drone pitch)
+ *          3. Apply corrections to LOS distance estimates
+ *          4. Convert pixel offset to y distance in meters
+ *
+ *      Larger bbox height/width means target is closer to the drone.
+ *      Cameras don't measure distance inherently - it is inferred from geometry
+ *
+ *      Why tilt matters:
+ *          When the drone pitches forward/back, the camera sees the same object
+ *          in a different part of the image, which changes the inferred
+ *          distance.
  ********************************************************************************/
 void dtrmn_target_loc_real(void)
 {
-    float d_idx_h;
-    float d_idx_w;
-    float y_idx_d;
-    float y_idx_pix;
     float delta_idx_d;
     float delta_idx_pix;
     float delta_d;
-    float target_bounding_box_rate;
+
+    g_tgt_pos_x_delta = (float)0.0;
+    g_tgt_pos_z_delta = (float)0.0;
 
     if (g_tgt_meas_valid && !g_tgt_lost)
     {
         /* Calculate distance from camera offset */
-        g_tgt_los_dist_from_pix_height = powf(g_tgt_height_pix / pix_height_x_coef, (float)1.0 / pix_height_x_pow);
-        g_tgt_los_dist_from_pix_width = powf(g_tgt_width_pix / pix_width_x, (float)1.0 / pix_width_x_pow);
+        g_tgt_los_dist_from_pix_height = powf(g_tgt_height_pix / tgt_los_pix_height_coef, (float)1.0 / tgt_los_pix_height_pow);
+        g_tgt_los_dist_from_pix_width = powf(g_tgt_width_pix / tgt_los_pix_width_coef, (float)1.0 / tgt_los_pix_width_pow);
 
-        if (g_tgt_aspect_ratio > 0.4f)
+        if (g_tgt_aspect_ratio > (float)0.4)
         {
             g_tgt_los_dist_meas = g_tgt_los_dist_from_pix_width;
         }
-        else if (g_tgt_los_dist_from_pix_height > 2.99f)
+        else if (g_tgt_los_dist_from_pix_height > (float)2.99)
         {
             g_tgt_los_dist_meas = g_tgt_los_dist_from_pix_height;
         }
@@ -511,13 +555,13 @@ void dtrmn_target_loc_real(void)
         offset of the center of the target to the side of the center of the video frame in pixels */
         g_tgt_pos_y_meas = g_cam0_m_per_pix * g_tgt_cntr_offset_x_pix;
 
-        if (g_tgt_cntr_offset_x_pix < 0.0f)
+        if (g_tgt_cntr_offset_x_pix < (float)0.0)
         {
             g_tgt_pos_y_meas = -g_tgt_pos_y_meas;
         }
 
-        x_target_prv = g_tgt_pos_x_meas;
-        y_target_prv = g_tgt_pos_y_meas;
+        tgt_pos_x_meas_prv = g_tgt_pos_x_meas;
+        tgt_pos_y_meas_prv = g_tgt_pos_y_meas;
     }
     else
     {
@@ -531,44 +575,48 @@ void dtrmn_target_loc_real(void)
         g_tgt_pos_z_delta = (float)0.0;
     }
 
-    loc_target_valid_prv = g_tgt_valid;
+    tgt_valid_prv = g_tgt_valid;
 }
 
 /********************************************************************************
  * Function: update_target_loc_real
- * Description: Update step in kalman filter.
+ * Description:
+ *      Smooth out the target position estimate by fusing bbox target distance
+ *      estimate with model based prediction.
+ *
+ *      Target assumed to move with constant acceleration kinematics model. This
+ *      removes jitter in the target x/y position estimates.
  ********************************************************************************/
 void update_target_loc_real(void)
 {
     if (g_tgt_meas_valid && !g_tgt_lost)
     {
-        if (target_is_lost_prv)
+        if (tgt_lost_prv)
         {
-            arma::colvec x0(n_states, arma::fill::zeros);
+            arma::colvec x0(kf_tgt_loc_n_states, arma::fill::zeros);
             x0(0) = g_tgt_pos_x_meas; // pos x
             x0(1) = g_tgt_pos_y_meas; // pos y
             // vx, vy, ax, ay left at 0
 
-            kf_loc.InitSystemState(x0);
-            kf_loc_reset = true;
+            kf_tgt_loc.InitSystemState(x0);
         }
 
         // Measurement vector (observations)
-        colvec z(2);
+        arma::colvec z(2);
         z << g_tgt_pos_x_meas << g_tgt_pos_y_meas;
 
-        // Define the system transition matrix A_loc (discretized)
-        // TODO: update the state transition matrix A_loc
+        // Define the system transition matrix kf_tgt_loc_A (discretized)
+        // TODO: update the state transition matrix kf_tgt_loc_A
         // Ensure g_app_dt is valid (std::isnan(g_app_dt) || std::isinf(g_app_dt) || g_app_dt <= 0)
 
         // No external control input for now
-        colvec u(1, fill::zeros);
+        arma::colvec u(1, arma::fill::zeros);
 
         // Perform Kalman filter update
-        kf_loc.Kalmanf(z, u);
+        kf_tgt_loc.Kalmanf(z, u);
 
         // Retrieve the updated state
-        colvec *state = kf_loc.GetCurrentEstimatedState();
+        arma::colvec *state = kf_tgt_loc.GetCurrentEstimatedState();
         g_tgt_pos_x_est = state->at(0);
         g_tgt_pos_y_est = state->at(1);
         g_tgt_vel_x_est = state->at(2);
@@ -587,7 +635,7 @@ void update_target_loc_real(void)
         g_tgt_acc_y_est = (float)0.0;
     }
 
-    target_is_lost_prv = g_tgt_lost;
+    tgt_lost_prv = g_tgt_lost;
 };
 
 /********************************************************************************
@@ -598,55 +646,24 @@ TargetLocalization::~TargetLocalization(void) {};
 
 /********************************************************************************
  * Function: init
- * Description: Initialize all TargetLocalization target variables.  Run once at the start
- *              of the program.
+ * Description: Initialize localization variables
  ********************************************************************************/
 bool TargetLocalization::init(void)
 {
     get_localization_params();
-    init_kf_loc();
+    init_kf_target_loc();
 
-    g_tgt_los_dist_from_pix_height = (float)0.0;
-    g_tgt_los_dist_from_pix_width = (float)0.0;
-    g_tgt_pos_x_meas = (float)0.0;
-    g_tgt_pos_y_meas = (float)0.0;
-    g_tgt_pos_z_meas = (float)0.0;
-    g_tgt_los_dist_meas = (float)0.0;
-    g_cam0_delta_angle_rad = (float)0.0;
-    g_cam0_angle_rad = (float)0.0;
-    g_tgt_pos_x_delta = (float)0.0;
-    g_tgt_pos_z_delta = (float)0.0;
-    g_cam0_comp_angle_rad = (float)0.0;
-    x_target_prv = (float)0.0;
-    y_target_prv = (float)0.0;
-    loc_target_valid_prv = false;
-    g_tgt_meas_valid = false;
-    camera_comp_angle_abs = (float)0.0;
-    g_cam0_fov_height = (float)0.0;
     g_cam0_m_per_pix = (float)0.00001;
-    g_tgt_cntr_offset_x_m = (float)0.0;
-    target_y_pix_hist4avg.assign(y_pix_window, (float)0.0);
-    target_x_pix_hist4avg.assign(x_pix_window, (float)0.0);
-    g_tgt_cntr_offset_x_pix_filt = (float)0.0;
-    g_tgt_cntr_offset_y_pix_filt = (float)0.0;
-    y_buffer_idx4avg = (int)0;
-    y_sum = (float)0.0;
-    x_buffer_idx4avg = (int)0;
-    x_sum = (float)0.0;
-    g_cam0_los_m = (float)0.0;
-    target_valid_prv = false;
-    kf_loc_reset = false;
-    g_tgt_lost = false;
-    target_is_lost_prv = false;
-    target_data_useful_prv = false;
+    tgt_cntr_offset_y_pix_hist.assign(tgt_cntr_offset_y_pix_hist_size, (float)0.0);
+    tgt_cntr_offset_x_pix_hist.assign(tgt_cntr_offset_x_pix_hist_size, (float)0.0);
 
     return true;
 }
 
 /********************************************************************************
  * Function: loop
- * Description: Return control parameters for the vehicle to TargetLocalization a designated
- *              target at a distance.
+ * Description: Process tracked/detected targets and locate them in engineering
+ *              units.
  ********************************************************************************/
 void TargetLocalization::loop(void)
 {

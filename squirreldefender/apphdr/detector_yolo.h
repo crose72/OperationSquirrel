@@ -1,10 +1,13 @@
 #ifdef ENABLE_CV
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WIN) || defined(BLD_WSL)
 
 /********************************************************************************
- * @file    detect_target_yolo.h
+ * @file    detector_yolo.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   YOLO-based object detection using TensorRT or ONNXRuntime depending
+ *          on platform. This module manages initialization, inference, and
+ *          shutdown of the YOLO engine through a static namespace-style class.
  ********************************************************************************/
 #ifndef DETECT_TARGET_YOLO_H
 #define DETECT_TARGET_YOLO_H
@@ -12,23 +15,24 @@
 /********************************************************************************
  * Includes
  ********************************************************************************/
-#include "YOLOv8.h"
 #include <vector>
+
+#include "YOLOv8.h"
 
 /********************************************************************************
  * Exported objects
  ********************************************************************************/
-#if defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WSL)
+#if defined(BLD_JETSON_ORIN) || defined(BLD_WSL)
 
+// Native linux supports TensorRT based inference
 extern std::vector<Object> g_det_yolo_list;
 extern int g_det_count;
-;
 
 #elif defined(BLD_WIN)
 
+// Windows uses ONNXRuntime based inference
 extern std::vector<YoloNet::detection> g_det_yolo_list;
 extern int g_det_count;
-;
 
 #else
 
@@ -40,11 +44,11 @@ extern int g_det_count;
  * Function prototypes and Class Definitions
  ********************************************************************************/
 
-class YOLO
+class DetectorYOLO
 {
 public:
-    YOLO(void);
-    ~YOLO(void);
+    DetectorYOLO();
+    ~DetectorYOLO();
 
     static bool init(void);
     static void loop(void);
@@ -55,5 +59,5 @@ private:
 
 #endif // DETECT_TARGET_YOLO_H
 
-#endif // defined(BLD_JETSON_ORIN_NANO) || defined(BLD_WIN)
+#endif // defined(BLD_JETSON_ORIN) || defined(BLD_WIN) || defined(BLD_WSL)
 #endif // ENABLE_CV

@@ -1,6 +1,8 @@
 /********************************************************************************
  * @file    timer.h
+ * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Utilities for timing calculations.
  ********************************************************************************/
 #ifndef TIMER_H
 #define TIMER_H

@@ -4,6 +4,3 @@
 [submodule "squirreldefender/modules/trtinfer"]
 	path = squirreldefender/modules/trtinfer
 	url = https://github.com/crose72/trtinfer.git
-[submodule "squirreldefender/modules/mcap"]
-	path = squirreldefender/modules/mcap
-	url = https://github.com/crose72/mcap_builder.git

@@ -4,6 +4,10 @@
  * @file    target_tracking.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   Extracts and maintains per-frame tracking information for the target,
+ *          including bounding-box geometry, pixel offsets, class ID, and
+ *          confidence. Acts as a lightweight tracking layer between detection
+ *          and localization.
  ********************************************************************************/
 #ifndef TRACK_TARGET_H
 #define TRACK_TARGET_H
@@ -27,8 +31,8 @@ extern float g_tgt_left_px;
 extern float g_tgt_right_px;
 extern float g_tgt_top_px;
 extern float g_tgt_bottom_px;
-extern float g_tgt_center_y_px;
-extern float g_tgt_center_x_px;
+extern float g_tgt_cntr_y_px;
+extern float g_tgt_cntr_x_px;
 extern float g_tgt_class_id;
 extern float g_tgt_conf;
 

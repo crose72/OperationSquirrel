@@ -4,6 +4,9 @@
  * @file    target_detection.h
  * @author  Cameron Rose
  * @date    1/22/2025
+ * @brief   High-level target detection arbitration that selects and manages the
+ *          appropriate detection backend (YOLO or SSD). Provides a unified
+ *          interface for initialization, inference, and shutdown.
  ********************************************************************************/
 #ifndef DETECT_TARGET_H
 #define DETECT_TARGET_H
@@ -12,8 +15,8 @@
  * Includes
  ********************************************************************************/
 #include "common_inc.h"
-#include "detect_target_yolo.h"
-#include "detect_target_nv.h"
+#include "detector_yolo.h"
+#include "detector_ssd.h"
 
 /********************************************************************************
  * Exported objects

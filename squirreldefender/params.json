@@ -1,4 +1,8 @@
 {
+  "system_params": {
+    "min_flight_alt_cm": 100,
+    "min_flight_alt_mm": 1000
+  },
   "mission_params": {
     "takeoff_alt_m": 7.3,
     "min_mission_alt_cm": 550,
@@ -82,17 +86,18 @@
       "kd": 0.0
     },
     "pid_yaw_forward": {
-      "kp": 0.024,
+      "kp": 0.048,
       "ki": 0.0,
       "kd": 0.015
     },
     "pid_yaw_reverse": {
-      "kp": 0.024,
+      "kp": 0.048,
       "ki": 0.0,
       "kd": 0.015
     },
-    "follow_dist_x_m": 10.0,
-    "follow_dist_y_m": 0.0,
+    "yaw_deadband_thresh": 50.0,
+    "des_follow_dist_x_m": 10.0,
+    "des_follow_dist_y_m": 0.0,
     "follow_dist_z_m": 0.0,
     "follow_dist_error_dot_filt_coef": 0.8,
     "max_velocity_mps": 10.0,
@@ -101,15 +106,16 @@
     "velocity_ff_brake_gain": -1.0
   },
   "camera_params": {
+    "sensor_id": 0,
     "sensor_mode": 0,
     "wb_mode": 1,
-    "ae_antibanding_mode": 2,
+    "ae_antibanding_mode": 0,
     "tnr_mode": 0,
     "ee_mode": 0,
     "exposure_min": 2000,
     "exposure_max": 8000000,
     "gain_min": 1.0,
-    "gain_max": 4.0,
+    "gain_max": 2.0,
     "isp_dgain_min": 1.0,
     "isp_dgain_max": 1.0,
     "input_format": "NV12",

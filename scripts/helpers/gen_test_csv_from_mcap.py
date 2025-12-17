@@ -50,36 +50,14 @@ import Common_pb2, Detection_pb2, Mavlink_pb2, Control_pb2, System_pb2, Target_p
 TOPICS = {
     "/system/state": System_pb2.SystemStateMsg,
     "/target/detection": Target_pb2.TargetDetection,
+    "/target/state": Target_pb2.TargetState,
     "/control/output": Control_pb2.ControlOutput,
     "/mav/system": Mavlink_pb2.MavSystem,
     "/mav/kinematics": Mavlink_pb2.MavKinematics,
-    "/mav/imu": Mavlink_pb2.MavImuRaw,
+    "/mav/imu": Mavlink_pb2.MavImu,
     "/mav/rangefinder": Mavlink_pb2.MavRangefinder,
     "/mav/flow": Mavlink_pb2.MavOpticalFlow,
     "/detection/objects": Detection_pb2.Objects,
-}
-
-# --------------------------------------------------------------------------
-# ⚙️ Signals to be converted from deg -> rad
-# --------------------------------------------------------------------------
-RAD_PER_DEG = math.pi / 180.0
-
-# Convert selected degree fields → radians
-DEGREE_FIELDS_TO_CONVERT = {
-    # TargetDetection
-    "delta_angle_deg",
-    "camera_tilt_deg",
-
-    # MavKinematics
-    "roll",
-    "pitch",
-    "yaw",
-    "rollspeed",
-    "pitchspeed",
-    "yawspeed",
-    "roll_rate_actual",
-    "pitch_rate_actual",
-    "yaw_rate_actual",
 }
 
 # --------------------------------------------------------------------------
@@ -94,6 +72,23 @@ TOPIC_CONFIG = {
         "g_system_state": "system_state",
     },
 
+    "/target/state": {
+        "g_cam0_delta_angle_deg": "delta_angle_deg",
+        "g_cam0_tilt_deg": "camera_tilt_deg",
+
+        "g_tgt_pos_x_delta": "delta_distance_x_m",
+        "g_tgt_pos_z_delta": "delta_distance_z_m",
+
+        "g_tgt_pos_x_est": "pos_x_est",
+        "g_tgt_pos_y_est": "pos_y_est",
+        "g_tgt_vel_x_est": "vel_x_est",
+        "g_tgt_vel_y_est": "vel_y_est",
+        "g_tgt_acc_x_est": "acc_x_est",
+        "g_tgt_acc_y_est": "acc_y_est",
+
+        "g_tgt_meas_valid": "is_measurement_valid",
+    },
+
     "/target/detection": {
         "g_tgt_valid": "is_target_detected",
         "g_tgt_detect_id": "detection_id",
@@ -101,9 +96,9 @@ TOPIC_CONFIG = {
         "g_tgt_class_id": "class_id",
         "g_tgt_conf": "confidence",
 
-        # Bounding box geometry
-        "g_tgt_cntr_offset_x_pix": "bbox_offset_x_px",
-        "g_tgt_cntr_offset_y_pix": "bbox_offset_y_px",
+        # Raw bbox geometry
+        "g_tgt_cntr_offset_x_pix": "bbox_center_offset_x_px_raw",
+        "g_tgt_cntr_offset_y_pix": "bbox_center_offset_y_px_raw",
         "g_tgt_height_pix": "bbox_height_px",
         "g_tgt_width_pix": "bbox_width_px",
         "g_tgt_aspect_ratio": "bbox_aspect_ratio",
@@ -112,39 +107,23 @@ TOPIC_CONFIG = {
         "g_tgt_top_px": "bbox_top_px",
         "g_tgt_bottom_px": "bbox_bottom_px",
 
-        # Center (filtered)
-        "g_tgt_cntr_offset_x_pix_filt": "bbox_center_x_px",
-        "g_tgt_cntr_offset_y_pix_filt": "bbox_center_y_px",
-
-        # EKF / deltas
-        "g_cam0_delta_angle_deg": "delta_angle_deg",
-        "g_cam0_tilt_deg": "camera_tilt_deg",
-        "g_tgt_pos_x_delta": "delta_distance_x_m",
-        "g_tgt_pos_z_delta": "delta_distance_z_m",
-
-        # EKF-estimated state (positions / velocities / accelerations)
-        "g_tgt_pos_x_est": "pos_x_est",
-        "g_tgt_pos_y_est": "pos_y_est",
-        "g_tgt_vel_x_est": "vel_x_est",
-        "g_tgt_vel_y_est": "vel_y_est",
-        "g_tgt_acc_x_est": "acc_x_est",
-        "g_tgt_acc_y_est": "acc_y_est",
-
-        # Data validity
-        "g_tgt_meas_valid": "is_measurement_valid",
+        # Filtered offsets
+        "g_tgt_cntr_offset_x_pix_filt": "bbox_center_offset_x_px_filt",
+        "g_tgt_cntr_offset_y_pix_filt": "bbox_center_offset_y_px_filt",
     },
 
     "/control/output": {
         "g_tgt_too_close": "is_target_too_close",
         "g_pos_err_x": "pos_error_x_m",
         "g_pos_err_y": "pos_error_y_m",
-        "g_ctrl_vel_x_cmd": "cmd_vel_x_mps",
-        "g_ctrl_vel_y_cmd": "cmd_vel_y_mps",
-        "g_ctrl_vel_z_cmd": "cmd_vel_z_mps",
         "g_yaw_err": "yaw_error",
         "g_veh_yaw_playback_adj": "yaw_playback",
         "g_ctrl_yaw_tgt": "yaw_target",
-        "g_ctrl_yaw_cmd": "cmd_yawrate_rps",
+
+        "g_ctrl_vel_x_cmd": "cmd_vel_x_mps",
+        "g_ctrl_vel_y_cmd": "cmd_vel_y_mps",
+        "g_ctrl_vel_z_cmd": "cmd_vel_z_mps",
+        "g_ctrl_yaw_cmd": "cmd_yaw_rad",
     },
 
     # MAVLink system/status
@@ -167,7 +146,7 @@ TOPIC_CONFIG = {
         "g_mav_gps_vel_x": "gps_vx",
         "g_mav_gps_vel_y": "gps_vy",
         "g_mav_gps_vel_z": "gps_vz",
-        "g_mav_gps_heading_deg": "gps_hdg",
+        "g_mav_gps_heading_cdeg": "gps_hdg",
 
         # Orientation (Euler)
         "g_mav_veh_roll_rad": "roll",
@@ -219,7 +198,7 @@ TOPIC_CONFIG = {
 
     # MAVLink rangefinder
     "/mav/rangefinder": {
-        "g_mav_rngfndr_dist_m": "current_distance",
+        "g_mav_rngfndr_dist_cm": "current_distance",
         "g_mav_rngfndr_quality": "signal_quality",
     },
 
@@ -260,7 +239,7 @@ def flatten(msg, prefix=""):
 # --------------------------------------------------------------------------
 def process_mcap(input_mcap: str):
     """Read one .mcap file, extract selected data, and export it to CSV."""
-    output_csv = os.path.splitext(input_mcap)[0] + "_test.csv"
+    output_csv = os.path.splitext(input_mcap)[0] + ".csv"
     print(f"\n🧩 Processing {input_mcap} → {output_csv}")
 
     # Step 1: Parse every message from the MCAP log.
@@ -279,16 +258,6 @@ def process_mcap(input_mcap: str):
             msg.ParseFromString(message.data)
             # Flatten into a dict of {field_name: value}
             data = flatten(msg)
-
-            # Convert degrees → radians for known angular fields
-            for key in list(data.keys()):
-                field_name = key.split(".")[-1]  # handle nested fields like x.y.z
-                if field_name in DEGREE_FIELDS_TO_CONVERT:
-                    try:
-                        data[key] = float(data[key]) * RAD_PER_DEG
-                    except:
-                        pass
-
 
             # Record the timestamp (ns since epoch) and topic.
             data["timestamp_ns"] = message.log_time
@@ -335,10 +304,30 @@ def process_mcap(input_mcap: str):
 # 🚀 Main
 # --------------------------------------------------------------------------
 if __name__ == "__main__":
+
+    # The bash wrapper passes exactly ONE argument:
+    # either a file OR a directory
+    if len(sys.argv) < 2:
+        sys.exit("❌ No path to mcap files provided.")
+
+    input_path = sys.argv[1]
+
+    # Expand folder → list of .mcap files
     files = []
-    for arg in sys.argv[1:]:
-        files.extend(glob.glob(arg))
-    if not files:
-        sys.exit("❌ No MCAP files provided.")
+    if os.path.isdir(input_path):
+        files = sorted(glob.glob(os.path.join(input_path, "*.mcap")))
+        if not files:
+            sys.exit(f"❌ No .mcap files found in directory: {input_path}")
+    elif os.path.isfile(input_path):
+        if not input_path.endswith(".mcap"):
+            sys.exit(f"❌ Input file is not an .mcap: {input_path}")
+        files = [input_path]
+    else:
+        sys.exit("❌ Input path is neither a file nor a directory.")
+
+    print(f"📁 Found {len(files)} MCAP file(s) to process.")
+
     for f in files:
         process_mcap(f)
+
+    print("\n🎉 All MCAPs processed successfully.\n")
