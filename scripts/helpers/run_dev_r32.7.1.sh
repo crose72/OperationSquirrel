@@ -1,5 +1,5 @@
 # Ensure ${OS_WS} is defined
-docker pull crose72/os-dev:jetson-inference-r32.7.1-latest
+docker pull crose72/os-dev:jetson-inference-r32.7.1-latest-test
 sudo docker run --runtime nvidia -it --rm --network host \
   --privileged --ipc=host \
   --env DISPLAY=$DISPLAY \
@@ -26,14 +26,17 @@ sudo docker run --runtime nvidia -it --rm --network host \
   --device /dev/nvhost-isp \
   --device /dev/ttyUSB0 \
   --device /dev/ttyTHS1 \
+  --volume /usr/src/tensorrt:/usr/src/tensorrt \
+  --volume /usr/include/aarch64-linux-gnu:/usr/include/aarch64-linux-gnu \
+  --volume /usr/lib/aarch64-linux-gnu:/usr/lib/aarch64-linux-gnu \
   --volume /proc/device-tree:/proc/device-tree:ro \
   --volume /dev:/dev \
   --volume /tmp/.X11-unix:/tmp/.X11-unix \
   --volume /tmp/argus_socket:/tmp/argus_socket \
   --volume /usr/lib/aarch64-linux-gnu/tegra:/usr/lib/aarch64-linux-gnu/tegra \
   --volume ${OS_WS}/operationsquirrel/squirreldefender:/workspace/operationsquirrel/squirreldefender \
-  --volume ${OS_WS}/YOLOv8-TensorRT-CPP:/workspace/YOLOv8-TensorRT-CPP \
+  --volume ${OS_WS}/trtinfer:/workspace/trtinfer \
   --name squirreldefender-dev \
-  crose72/os-dev:jetson-inference-r32.7.1-latest \
-  bash -c "cd /workspace/operationsquirrel/squirreldefender/build \
+  crose72/os-dev:jetson-inference-r32.7.1-latest-test \
+  bash -c "cd /workspace/trtinfer/ \
     && exec bash"
