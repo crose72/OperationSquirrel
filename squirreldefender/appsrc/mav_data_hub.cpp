@@ -659,7 +659,7 @@ void proc_mav_unknown(const mavlink_message_t *msg)
 {
 #ifdef DEBUG_BUILD
 
-    printf("Received message with ID: %u\n", msg.msgid);
+    printf("Received message with ID: %u\n", msg->msgid);
 
 #endif // DEBUG_BUILD
 }
