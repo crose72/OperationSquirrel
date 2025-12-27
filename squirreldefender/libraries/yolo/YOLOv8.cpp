@@ -20,7 +20,8 @@ YOLOv8::YOLOv8(const std::string &trtModelPath, const Config &config)
       mSegThreshold(config.segmentationThreshold),
       mClassNames(config.classNames),
       mNumKPS(config.numKPS),
-      mKPSThresh(config.kpsThreshold)
+      mKPSThresh(config.kpsThreshold),
+      mNumClasses(config.classNames.size())
 {
     if (!trtModelPath.empty())
     {

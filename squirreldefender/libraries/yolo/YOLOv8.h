@@ -137,10 +137,10 @@ private:
     std::vector<float> mAspectScaleFactors;
 
     // Common parameters
-    const float mDetectionThreshold;
-    const float mNMSThreshold = (float)0.65; // Non-maximum suppression threshold
-    const int mTopK = 100;                   // Max number of detected objects to return
-    int mNumClasses = 80;                    // default for COCO dataset
+    float mDetectionThreshold;
+    float mNMSThreshold; // Non-maximum suppression threshold
+    int mTopK;           // Max number of detected objects to return
+    int mNumClasses;     // default for COCO dataset
 
     // Object classes as strings
     const std::vector<std::string> mClassNames;
@@ -152,12 +152,12 @@ private:
     int mSegChannels;
     int mSegHeight;
     int mSegWidth;
-    const float mSegThreshold;
+    float mSegThreshold;
 
     // Pose estimation parameters
     int mNumPoseAnchorFeatures = 56; // default for pose estimation
-    const int mNumKPS;
-    const float mKPSThresh;
+    int mNumKPS;
+    float mKPSThresh;
 
     // Color list for drawing objects
     const std::vector<std::vector<float>> mColorList = {{1, 1, 1},
